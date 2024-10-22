@@ -1,0 +1,3 @@
+﻿Install-Module -Name PS2EXE -Scope CurrentUser
+ps2exe "C:\Users\jason.lamb\OneDrive - middough\General - IT Operations\PowerShell\new hire AD create.ps1" "C:\temp\new hire AD create.exe" -noConsole -iconFile "C:\Users\jason.lamb\OneDrive - middough\General - IT Operations\PowerShell\jasonlamb_me-favicon.ico"
+
