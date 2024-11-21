@@ -2,7 +2,7 @@
 Import-Module ActiveDirectory
 
 # Define the username you want to check
-$username = "matt.bedee"
+$username = "ols"
 
 # Get the user's account details
 $user = Get-ADUser -Identity $username -Properties "msDS-UserPasswordExpiryTimeComputed"
