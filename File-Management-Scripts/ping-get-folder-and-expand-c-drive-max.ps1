@@ -1,9 +1,11 @@
 ﻿# Define the list of computers
-$computers = @('nerdio0924-2d07', 'nerdio0924-6af1', 'nerdio0924-debe', 'nerdio0924-f2f7', 'nerdio0924-f39c')  # Replace with actual computer names
+$computers = @('nerdio0924-2d07', 'nerdio0924-3511', 'nerdio0924-6af1',  'nerdio0924-be0c', 'nerdio0924-debe'  )  # Replace with actual computer names
 
-<#foreach ($computer in $computers) {
+<#
+foreach ($computer in $computers) {
     # Ping the computer
     $ping = Test-Connection -ComputerName $computer -Count 1 -Quiet
+    #Test-Connection -ComputerName $computer -Count 1 -Quiet
 
     if ($ping) {
         # If the ping is successful, run Get-ChildItem on C:\temp
@@ -11,6 +13,18 @@ $computers = @('nerdio0924-2d07', 'nerdio0924-6af1', 'nerdio0924-debe', 'nerdio0
             Invoke-Command -ComputerName $computer -ScriptBlock {
                 # Get the list of files in C:\temp
                 Get-ChildItem -Path C:\temp
+             <#
+                # get the disk space
+$diskSpace = Get-WmiObject Win32_LogicalDisk -Filter "DeviceID='C:'" | Select-Object Size, FreeSpace
+# Convert disk space to GB
+$diskSpaceGB = [PSCustomObject]@{
+    SizeGB      = [math]::Round($diskSpace.Size / 1GB, 2)
+    FreeSpaceGB = [math]::Round($diskSpace.FreeSpace / 1GB, 2)
+}
+
+# Display the disk space in GB
+$diskSpaceGB | Format-Table -AutoSize -Wrap
+#>
             } -ErrorAction Stop
         }
         catch {
@@ -22,8 +36,10 @@ $computers = @('nerdio0924-2d07', 'nerdio0924-6af1', 'nerdio0924-debe', 'nerdio0
         # If the ping fails, output a message
         Write-Host "$computer is not reachable."
     }
+    #>
 }
-#>
+
+
 
 # Run the command on each computer
 Invoke-Command -ComputerName $computers -ScriptBlock {
@@ -54,3 +70,4 @@ Invoke-Command -ComputerName $computers -ScriptBlock {
         "Error occurred on $($env:COMPUTERNAME): $_"
     }
 }
+
