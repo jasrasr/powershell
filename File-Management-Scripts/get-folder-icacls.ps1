@@ -1,8 +1,8 @@
 # Get folder permissions using icacls
 
 # Define folder paths
-$projectFolderPath = '\\middough.local\corp\data\proj\!newprojecttemplate-BIM'
-$clientFolderPath = '\\middough.local\corp\data\proj\!newclienttemplate'
+$projectFolderPath = '\\${domain}.local\corp\data\proj\!newprojecttemplate-BIM'
+$clientFolderPath = '\\${domain}.local\corp\data\proj\!newclienttemplate'
 
 # Array of folder paths to process
 $folders = @($projectFolderPath, $clientFolderPath)
@@ -13,21 +13,21 @@ foreach ($folder in $folders) {
 
         # Get only directories (folders) and process them
         Get-ChildItem -Path $folder -Directory -Recurse | ForEach-Object {
-            icacls $_.FullName | out-file "C:\users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-Private\File-Management-Scripts\n drive client and folder icacls1.txt" -Append
+            icacls $_.FullName | out-file "C:\users\${usernmae}\OneDrive - ${domain}\Documents\GitHub\PowerShell-Private\File-Management-Scripts\n drive client and folder icacls1.txt" -Append
         }
     } else {
         Write-Host "The specified folder path does not exist: $folder" -ForegroundColor Red
     }
 }
-notepad "C:\users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-Private\File-Management-Scripts\n drive client and folder icacls.txt"
+notepad "${onedrivepath}\Documents\GitHub\PowerShell-Private\File-Management-Scripts\n drive client and folder icacls.txt"
 
 $files = @(
-    'C:\users\jason.lamb\OneDrive - middough\Documents\GitHub\robocopy Logs\clean\robocopy-2025-03-31-12-58-44.log',
-    'C:\users\jason.lamb\OneDrive - middough\Documents\GitHub\robocopy Logs\clean\largerobocopy-clean1-clean.log'
+    '${onedrivepath}\Documents\GitHub\robocopy Logs\clean\robocopy-2025-03-31-12-58-44.log',
+    '${onedrivepath}\Documents\GitHub\robocopy Logs\clean\largerobocopy-clean1-clean.log'
 )
 
 
-$logFilePath = "C:\users\jason.lamb\OneDrive - middough\Documents\GitHub\robo"
+$logFilePath = "${onedrivepath}\Documents\GitHub\robo"
 if (Test-Path $logFilePath) {
     $lineCount = (Get-Content $logFilePath).Count
     $fileSizeBytes = (Get-Item $logFilePath).Length

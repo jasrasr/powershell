@@ -1,7 +1,7 @@
 import-module dsinternals
-$server = 'cledc1'
-$weakpasswordsfilepath = 'C:\Users\jason.lamb\OneDrive - middough\Downloads\weakpasswords.txt'
-$results = (get-adreplaccount -all -server $server | Test-ADPasswordQuality -weakpasswordsfile $weakpasswordsfilepath | Tee-Object -FilePath C:\temp\middoughpasswordsreport022025.txt)
+$server = 'server'
+$weakpasswordsfilepath = 'C:\Users\...\weakpasswords.txt'
+$results = (get-adreplaccount -all -server $server | Test-ADPasswordQuality -weakpasswordsfile $weakpasswordsfilepath | Tee-Object -FilePath "C:\temp\$domain-passwordsreport022025.txt")
 
 $results.WeakPassword
 $adweakpasswords = $results.WeakPassword

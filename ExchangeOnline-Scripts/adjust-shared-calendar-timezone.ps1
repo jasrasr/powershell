@@ -1,21 +1,21 @@
 # 1. Import the Exchange Online PowerShell module and connect
 #Import-Module ExchangeOnlineManagement
-#Connect-ExchangeOnline -UserPrincipalName 'jason.lamb@middough.com'
+#Connect-ExchangeOnline -UserPrincipalName '[email]'
 
 # 2. Define the array of conference/mailbox email addresses
 $CalendarMailboxes = @(
-    "CLE-ConferenceA1@Middough.com",
-    "CLE-ConferenceA2@Middough.com",
-    "CLE-Conferenceb1@Middough.com",
-    "CLE-Conferenceb2@Middough.com",
-    "CLE-Conferencec1@Middough.com",
-    "CLE-Conferencec2@Middough.com",
-    "CLE-Conferenced1@Middough.com",
-    "CLE-Conferenced2@Middough.com",
-    "CLE-Conferencedevelopmentcenter@Middough.com",
-    "CLE-Conferenceboardroom@Middough.com",
-    "CLE-Conferencemain@Middough.com",
-    "CLE-insta360-camera@Middough.com"
+    "CLE-ConferenceA1@$domain.com",
+    "CLE-ConferenceA2@$domain.com",
+    "CLE-Conferenceb1@$domain.com",
+    "CLE-Conferenceb2@$domain.com",
+    "CLE-Conferencec1@$domain.com",
+    "CLE-Conferencec2@$domain.com",
+    "CLE-Conferenced1@$domain.com",
+    "CLE-Conferenced2@$domain.com",
+    "CLE-Conferencedevelopmentcenter@$domain.com",
+    "CLE-Conferenceboardroom@$domain.com",
+    "CLE-Conferencemain@$domain.com",
+    "CLE-insta360-camera@$domain.com"
 )
 
 # 3. Loop through each mailbox and set the desired properties

@@ -1,5 +1,5 @@
 ﻿# Define the root folder to search
-$rootFolder = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell"
+$rootFolder = "${onedrivepath}\Documents\GitHub\PowerShell"
 
 Get-ChildItem -Path $rootFolder -Recurse -Force | ForEach-Object {
     if ($_.Name -match '\s') {
@@ -39,7 +39,7 @@ Get-ChildItem -Path $rootFolder -Recurse -Force | ForEach-Object {
 
 
 # Define the root folder to search
-$rootFolder = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-private"
+$rootFolder = "${onedrivepath}\Documents\GitHub\PowerShell-private"
 
 Get-ChildItem -Path $rootFolder -Recurse -Force | ForEach-Object {
     if ($_.Name -match '\s') {

@@ -1,5 +1,5 @@
 # Define the folder path where your .ps1 files are located
-$scriptFolder = "C:\users\%username%\onedrive - middough\documents\github\powershell"
+$scriptFolder = "C:\users\..\powershell"
 
 # Get all .ps1 files in the folder
 $ps1Files = Get-ChildItem -Path $scriptFolder -Filter *.ps1
@@ -31,4 +31,4 @@ foreach ($file in $ps1Files) {
 $allVariables | Format-Table -AutoSize
 
 # Optionally, export the results to a CSV file for further analysis
-$allVariables | Export-Csv -Path "$scriptFolder\VariablesReport.csv" -NoTypeInformation
+#$allVariables | Export-Csv -Path "$scriptFolder\VariablesReport.csv" -NoTypeInformation

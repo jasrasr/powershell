@@ -1,6 +1,6 @@
-﻿# Define OneDrive path specific to Middough
-$oneDrivePath = "C:\users\$env:USERNAME\OneDrive - Middough"
+﻿# Define OneDrive path specific to ${domainup}
 
+$oneDrivePath = "C:\users\$env:USERNAME\OneDrive - ${domain}"
 # Check if OneDrive process is running
 $oneDriveProcess = Get-Process -Name "OneDrive" -ErrorAction SilentlyContinue
 
@@ -25,8 +25,8 @@ $sourceFolders = @(
 $UserFolders = @("Desktop", "Documents", "Downloads", "Pictures", "Music", "Videos")
 
 
-# Define the OneDrive path specific to Middough
-$oneDrivePath = "C:\users\$env:USERNAME\OneDrive - Middough"
+# Define the OneDrive path specific to ${domainup}
+$oneDrivePath = "C:\users\$env:USERNAME\OneDrive - ${domain}"
 
 
 

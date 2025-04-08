@@ -1,8 +1,8 @@
 # Define the path to the text files
-$txtFilesPath = "C:\Users\jason.lamb\OneDrive - middough\Downloads\GRC_SN_Files\Transcriptions\*.txt"
+$txtFilesPath = "C:\Users\${username}\OneDrive - ${domain}\Downloads\GRC_SN_Files\Transcriptions\*.txt"
 
 # Define the output file path
-$outputCsvPath = "C:\Users\jason.lamb\OneDrive - middough\Downloads\GRC_SN_Files\Transcriptions\output\output.txt"
+$outputCsvPath = "C:\Users\${username}\OneDrive - ${domain}\Downloads\GRC_SN_Files\Transcriptions\output\output.txt"
 
 # Initialize the output file with headers
 "File,Series,Episode,Date,Title" | Out-File -FilePath $outputCsvPath

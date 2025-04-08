@@ -11,15 +11,15 @@
 # The merged PDF files will be saved in the output folder with the specified batch range in the file name.
 # The script will output a message for each batch range processed, indicating the files have been merged successfully.
 
-cd 'C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell\File-Management-Scripts'
+cd '${onedrivepath}\Documents\GitHub\PowerShell\File-Management-Scripts'
 # Download PDFsharp library (assumes you have curl.exe in the same folder as the script)
 
 # Navigate to the directory where you want to install the package
-cd 'C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell\File-Management-Scripts'
+cd '${onedrivepath}\Documents\GitHub\PowerShell\File-Management-Scripts'
 
 # Download the NuGet executable
 Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -OutFile "nuget.exe"
-Move-Item -Path "nuget.exe" -Destination "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell\nuget"
+Move-Item -Path "nuget.exe" -Destination "${onedrivepath}\Documents\GitHub\PowerShell\nuget"
 
 # Install PDFsharp package
 .\nuget.exe install PDFsharp -Version 1.50.5147
@@ -28,7 +28,7 @@ Move-Item -Path "nuget.exe" -Destination "C:\Users\jason.lamb\OneDrive - middoug
 $scriptPath = $MyInvocation.MyCommand.Path
 $scriptFolder = Split-Path -Path $scriptPath
 Add-Type -Path (Join-Path -Path $scriptFolder -ChildPath "PDFsharp.dll")
-cd 'C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell\File-Management-Scripts'
+cd '${onedrivepath}\Documents\GitHub\PowerShell\File-Management-Scripts'
 # Download PDFsharp library (assumes you have curl.exe in the same folder as the script)
 
 curl.exe -o PDFsharp.zip https://sourceforge.net/projects/pdfsharp/files/pdfsharp/PDFsharp%201.50.5147/PDFsharp-MigraDocFoundation-Assemblies-1_50_5147.zip/download
@@ -45,8 +45,8 @@ Add-Type -Path (Join-Path -Path $scriptFolder -ChildPath "PDFsharp.dll")
 Add-Type -Path "C:\Path\To\PDFsharp.dll"
 
 # Define the source and output folders
-$sourceFolder = "C:\Users\jason.lamb\OneDrive - middough\Downloads\GRC_SN_Files\PDFs"
-$outputFolder = "C:\Users\jason.lamb\OneDrive - middough\Downloads\GRC_SN_Files\Merged"
+$sourceFolder = "${onedrivepath}\Downloads\GRC_SN_Files\PDFs"
+$outputFolder = "${onedrivepath}\Downloads\GRC_SN_Files\Merged"
 
 # Loop through each batch range (0-9) to handle 000-099, 100-199, ..., 900-999
 for ($batch = 0; $batch -le 9; $batch++) {
