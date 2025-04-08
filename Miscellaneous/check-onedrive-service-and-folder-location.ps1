@@ -1,5 +1,5 @@
-# Define the OneDrive path specific to Middough
-$oneDrivePath = "C:\users\$env:USERNAME\OneDrive - Middough"
+# Define the OneDrive path specific to ${domain}
+$oneDrivePath = "C:\users\$env:USERNAME\OneDrive - ${domain}"
 
 # Define the name of the OneDrive process
 $onedriveProcessName = "OneDrive"
@@ -62,8 +62,8 @@ foreach ($sourcePath in $sourceFolders) {
 
 
 
-# Define the OneDrive path specific to Middough
-$oneDrivePath = "C:\users\$env:USERNAME\OneDrive - Middough"
+# Define the OneDrive path specific to ${domainup}
+$oneDrivePath = "C:\users\$env:USERNAME\OneDrive - ${domain}"
 
 # Check if OneDrive path exists
 if (-Not (Test-Path -Path $oneDrivePath)) {

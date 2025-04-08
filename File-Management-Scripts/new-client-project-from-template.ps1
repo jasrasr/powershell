@@ -1,7 +1,7 @@
 #get time date
 $datetime = Get-Date -Format "yyMMdd-HHmmss"
 #set path
-#$logpath = "\\middough.local\corp\data\proj\!TEMPLATE\logs\robocopylog-$datetime.txt"
+#$logpath = "\\${domain}.local\corp\data\proj\!TEMPLATE\logs\robocopylog-$datetime.txt"
 $logpath = "c:\temp\!template\logs\robocopylog-$datetime.txt"
 new-item -path $logpath -type file -force
 function newclientq {

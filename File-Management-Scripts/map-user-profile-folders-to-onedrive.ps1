@@ -8,8 +8,8 @@ $sourceFolders = @(
     "C:\users\$env:USERNAME\Videos"
 )
 
-# Define the OneDrive path specific to Middough
-$oneDrivePath = "C:\users\$env:USERNAME\OneDrive - Middough"
+# Define the OneDrive path specific to ${domainup}
+$oneDrivePath = "C:\users\$env:USERNAME\OneDrive - ${domain}"
 
 # Check if OneDrive path exists
 if (-Not (Test-Path -Path $oneDrivePath)) {

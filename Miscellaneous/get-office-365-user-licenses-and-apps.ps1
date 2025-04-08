@@ -1,14 +1,14 @@
 # Specify the users' emails or User Principal Names (UPNs)
 $UserPrincipalNames = @(
-    "andy.minderman@middough.com", 
-    "charles.bridge@middough.com",
-    "david.bridenstine@middough.com",
-    "justin.walters@middough.com",
-    "nathan.ingram@middough.com",
-    "jackie.morris@middough.com",
-    "paula.stoneman@middough.com",
-    "keyana.williams@middough.com",
-    "matt.bedee@middough.com"
+    "andy.minderman@${domain}.com", 
+    "charles.bridge@${domain}.com",
+    "david.bridenstine@${domain}.com",
+    "justin.walters@${domain}.com",
+    "nathan.ingram@${domain}.com",
+    "jackie.morris@${domain}.com",
+    "paula.stoneman@${domain}.com",
+    "keyana.williams@${domain}.com",
+    "matt.bedee@${domain}.com"
 )  # Replace with the specific users' UPNs
 
 # ...existing code...
@@ -23,7 +23,7 @@ foreach ($UserPrincipalName in $UserPrincipalNames) {
         $Licenses = $User.Licenses
         
         foreach ($License in $Licenses) {
-            if ($License.AccountSkuId -eq "middough:SPE_E3") {
+            if ($License.AccountSkuId -eq "${domain}:SPE_E3") {
                 Write-Output " License SKU: $($License.AccountSkuId)"
                 
                 # Check enabled services under the license

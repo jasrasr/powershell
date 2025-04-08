@@ -1,6 +1,6 @@
 $ComputerName = "CHIW10H36D1J3"
 $GroupName = "Administrators"
-$userName = "middough\jason.lamb"
+$userName = "${domain}\jason.lamb"
 
 ping $ComputerName
 #Get-CimInstance -ClassName Win32_Group -ComputerName $ComputerName | Select-Object Name, Description

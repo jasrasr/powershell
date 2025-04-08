@@ -1,6 +1,6 @@
 # Variables
 $taskName = "Auto-Update-Panzura-Disk-Space-Usage-Log"
-$scriptPath = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell\File-Management-Scripts\panzura disk space.ps1"
+$scriptPath = "${onedrivepath}\Documents\GitHub\PowerShell\File-Management-Scripts\panzura disk space.ps1"
 $triggerTimeAM = "8:01AM"  # First time to run the task
 $triggerTimePM = "8:01PM"  # Second time to run the task
 

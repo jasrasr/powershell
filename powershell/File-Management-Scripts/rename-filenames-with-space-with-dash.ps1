@@ -1,5 +1,5 @@
 ﻿# Define the root folder to search
-$rootFolder = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell"
+$rootFolder = "${onedrivepath}\Documents\GitHub\PowerShell"
 
 # Get all files and folders recursively from the root folder
 Get-ChildItem -Path $rootFolder -Recurse | ForEach-Object {
@@ -23,7 +23,7 @@ Get-ChildItem -Path $rootFolder -Recurse | ForEach-Object {
 }
 
 # Define the root folder to search
-$rootFolder = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-private"
+$rootFolder = "${onedrivepath}\Documents\GitHub\PowerShell-private"
 
 # Get all files and folders recursively from the root folder
 Get-ChildItem -Path $rootFolder -Recurse | ForEach-Object {

@@ -1,5 +1,5 @@
 # Define the path to the file you want to rename
-$filePath = "C:\Users\jason.lamb\OneDrive - middough\Downloads\Autodesk Licensing Service - 15.1.0.12339 - Win - Update.exe"
+$filePath = "${onedrivepath}\Downloads\Autodesk Licensing Service - 15.1.0.12339 - Win - Update.exe"
 
 # Get the directory and file name
 $directory = Split-Path $filePath

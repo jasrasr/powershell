@@ -18,7 +18,7 @@ try {
 
 
 # Path to save the report
-$reportfile = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\out-file\TeamsOwnersAndMembers-$datetime.csv"
+$reportfile = "${onedrivepath}\Documents\GitHub\out-file\TeamsOwnersAndMembers-$datetime.csv"
 
 # Function to Get Team Owners and Members
 function Get-TeamOwnersAndMembers {

@@ -1,5 +1,5 @@
 # Define the folder path where your .ps1 files are located
-$scriptFolder = "C:\users\%username%\onedrive - middough\documents\github\powershell"
+$scriptFolder = "C:\users\...\powershell"
 
 # Define the output file path for the variables
 $outputPs1 = "$scriptFolder\CommonVariables.ps1"
