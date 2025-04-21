@@ -1,0 +1,242 @@
+Clear-Host
+
+# --- Initialize Board ---
+function Initialize-Board {
+    $global:Board = @{}
+    $global:BigWinners = @{}
+    $global:MoveHistory = @()
+    $global:currentPlayerSymbol = "X"
+    $global:FinalGameOver = $false
+
+    for ($i = 1; $i -le 9; $i++) {
+        $Board[$i] = @{}
+        $BigWinners[$i] = " "
+        for ($j = 1; $j -le 9; $j++) {
+            $Board[$i][$j] = " "
+        }
+    }
+}
+
+Initialize-Board
+
+# --- Win Conditions ---
+$winningCombinations = @(
+    @(1,2,3), @(4,5,6), @(7,8,9),
+    @(1,4,7), @(2,5,8), @(3,6,9),
+    @(1,5,9), @(3,5,7)
+)
+
+# --- Player Setup ---
+$symbols = @("X", "O")
+$players = @{}
+foreach ($s in $symbols) {
+    $n = Read-Host "Enter name for Player '$s'"
+    $players[$s] = if ($n) { $n } else { $s }
+}
+$global:WinCount = @{ "X"=0; "O"=0 }
+
+# --- Show Board with Side Scoreboard ---
+function Show-Board {
+    Clear-Host
+    Write-Host "`nSUPER TIC TAC TOE ($($players.X) vs $($players.O)) (q=Quit r=Reset u=Undo)" -ForegroundColor Cyan
+
+    if ($FinalGameOver) {
+        $scoreboardLines = @(
+            "FINAL SCOREBOARD",
+            "$($players.X) (X) Wins: $($WinCount.X)",
+            "$($players.O) (O) Wins: $($WinCount.O)"
+        )
+    }
+    else {
+        $scoreboardLines = @(
+            "Scoreboard",
+            "$($players.X) (X) Wins: $($WinCount.X)",
+            "$($players.O) (O) Wins: $($WinCount.O)"
+        )
+    }
+
+    $scoreboardLineIndex = 0
+    $scoreboardStartRow = 1
+    $rowCounter = 0
+
+    for ($bigRow=0; $bigRow -lt 3; $bigRow++) {
+        for ($smallRow=0; $smallRow -lt 3; $smallRow++) {
+            $line = ""
+            for ($bigCol=0; $bigCol -lt 3; $bigCol++) {
+                $big = $bigRow*3 + $bigCol + 1
+                for ($smallCol=0; $smallCol -lt 3; $smallCol++) {
+                    $small = $smallRow*3 + $smallCol + 1
+                    $val = if ($Board[$big][$small] -eq " ") { "." } else { $Board[$big][$small] }
+                    $line += " $val "
+                }
+                if ($bigCol -lt 2) { $line += "|" }
+            }
+
+            $line = $line.PadRight(50)
+
+            if ($rowCounter -ge $scoreboardStartRow -and $scoreboardLineIndex -lt $scoreboardLines.Count) {
+                $line += $scoreboardLines[$scoreboardLineIndex]
+                $scoreboardLineIndex++
+            }
+
+            Write-Host $line
+            $rowCounter++
+        }
+
+        if ($bigRow -lt 2) {
+            Write-Host ("-"*33)
+            $rowCounter++
+        }
+    }
+}
+
+# --- Show Winner Board ---
+function Show-WinnerBoard {
+    Clear-Host
+    Write-Host "`n🎉🎉 SUPER TIC TAC TOE WINNNNNNER! 🎉🎉" -ForegroundColor Cyan
+
+    $letters = @{
+        1=@("w","i","n"); 2=@("n","n","n"); 3=@("n","e","r");
+        4=@("W","I","N"); 5=@("N","N","N"); 6=@("N","E","R");
+        7=@("w","i","n"); 8=@("n","n","n"); 9=@("n","e","r")
+    }
+
+    for ($bigRow=0; $bigRow -lt 3; $bigRow++) {
+        for ($smallRow=0; $smallRow -lt 3; $smallRow++) {
+            $line = ""
+            for ($bigCol=0; $bigCol -lt 3; $bigCol++) {
+                $big = $bigRow*3 + $bigCol + 1
+                for ($smallCol=0; $smallCol -lt 3; $smallCol++) {
+                    $ch = if ($smallRow -eq 1) { $letters[$big][$smallCol] } else { "." }
+                    $line += " $ch "
+                }
+                if ($bigCol -lt 2) { $line += "|" }
+            }
+            Write-Host $line
+        }
+        if ($bigRow -lt 2) { Write-Host ("-"*33) }
+    }
+    Write-Host "`n🎉🎉 WINNNNNNER! 🎉🎉" -ForegroundColor Yellow
+}
+
+# --- Check for Wins ---
+function Check-SmallBoardWin($big, $symbol) {
+    $winningCombinations | ForEach-Object {
+        if ($Board[$big][$_[0]] -eq $symbol -and $Board[$big][$_[1]] -eq $symbol -and $Board[$big][$_[2]] -eq $symbol) { return $true }
+    }
+    return $false
+}
+
+function Check-FullGameWin($symbol) {
+    $winningCombinations | ForEach-Object {
+        if ($BigWinners[$_[0]] -eq $symbol -and $BigWinners[$_[1]] -eq $symbol -and $BigWinners[$_[2]] -eq $symbol) { return $true }
+    }
+    return $false
+}
+
+# --- Animations ---
+function Animate-ExpandingWinner {
+    param([string]$text="WINNNNNNER!", [int]$delay=200)
+    for ($i=1; $i -le $text.Length; $i++) {
+        Clear-Host
+        Write-Host "`n" -NoNewline
+        Write-Host ($text.Substring(0, $i)) -ForegroundColor Yellow
+        Start-Sleep -Milliseconds $delay
+    }
+}
+
+function Animate-ScrollingWinner {
+    param([string]$text="🎉 WINNNNNNER 🎉", [int]$spaces=40, [int]$delay=75)
+    for ($i=0; $i -le $spaces; $i++) {
+        Clear-Host
+        Write-Host (" " * $i) -NoNewline
+        Write-Host $text -ForegroundColor Yellow
+        Start-Sleep -Milliseconds $delay
+    }
+}
+
+# --- Main Game Loop ---
+while ($true) {
+    Show-Board
+    $playerName = $players[$currentPlayerSymbol]
+    Write-Host "`n$playerName's Turn ($currentPlayerSymbol) (q=Quit r=Reset u=Undo)" -ForegroundColor Yellow
+
+    # BIG square input
+    do {
+        $bigMove = Read-Host "Choose BIG square (1-9)"
+        if ($bigMove -eq "q") { exit }
+        if ($bigMove -eq "r") { Initialize-Board; continue 2 }
+        if ($bigMove -eq "u" -and $MoveHistory.Count -gt 0) { $last=$MoveHistory[-1]; $Board[$last.Big][$last.Small] = " "; $MoveHistory.RemoveAt($MoveHistory.Count-1); $currentPlayerSymbol=$last.Symbol; continue 2 }
+    } until ($bigMove -match '^[1-9]$')
+    $bigMove = [int]$bigMove
+
+    # SMALL square input
+    do {
+        $smallMove = Read-Host "Choose SMALL square (1-9)"
+        if ($smallMove -eq "q") { exit }
+        if ($smallMove -eq "r") { Initialize-Board; continue 2 }
+        if ($smallMove -eq "u" -and $MoveHistory.Count -gt 0) { $last=$MoveHistory[-1]; $Board[$last.Big][$last.Small] = " "; $MoveHistory.RemoveAt($MoveHistory.Count-1); $currentPlayerSymbol=$last.Symbol; continue 2 }
+    } until ($smallMove -match '^[1-9]$')
+    $smallMove = [int]$smallMove
+
+    # Place move
+    if ($Board[$bigMove][$smallMove] -ne " ") {
+        Write-Host "Spot already taken!" -ForegroundColor Red
+        Start-Sleep -Milliseconds 1000
+        continue
+    }
+
+    $Board[$bigMove][$smallMove] = $currentPlayerSymbol
+    $MoveHistory += [pscustomobject]@{Big=$bigMove; Small=$smallMove; Symbol=$currentPlayerSymbol}
+
+    if (Check-SmallBoardWin $bigMove $currentPlayerSymbol) {
+        $BigWinners[$bigMove] = $currentPlayerSymbol
+    }
+
+    if (Check-FullGameWin $currentPlayerSymbol) {
+        $FinalGameOver = $true
+        Animate-ExpandingWinner
+        Animate-ScrollingWinner
+        Show-Board
+        Write-Host "`n🎉🎉 Winner! 🎉🎉`n🎉🎉 $playerName WINS THE WHOLE GAME! 🎉🎉" -ForegroundColor Magenta
+        Read-Host "`nPress Enter to continue..."
+        $WinCount[$currentPlayerSymbol]++
+
+        do {
+            $playAgain = Read-Host "`nPlay again? (y/n)"
+        } until ($playAgain -match '^(y|Y|n|N)$')
+
+        if ($playAgain -match '^(y|Y)$') {
+            Initialize-Board
+            continue
+        }
+        else {
+            break
+        }
+    }
+
+    $currentPlayerSymbol = if ($currentPlayerSymbol -eq "X") { "O" } else { "X" }
+}
+
+<#
+test entries
+1,1
+2,2
+1,4
+3,3
+1,7
+5,5
+4,1
+6,6
+4,4
+8,8
+4,7
+9,9
+7,1
+2,3
+7,4
+2,5
+7,7
+
+
+#>
