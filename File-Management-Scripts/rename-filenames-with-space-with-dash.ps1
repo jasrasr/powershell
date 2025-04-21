@@ -1,78 +1,47 @@
 ﻿# Define the root folder to search
 $rootFolder = "${onedrivepath}\Documents\GitHub\PowerShell"
 
-Get-ChildItem -Path $rootFolder -Recurse -Force | ForEach-Object {
-    if ($_.Name -match '\s') {
-        $baseName = $_.Name -replace '\s', '-'
-        $directory = $_.DirectoryName
-        $targetPath = Join-Path $directory $baseName
-
-        # If it's a file, split name and extension
-        if (-not $_.PSIsContainer) {
-            $nameNoExt = [System.IO.Path]::GetFileNameWithoutExtension($baseName)
-            $ext = [System.IO.Path]::GetExtension($baseName)
-
-            # Add -dup until it's unique
-            while (Test-Path $targetPath) {
-                $nameNoExt += "-dup"
-                $baseName = "$nameNoExt$ext"
-                $targetPath = Join-Path $directory $baseName
-            }
-        }
-        else {
-            # It's a folder
-            while (Test-Path $targetPath) {
-                $baseName += "-dup"
-                $targetPath = Join-Path $directory $baseName
-            }
-        }
-
+# Get all files and folders recursively from the root folder
+Get-ChildItem -Path $rootFolder -Recurse | ForEach-Object {
+    # Check if the name contains a space
+    if ($_.Name -match "\s") {
+        # Replace spaces with dashes in the name
+        $newName = $_.Name -replace "\s", "-"
+        
+        # Construct the full path for the new name
+        $newFullName = Join-Path $_.DirectoryName $newName
+        
+        # Rename the item (file or folder)
         try {
-            Rename-Item -Path $_.FullName -NewName $baseName -Force
-            Write-Host "Renamed: '$($_.FullName)' → '$targetPath'"
+            Rename-Item -Path $_.FullName -NewName $newFullName -Force
+            Write-Output "Renamed: '$($_.FullName)' to '$newFullName'"
         }
         catch {
-            Write-Warning "Failed to rename: '$($_.FullName)' → '$targetPath' - $($_.Exception.Message)"
+            Write-Output "Failed to rename: '$($_.FullName)'"
         }
     }
 }
 
-
 # Define the root folder to search
 $rootFolder = "${onedrivepath}\Documents\GitHub\PowerShell-private"
 
-Get-ChildItem -Path $rootFolder -Recurse -Force | ForEach-Object {
-    if ($_.Name -match '\s') {
-        $baseName = $_.Name -replace '\s', '-'
-        $directory = $_.DirectoryName
-        $targetPath = Join-Path $directory $baseName
-
-        # If it's a file, split name and extension
-        if (-not $_.PSIsContainer) {
-            $nameNoExt = [System.IO.Path]::GetFileNameWithoutExtension($baseName)
-            $ext = [System.IO.Path]::GetExtension($baseName)
-
-            # Add -dup until it's unique
-            while (Test-Path $targetPath) {
-                $nameNoExt += "-dup"
-                $baseName = "$nameNoExt$ext"
-                $targetPath = Join-Path $directory $baseName
-            }
-        }
-        else {
-            # It's a folder
-            while (Test-Path $targetPath) {
-                $baseName += "-dup"
-                $targetPath = Join-Path $directory $baseName
-            }
-        }
-
+# Get all files and folders recursively from the root folder
+Get-ChildItem -Path $rootFolder -Recurse | ForEach-Object {
+    # Check if the name contains a space
+    if ($_.Name -match "\s") {
+        # Replace spaces with dashes in the name
+        $newName = $_.Name -replace "\s", "-"
+        
+        # Construct the full path for the new name
+        $newFullName = Join-Path $_.DirectoryName $newName
+        
+        # Rename the item (file or folder)
         try {
-            Rename-Item -Path $_.FullName -NewName $baseName -Force
-            Write-Host "Renamed: '$($_.FullName)' → '$targetPath'"
+            Rename-Item -Path $_.FullName -NewName $newFullName -Force
+            Write-Output "Renamed: '$($_.FullName)' to '$newFullName'"
         }
         catch {
-            Write-Warning "Failed to rename: '$($_.FullName)' → '$targetPath' - $($_.Exception.Message)"
+            Write-Output "Failed to rename: '$($_.FullName)'"
         }
     }
 }
