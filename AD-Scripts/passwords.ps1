@@ -1,7 +1,7 @@
 import-module dsinternals
-$server = 'server'
-$weakpasswordsfilepath = 'C:\Users\...\weakpasswords.txt'
-$results = (get-adreplaccount -all -server $server | Test-ADPasswordQuality -weakpasswordsfile $weakpasswordsfilepath | Tee-Object -FilePath "C:\temp\$domain-passwordsreport022025.txt")
+$server = 'server' # use AD server
+$weakpasswordsfilepath = 'C:\Users\...\weakpasswords.txt' # point to havibeenpwnd or similar plain text password file with each line as new password
+$results = (get-adreplaccount -all -server $server | Test-ADPasswordQuality -weakpasswordsfile $weakpasswordsfilepath | Tee-Object -FilePath "C:\temp\passwordsreport.txt")  # output to file
 
 $results.WeakPassword
 $adweakpasswords = $results.WeakPassword
