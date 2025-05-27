@@ -27,3 +27,18 @@ Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery | Out-
 Write-Host "Using Repair-WinGetPackageManager cmdlet to bootstrap WinGet..."
 Repair-WinGetPackageManager
 Write-Host "Done."
+
+<#
+
+# $profile file locations
+# VSC aka Visual Studio Code or VS Code, PS5 = PowerShell v5+ and PS7 = PowerShell v7+
+VSC = "C:\Users\$env:username\Documents\PowerShell\Microsoft.VSCode_profile.ps1" 
+PS5 = "C:\Users\$env:username\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
+PS7 = "C:\Users\$env:username\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+# same for different admin user on the same computer, replace $env:username with admin username
+
+MOST IMPORTANT - add dot reference to the common profile file for common variables
+. $commonProfilePath
+$commonProfilePath = "C:\Users\$env:username\Documents\!PowerShellCommonProfile.ps1"
+
+#>
