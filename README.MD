@@ -48,18 +48,6 @@ For example, to run a backup script:
 
 .\BackupScript.ps1 -SourcePath "C:\Data" -DestinationPath "D:\Backup"
 
-Scripts Included
-
-Below is a list of the main scripts available in this repository:
-
-	1.	BackupScript.ps1
-	•	Automates the process of backing up files from a source directory to a destination.
-	2.	UserReport.ps1
-	•	Generates a report on Active Directory user accounts and exports the data to a CSV file.
-	3.	SystemHealthCheck.ps1
-	•	Performs a health check on the system, checking for disk space, memory usage, and key system services.
-	4.	FileOrganizer.ps1
-	•	Organizes files in a directory based on their type or extension.
 
 Feel free to explore other scripts in the repository and see the comments within each script for additional information.
 
