@@ -1,4 +1,4 @@
 # this will change the default behavior of a shared calendar to allow for overlapping calendar events
-Connect-ExchangeOnline -UserPrincipalName '[email]'
-Set-CalendarProcessing -Identity cle-dqr@${domain}.com -AllowConflicts $true
-Get-CalendarProcessing -Identity cle-dqr@${domain}.com | Format-List
+Connect-ExchangeOnline -UserPrincipalName '[admin email]'
+Set-CalendarProcessing -Identity shared-email@domain.com -AllowConflicts $true
+Get-CalendarProcessing -Identity  shared-email@domain.com | Format-List
