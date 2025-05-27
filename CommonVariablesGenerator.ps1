@@ -1,8 +1,10 @@
+# This script also generates a list of $variables from other files, different output than the other script - CommonVariables.ps1
+
 # Define the folder path where your .ps1 files are located
-$scriptFolder = "C:\users\...\powershell"
+$scriptFolder = "C:\Users\...\PowerShell"
 
 # Define the output file path for the variables
-$outputPs1 = "$scriptFolder\CommonVariables.ps1"
+$outputPs1 = "C:\Users\...\PowerShellCommonProfile.ps1"
 
 # Get all .ps1 files in the folder
 $ps1Files = Get-ChildItem -Path $scriptFolder -Filter *.ps1
@@ -33,7 +35,7 @@ foreach ($file in $ps1Files) {
 # Check if the CommonVariables.ps1 file already exists
 if (-not (Test-Path $outputPs1)) {
     # Create the file and add a header comment
-    Add-Content -Path $outputPs1 -Value "`# This file contains common variables extracted from other scripts`"
+    Add-Content -Path $outputPs1 -Value "# This file contains common variables extracted from other scripts"
 }
 
 # Loop through the new variables and append them to the CommonVariables.ps1 file
@@ -45,3 +47,4 @@ foreach ($newVar in $newVariables) {
         Add-Content -Path $outputPs1 -Value "`$($newVar.Variable) = `"$($newVar.Variable)_value`"  # from $($newVar.ScriptFile)"
     }
 }
+
