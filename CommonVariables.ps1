@@ -1,5 +1,7 @@
+# Use this script to get all $variable tags from a folder of *.ps1 files
+
 # Define the folder path where your .ps1 files are located
-$scriptFolder = "C:\users\..\powershell"
+$scriptFolder = "C:\users\..\powershell-scripts"
 
 # Get all .ps1 files in the folder
 $ps1Files = Get-ChildItem -Path $scriptFolder -Filter *.ps1
