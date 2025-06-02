@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Password Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 300px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="range"] {
+            width: 100%;
+        }
+        .options {
+            text-align: left;
+            margin: 10px 0;
+        }
+        .options label {
+            display: block;
+            margin: 5px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Password Generator</h1>
+        <input type="text" id="password" readonly placeholder="Your Secure Password">
+        <div class="options">
+            <label>Password Length: <span id="lengthValue">12</span></label>
+            <input type="range" id="lengthSlider" min="8" max="20" value="12">
+            <label><input type="checkbox" id="includeUppercase" checked> Include Uppercase Letters</label>
+            <label><input type="checkbox" id="includeLowercase" checked> Include Lowercase Letters</label>
+            <label><input type="checkbox" id="includeNumbers" checked> Include Numbers</label>
+            <label><input type="checkbox" id="includeSymbols" checked> Include Symbols</label>
+            <label><input type="checkbox" id="excludeAmbiguous" checked> Exclude Ambiguous /\|IiLl1oO0</label>
+            <label><input type="checkbox" id="excludeExtraSpecial" checked> Exclude Extra Special  ()_`|}{[]:;,./</label>
+        </div>
+        <button id="generateButton">Generate Password</button>
+        <button onclick="copyPassword()">Copy</button>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = document.querySelectorAll('#lengthSlider, #includeUppercase, #includeLowercase, #includeNumbers, #includeSymbols, #excludeAmbiguous, #excludeExtraSpecial');
+            inputs.forEach(input => input.addEventListener('input', generatePassword));
+            document.getElementById('generateButton').addEventListener('click', generatePassword);
+            generatePassword(); // Generate a password on initial load
+        });
+
+        function updateLengthValue(value) {
+            document.getElementById('lengthValue').textContent = value;
+        }
+
+        function generatePassword() {
+            const length = document.getElementById('lengthSlider').value;
+            const includeUppercase = document.getElementById('includeUppercase').checked;
+            const includeLowercase = document.getElementById('includeLowercase').checked;
+            const includeNumbers = document.getElementById('includeNumbers').checked;
+            const includeSymbols = document.getElementById('includeSymbols').checked;
+            const excludeAmbiguous = document.getElementById('excludeAmbiguous').checked;
+            const excludeExtraSpecial = document.getElementById('excludeExtraSpecial').checked;
+
+            let uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
+            let numberChars = '0123456789';
+            let symbolChars = '!@#$%^&*+~?><-=';
+
+            const ambiguousChars = '/\|IiLl1oO0';
+            const extraSpecialChars = '()_`}{[]:;,.';
+
+            if (excludeAmbiguous) {
+                uppercaseChars = removeCharacters(uppercaseChars, ambiguousChars);
+                lowercaseChars = removeCharacters(lowercaseChars, ambiguousChars);
+                numberChars = removeCharacters(numberChars, ambiguousChars);
+            }
+
+            if (excludeExtraSpecial) {
+                symbolChars = removeCharacters(symbolChars, extraSpecialChars);
+            }
+
+            let charSet = '';
+            if (includeUppercase) charSet += uppercaseChars;
+            if (includeLowercase) charSet += lowercaseChars;
+            if (includeNumbers) charSet += numberChars;
+            if (includeSymbols) charSet += symbolChars;
+
+            if (charSet === '') {
+                alert('Please select at least one character type.');
+                return;
+            }
+
+            let password = '';
+            const cryptoObj = window.crypto || window.msCrypto;
+            const randomValues = new Uint32Array(length);
+            cryptoObj.getRandomValues(randomValues);
+
+            for (let i = 0; i < length; i++) {
+                password += charSet.charAt(randomValues[i] % charSet.length);
+            }
+
+            document.getElementById('password').value = password;
+            updateLengthValue(length);
+        }
+
+        function removeCharacters(charSet, charsToRemove) {
+            let result = '';
+            for (let char of charSet) {
+                if (!charsToRemove.includes(char)) {
+                    result += char;
+                }
+            }
+            return result;
+        }
+
+        function copyPassword() {
+    const passField = document.getElementById('password');
+    navigator.clipboard.writeText(passField.value)
+        .then(() => alert('Password copied!'))
+        .catch(() => alert('Failed to copy.'));
+}
+
+
+    </script>
+</body>
+</html>
