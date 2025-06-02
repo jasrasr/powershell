@@ -55,3 +55,4 @@ $allResults | Select-Object Server, TaskName, Folder, RunAsUser |
 Export-Csv -Path $exportPath -NoTypeInformation
 
 Write-Host "`nExport complete : $exportPath" -ForegroundColor Green
+notepad $exportpath
