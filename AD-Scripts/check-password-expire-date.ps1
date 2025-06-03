@@ -2,7 +2,7 @@
 Import-Module ActiveDirectory
 
 # Define the username you want to check
-$username = "ols"
+$username = "[username]"
 
 # Get the user's account details
 $user = Get-ADUser -Identity $username -Properties "msDS-UserPasswordExpiryTimeComputed"
@@ -34,7 +34,7 @@ Get-ADUser -Identity $user -Properties "msDS-UserPasswordExpiryTimeComputed" |
 Import-Module ActiveDirectory
 
 # Define the username you want to check
-$username = "jason.lamb"
+$username = "[username]"
 
 # Get the user's account details
 $user = Get-ADUser -Identity $username -Properties "msDS-UserPasswordExpiryTimeComputed"
@@ -70,7 +70,7 @@ Write-Host "Calendar event created for 24 hours before the password expiry date.
 Import-Module ActiveDirectory
 
 # Replace 'username' with the actual domain username you want to check
-$user = "jason.lamb"
+$user = "[username]"
 
 # Get the user's password expiration date
 $expirationDate = Get-ADUser -Identity $user -Properties "msDS-UserPasswordExpiryTimeComputed" | 
