@@ -37,10 +37,10 @@ foreach ($subkey in $subkeys) {
 }
 
 # Sort the results by ProductName
-#$sortedResult = $result | Sort-Object -Property ProductName
+$sortedResult = $result | Sort-Object -Property ProductName
 
 # Export the sorted result to screen and file
-#$sortedResult | Format-Table -AutoSize | Tee-Object -FilePath $outputFile
+$sortedResult | Format-Table -AutoSize | Tee-Object -FilePath $outputFile
 
 # Export the sorted result to file in CSV format
 $sortedResult | Export-Csv -Path $outputFile -NoTypeInformation
