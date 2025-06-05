@@ -1,4 +1,4 @@
-$ComputerName = "CHIW10H36D1J3"
+$ComputerName = "${computername}"
 $GroupName = "Administrators"
 $userName = "${domain}\jason.lamb"
 
