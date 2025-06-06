@@ -25,7 +25,7 @@ if (-not (Test-Path $destinationPath)) {
 
 # Random file size between 1GB and 4GB
 $minMB = 1024
-$maxMB = 4096
+$maxMB = 1025
 $fileSizeMB = Get-Random -Minimum $minMB -Maximum $maxMB
 $fileSizeBytes = $fileSizeMB * 1MB
 
@@ -92,18 +92,36 @@ try {
 }
 
 # Final report
-Write-Host ""
-Write-Host "╔══════════════════════════════════════════╗"
-Write-Host "║         🚀 Transfer Test Result          ║"
-Write-Host "╠══════════════════════════════════════════╣"
-Write-Host ("║ Destination Computer : {0,-20}║" -f $computerName.ToUpper())
-Write-Host ("║ File Size            : {0,-7} MB           ║" -f $fileSizeMB)
-Write-Host ("║ Elapsed Time         : {0,-7} seconds       ║" -f $elapsed.ToString("0.00"))
-Write-Host ("║ Transfer Speed       : {0,-7} MB/s          ║" -f $speed)
-Write-Host "╠══════════════════════════════════════════╣"
-if ($srcDeleted -and $dstDeleted) {
-    Write-Host "║ Temp files cleaned from both locations.  ║"
+# Prepare log message
+$log = @()
+$log += ""
+$log += "🚀 Transfer Test Result"
+$log += "------------------------"
+$log += "Destination Computer : $($computerName.ToUpper())"
+$log += "File Size            : $fileSizeMB MB"
+$log += "Elapsed Time         : $($elapsed.ToString('0.00')) seconds"
+$log += "Transfer Speed       : $speed MB/s"
+$log += ""
+$log += if ($srcDeleted -and $dstDeleted) {
+    "✅ Temp files cleaned from both locations."
 } else {
-    Write-Host "║ ⚠ Warning: One or more files not deleted. ║"
+    "⚠ Temp file cleanup failed for one or both locations."
 }
-Write-Host "╚══════════════════════════════════════════╝"
+
+# Output to screen
+$log | ForEach-Object { Write-Host $_ }
+
+# Ensure export folder exists
+$logPath = 'C:\Temp\powershell-exports\speedtest-log.txt'
+$logFolder = Split-Path $logPath
+if (-not (Test-Path $logFolder)) {
+    New-Item -Path $logFolder -ItemType Directory | Out-Null
+}
+
+# Append to log file
+$timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+$log | Add-Content -Path $logPath
+Add-Content -Path $logPath -Value "Timestamp            : $timestamp"
+Add-Content -Path $logPath -Value ("=" * 40)
+
+
