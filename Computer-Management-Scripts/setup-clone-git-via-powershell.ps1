@@ -1,12 +1,12 @@
-# Revision : 1.1
-# Description : Git setup and GitHub repo clone with fallback to Documents if OneDrive not ready, user prompts for Git identity
+# Revision : 1.2
+# Description : Git setup and GitHub repo clone with OneDrive fallback, prompts for user config, updated Git v2.50.0 URL
 # Author : Jason Lamb (with help from ChatGPT)
 # Created Date : 2025-06-19
 # Modified Date : 2025-06-19
 
 # Step 1: Download and install Git for Windows
 $gitInstaller = "$env:TEMP\Git-Setup.exe"
-$gitDownloadUrl = "https://github.com/git-for-windows/git/releases/latest/download/Git-2.45.2-64-bit.exe"
+$gitDownloadUrl = "https://github.com/git-for-windows/git/releases/download/v2.50.0.windows.1/Git-2.50.0-64-bit.exe"
 
 Write-Host "Downloading Git installer from $gitDownloadUrl ..."
 Invoke-WebRequest -Uri $gitDownloadUrl -OutFile $gitInstaller
