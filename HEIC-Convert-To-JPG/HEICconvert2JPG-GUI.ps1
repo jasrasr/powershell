@@ -46,19 +46,20 @@ Revision 4.3
 update "&" in output
 #>
 
-<#
-Revision 5.0
-package as exe
-#>
-
-# GUI Revision 5 - HEIC to JPG Converter
-# Author: Jason Lamb
-# Created: 2025-04
-# Version: GUI Rev 5.0
-# Description: Converts HEIC/HEIF files to JPG using ImageMagick via PowerShell GUI.
-# Dependencies: ImageMagick (https://imagemagick.org)
+# Revision : 5.1
+# Description : GUI to convert HEIC/HEIF files to JPG using ImageMagick (portable compatible, handles UNC, PowerShell 7 required)
+# Author : Jason Lamb
+# Created Date : 2025-04
+# Modified Date : 2025-06-25
 
 $global:collectedFiles = @()
+
+# ✅ PowerShell 7+ check
+if ($PSVersionTable.PSVersion.Major -lt 7) {
+    Add-Type -AssemblyName System.Windows.Forms
+    [System.Windows.Forms.MessageBox]::Show("❌ This script requires PowerShell 7 or later.`nDownload: https://aka.ms/powershell","PowerShell Version Too Low")
+    exit
+}
 
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
@@ -75,7 +76,21 @@ function Start-Convert {
     $skipped = 0
     $failed = 0
 
-    $OutputFolder = (Resolve-Path $OutputFolder).Path
+    # ✅ Detect magick.exe (system path, then local fallback)
+    $magickCmd = "magick"
+    if (-not (Get-Command $magickCmd -ErrorAction SilentlyContinue)) {
+        $scriptDir = '.\'
+        $localMagick = Join-Path $scriptDir "ImageMagick\magick.exe"
+        if (Test-Path $localMagick) {
+            $magickCmd = $localMagick
+        } else {
+            $LogBox.AppendText("❌ magick.exe not found.`n")
+            [System.Windows.Forms.MessageBox]::Show("ImageMagick not found. Please install or place magick.exe in an 'ImageMagick' folder next to this script.","Missing magick.exe")
+            return
+        }
+    }
+
+    $OutputFolder = (Resolve-Path -LiteralPath $OutputFolder).Path
     $logPath = Join-Path $OutputFolder "conversion-log.csv"
     $archiveFolder = Join-Path (Split-Path -Path $Files[0]) 'Original HEIC'
 
@@ -90,7 +105,7 @@ function Start-Convert {
 
     foreach ($filePath in $Files) {
         $ProgressBar.PerformStep()
-        $file = Get-Item $filePath
+        $file = Get-Item -LiteralPath $filePath
         $ext = $file.Extension.ToLower()
         if ($ext -notin '.heic', '.heif') { continue }
 
@@ -100,7 +115,7 @@ function Start-Convert {
         $heicSize = [math]::Round($file.Length / 1KB, 2)
 
         if (Test-Path $jpgPath) {
-            $jpgSize = [math]::Round((Get-Item $jpgPath).Length / 1KB, 2)
+            $jpgSize = [math]::Round((Get-Item -LiteralPath $jpgPath).Length / 1KB, 2)
             "$($file.Name),$jpgName,Skipped (JPG exists),$heicSize,$jpgSize,N/A,$timestamp" | Out-File -FilePath $logPath -Append -Encoding utf8
             $LogBox.AppendText("⚠ Skipped: $($file.Name)`n")
             $skipped++
@@ -108,10 +123,18 @@ function Start-Convert {
         }
 
         try {
-            magick $file.FullName $jpgPath
-            $jpg = Get-Item $jpgPath
+            $srcPath = (Resolve-Path -LiteralPath $file.FullName).Path
+            $dstPath = $jpgPath
+
+            & $magickCmd "`"$srcPath`"" "`"$dstPath`""
+
+            if (-not (Test-Path -LiteralPath $dstPath)) {
+                throw "JPG not created"
+            }
+
+            $jpg = Get-Item -LiteralPath $dstPath
             $jpgSize = [math]::Round($jpg.Length / 1KB, 2)
-            $dimensions = magick identify -format "%wx%h" $jpgPath
+            $dimensions = & $magickCmd identify -format "%wx%h" "`"$dstPath`""
 
             Move-Item -Path $file.FullName -Destination (Join-Path $archiveFolder $file.Name) -Force
 
@@ -132,29 +155,26 @@ function Start-Convert {
 
 # GUI Setup
 $form = New-Object System.Windows.Forms.Form
-$form.Text = "HEIC to JPG Converter (GUI Rev 4.3)"
+$form.Text = "HEIC to JPG Converter (GUI Rev 5.1)"
 $form.Size = New-Object System.Drawing.Size(640,540)
 $form.StartPosition = "CenterScreen"
 
-# Instructions (as label)
 $infoLabel = New-Object System.Windows.Forms.Label
 $infoLabel.AutoSize = $false
 $infoLabel.Size = New-Object System.Drawing.Size(600, 40)
 $infoLabel.Location = New-Object System.Drawing.Point(10,10)
-$infoLabel.Text = "📅 Drag && drop HEIC/HEIF files below or use the Browse button.\n📁 Output folder defaults to input."
+$infoLabel.Text = "📅 Drag && drop HEIC/HEIF files below or use the Browse button.`n📁 Output folder defaults to input."
 $infoLabel.Font = New-Object System.Drawing.Font("Segoe UI", 9)
 $form.Controls.Add($infoLabel)
 
-# Metadata label
 $metaLabel = New-Object System.Windows.Forms.Label
 $metaLabel.AutoSize = $false
 $metaLabel.Size = New-Object System.Drawing.Size(600, 20)
 $metaLabel.Location = New-Object System.Drawing.Point(10, 50)
-$metaLabel.Text = "Author: Jason Lamb    Created: 2025-04    Version: GUI Rev 4.3"
+$metaLabel.Text = "Author: Jason Lamb    Created: 2025-04    Version: GUI Rev 5.1"
 $metaLabel.Font = New-Object System.Drawing.Font("Segoe UI", 8, [System.Drawing.FontStyle]::Italic)
 $form.Controls.Add($metaLabel)
 
-# Input Browse
 $inputLabel = New-Object System.Windows.Forms.Label
 $inputLabel.Text = "Input File(s):"
 $inputLabel.Location = New-Object System.Drawing.Point(10,80)
@@ -181,7 +201,6 @@ $inputBrowse.Add_Click({
 })
 $form.Controls.Add($inputBrowse)
 
-# Drop zone
 $dropLabel = New-Object System.Windows.Forms.Label
 $dropLabel.Text = "Drag && drop files/folders here"
 $dropLabel.Size = New-Object System.Drawing.Size(600,50)
@@ -191,7 +210,6 @@ $dropLabel.TextAlign = "MiddleCenter"
 $dropLabel.AllowDrop = $true
 $form.Controls.Add($dropLabel)
 
-# Output box
 $outputLabel = New-Object System.Windows.Forms.Label
 $outputLabel.Text = "Output Folder:"
 $outputLabel.Location = New-Object System.Drawing.Point(10,170)
@@ -213,20 +231,17 @@ $browseButton.Add_Click({
 })
 $form.Controls.Add($browseButton)
 
-# Log box
 $logBox = New-Object System.Windows.Forms.RichTextBox
 $logBox.Size = New-Object System.Drawing.Size(600,200)
 $logBox.Location = New-Object System.Drawing.Point(10,200)
 $logBox.ReadOnly = $true
 $form.Controls.Add($logBox)
 
-# Progress bar
 $progress = New-Object System.Windows.Forms.ProgressBar
 $progress.Size = New-Object System.Drawing.Size(600,20)
 $progress.Location = New-Object System.Drawing.Point(10,410)
 $form.Controls.Add($progress)
 
-# Convert button
 $convertButton = New-Object System.Windows.Forms.Button
 $convertButton.Text = "Convert"
 $convertButton.Location = New-Object System.Drawing.Point(270,440)
@@ -245,7 +260,6 @@ $convertButton.Add_Click({
 })
 $form.Controls.Add($convertButton)
 
-# Drag/drop logic
 $dropLabel.Add_DragEnter({
     if ($_.Data.GetDataPresent([Windows.Forms.DataFormats]::FileDrop)) {
         $_.Effect = [Windows.Forms.DragDropEffects]::Copy
