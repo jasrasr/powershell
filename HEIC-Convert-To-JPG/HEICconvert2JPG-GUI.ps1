@@ -48,6 +48,9 @@ update "&" in output
 
 # Revision : 5.1
 # Description : GUI to convert HEIC/HEIF files to JPG using ImageMagick (portable compatible, handles UNC, PowerShell 7 required)
+
+# Revision : 5.2
+# Description : Portable ImageMagick GUI HEIC to JPG Converter with module path override
 # Author : Jason Lamb
 # Created Date : 2025-04
 # Modified Date : 2025-06-25
@@ -76,18 +79,16 @@ function Start-Convert {
     $skipped = 0
     $failed = 0
 
-    # ✅ Detect magick.exe (system path, then local fallback)
-    $magickCmd = "magick"
-    if (-not (Get-Command $magickCmd -ErrorAction SilentlyContinue)) {
-        $scriptDir = '.\'
-        $localMagick = Join-Path $scriptDir "ImageMagick\magick.exe"
-        if (Test-Path $localMagick) {
-            $magickCmd = $localMagick
-        } else {
-            $LogBox.AppendText("❌ magick.exe not found.`n")
-            [System.Windows.Forms.MessageBox]::Show("ImageMagick not found. Please install or place magick.exe in an 'ImageMagick' folder next to this script.","Missing magick.exe")
-            return
-        }
+    # ✅ Force portable magick.exe
+    $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+    $magickCmd = Join-Path $scriptDir "ImageMagick\magick.exe"
+    $modulePath = Join-Path $scriptDir "ImageMagick\modules\coders"
+    $configPath = Join-Path $scriptDir "ImageMagick\config"
+
+    if (-not (Test-Path $magickCmd)) {
+        $LogBox.AppendText("❌ magick.exe not found in 'ImageMagick' folder.`n")
+        [System.Windows.Forms.MessageBox]::Show("Missing portable magick.exe in 'ImageMagick' folder next to script.","Error")
+        return
     }
 
     $OutputFolder = (Resolve-Path -LiteralPath $OutputFolder).Path
@@ -126,6 +127,10 @@ function Start-Convert {
             $srcPath = (Resolve-Path -LiteralPath $file.FullName).Path
             $dstPath = $jpgPath
 
+            # ✅ Override ImageMagick environment variables for modules/config
+            $env:MAGICK_CODER_MODULE_PATH = $modulePath
+            $env:MAGICK_CONFIGURE_PATH = $configPath
+
             & $magickCmd "`"$srcPath`"" "`"$dstPath`""
 
             if (-not (Test-Path -LiteralPath $dstPath)) {
@@ -147,6 +152,10 @@ function Start-Convert {
             $LogBox.AppendText("❌ Failed: $($file.Name)`n")
             $failed++
         }
+        finally {
+            Remove-Item Env:MAGICK_CODER_MODULE_PATH -ErrorAction SilentlyContinue
+            Remove-Item Env:MAGICK_CONFIGURE_PATH -ErrorAction SilentlyContinue
+        }
     }
 
     [System.Windows.Forms.MessageBox]::Show("Done! ✅ $converted converted, ⚠ $skipped skipped, ❌ $failed failed.","Conversion Summary")
@@ -155,7 +164,7 @@ function Start-Convert {
 
 # GUI Setup
 $form = New-Object System.Windows.Forms.Form
-$form.Text = "HEIC to JPG Converter (GUI Rev 5.1)"
+$form.Text = "HEIC to JPG Converter (GUI Rev 5.2)"
 $form.Size = New-Object System.Drawing.Size(640,540)
 $form.StartPosition = "CenterScreen"
 
@@ -171,7 +180,7 @@ $metaLabel = New-Object System.Windows.Forms.Label
 $metaLabel.AutoSize = $false
 $metaLabel.Size = New-Object System.Drawing.Size(600, 20)
 $metaLabel.Location = New-Object System.Drawing.Point(10, 50)
-$metaLabel.Text = "Author: Jason Lamb    Created: 2025-04    Version: GUI Rev 5.1"
+$metaLabel.Text = "Author: Jason Lamb    Created: 2025-04    Version: GUI Rev 5.2"
 $metaLabel.Font = New-Object System.Drawing.Font("Segoe UI", 8, [System.Drawing.FontStyle]::Italic)
 $form.Controls.Add($metaLabel)
 
