@@ -1,5 +1,5 @@
-# Revision : 1.0
-# Description : Display a PowerShell progress bar with a variable total duration
+# Revision : 1.1
+# Description : Display a PowerShell progress bar with a variable total duration (fixed 99% hang issue)
 # Author : Jason Lamb (with help from ChatGPT)
 # Created Date : 2025-07-01
 # Modified Date : 2025-07-01
@@ -16,10 +16,17 @@ $interval = $duration / $steps
 
 Write-Host "Progress will complete in approximately $duration seconds..."
 
-for ($i = 0; $i -le $steps; $i++) {
+for ($i = 0; $i -lt $steps; $i++) {
     $percent = ($i / $steps) * 100
-    Write-Progress -Activity "Processing Task" -Status "$percent% Complete" -PercentComplete $percent
+    Write-Progress -Activity "Processing Task" -Status "$([math]::Round($percent,0))% Complete" -PercentComplete $percent
     Start-Sleep -Milliseconds ($interval * 1000)
 }
+
+# Final update to ensure 100% is shown
+Write-Progress -Activity "Processing Task" -Status "100% Complete" -PercentComplete 100
+Start-Sleep -Milliseconds 300
+
+# Clear the progress bar
+Write-Progress -Activity "Processing Task" -Completed
 
 Write-Host "Done! Total time : $duration seconds"
