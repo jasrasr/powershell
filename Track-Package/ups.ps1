@@ -15,5 +15,6 @@ function ups {
 
 # call with 'ups 1Z################'
 # returns
-C:\Users\jason.lamb> ups 1ZX1615YD904086345
-https://www.ups.com/track?track=yes&trackNums=1ZX1615YD904086345
+# C:\> ups 1Z################
+# https://www.ups.com/track?track=yes&trackNums=1Z################
+# launches chrome in new window
