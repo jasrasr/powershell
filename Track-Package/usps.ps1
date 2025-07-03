@@ -1,3 +1,9 @@
+# Revision : 1.0
+# Description : Launches a USPS tracking URL in a new Chrome window and returns the URL for logging or further use
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-07-03
+# Modified Date : 2025-07-03
+
 function usps {
     param(
         [Parameter(Mandatory)][string]$TrackingNumber
