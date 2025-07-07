@@ -1,32 +1,63 @@
-# Revision : 1.1
-# Description : Display a PowerShell progress bar with a variable total duration (fixed 99% hang issue)
+# Revision : 2.1
+# Description : GUI version of variable-time progress bar using WinForms (param fix)
 # Author : Jason Lamb (with help from ChatGPT)
 # Created Date : 2025-07-01
 # Modified Date : 2025-07-01
 
-param (
-    [int]$MinSeconds = 3,
-    [int]$MaxSeconds = 10
-)
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
 
-# Generate random duration in seconds
+# === CONFIGURATION ===
+$MinSeconds = 3
+$MaxSeconds = 10
+
+# Generate random duration
 $duration = Get-Random -Minimum $MinSeconds -Maximum ($MaxSeconds + 1)
 $steps = 100
 $interval = $duration / $steps
 
-Write-Host "Progress will complete in approximately $duration seconds..."
+# === BUILD GUI ===
+$form = New-Object System.Windows.Forms.Form
+$form.Text = "Progress Task"
+$form.Size = New-Object System.Drawing.Size(400,120)
+$form.StartPosition = "CenterScreen"
+$form.Topmost = $true
 
-for ($i = 0; $i -lt $steps; $i++) {
-    $percent = ($i / $steps) * 100
-    Write-Progress -Activity "Processing Task" -Status "$([math]::Round($percent,0))% Complete" -PercentComplete $percent
-    Start-Sleep -Milliseconds ($interval * 1000)
-}
+# Label
+$label = New-Object System.Windows.Forms.Label
+$label.AutoSize = $true
+$label.Location = New-Object System.Drawing.Point(10,10)
+$label.Text = "Processing... 0%"
+$form.Controls.Add($label)
 
-# Final update to ensure 100% is shown
-Write-Progress -Activity "Processing Task" -Status "100% Complete" -PercentComplete 100
-Start-Sleep -Milliseconds 300
+# Progress bar
+$progressBar = New-Object System.Windows.Forms.ProgressBar
+$progressBar.Location = New-Object System.Drawing.Point(10,40)
+$progressBar.Size = New-Object System.Drawing.Size(360,25)
+$progressBar.Minimum = 0
+$progressBar.Maximum = 100
+$form.Controls.Add($progressBar)
 
-# Clear the progress bar
-Write-Progress -Activity "Processing Task" -Completed
+# Timer
+$timer = New-Object System.Windows.Forms.Timer
+$timer.Interval = $interval * 1000  # milliseconds
 
-Write-Host "Done! Total time : $duration seconds"
+$i = 0
+$timer.Add_Tick({
+    $i++
+    $progressBar.Value = $i
+    $label.Text = "Processing... $i%"
+
+    if ($i -ge 100) {
+        $timer.Stop()
+        $label.Text = "Completed in $duration seconds!"
+        Start-Sleep -Milliseconds 500
+        $form.Close()
+    }
+})
+
+# Start timer when form is shown
+$form.Add_Shown({ $timer.Start() })
+
+# Show the GUI
+[void]$form.ShowDialog()
