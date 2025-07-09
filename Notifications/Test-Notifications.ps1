@@ -1,6 +1,6 @@
 # Basic Tests for Notification System
-# Author: Jason Lamb (jasrasr)
-# Created: 2024-07-08
+# Author: Jason Lamb (@jasrasr) (with help from GitHub Copilot)
+# Created: 7/8/25
 # Description: Basic tests to verify notification system functionality
 
 # Import the notification manager
