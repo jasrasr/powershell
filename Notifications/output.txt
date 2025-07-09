@@ -1,0 +1,153 @@
+Notifications cleared successfully
+=== NOTIFICATION SYSTEM USAGE EXAMPLE ===
+
+Example 1: Creating notifications with different types
+Notification created successfully: System Maintenance
+
+[32;1mId          : [0m0c51250f-22a1-4dec-9d11-f87a0718f13e
+[32;1mTitle       : [0mSystem Maintenance
+[32;1mMessage     : [0mSystem will be down for maintenance tonight
+[32;1mType        : [0mWarning
+[32;1mCategory    : [0mSystem
+[32;1mCreatedDate : [0m2025-07-08 20:08:13
+[32;1mIsRead      : [0mFalse
+
+Notification created successfully: Deployment Complete
+[32;1mId          : [0m19c06a11-29f7-4864-b012-e0e4bf6193c1
+[32;1mTitle       : [0mDeployment Complete
+[32;1mMessage     : [0mApplication v2.1 has been deployed successfully
+[32;1mType        : [0mSuccess
+[32;1mCategory    : [0mDeployment
+[32;1mCreatedDate : [0m2025-07-08 20:08:13
+[32;1mIsRead      : [0mFalse
+
+Notification created successfully: Security Alert
+[32;1mId          : [0mcb4c774e-df29-4074-8c37-f985eb385e56
+[32;1mTitle       : [0mSecurity Alert
+[32;1mMessage     : [0mUnauthorized access attempt detected
+[32;1mType        : [0mError
+[32;1mCategory    : [0mSecurity
+[32;1mCreatedDate : [0m2025-07-08 20:08:13
+[32;1mIsRead      : [0mFalse
+
+
+Example 2: Viewing all notifications
+
+=== NOTIFICATIONS ===
+Total: 3
+
+● [Warning] System Maintenance
+  ID: 0c51250f-22a1-4dec-9d11-f87a0718f13e
+  Category: System
+  Created: 2025-07-08 20:08:13
+  Status: Unread
+  Message: System will be down for maintenance tonight
+
+● [Success] Deployment Complete
+  ID: 19c06a11-29f7-4864-b012-e0e4bf6193c1
+  Category: Deployment
+  Created: 2025-07-08 20:08:13
+  Status: Unread
+  Message: Application v2.1 has been deployed successfully
+
+● [Error] Security Alert
+  ID: cb4c774e-df29-4074-8c37-f985eb385e56
+  Category: Security
+  Created: 2025-07-08 20:08:13
+  Status: Unread
+  Message: Unauthorized access attempt detected
+
+=== END NOTIFICATIONS ===
+
+Example 3: Marking the first notification as read
+Notification marked as read
+True
+
+Example 4: Viewing only unread notifications
+
+=== NOTIFICATIONS ===
+Total: 2
+
+● [Success] Deployment Complete
+  ID: 19c06a11-29f7-4864-b012-e0e4bf6193c1
+  Category: Deployment
+  Created: 2025-07-08 20:08:13
+  Status: Unread
+  Message: Application v2.1 has been deployed successfully
+
+● [Error] Security Alert
+  ID: cb4c774e-df29-4074-8c37-f985eb385e56
+  Category: Security
+  Created: 2025-07-08 20:08:13
+  Status: Unread
+  Message: Unauthorized access attempt detected
+
+=== END NOTIFICATIONS ===
+
+Example 5: Viewing only Error notifications
+
+=== NOTIFICATIONS ===
+Total: 1
+
+● [Error] Security Alert
+  ID: cb4c774e-df29-4074-8c37-f985eb385e56
+  Category: Security
+  Created: 2025-07-08 20:08:13
+  Status: Unread
+  Message: Unauthorized access attempt detected
+
+=== END NOTIFICATIONS ===
+
+Example 6: Viewing only System notifications
+
+=== NOTIFICATIONS ===
+Total: 1
+
+✓ [Warning] System Maintenance
+  ID: 0c51250f-22a1-4dec-9d11-f87a0718f13e
+  Category: System
+  Created: 2025-07-08 20:08:13
+  Status: Read
+  Message: System will be down for maintenance tonight
+
+=== END NOTIFICATIONS ===
+
+Example 7: Getting notification statistics
+Total notifications: 3
+Unread: 2
+Read: 1
+
+Example 8: Batch operation - marking all Security notifications as read
+Notification marked as read
+True
+
+Example 9: Final notification status
+
+=== NOTIFICATIONS ===
+Total: 3
+
+✓ [Warning] System Maintenance
+  ID: 0c51250f-22a1-4dec-9d11-f87a0718f13e
+  Category: System
+  Created: 2025-07-08 20:08:13
+  Status: Read
+  Message: System will be down for maintenance tonight
+
+● [Success] Deployment Complete
+  ID: 19c06a11-29f7-4864-b012-e0e4bf6193c1
+  Category: Deployment
+  Created: 2025-07-08 20:08:13
+  Status: Unread
+  Message: Application v2.1 has been deployed successfully
+
+✓ [Error] Security Alert
+  ID: cb4c774e-df29-4074-8c37-f985eb385e56
+  Category: Security
+  Created: 2025-07-08 20:08:13
+  Status: Read
+  Message: Unauthorized access attempt detected
+
+=== END NOTIFICATIONS ===
+
+=== EXAMPLE COMPLETE ===
+The notification system provides a complete solution for managing notifications with read/unread status tracking.
