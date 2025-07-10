@@ -241,9 +241,32 @@ while ($true) {
     $Board[$bigMove][$smallMove] = $currentPlayerSymbol
     $MoveHistory += [pscustomobject]@{Big=$bigMove; Small=$smallMove; Symbol=$currentPlayerSymbol}
 
-    if (Check-SmallBoardWin($bigMove, $currentPlayerSymbol)) {
-        $BigWinners[$bigMove] = $currentPlayerSymbol
+if ($BigWinners[$bigMove] -eq " " -and (Check-SmallBoardWin $bigMove $currentPlayerSymbol)) {
+
+    $BigWinners[$bigMove] = $currentPlayerSymbol
+
+    if (Check-FullGameWin $currentPlayerSymbol) {
+        $FinalGameOver = $true
+        Animate-ExpandingWinner
+        Animate-ScrollingWinner
+        Show-WinnerBoard
+        Read-Host "`nPress Enter to continue..."
+        $WinCount[$currentPlayerSymbol]++
+
+        do {
+            $playAgain = Read-Host "`nPlay again? (y/n)"
+        } until ($playAgain -match '^(y|Y|n|N)$')
+
+        if ($playAgain -match '^(y|Y)$') {
+            Initialize-Board
+            continue
+        }
+        else {
+            break
+        }
     }
+}
+
 
     if (Check-FullGameWin($currentPlayerSymbol)) {
         $FinalGameOver = $true
