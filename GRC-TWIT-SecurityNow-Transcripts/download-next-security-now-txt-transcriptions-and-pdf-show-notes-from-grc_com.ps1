@@ -27,21 +27,27 @@ function Write-Log {
     Add-Content -Path $global:logFile -Value "[$timestamp] $Message"
 }
 
-# Detect next missing TXT
-$global:nextFileNumber = $startingPoint
-while (Test-Path (Join-Path $txtFolder "sn-$global:nextFileNumber.txt")) {
-    Write-Host "TXT already exists: sn-$global:nextFileNumber.txt, skipping..." -ForegroundColor Green
-    Write-Log "Auto-skip (TXT exists): sn-$global:nextFileNumber.txt"
-    $global:nextFileNumber++
+# Load last downloaded number or fallback to starting point
+if (Test-Path $trackingFile) {
+    try {
+        $trackingData = Get-Content -Path $trackingFile | ConvertFrom-Json
+        $global:nextFileNumber = [int]$trackingData.LastTXT + 1
+        $global:nextfilenumberpdf = [int]$trackingData.LastPDF + 1
+        Write-Host "Resuming from JSON : TXT $($global:nextFileNumber), PDF $($global:nextfilenumberpdf)" -ForegroundColor Cyan
+        Write-Log "Resuming from last-downloaded.json"
+    } catch {
+        Write-Host "Failed to parse last-downloaded.json, defaulting to $startingPoint" -ForegroundColor Red
+        Write-Log "Failed to parse last-downloaded.json, defaulting to $startingPoint"
+        $global:nextFileNumber = $startingPoint
+        $global:nextfilenumberpdf = $startingPoint
+    }
+} else {
+    $global:nextFileNumber = $startingPoint
+    $global:nextfilenumberpdf = $startingPoint
+    Write-Host "No tracking file found, starting from $startingPoint" -ForegroundColor Yellow
+    Write-Log "No tracking file found, starting from $startingPoint"
 }
 
-# Detect next missing PDF
-$global:nextfilenumberpdf = $startingPoint
-while (Test-Path (Join-Path $pdfFolder "sn-$global:nextfilenumberpdf-notes.pdf")) {
-    Write-Host "PDF already exists: sn-$global:nextfilenumberpdf-notes.pdf, skipping..." -ForegroundColor Green
-    Write-Log "Auto-skip (PDF exists): sn-$global:nextfilenumberpdf-notes.pdf"
-    $global:nextfilenumberpdf++
-}
 
 $global:txtDownloaded = 0
 $global:pdfDownloaded = 0
