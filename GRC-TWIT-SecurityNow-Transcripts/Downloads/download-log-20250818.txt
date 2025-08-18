@@ -1,0 +1,48 @@
+[2025-08-18 11:48:26] Checking TXT: sn-1030.txt
+[2025-08-18 11:48:27] Error: https://www.grc.com/sn/sn-1030.txt - Could not find a part of the path 'C:\users\jason.lamb\OneDrive - middough\documents\github\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\TXT-Transcriptions\sn-1030.txt'.
+[2025-08-18 11:48:27] Checking TXT: sn-1031.txt
+[2025-08-18 11:48:28] Error: https://www.grc.com/sn/sn-1031.txt - Could not find a part of the path 'C:\users\jason.lamb\OneDrive - middough\documents\github\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\TXT-Transcriptions\sn-1031.txt'.
+[2025-08-18 11:48:28] TXT stopped after 2 consecutive failures at sn-1032.txt
+[2025-08-18 11:48:28] Checking PDF: sn-1030-notes.pdf
+[2025-08-18 11:48:29] Error: https://www.grc.com/sn/sn-1030-notes.pdf - Could not find a part of the path 'C:\users\jason.lamb\OneDrive - middough\documents\github\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\PDF-Show-Notes\sn-1030-notes.pdf'.
+[2025-08-18 11:48:29] Checking PDF: sn-1031-notes.pdf
+[2025-08-18 11:48:29] Error: https://www.grc.com/sn/sn-1031-notes.pdf - Could not find a part of the path 'C:\users\jason.lamb\OneDrive - middough\documents\github\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\PDF-Show-Notes\sn-1031-notes.pdf'.
+[2025-08-18 11:48:29] PDF stopped after 2 consecutive failures at sn-1032-notes.pdf
+[2025-08-18 11:48:29] TXT files downloaded: 0
+[2025-08-18 11:48:29] PDF files downloaded: 0
+[2025-08-18 11:48:29] Log complete.
+[2025-08-18 11:52:03] Checking TXT: sn-1033.txt
+[2025-08-18 11:52:04] Downloaded: sn-1033.txt
+[2025-08-18 11:52:04] Checking TXT: sn-1034.txt
+[2025-08-18 11:52:05] Downloaded: sn-1034.txt
+[2025-08-18 11:52:05] Checking TXT: sn-1035.txt
+[2025-08-18 11:52:06] Downloaded: sn-1035.txt
+[2025-08-18 11:52:06] Checking TXT: sn-1036.txt
+[2025-08-18 11:52:07] Downloaded: sn-1036.txt
+[2025-08-18 11:52:07] Checking TXT: sn-1037.txt
+[2025-08-18 11:52:08] Downloaded: sn-1037.txt
+[2025-08-18 11:52:08] Checking TXT: sn-1038.txt
+[2025-08-18 11:52:08] Error: https://www.grc.com/sn/sn-1038.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-08-18 11:52:08] Checking TXT: sn-1039.txt
+[2025-08-18 11:52:09] Error: https://www.grc.com/sn/sn-1039.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-08-18 11:52:09] TXT stopped after 2 consecutive failures at sn-1040.txt
+[2025-08-18 11:52:09] Checking PDF: sn-1033-notes.pdf
+[2025-08-18 11:52:09] Skipped (exists): sn-1033-notes.pdf
+[2025-08-18 11:52:09] Checking PDF: sn-1034-notes.pdf
+[2025-08-18 11:52:10] Downloaded: sn-1034-notes.pdf
+[2025-08-18 11:52:10] Checking PDF: sn-1035-notes.pdf
+[2025-08-18 11:52:11] Downloaded: sn-1035-notes.pdf
+[2025-08-18 11:52:11] Checking PDF: sn-1036-notes.pdf
+[2025-08-18 11:52:12] Downloaded: sn-1036-notes.pdf
+[2025-08-18 11:52:12] Checking PDF: sn-1037-notes.pdf
+[2025-08-18 11:52:13] Downloaded: sn-1037-notes.pdf
+[2025-08-18 11:52:13] Checking PDF: sn-1038-notes.pdf
+[2025-08-18 11:52:15] Downloaded: sn-1038-notes.pdf
+[2025-08-18 11:52:15] Checking PDF: sn-1039-notes.pdf
+[2025-08-18 11:52:15] Error: https://www.grc.com/sn/sn-1039-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-08-18 11:52:15] Checking PDF: sn-1040-notes.pdf
+[2025-08-18 11:52:15] Error: https://www.grc.com/sn/sn-1040-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-08-18 11:52:15] PDF stopped after 2 consecutive failures at sn-1041-notes.pdf
+[2025-08-18 11:52:15] TXT files downloaded: 5
+[2025-08-18 11:52:15] PDF files downloaded: 5
+[2025-08-18 11:52:15] Log complete.
