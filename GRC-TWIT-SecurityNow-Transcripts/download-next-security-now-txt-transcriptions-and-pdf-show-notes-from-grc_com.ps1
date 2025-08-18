@@ -183,10 +183,13 @@ Write-Host "Downloaded TXT transcripts : $global:txtDownloaded" -ForegroundColor
 Write-Host "Downloaded PDF notes       : $global:pdfDownloaded" -ForegroundColor Cyan
 Write-Log "TXT files downloaded: $global:txtDownloaded"
 Write-Log "PDF files downloaded: $global:pdfDownloaded"
-Write-Log "Log complete."
+
 
 # Save last known downloaded state
 Save-LastDownloaded
+
+Write-Log "Log complete."
+Write-Log "~~~`n"
 
 # Open the log file
 Start-Process -FilePath $global:logFile
