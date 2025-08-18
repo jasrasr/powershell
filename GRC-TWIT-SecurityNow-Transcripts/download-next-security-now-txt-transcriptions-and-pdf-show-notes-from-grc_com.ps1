@@ -7,6 +7,8 @@
 $global:downloadbase = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads"
 $global:baseUrl = "https://www.grc.com/sn/"
 $startingPoint = 1030
+$global:lastTXTDownloaded = $null
+$global:lastPDFDownloaded = $null
 $trackingFile = Join-Path $global:downloadbase 'last-downloaded.json'
 
 # Ensure base folder exists
@@ -55,7 +57,7 @@ $global:pdfDownloaded = 0
 function get-grctxttranscript {
     $failureCount = 0
     while ($failureCount -lt 2) {
-        Write-Host "Next file number to check: $global:nextFileNumber"
+        Write-Host "Next TXT file number to check: $global:nextFileNumber"
         Write-Log "Checking TXT: sn-$global:nextFileNumber.txt"
 
         $txtUrl = "${global:baseUrl}sn-$global:nextFileNumber.txt"
@@ -76,8 +78,10 @@ function get-grctxttranscript {
                     Write-Host $txtUrl -ForegroundColor Yellow
                     Write-Log "Downloaded: sn-$global:nextFileNumber.txt"
                     $global:txtDownloaded++
+                    $global:lastTXTDownloaded = $global:nextFileNumber
                     $failureCount = 0
                     $global:nextFileNumber++
+
                 } else {
                     Write-Host "TXT url not found on web: sn-$global:nextFileNumber.txt" -ForegroundColor Red
                     Write-Log "Not found (HEAD 404): sn-$global:nextFileNumber.txt"
@@ -103,7 +107,7 @@ function get-grctxttranscript {
 function get-grcpdfshownotes {
     $failureCount = 0
     while ($failureCount -lt 2) {
-        Write-Host "Next file number to check: $global:nextfilenumberpdf"
+        Write-Host "Next PDF file number to check: $global:nextfilenumberpdf"
         Write-Log "Checking PDF: sn-$global:nextfilenumberpdf-notes.pdf"
 
         $pdfUrl = "${global:baseUrl}sn-$global:nextfilenumberpdf-notes.pdf"
@@ -124,7 +128,9 @@ function get-grcpdfshownotes {
                     Write-Host $pdfUrl -ForegroundColor Yellow
                     Write-Log "Downloaded: sn-$global:nextfilenumberpdf-notes.pdf"
                     $global:pdfDownloaded++
+                    $global:lastPDFDownloaded = $global:nextfilenumberpdf
                     $failureCount = 0
+
                 } else {
                     Write-Host "PDF url not found on web: sn-$global:nextfilenumberpdf-notes.pdf" -ForegroundColor Red
                     Write-Host $pdfUrl -ForegroundColor Red
@@ -150,14 +156,15 @@ function get-grcpdfshownotes {
 
 function Save-LastDownloaded {
     $data = @{
-        LastTXT = $global:nextFileNumber - 1
-        LastPDF = $global:nextfilenumberpdf - 1
+        LastTXT = if ($global:lastTXTDownloaded) { $global:lastTXTDownloaded } else { $global:nextFileNumber - 1 }
+        LastPDF = if ($global:lastPDFDownloaded) { $global:lastPDFDownloaded } else { $global:nextfilenumberpdf - 1 }
     }
     $data | ConvertTo-Json | Set-Content -Path $trackingFile -Encoding UTF8
     Write-Host "Saved last downloaded numbers to: $trackingFile" -ForegroundColor Cyan
     Write-Log "Saved last TXT : sn-$($data.LastTXT).txt"
     Write-Log "Saved last PDF : sn-$($data.LastPDF)-notes.pdf"
 }
+
 
 # Run downloads
 get-grctxttranscript
