@@ -1,5 +1,5 @@
-# Revision : 1.7
-# Description : Downloads GRC Security Now transcripts and PDF show notes until two consecutive failures occur, logs results, and opens the log file.
+# Revision : 1.8
+# Description : Downloads GRC Security Now transcripts and PDF show notes with resume, logging, and persistent tracking
 # Author : Jason Lamb (with help from ChatGPT)
 # Created Date : 2025-05-16
 # Modified Date : 2025-08-18
@@ -7,35 +7,19 @@
 $global:downloadbase = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads"
 $global:baseUrl = "https://www.grc.com/sn/"
 $startingPoint = 1030
+$trackingFile = Join-Path $global:downloadbase 'last-downloaded.json'
 
-# Ensure base download folder exists
+# Ensure base folder exists
 if (-not (Test-Path $global:downloadbase)) {
     New-Item -Path $global:downloadbase -ItemType Directory -Force | Out-Null
 }
 
-# Auto-calculate the next available number by checking file presence
+# Init folders
 $txtFolder = "$global:downloadbase\TXT-Transcriptions"
 $pdfFolder = "$global:downloadbase\PDF-Show-Notes"
 
-$nextAvailable = $startingPoint
-while ($true) {
-    $txtPath = Join-Path $txtFolder "sn-$nextAvailable.txt"
-    $pdfPath = Join-Path $pdfFolder "sn-$nextAvailable-notes.pdf"
-
-    if ((Test-Path $txtPath) -and (Test-Path $pdfPath)) {
-        $nextAvailable++
-    } else {
-        break
-    }
-}
-
-$global:nextFileNumber = $nextAvailable
-$global:nextfilenumberpdf = $nextAvailable
-
+# Init log
 $global:logFile = "$global:downloadbase\download-log-$(Get-Date -Format 'yyyyMMdd').txt"
-
-$global:txtDownloaded = 0
-$global:pdfDownloaded = 0
 
 function Write-Log {
     param ([string]$Message)
@@ -43,10 +27,27 @@ function Write-Log {
     Add-Content -Path $global:logFile -Value "[$timestamp] $Message"
 }
 
-function get-grctxttranscript {
-    $txtFolder = "$global:downloadbase\TXT-Transcriptions"
-    $failureCount = 0
+# Detect next missing TXT
+$global:nextFileNumber = $startingPoint
+while (Test-Path (Join-Path $txtFolder "sn-$global:nextFileNumber.txt")) {
+    Write-Host "TXT already exists: sn-$global:nextFileNumber.txt, skipping..." -ForegroundColor Green
+    Write-Log "Auto-skip (TXT exists): sn-$global:nextFileNumber.txt"
+    $global:nextFileNumber++
+}
 
+# Detect next missing PDF
+$global:nextfilenumberpdf = $startingPoint
+while (Test-Path (Join-Path $pdfFolder "sn-$global:nextfilenumberpdf-notes.pdf")) {
+    Write-Host "PDF already exists: sn-$global:nextfilenumberpdf-notes.pdf, skipping..." -ForegroundColor Green
+    Write-Log "Auto-skip (PDF exists): sn-$global:nextfilenumberpdf-notes.pdf"
+    $global:nextfilenumberpdf++
+}
+
+$global:txtDownloaded = 0
+$global:pdfDownloaded = 0
+
+function get-grctxttranscript {
+    $failureCount = 0
     while ($failureCount -lt 2) {
         Write-Host "Next file number to check: $global:nextFileNumber"
         Write-Log "Checking TXT: sn-$global:nextFileNumber.txt"
@@ -94,9 +95,7 @@ function get-grctxttranscript {
 }
 
 function get-grcpdfshownotes {
-    $pdfFolder = "$global:downloadbase\PDF-Show-Notes"
     $failureCount = 0
-
     while ($failureCount -lt 2) {
         Write-Host "Next file number to check: $global:nextfilenumberpdf"
         Write-Log "Checking PDF: sn-$global:nextfilenumberpdf-notes.pdf"
@@ -143,17 +142,30 @@ function get-grcpdfshownotes {
     }
 }
 
-# Run download functions
+function Save-LastDownloaded {
+    $data = @{
+        LastTXT = $global:nextFileNumber - 1
+        LastPDF = $global:nextfilenumberpdf - 1
+    }
+    $data | ConvertTo-Json | Set-Content -Path $trackingFile -Encoding UTF8
+    Write-Host "Saved last downloaded numbers to: $trackingFile" -ForegroundColor Cyan
+    Write-Log "Saved last TXT : sn-$($data.LastTXT).txt"
+    Write-Log "Saved last PDF : sn-$($data.LastPDF)-notes.pdf"
+}
+
+# Run downloads
 get-grctxttranscript
 get-grcpdfshownotes
 
-# Output summary
+# Summary
 Write-Host "Downloaded TXT transcripts : $global:txtDownloaded" -ForegroundColor Cyan
 Write-Host "Downloaded PDF notes       : $global:pdfDownloaded" -ForegroundColor Cyan
-
 Write-Log "TXT files downloaded: $global:txtDownloaded"
 Write-Log "PDF files downloaded: $global:pdfDownloaded"
 Write-Log "Log complete."
+
+# Save last known downloaded state
+Save-LastDownloaded
 
 # Open the log file
 Start-Process -FilePath $global:logFile
