@@ -155,15 +155,23 @@ function get-grcpdfshownotes {
 }
 
 function Save-LastDownloaded {
+    if ($global:txtDownloaded -eq 0 -and $global:pdfDownloaded -eq 0) {
+        Write-Host "No successful downloads, skipping update to last-downloaded.json" -ForegroundColor Yellow
+        Write-Log "No downloads — last-downloaded.json was NOT updated"
+        return
+    }
+
     $data = @{
         LastTXT = if ($global:lastTXTDownloaded) { $global:lastTXTDownloaded } else { $global:nextFileNumber - 1 }
         LastPDF = if ($global:lastPDFDownloaded) { $global:lastPDFDownloaded } else { $global:nextfilenumberpdf - 1 }
     }
+
     $data | ConvertTo-Json | Set-Content -Path $trackingFile -Encoding UTF8
     Write-Host "Saved last downloaded numbers to: $trackingFile" -ForegroundColor Cyan
     Write-Log "Saved last TXT : sn-$($data.LastTXT).txt"
     Write-Log "Saved last PDF : sn-$($data.LastPDF)-notes.pdf"
 }
+
 
 
 # Run downloads
