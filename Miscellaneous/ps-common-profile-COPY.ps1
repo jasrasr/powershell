@@ -156,168 +156,198 @@ if ($trackedChanges) {
 
 ####################
 
+# Revision : 1.0
+# Description : Fixes Git staging logic so untracked/renamed/deleted files are added before commit; adds safe rename step, proper datetime, empty-commit fallback  (Rev 1.0)
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-09-16
+# Modified Date : 2025-09-16
+
 function Git-PowerShell-Sync {
+    param()
+
     $repoPath = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell"
+    $datetime = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
 
-#START RENAME FILES WITH SPACES TO DASHES
-
-# Define the root folder to search
-$rootFolder = $repoPath
-
-Get-ChildItem -Path $rootFolder -Recurse -Force | ForEach-Object {
-    if ($_.Name -match '\s') {
-        $baseName = $_.Name -replace '\s', '-'
-        $directory = $_.DirectoryName
-        $targetPath = Join-Path $directory $baseName
-
-        # If it's a file, split name and extension
-        if (-not $_.PSIsContainer) {
-            $nameNoExt = [System.IO.Path]::GetFileNameWithoutExtension($baseName)
-            $ext = [System.IO.Path]::GetExtension($baseName)
-
-            # Add -dup until it's unique
-            while (Test-Path $targetPath) {
-                $nameNoExt += "-dup"
-                $baseName = "$nameNoExt$ext"
-                $targetPath = Join-Path $directory $baseName
-            }
-        }
-        else {
-            # It's a folder
-            while (Test-Path $targetPath) {
-                $baseName += "-dup"
-                $targetPath = Join-Path $directory $baseName
-            }
-        }
-
-        try {
-            Rename-Item -Path $_.FullName -NewName $baseName -Force
-            Write-Host "Renamed: '$($_.FullName)' → '$targetPath'"
-        }
-        catch {
-            Write-Warning "Failed to rename: '$($_.FullName)' → '$targetPath' - $($_.Exception.Message)"
-        }
-    }
-}
-
-
-#START GIT PUBLIC POWERSHELL
-    if (Test-Path $repoPath) {
-        Set-Location $repoPath
-        Write-Host "Switched to $repoPath" -ForegroundColor Yellow
-    } else {
-        Write-Host "Repository path does not exist: $repoPath" -ForegroundColor Red
+    if (-not (Test-Path -LiteralPath $repoPath)) {
+        Write-Host "Repository path does not exist : $repoPath" -ForegroundColor Red
         return
     }
 
-    Write-Host "Pulling latest changes from PowerShell repository..." -ForegroundColor Green
+    Set-Location -LiteralPath $repoPath
+    Write-Host "Switched to $repoPath" -ForegroundColor Yellow
+
+    # --- SAFETY: never touch the .git folder during renames ---
+    $rootFolder = $repoPath
+    Get-ChildItem -Path $rootFolder -Recurse -Force -File,Directory |
+        Where-Object {
+            $_.FullName -notmatch [regex]::Escape("\.git\") -and
+            $_.Name -match '\s'
+        } | ForEach-Object {
+            $originalFull = $_.FullName
+            $baseName = $_.Name -replace '\s','-'
+            $directory = $_.DirectoryName
+            $targetPath = Join-Path $directory $baseName
+
+            if (-not $_.PSIsContainer) {
+                $nameNoExt = [System.IO.Path]::GetFileNameWithoutExtension($baseName)
+                $ext = [System.IO.Path]::GetExtension($baseName)
+                while (Test-Path -LiteralPath $targetPath) {
+                    $nameNoExt += "-dup"
+                    $baseName = "$nameNoExt$ext"
+                    $targetPath = Join-Path $directory $baseName
+                }
+            }
+            else {
+                while (Test-Path -LiteralPath $targetPath) {
+                    $baseName += "-dup"
+                    $targetPath = Join-Path $directory $baseName
+                }
+            }
+
+            try {
+                Rename-Item -LiteralPath $originalFull -NewName $baseName -Force
+                Write-Host "Renamed : '$originalFull' -> '$targetPath'"
+            }
+            catch {
+                Write-Host "Failed to rename : '$originalFull' -> '$targetPath'  Error : $($_.Exception.Message)" -ForegroundColor Red
+            }
+        }
+
+    Write-Host "Pulling latest changes..." -ForegroundColor Green
     git pull origin main --quiet
 
-### - modified for empty commit 071025
-# Fetch status in a machine-friendly format (porcelain)
-$status = git status --porcelain
+    # --- CRITICAL FIX: stage everything (adds, deletes, renames) BEFORE checking status ---
+    # -A will stage new files (untracked), deletions, and renames in one pass
+    Write-Host "Staging all changes (git add -A)..." -ForegroundColor Green
+    git add -A
 
-# Filter out untracked files (lines starting with '??')
-$trackedChanges = $status | Where-Object { $_ -notmatch '^\?\?' }
+    # Determine if anything is staged
+    # git diff --cached --quiet returns exit code 1 when there ARE staged changes
+    git diff --cached --quiet
+    $hasStagedChanges = ($LASTEXITCODE -ne 0)
 
-if ($trackedChanges) {
-    # Changes exist in tracked files
-    Write-Host "Staging all changes..." -ForegroundColor Green
-    git add .
-    Write-Host "Committing changes..." -ForegroundColor Green
-    git commit -m "git commit powershell private function $datetime"
-} else {
-    # No tracked changes — create an empty commit
-    Write-Host "No tracked changes - committing " -ForegroundColor Magenta
-    git commit --allow-empty -m "$datetime committed even if no tracked changes for this repo"
-}
-### 
-    Write-Host "Pushing to PowerShell repository..." -ForegroundColor Green
+    if ($hasStagedChanges) {
+        Write-Host "Committing staged changes..." -ForegroundColor Green
+        git commit -m "Git sync : $datetime"
+    }
+    else {
+        # Nothing staged; also check if working tree still has unstaged changes and try once more
+        $statusPorcelain = git status --porcelain
+        if ($statusPorcelain) {
+            Write-Host "Detected unstaged changes after first pass, staging again..." -ForegroundColor Yellow
+            git add -A
+            git diff --cached --quiet
+            $hasStagedChanges = ($LASTEXITCODE -ne 0)
+        }
+
+        if ($hasStagedChanges) {
+            Write-Host "Committing staged changes..." -ForegroundColor Green
+            git commit -m "Git sync (second pass) : $datetime"
+        }
+        else {
+            Write-Host "No changes to commit - creating empty commit for traceability..." -ForegroundColor Magenta
+            git commit --allow-empty -m "Empty sync commit : $datetime"
+        }
+    }
+
+    Write-Host "Pushing to origin/main..." -ForegroundColor Green
     git push origin main --quiet
 
     Write-Host "Git sync completed!" -ForegroundColor Cyan
 }
+
 ##################
+
+# Revision : 1.0
+# Description : PowerShell-Private repo commit helper with safe rename, stage-everything (git add -A), staged-change detection, and empty-commit fallback (Rev 1.0)
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-09-16
+# Modified Date : 2025-09-16
 
 function Git-Commit-PowerShell-Private {
 
-    $repoPath = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-Private"
+    $repoPath  = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-Private"
+    $datetime  = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
 
-#START RENAME FILES WITH SPACES TO DASHES - PRIVATE
-
-# Define the root folder to search
-$rootFolder = $repoPath
-
-Get-ChildItem -Path $rootFolder -Recurse -Force | ForEach-Object {
-    if ($_.Name -match '\s') {
-        $baseName = $_.Name -replace '\s', '-'
-        $directory = $_.DirectoryName
-        $targetPath = Join-Path $directory $baseName
-
-        # If it's a file, split name and extension
-        if (-not $_.PSIsContainer) {
-            $nameNoExt = [System.IO.Path]::GetFileNameWithoutExtension($baseName)
-            $ext = [System.IO.Path]::GetExtension($baseName)
-
-            # Add -dup until it's unique
-            while (Test-Path $targetPath) {
-                $nameNoExt += "-dup"
-                $baseName = "$nameNoExt$ext"
-                $targetPath = Join-Path $directory $baseName
-            }
-        }
-        else {
-            # It's a folder
-            while (Test-Path $targetPath) {
-                $baseName += "-dup"
-                $targetPath = Join-Path $directory $baseName
-            }
-        }
-
-        try {
-            Rename-Item -Path $_.FullName -NewName $baseName -Force
-            Write-Host "Renamed: '$($_.FullName)' → '$targetPath'"
-        }
-        catch {
-            Write-Warning "Failed to rename: '$($_.FullName)' → '$targetPath' - $($_.Exception.Message)"
-        }
-    }
-}
-
-#START GIT PRIVATE
-    if (Test-Path $repoPath) {
-        Set-Location $repoPath
-        Write-Host "Switched to $repoPath" -ForegroundColor Yellow
-    } else {
-        Write-Host "Repository path does not exist: $repoPath" -ForegroundColor Red
+    if (-not (Test-Path -LiteralPath $repoPath)) {
+        Write-Host "Repository path does not exist : $repoPath" -ForegroundColor Red
         return
     }
 
+    Set-Location -LiteralPath $repoPath
+    Write-Host "Switched to $repoPath" -ForegroundColor Yellow
 
+    # --- SAFETY: never touch .git during renames; use -LiteralPath everywhere ---
+    $rootFolder = $repoPath
 
-### - modified for empty commit 071025
-# Fetch status in a machine-friendly format (porcelain)
-$status = git status --porcelain
+    Get-ChildItem -Path $rootFolder -Recurse -Force -File,Directory |
+        Where-Object {
+            $_.FullName -notmatch [regex]::Escape("\.git\") -and
+            $_.Name -match '\s'
+        } | ForEach-Object {
 
-# Filter out untracked files (lines starting with '??')
-$trackedChanges = $status | Where-Object { $_ -notmatch '^\?\?' }
+            $originalFull = $_.FullName
+            $baseName     = $_.Name -replace '\s','-'
+            $directory    = $_.DirectoryName
+            $targetPath   = Join-Path $directory $baseName
 
-if ($trackedChanges) {
-    # Changes exist in tracked files
-    Write-Host "Staging all changes..." -ForegroundColor Green
-    git add .
-    Write-Host "Committing changes..." -ForegroundColor Green
-    git commit -m "git commit powershell private function $datetime"
-} else {
-    # No tracked changes — create an empty commit
-    Write-Host "No tracked changes - committing " -ForegroundColor Magenta
-    git commit --allow-empty -m "$datetime committed even if no tracked changes for this repo"
-}
-###    
+            if (-not $_.PSIsContainer) {
+                $nameNoExt = [System.IO.Path]::GetFileNameWithoutExtension($baseName)
+                $ext       = [System.IO.Path]::GetExtension($baseName)
 
+                while (Test-Path -LiteralPath $targetPath) {
+                    $nameNoExt += "-dup"
+                    $baseName   = "$nameNoExt$ext"
+                    $targetPath = Join-Path $directory $baseName
+                }
+            }
+            else {
+                while (Test-Path -LiteralPath $targetPath) {
+                    $baseName   += "-dup"
+                    $targetPath  = Join-Path $directory $baseName
+                }
+            }
+
+            try {
+                Rename-Item -LiteralPath $originalFull -NewName $baseName -Force
+                Write-Host "Renamed : '$originalFull' -> '$targetPath'"
+            }
+            catch {
+                Write-Host "Failed to rename : '$originalFull' -> '$targetPath'  Error : $($_.Exception.Message)" -ForegroundColor Red
+            }
+        }
+
+    # --- CRITICAL FIX: Stage everything (adds, deletes, renames) BEFORE checking status ---
+    Write-Host "Staging all changes (git add -A)..." -ForegroundColor Green
+    git add -A
+
+    # Check if anything is staged now
+    git diff --cached --quiet
+    $hasStagedChanges = ($LASTEXITCODE -ne 0)
+
+    if (-not $hasStagedChanges) {
+        # If working tree still reports changes, try staging once more (edge cases)
+        $statusPorcelain = git status --porcelain
+        if ($statusPorcelain) {
+            Write-Host "Detected unstaged changes after first pass, staging again..." -ForegroundColor Yellow
+            git add -A
+            git diff --cached --quiet
+            $hasStagedChanges = ($LASTEXITCODE -ne 0)
+        }
+    }
+
+    if ($hasStagedChanges) {
+        Write-Host "Committing staged changes..." -ForegroundColor Green
+        git commit -m "Git sync (private) : $datetime"
+    }
+    else {
+        Write-Host "No changes to commit - creating empty commit for traceability..." -ForegroundColor Magenta
+        git commit --allow-empty -m "Empty sync commit (private) : $datetime"
+    }
 
     Write-Host "Git PowerShell-Private COMMIT completed!" -ForegroundColor Cyan
 }
+
 
 ####################
 
