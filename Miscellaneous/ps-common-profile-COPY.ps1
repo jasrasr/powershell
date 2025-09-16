@@ -1,8 +1,10 @@
+# backup @ $GitHubpath\PowerShell\Miscellaneous\ps-common-profile-COPY.ps1'
+
 function Start-CustomTranscript {
     $username = $env:USERNAME
     $hostname = $env:COMPUTERNAME
     $timestamp = (Get-Date).ToString("yyyyMMdd_HHmmss")
-    $transcriptDir = "$GitHubpath\PowerShell Transcript"
+    $transcriptDir = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell Transcript"
     $transcriptPath = "$transcriptDir\PStranscript-$hostname-$username-$timestamp.txt"
     
     if (!(Test-Path $transcriptDir)) {
@@ -15,21 +17,32 @@ function Start-CustomTranscript {
 
 ####################
 
-Write-host "Script Updated 9:16 AM 8/19/2025" -foregroundcolor darkyellow 
+Write-host "Script Updated 8:20 AM 9/8/2025" -foregroundcolor darkyellow 
 #& '.\script-update-date-time.ps1'
 
 ####################
+<#
 # https://www.hanselman.com/blog/how-to-make-a-pretty-prompt-in-windows-terminal-with-powerline-nerd-fonts-cascadia-code-wsl-and-ohmyposh
 Import-Module -Name Terminal-Icons
 Import-Module posh-git
 Import-Module oh-my-posh
 Set-PoshPrompt -Theme Paradox
+#>
+
+# Add Import-Module line if not already present
+$profileContent = Get-Content -Path $PROFILE -ErrorAction SilentlyContinue
+if ($profileContent -notmatch 'Import-Module\s+Terminal-Icons') {
+    Add-Content -Path $PROFILE -Value "`n# Load Terminal-Icons for fancy directory/file icons`nImport-Module -Name Terminal-Icons -ErrorAction SilentlyContinue"
+    Write-Host "Updated profile to auto-load Terminal-Icons."
+} else {
+    Write-Host "Profile already includes Terminal-Icons import."
+}
 
 ####################
 
 # Load credentials from the file for each computer
 # Construct the path to the credential file based on the computer name
-$credPath = Join-Path -Path "$GitHubpath" -ChildPath "admincred-$env:COMPUTERNAME.xml"
+$credPath = Join-Path -Path "C:\users\jason.lamb\OneDrive - middough\Documents\GitHub" -ChildPath "admincred-$env:COMPUTERNAME.xml"
 
 # Check if the credential file exists
 if (Test-Path $credPath) {
@@ -43,10 +56,10 @@ if (Test-Path $credPath) {
 } else {
     Write-Warning "Credential file not found: $credPath"
 Write-Warning "ENTER ADM CREDENTIALS"
-#. "$GitHubpath\set-save-admincred-per-computer.ps1"
+#. "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\set-save-admincred-per-computer.ps1"
 }
 
-# $admincred = Import-Clixml -Path "$GitHubpath\admincred.xml"
+# $admincred = Import-Clixml -Path "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\admincred.xml"
 
 ####################
 
@@ -60,7 +73,7 @@ Write-Warning "ENTER ADM CREDENTIALS"
 
 function Git-PowerShell-Private-Sync {
 
-    $repoPath = "$GitHubpath\PowerShell-Private"
+    $repoPath = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-Private"
 
 #START RENAME FILES WITH SPACES TO DASHES - PRIVATE
 
@@ -113,7 +126,7 @@ Get-ChildItem -Path $rootFolder -Recurse -Force | ForEach-Object {
     }
 
     Write-Host "Pulling latest changes from private repository..." -ForegroundColor Green
-    git pull private main
+    git pull private main --quiet
 
 ### - modified for empty commit 071025
 # Fetch status in a machine-friendly format (porcelain)
@@ -136,7 +149,7 @@ if ($trackedChanges) {
 ###    
 
     Write-Host "Pushing to private repository..." -ForegroundColor Green
-    git push private main
+    git push private main --quiet
 
     Write-Host "Git sync completed!" -ForegroundColor Cyan
 }
@@ -144,7 +157,7 @@ if ($trackedChanges) {
 ####################
 
 function Git-PowerShell-Sync {
-    $repoPath = "$GitHubpath\PowerShell"
+    $repoPath = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell"
 
 #START RENAME FILES WITH SPACES TO DASHES
 
@@ -198,7 +211,7 @@ Get-ChildItem -Path $rootFolder -Recurse -Force | ForEach-Object {
     }
 
     Write-Host "Pulling latest changes from PowerShell repository..." -ForegroundColor Green
-    git pull origin main
+    git pull origin main --quiet
 
 ### - modified for empty commit 071025
 # Fetch status in a machine-friendly format (porcelain)
@@ -220,15 +233,177 @@ if ($trackedChanges) {
 }
 ### 
     Write-Host "Pushing to PowerShell repository..." -ForegroundColor Green
-    git push origin main
+    git push origin main --quiet
 
     Write-Host "Git sync completed!" -ForegroundColor Cyan
 }
+##################
+
+function Git-Commit-PowerShell-Private {
+
+    $repoPath = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-Private"
+
+#START RENAME FILES WITH SPACES TO DASHES - PRIVATE
+
+# Define the root folder to search
+$rootFolder = $repoPath
+
+Get-ChildItem -Path $rootFolder -Recurse -Force | ForEach-Object {
+    if ($_.Name -match '\s') {
+        $baseName = $_.Name -replace '\s', '-'
+        $directory = $_.DirectoryName
+        $targetPath = Join-Path $directory $baseName
+
+        # If it's a file, split name and extension
+        if (-not $_.PSIsContainer) {
+            $nameNoExt = [System.IO.Path]::GetFileNameWithoutExtension($baseName)
+            $ext = [System.IO.Path]::GetExtension($baseName)
+
+            # Add -dup until it's unique
+            while (Test-Path $targetPath) {
+                $nameNoExt += "-dup"
+                $baseName = "$nameNoExt$ext"
+                $targetPath = Join-Path $directory $baseName
+            }
+        }
+        else {
+            # It's a folder
+            while (Test-Path $targetPath) {
+                $baseName += "-dup"
+                $targetPath = Join-Path $directory $baseName
+            }
+        }
+
+        try {
+            Rename-Item -Path $_.FullName -NewName $baseName -Force
+            Write-Host "Renamed: '$($_.FullName)' → '$targetPath'"
+        }
+        catch {
+            Write-Warning "Failed to rename: '$($_.FullName)' → '$targetPath' - $($_.Exception.Message)"
+        }
+    }
+}
+
+#START GIT PRIVATE
+    if (Test-Path $repoPath) {
+        Set-Location $repoPath
+        Write-Host "Switched to $repoPath" -ForegroundColor Yellow
+    } else {
+        Write-Host "Repository path does not exist: $repoPath" -ForegroundColor Red
+        return
+    }
+
+
+
+### - modified for empty commit 071025
+# Fetch status in a machine-friendly format (porcelain)
+$status = git status --porcelain
+
+# Filter out untracked files (lines starting with '??')
+$trackedChanges = $status | Where-Object { $_ -notmatch '^\?\?' }
+
+if ($trackedChanges) {
+    # Changes exist in tracked files
+    Write-Host "Staging all changes..." -ForegroundColor Green
+    git add .
+    Write-Host "Committing changes..." -ForegroundColor Green
+    git commit -m "git commit powershell private function $datetime"
+} else {
+    # No tracked changes — create an empty commit
+    Write-Host "No tracked changes - committing " -ForegroundColor Magenta
+    git commit --allow-empty -m "$datetime committed even if no tracked changes for this repo"
+}
+###    
+
+
+    Write-Host "Git PowerShell-Private COMMIT completed!" -ForegroundColor Cyan
+}
+
+####################
+
+function Git-Commit-PowerShell {
+    $repoPath = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell"
+
+#START RENAME FILES WITH SPACES TO DASHES
+
+# Define the root folder to search
+$rootFolder = $repoPath
+
+Get-ChildItem -Path $rootFolder -Recurse -Force | ForEach-Object {
+    if ($_.Name -match '\s') {
+        $baseName = $_.Name -replace '\s', '-'
+        $directory = $_.DirectoryName
+        $targetPath = Join-Path $directory $baseName
+
+        # If it's a file, split name and extension
+        if (-not $_.PSIsContainer) {
+            $nameNoExt = [System.IO.Path]::GetFileNameWithoutExtension($baseName)
+            $ext = [System.IO.Path]::GetExtension($baseName)
+
+            # Add -dup until it's unique
+            while (Test-Path $targetPath) {
+                $nameNoExt += "-dup"
+                $baseName = "$nameNoExt$ext"
+                $targetPath = Join-Path $directory $baseName
+            }
+        }
+        else {
+            # It's a folder
+            while (Test-Path $targetPath) {
+                $baseName += "-dup"
+                $targetPath = Join-Path $directory $baseName
+            }
+        }
+
+        try {
+            Rename-Item -Path $_.FullName -NewName $baseName -Force
+            Write-Host "Renamed: '$($_.FullName)' → '$targetPath'"
+        }
+        catch {
+            Write-Warning "Failed to rename: '$($_.FullName)' → '$targetPath' - $($_.Exception.Message)"
+        }
+    }
+}
+
+
+#START GIT PUBLIC POWERSHELL
+    if (Test-Path $repoPath) {
+        Set-Location $repoPath
+        Write-Host "Switched to $repoPath" -ForegroundColor Yellow
+    } else {
+        Write-Host "Repository path does not exist: $repoPath" -ForegroundColor Red
+        return
+    }
+
+
+### - modified for empty commit 071025
+# Fetch status in a machine-friendly format (porcelain)
+$status = git status --porcelain
+
+# Filter out untracked files (lines starting with '??')
+$trackedChanges = $status | Where-Object { $_ -notmatch '^\?\?' }
+
+if ($trackedChanges) {
+    # Changes exist in tracked files
+    Write-Host "Staging all changes..." -ForegroundColor Green
+    git add .
+    Write-Host "Committing changes..." -ForegroundColor Green
+    git commit -m "git commit powershell private function $datetime"
+} else {
+    # No tracked changes — create an empty commit
+    Write-Host "No tracked changes - committing " -ForegroundColor Magenta
+    git commit --allow-empty -m "$datetime committed even if no tracked changes for this repo"
+}
+###
+
+    Write-Host "Git PowerShell sync completed!" -ForegroundColor Cyan
+}
+
 
 ###################
 
 function Git-jasrasr-Sync {
-    $repoPath = "$GitHubpath\jasrasr.github.io"
+    $repoPath = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\jasrasr.github.io"
 
 #START RENAME FILES WITH SPACES TO DASHES
 
@@ -282,7 +457,7 @@ Get-ChildItem -Path $rootFolder -Recurse -Force | ForEach-Object {
     }
 
     Write-Host "Pulling latest changes from PowerShell repository..." -ForegroundColor Green
-    git pull origin main
+    git pull origin main --quiet
 
     Write-Host "Staging all changes..." -ForegroundColor Green
     git add .
@@ -291,7 +466,7 @@ Get-ChildItem -Path $rootFolder -Recurse -Force | ForEach-Object {
     git commit -m "git commit PowerShell function $datetime"
 
     Write-Host "Pushing to PowerShell repository..." -ForegroundColor Green
-    git push origin main
+    git push origin main --quiet
 
     Write-Host "Git sync completed!" -ForegroundColor Cyan
 }
@@ -304,7 +479,7 @@ Set-Alias jlgjs Git-jasrasr-Sync
 
 ####################
 
-import-module '$GitHubpath\PowerShell-Private\MyCustomModule\mycustommodule.psm1'
+import-module 'C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-Private\MyCustomModule\mycustommodule.psm1'
 
 
 ####################
@@ -350,10 +525,10 @@ write-host "$env:COMPUTERNAME \ $env:USERNAME" -ForegroundColor red
 
 # Create a hash table of computers
 $Computers = @(
-    @{ ComputerName = "CLEW10BGZ32G2"; Model = "5510"; Location = "Home" }
-    @{ ComputerName = "CLEW103LMHFH2"; Model = "5520"; Location = "Office" }
-    @{ ComputerName = "CLEW11DZ93HW3"; Model = "7320"; Location = "Main Old" }
-    @{ ComputerName = "CLEW1067LLFH2"; Model = "5285"; Location = "Office" }
+#    @{ ComputerName = "CLEW10BGZ32G2"; Model = "5510"; Location = "Home" }
+#    @{ ComputerName = "CLEW103LMHFH2"; Model = "5520"; Location = "Office" }
+#    @{ ComputerName = "CLEW11DZ93HW3"; Model = "7320"; Location = "Main Old" }
+#    @{ ComputerName = "CLEW1067LLFH2"; Model = "5285"; Location = "Office" }
     @{ ComputerName = "CLEW112GFF814"; Model = "5680"; Location = "Office" }
     @{ ComputerName = "CLE3RF6G94"; Model = "7350"; Location = "Main" }
     )
@@ -687,20 +862,28 @@ $fileVersionr22
 
 ###############
 
-$onedrivepath = 'C:\users\[username]\OneDrive' #redacted for GitHub
+$onedrivepath = 'C:\users\jason.lamb\OneDrive - middough'
 $githubpath = "$onedrivepath\documents\github"
 $gitpspath = "$githubpath\powershell"
 $temppath = 'C:temp'
 $ccmcache = 'C:\windows\ccmcache'
-$psexec = "$GitHubpath\PsExec"
-
+$clesccm = '\\clesccm\e$\application source\cad applications'
+$middlocal = '\\middough.local\corp\data'
+#Function np { & 'C:\Program Files (x86)\Notepad++\notepad++.exe' @args }
+#Function notepadnew { & 'C:\Windows\System32\notepad.exe' @args }
+$psexec = "C:\Users\jason.lamb\OneDrive - middough\Github\PsExec"
+$domain = "middough" #${domain} for no space
+$domainup = "Middough" #${domain} for no space
+$username = "jason.lamb" #${username} for no space
+$ndrive = "\\middough.local\corp\data\proj"
+$udrive = "\\middough.local\corp\data\dept"
 
 ######################
 
-# delete duplicate desktop files on the desktop from OneDrive with the same "domain inc-*.lnk"
+# delete duplicate desktop files on the desktop from OneDrive with the same "middough inc-*.lnk"
 function delete-dupdesktop {
-$desktopfolder = "C:\users\$env:username\onedrive - domain\desktop"
-$desktopfiles = Get-ChildItem -Path $desktopfolder -Filter "domain inc-*.lnk"
+$desktopfolder = "C:\users\$env:username\onedrive - middough\desktop"
+$desktopfiles = Get-ChildItem -Path $desktopfolder -Filter "middough inc-*.lnk"
 foreach ($dupfile in $desktopfiles) {
 Write-host "File deleted: $dupfile"
 	Remove-Item -Path $dupfile.FullName -Force
@@ -723,9 +906,9 @@ function datetime {
     $global:datetime2 = Get-Date -Format "yy-MM-dd-HH-mm-ss"
     $global:datetime3 = Get-Date -Format "yyyy-MM-dd-HH-mm-ss"
     Write-Host "`$datetime "$global:datetime
-    Write-Host "`$datetime1 "$global:datetime1
-    Write-Host "`$datetime2 "$global:datetime2
-    Write-Host "`$datetime3 "$global:datetime3
+#    Write-Host "`$datetime1 "$global:datetime1
+#    Write-Host "`$datetime2 "$global:datetime2
+#    Write-Host "`$datetime3 "$global:datetime3
 }
 datetime
 $datetime
@@ -795,18 +978,19 @@ $jobs | ForEach-Object {
 }
 }
 
-###
+######################
 
 $env:Path += ";C:\ProgramData\chocolatey\bin"
 
-###
+######################
 
-$users = 'username1', 'username2' #redacted for GitHub
+$users = 'jason.lamb', 'adm.jlamb'
 $users | ForEach-Object {
     Get-ADUser -Identity $_ -Properties msDS-UserPasswordExpiryTimeComputed |
     Select-Object Name, @{Name="PasswordExpiryDate"; Expression = {[datetime]::FromFileTime($_."msDS-UserPasswordExpiryTimeComputed")}}
 } | Sort-Object PasswordExpiryDate
 
+######################
 
 # Check if running as administrator
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -824,6 +1008,15 @@ if ($isAdmin) {
 ######################
 
 $psetemp = 'c:\temp\powershell-exports'
+
+######################
+
+function jlgitcom2 {
+$current = (Get-Location).Path
+    Git-Commit-PowerShell-Private
+    Git-Commit-PowerShell
+Set-Location $current
+}
 
 ######################
 
@@ -926,4 +1119,108 @@ function Track-Package {
 
 ######################
 
-. '$GitHubpath\!PS-custom-faq-help.ps1'
+. 'C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\!PS-custom-faq-help.ps1'
+
+######################
+
+# Revision : 1.0
+# Description : Launches Dell support page for a given service tag in a new Chrome window and returns the URL
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-08-20
+# Modified Date : 2025-08-20
+
+function dell {
+    param(
+        [Parameter(Mandatory)][string]$ServiceTag
+    )
+
+    # Construct the Dell support URL
+    $url = "https://www.dell.com/support/home/en-us/product-support/servicetag/$ServiceTag"
+
+    # Launch Chrome in a new window with the support page
+    Start-Process chrome.exe "--new-window $url"
+
+    # Return the URL for logging or further use
+    return $url
+}
+
+# call with 'dell 7QBMYK3'
+# returns
+# C:\> dell 7QBMYK3
+# https://www.dell.com/support/home/en-us/product-support/servicetag/7QBMYK3
+# launches chrome in new window
+
+#. 'C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-Private\File-Management-Scripts\compare-source-destination-files-and-csv-export-diff.ps1'
+
+######################
+
+# =========================
+# Run-Once-Per-Day Guard
+# Rev: 1.3  (J. Lamb)
+# =========================
+
+# Assumes $githubpath is set elsewhere in your $PROFILE
+$stateRoot = Join-Path $githubpath "Daily Run Status"
+$stampFile = Join-Path $stateRoot "daily-run.txt"
+$today     = Get-Date -Format 'yyyy-MM-dd'
+
+if (-not (Test-Path $stateRoot)) {
+    New-Item -ItemType Directory -Path $stateRoot -Force | Out-Null
+}
+
+# Read last-run date: find the first line that matches YYYY-MM-DD
+$last = $null
+if (Test-Path $stampFile) {
+    $lines = Get-Content -Path $stampFile -ErrorAction SilentlyContinue
+    foreach ($line in $lines) {
+        $t = $line.Trim()
+        if ($t -match '^\d{4}-\d{2}-\d{2}$') { $last = $t; break }
+    }
+}
+
+# Helper: locked write of header + date (prevents races)
+function Set-DailyStamp {
+    param([string] $Path, [string] $Date)
+
+    $contentLines = @('#DO NOT CHANGE THIS FILE', $Date)
+
+    $dir = Split-Path $Path -Parent
+    if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+
+    $fs = [System.IO.File]::Open($Path,
+        [System.IO.FileMode]::OpenOrCreate,
+        [System.IO.FileAccess]::ReadWrite,
+        [System.IO.FileShare]::None)
+    try {
+        $text  = ($contentLines -join [Environment]::NewLine) + [Environment]::NewLine
+        $bytes = [System.Text.Encoding]::UTF8.GetBytes($text)
+        $fs.SetLength(0); $fs.Write($bytes,0,$bytes.Length); $fs.Flush()
+    } finally { $fs.Dispose() }
+}
+
+# --- Only run once per calendar day ---
+if ($last -ne $today) {
+
+    # ===== Your once-per-day steps =====
+    try {
+        # 1) Security Now! fetch
+        & 'C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell\GRC-TWIT-SecurityNow-Transcripts\download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com.ps1'
+
+        # 2) File compare + CSV diff
+        & 'C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-Private\File-Management-Scripts\compare-source-destination-files-and-csv-export-diff.ps1'
+
+        # 3) Git sync function
+        jlgps2
+
+        # ✅ Only stamp AFTER all above attempted
+        Set-DailyStamp -Path $stampFile -Date $today
+        Write-Host "Daily tasks complete : stamped $today" -ForegroundColor Green  # (space before colon, just how you like it)
+    }
+    catch {
+        Write-Warning "Daily tasks failed : $($_.Exception.Message)"
+        # No stamp on failure -> will try again next session
+    }
+}
+else {
+    Write-Host "Daily tasks already stamped for $today : skipping" -ForegroundColor Yellow
+}
