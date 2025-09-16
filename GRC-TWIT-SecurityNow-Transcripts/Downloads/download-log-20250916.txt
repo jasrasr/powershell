@@ -66,3 +66,26 @@
 2025-09-16T11:50:35 START File compare + CSV diff
 2025-09-16T11:50:36 OK    File compare + CSV diff
 2025-09-16T11:50:36 START Git PowerShell repos sync
+2025-09-16T11:50:45 OK    Git PowerShell repos sync
+2025-09-16T11:50:45 STAMP set -> 2025-09-16
+[2025-09-16 11:56:19] Resuming from last-downloaded.json
+[2025-09-16 11:56:19] Checking TXT: sn-1042.txt
+[2025-09-16 11:56:19] Error: https://www.grc.com/sn/sn-1042.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-09-16 11:56:19] Checking TXT: sn-1043.txt
+[2025-09-16 11:56:20] Error: https://www.grc.com/sn/sn-1043.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-09-16 11:56:20] TXT stopped after 2 consecutive failures at sn-1044.txt
+[2025-09-16 11:56:20] Checking PDF: sn-1044-notes.pdf
+[2025-09-16 11:56:20] Error: https://www.grc.com/sn/sn-1044-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-09-16 11:56:20] Checking PDF: sn-1045-notes.pdf
+[2025-09-16 11:56:20] Error: https://www.grc.com/sn/sn-1045-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-09-16 11:56:20] PDF stopped after 2 consecutive failures at sn-1046-notes.pdf
+[2025-09-16 11:56:20] TXT files downloaded: 0
+[2025-09-16 11:56:20] PDF files downloaded: 0
+[2025-09-16 11:56:20] No downloads — last-downloaded.json was NOT updated
+[2025-09-16 11:56:20] Log complete.
+[2025-09-16 11:56:20] ~~~
+
+2025-09-16T11:56:21 OK    SecurityNow fetch
+2025-09-16T11:56:21 START File compare + CSV diff
+2025-09-16T11:56:23 OK    File compare + CSV diff
+2025-09-16T11:56:23 START Git PowerShell repos sync
