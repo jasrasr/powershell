@@ -4,6 +4,12 @@
 # Created Date : 2025-08-18
 # Modified Date : 2025-08-18
 
+# Define path variables if not already set
+if (-not $githubpath) {
+    $onedrivepath = 'C:\users\jason.lamb\OneDrive - middough'
+    $githubpath = "$onedrivepath\documents\github"
+}
+
 function Export-MarkdownIndex {
     $global:downloadbase = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads"
     $txtFolder = Join-Path $global:downloadbase 'TXT-Transcriptions'
@@ -68,7 +74,7 @@ function Export-MarkdownIndex {
 }
 
 function Export-HtmlIndex {
-    $githubpath = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub"
+    # Use the global $githubpath variable defined elsewhere
     $global:downloadbase = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads"
     $txtFolder = Join-Path $global:downloadbase 'TXT-Transcriptions'
     $pdfFolder = Join-Path $global:downloadbase 'PDF-Show-Notes'

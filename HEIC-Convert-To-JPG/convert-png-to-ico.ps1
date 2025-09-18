@@ -3,6 +3,12 @@
 
 # Revision #3
 
+# Define path variables if not already set
+if (-not $githubpath) {
+    $onedrivepath = 'C:\users\jason.lamb\OneDrive - middough'
+    $githubpath = "$onedrivepath\documents\github"
+}
+
 Add-Type -AssemblyName System.Drawing
 
 function Convert-PngToMultiResIco {
@@ -78,11 +84,11 @@ function Convert-PngToMultiResIco {
 }
 
 
-Convert-PngToMultiResIco -PngPath "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell\HEIC-Convert-To-JPG\icon.png"
+Convert-PngToMultiResIco -PngPath "$githubpath\PowerShell\HEIC-Convert-To-JPG\icon.png"
 
 
 <#
-$pngPath = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell\HEIC-Convert-To-JPG\icon.png"
+$pngPath = "$githubpath\PowerShell\HEIC-Convert-To-JPG\icon.png"
 
 if (Test-Path $pngPath) {
     Write-Host "✅ File exists : $pngPath"

@@ -4,6 +4,12 @@
 # Created Date : 2025-08-19
 # Modified Date : Auto-updates when reloaded
 
+# Define path variables if not already set
+if (-not $githubpath) {
+    $onedrivepath = 'C:\users\jason.lamb\OneDrive - middough'
+    $githubpath = "$onedrivepath\documents\github"
+}
+
 $Revision     = '1.5'
 $CreatedDate  = '2025-08-19'
 $ModifiedDate = (Get-Date).ToString('yyyy-MM-dd')
@@ -23,7 +29,7 @@ function Show-JasonHelp {
     # --- Help Text ---
     $helpText = @"
 # FAQ File Location
-C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\!PS-custom-faq-help.ps1
+$githubpath\!PS-custom-faq-help.ps1
 
 # Common Paths
 C:\temp\powershell-exports\
@@ -51,4 +57,4 @@ Keep scripts revisioned, logged, and stored in GitHub repos. > jlgps2
 
 Set-Alias sjh Show-JasonHelp
 
-$faq = "$GitHubpath\!PS-custom-faq-help.ps1"
+$faq = "$githubpath\!PS-custom-faq-help.ps1"
