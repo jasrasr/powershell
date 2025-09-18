@@ -1,7 +1,12 @@
 # ConvertCsvToXlsx.ps1
 
+# Need to define $onedrivepath variable if not already defined
+if (-not $onedrivepath) {
+    $onedrivepath = 'C:\users\jason.lamb\OneDrive - middough'
+}
+
 # Define the folder to monitor
-$watchFolder = 'C:\Users\jason.lamb\OneDrive - middough\Downloads\csv2xlsx'
+$watchFolder = "$onedrivepath\Downloads\csv2xlsx"
 $processedFolder = Join-Path $watchFolder 'Processed'
 
 # Ensure the processed folder exists

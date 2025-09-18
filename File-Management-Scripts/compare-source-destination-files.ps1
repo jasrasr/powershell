@@ -4,9 +4,14 @@
 # Created Date : 2025-09-04
 # Modified Date : 2025-09-04
 
+# Need to define $onedrivepath variable if not already defined
+if (-not $onedrivepath) {
+    $onedrivepath = 'C:\users\jason.lamb\OneDrive - middough'
+}
+
 param(
     [string] $SourceFile = 'S:\Corporate\MIS\Project List Download.xlsx',
-    [string] $DestFolder = 'C:\Users\jason.lamb\OneDrive - middough\General - IT\U & N Drive clean up',
+    [string] $DestFolder = "$onedrivepath\General - IT\U & N Drive clean up",
     [string] $BaseName   = 'Project List Download',      # filename prefix before the date
     [string] $SearchMask = 'Project List Download*.xlsx' # existing destination pattern
 )

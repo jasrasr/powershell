@@ -5,9 +5,14 @@
 # Created Date : 2025-09-04
 # Modified Date : 2025-09-04
 
+# Need to define $onedrivepath variable if not already defined
+if (-not $onedrivepath) {
+    $onedrivepath = 'C:\users\jason.lamb\OneDrive - middough'
+}
+
 param(
     # Where your dated project list XLSX files live
-    [string] $Folder = 'C:\Users\jason.lamb\OneDrive - middough\General - IT\U & N Drive clean up',
+    [string] $Folder = "$onedrivepath\General - IT\U & N Drive clean up",
     # Pattern to match the dated files (e.g., "Project List Download 090425.xlsx")
     [string] $SearchMask = 'Project List Download*.xlsx',
 
