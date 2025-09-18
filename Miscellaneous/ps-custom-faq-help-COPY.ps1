@@ -4,6 +4,11 @@
 # Created Date : 2025-08-19
 # Modified Date : Auto-updates when reloaded
 
+# Need to define $onedrivepath variable if not already defined
+if (-not $onedrivepath) {
+    $onedrivepath = 'C:\users\jason.lamb\OneDrive - middough'
+}
+
 $Revision     = '1.5'
 $CreatedDate  = '2025-08-19'
 $ModifiedDate = (Get-Date).ToString('yyyy-MM-dd')
@@ -23,7 +28,7 @@ function Show-JasonHelp {
     # --- Help Text ---
     $helpText = @"
 # FAQ File Location
-C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\!PS-custom-faq-help.ps1
+$onedrivepath\Documents\GitHub\!PS-custom-faq-help.ps1
 
 # Common Paths
 C:\temp\powershell-exports\
