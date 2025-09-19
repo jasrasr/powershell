@@ -68,7 +68,6 @@ function Export-MarkdownIndex {
 }
 
 function Export-HtmlIndex {
-    $githubpath = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub"
     $global:downloadbase = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads"
     $txtFolder = Join-Path $global:downloadbase 'TXT-Transcriptions'
     $pdfFolder = Join-Path $global:downloadbase 'PDF-Show-Notes'
