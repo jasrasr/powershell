@@ -20,4 +20,5 @@ This tool builds a searchable offline HTML viewer for Security Now! transcripts 
 
 If you are starting without any downloaded PDFs or Transcripts then delete the 'download-log-20250922.txt' file. It will be created on the fly and updated as needed with every run of the script. 
 
-I have added this script to my $profile so every time I run a new PowerShell session it runs to check for any new episodes. I also added a script that only checks one a day. YOu can find that located here: [link]
+I have added this script to my $profile so every time I run a new PowerShell session it runs to check for any new episodes. I also added a script that only checks one a day. YOu can find that located here: [run-once-daily.ps1](https://github.com/jasrasr/powershell/blob/main/Miscellaneous/run-once-daily.ps1
+)
