@@ -1,0 +1,17 @@
+[2025-09-22 11:38:31] Resuming from last-downloaded.json
+[2025-09-22 11:38:31] Checking TXT: sn-1043.txt
+[2025-09-22 11:38:31] Error: https://www.grc.com/sn/sn-1043.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-09-22 11:38:31] Checking TXT: sn-1044.txt
+[2025-09-22 11:38:32] Error: https://www.grc.com/sn/sn-1044.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-09-22 11:38:32] TXT stopped after 2 consecutive failures at sn-1045.txt
+[2025-09-22 11:38:32] Checking PDF: sn-1046-notes.pdf
+[2025-09-22 11:38:32] Error: https://www.grc.com/sn/sn-1046-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-09-22 11:38:32] Checking PDF: sn-1047-notes.pdf
+[2025-09-22 11:38:33] Error: https://www.grc.com/sn/sn-1047-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-09-22 11:38:33] PDF stopped after 2 consecutive failures at sn-1048-notes.pdf
+[2025-09-22 11:38:33] TXT files downloaded: 0
+[2025-09-22 11:38:33] PDF files downloaded: 0
+[2025-09-22 11:38:33] No downloads — last-downloaded.json was NOT updated
+[2025-09-22 11:38:33] Log complete.
+[2025-09-22 11:38:33] ~~~
+
