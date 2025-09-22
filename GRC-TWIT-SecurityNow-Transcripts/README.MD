@@ -8,24 +8,16 @@ This project is underway to download the transcripts and show notes. That is wor
 
 then the next attempt download will be sn-1040-notes.pdf and sn-1040.txt. The script will attempt to download in sequence until 2 failures and will update the json file with the last successsful download.
 
-The below section is still in testing.
-
-## GRC Security Now! HTML Archive
+## GRC Security Now! 
 
 This tool builds a searchable offline HTML viewer for Security Now! transcripts and show notes.
 
 ### Folders Used
 - **Transcripts:** $onedrivepath\Downloads\GRC_SN_Files\Transcriptions
+-- change this to fit your needs
 - **Show Notes:** $onedrivepath\Downloads\GRC_SN_Files\PDF Show Notes
+-- change this to fit your needs
 
-### How to Add More Episodes
-1. Add a new .txt transcript to the Transcripts folder.
-2. Add the matching .pdf show notes file (using the same filename) to the PDF Show Notes folder (optional).
-3. Run this script again.
+If you are starting without any downloaded PDFs or Transcripts then delete the 'download-log-20250922.txt' file. It will be created on the fly and updated as needed with every run of the script. 
 
-### Tags
-Tags are generated locally using keyword matching (simple AI-style logic). You can expand or modify the logic in the Get-AITags function as needed.
-
-### Output
-- **HTML Viewer:** grc_sn_searchable.html
-
+I have added this script to my $profile so every time I run a new PowerShell session it runs to check for any new episodes. I also added a script that only checks one a day. YOu can find that located here: [link]
