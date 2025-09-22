@@ -8,10 +8,6 @@ This project is underway to download the transcripts and show notes. That is wor
 
 then the next attempt download will be sn-1040-notes.pdf and sn-1040.txt. The script will attempt to download in sequence until 2 failures and will update the json file with the last successsful download.
 
-## GRC Security Now! 
-
-This tool builds a searchable offline HTML viewer for Security Now! transcripts and show notes.
-
 ### Folders Used
 - **Transcripts:** $onedrivepath\Downloads\GRC_SN_Files\Transcriptions
 -- change this to fit your needs
