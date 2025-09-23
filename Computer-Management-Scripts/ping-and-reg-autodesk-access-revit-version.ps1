@@ -1,5 +1,5 @@
-# Revision : 1.6
-# Description : Query Autodesk Access and all Revit 2026 components (incl. FormIt Converter), show Publisher/Version/Name/InstallDate + RegistryPath; runs local when target == host; logs to C:\temp\powershell-exports\  [Rev 1.6]
+# Revision : 1.7
+# Description : Query Autodesk Access and all Revit 2026 components (incl. FormIt Converter), return full table: Computer, RegistryPath, Publisher, DisplayVersion, DisplayName, InstallDate; run local when host matches; log to C:\temp\powershell-exports\  [Rev 1.7]
 # Author : Jason Lamb (with help from ChatGPT)
 # Created Date : 2025-09-18
 # Modified Date : 2025-09-18
@@ -24,7 +24,7 @@ $regHives = @(
   'HKLM:\SOFTWARE\Autodesk\UPI2'
 )
 
-# Match rule: include Autodesk Access AND anything that mentions "Revit 2026" (restores items like "FormIt Converter for Revit 2026")
+# Match rule: include Autodesk Access AND anything that mentions "Revit 2026" (captures FormIt Converter for Revit 2026, etc.)
 $matchScriptBlock = {
     param($name)
     if (-not $name) { return $false }
@@ -32,47 +32,44 @@ $matchScriptBlock = {
 }
 
 # -------------------------
-# Helper : Normalize a single registry entry to a PSObject with desired fields
+# Helpers
 # -------------------------
+function Get-FirstPresentValue {
+    param(
+        [object]$Entry,
+        [string[]]$PropertyNames
+    )
+    foreach ($p in $PropertyNames) {
+        if ($Entry.PSObject.Properties.Name -contains $p) {
+            $v = $Entry.$p
+            if ($null -ne $v -and ($v -isnot [string] -or $v.Trim() -ne '')) {
+                return $v
+            }
+        }
+    }
+    return $null
+}
+
 function Convert-EntryToResultObject {
     param($entry)
 
-    # Name: prefer DisplayName, then ProductName
-    $name = $entry.DisplayName
-    if (-not $name -and $entry.PSObject.Properties.Name -contains 'ProductName') {
-        $name = $entry.ProductName
-    }
+    $name = Get-FirstPresentValue -Entry $entry -PropertyNames @('DisplayName','ProductName','Name','Title')
 
-    # Publisher: prefer Publisher, then Vendor, then Manufacturer
-    $publisher = $entry.Publisher
-    if (-not $publisher -and $entry.PSObject.Properties.Name -contains 'Vendor') {
-        $publisher = $entry.Vendor
-    }
-    if (-not $publisher -and $entry.PSObject.Properties.Name -contains 'Manufacturer') {
-        $publisher = $entry.Manufacturer
-    }
+    $publisher = Get-FirstPresentValue -Entry $entry -PropertyNames @('Publisher','Vendor','Manufacturer','Company')
 
-    # Version: prefer DisplayVersion, then ProductVersion, then Version
-    $version = $entry.DisplayVersion
-    if (-not $version -and $entry.PSObject.Properties.Name -contains 'ProductVersion') {
-        $version = $entry.ProductVersion
-    }
-    if (-not $version -and $entry.PSObject.Properties.Name -contains 'Version') {
-        $version = $entry.Version
-    }
+    $version = Get-FirstPresentValue -Entry $entry -PropertyNames @('DisplayVersion','ProductVersion','Version','VersionString')
 
-    # InstallDate: handle 'yyyyMMdd', ISO, DateTime, or anything parseable
     $installDateStr = $null
-    $rawDate = $entry.InstallDate
+    $rawDate = Get-FirstPresentValue -Entry $entry -PropertyNames @('InstallDate','InstallDateUTC','Installed','InstallTime')
     if ($rawDate) {
         if ($rawDate -is [datetime]) {
             $installDateStr = $rawDate.ToString('yyyy-MM-dd')
         }
-        elseif ($rawDate -match '^\d{8}$') {
+        elseif ($rawDate -is [string] -and $rawDate -match '^\d{8}$') {
             try { $installDateStr = [datetime]::ParseExact($rawDate, 'yyyyMMdd', $null).ToString('yyyy-MM-dd') } catch { $installDateStr = $null }
         }
         else {
-            try { $installDateStr = [datetime]$rawDate | ForEach-Object { $_.ToString('yyyy-MM-dd') } } catch { $installDateStr = $null }
+            try { $installDateStr = ([datetime]$rawDate).ToString('yyyy-MM-dd') } catch { $installDateStr = $null }
         }
     }
 
@@ -86,26 +83,17 @@ function Convert-EntryToResultObject {
     }
 }
 
-# -------------------------
-# Helper : Core query logic (local machine)
-# -------------------------
 function Get-Installed-AutodeskTargets {
     param(
         [string[]] $Hives,
         [scriptblock] $NameMatcher
     )
-
     foreach ($hive in $Hives) {
         if (Test-Path $hive) {
             Get-ChildItem -Path $hive -ErrorAction SilentlyContinue |
             Get-ItemProperty -ErrorAction SilentlyContinue |
             ForEach-Object {
-                # Get name using same logic as converter
-                $tmpName = $_.DisplayName
-                if (-not $tmpName -and $_.PSObject.Properties.Name -contains 'ProductName') {
-                    $tmpName = $_.ProductName
-                }
-
+                $tmpName = Get-FirstPresentValue -Entry $_ -PropertyNames @('DisplayName','ProductName','Name','Title')
                 if (& $NameMatcher $tmpName) {
                     Convert-EntryToResultObject -entry $_
                 }
@@ -119,7 +107,6 @@ function Get-Installed-AutodeskTargets {
 # -------------------------
 $results = foreach ($computer in $computerstoping) {
 
-    # If target is the current machine, run locally to avoid remoting
     if ($computer -ieq $env:COMPUTERNAME) {
         try {
             Get-Installed-AutodeskTargets -Hives $regHives -NameMatcher $matchScriptBlock
@@ -129,46 +116,36 @@ $results = foreach ($computer in $computerstoping) {
         continue
     }
 
-    # Else remote
     if (Test-Connection -ComputerName $computer -Count 1 -Quiet) {
         try {
             Invoke-Command -ComputerName $computer -ScriptBlock {
                 param($regHives, $matchBlock)
 
+                function Get-FirstPresentValue {
+                    param([object]$Entry,[string[]]$PropertyNames)
+                    foreach ($p in $PropertyNames) {
+                        if ($Entry.PSObject.Properties.Name -contains $p) {
+                            $v = $Entry.$p
+                            if ($null -ne $v -and ($v -isnot [string] -or $v.Trim() -ne '')) { return $v }
+                        }
+                    }
+                    return $null
+                }
+
                 function Convert-EntryToResultObject {
                     param($entry)
-                    $name = $entry.DisplayName
-                    if (-not $name -and $entry.PSObject.Properties.Name -contains 'ProductName') {
-                        $name = $entry.ProductName
-                    }
-
-                    $publisher = $entry.Publisher
-                    if (-not $publisher -and $entry.PSObject.Properties.Name -contains 'Vendor') {
-                        $publisher = $entry.Vendor
-                    }
-                    if (-not $publisher -and $entry.PSObject.Properties.Name -contains 'Manufacturer') {
-                        $publisher = $entry.Manufacturer
-                    }
-
-                    $version = $entry.DisplayVersion
-                    if (-not $version -and $entry.PSObject.Properties.Name -contains 'ProductVersion') {
-                        $version = $entry.ProductVersion
-                    }
-                    if (-not $version -and $entry.PSObject.Properties.Name -contains 'Version') {
-                        $version = $entry.Version
-                    }
+                    $name      = Get-FirstPresentValue -Entry $entry -PropertyNames @('DisplayName','ProductName','Name','Title')
+                    $publisher = Get-FirstPresentValue -Entry $entry -PropertyNames @('Publisher','Vendor','Manufacturer','Company')
+                    $version   = Get-FirstPresentValue -Entry $entry -PropertyNames @('DisplayVersion','ProductVersion','Version','VersionString')
 
                     $installDateStr = $null
-                    $rawDate = $entry.InstallDate
+                    $rawDate = Get-FirstPresentValue -Entry $entry -PropertyNames @('InstallDate','InstallDateUTC','Installed','InstallTime')
                     if ($rawDate) {
-                        if ($rawDate -is [datetime]) {
-                            $installDateStr = $rawDate.ToString('yyyy-MM-dd')
-                        }
-                        elseif ($rawDate -match '^\d{8}$') {
+                        if ($rawDate -is [datetime])      { $installDateStr = $rawDate.ToString('yyyy-MM-dd') }
+                        elseif ($rawDate -is [string] -and $rawDate -match '^\d{8}$') {
                             try { $installDateStr = [datetime]::ParseExact($rawDate, 'yyyyMMdd', $null).ToString('yyyy-MM-dd') } catch { $installDateStr = $null }
-                        }
-                        else {
-                            try { $installDateStr = [datetime]$rawDate | ForEach-Object { $_.ToString('yyyy-MM-dd') } } catch { $installDateStr = $null }
+                        } else {
+                            try { $installDateStr = ([datetime]$rawDate).ToString('yyyy-MM-dd') } catch { $installDateStr = $null }
                         }
                     }
 
@@ -183,17 +160,13 @@ $results = foreach ($computer in $computerstoping) {
                 }
 
                 function Get-Installed-AutodeskTargets {
-                    param([string[]] $Hives, [scriptblock] $NameMatcher)
+                    param([string[]] $Hives,[scriptblock] $NameMatcher)
                     foreach ($hive in $Hives) {
                         if (Test-Path $hive) {
                             Get-ChildItem -Path $hive -ErrorAction SilentlyContinue |
                             Get-ItemProperty -ErrorAction SilentlyContinue |
                             ForEach-Object {
-                                $tmpName = $_.DisplayName
-                                if (-not $tmpName -and $_.PSObject.Properties.Name -contains 'ProductName') {
-                                    $tmpName = $_.ProductName
-                                }
-
+                                $tmpName = Get-FirstPresentValue -Entry $_ -PropertyNames @('DisplayName','ProductName','Name','Title')
                                 if (& $NameMatcher $tmpName) {
                                     Convert-EntryToResultObject -entry $_
                                 }
@@ -205,20 +178,23 @@ $results = foreach ($computer in $computerstoping) {
                 Get-Installed-AutodeskTargets -Hives $regHives -NameMatcher $matchBlock
             } -ArgumentList $regHives, $matchScriptBlock
         } catch {
-            Write-Host "$computer : Error querying registry $_" -ForegroundColor Red
+            Write-Host "$computer : Error querying registry $_"
         }
     } else {
-        Write-Host "$computer : Not Found" -ForegroundColor Yellow
+        Write-Host "$computer : Not Found"
     }
 }
 
 Write-Host "Autodesk Access and Revit 2026 check complete."
 
-# Console output as a table with all fields
-$results | Sort-Object Computer, DisplayName | Format-Table -AutoSize Computer, RegistryPath, Publisher, DisplayVersion, DisplayName, InstallDate
+# Force a consistent table with all columns (even if some are null)
+$ordered = $results | Select-Object Computer, RegistryPath, Publisher, DisplayVersion, DisplayName, InstallDate
+
+# Console table
+$ordered | Format-Table -AutoSize
 
 # Save the same table into the file
-$results | Sort-Object Computer, DisplayName | Format-Table -AutoSize Computer, RegistryPath, Publisher, DisplayVersion, DisplayName, InstallDate | Out-String | Set-Content -Path $filePath
+$ordered | Format-Table -AutoSize | Out-String | Set-Content -Path $filePath
 
 # Verify file (and open when created)
 if (Test-Path $filePath) {

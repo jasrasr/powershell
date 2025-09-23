@@ -4,7 +4,7 @@ function Start-CustomTranscript {
     $username = $env:USERNAME
     $hostname = $env:COMPUTERNAME
     $timestamp = (Get-Date).ToString("yyyyMMdd_HHmmss")
-    $transcriptDir = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell Transcript"
+    $transcriptDir = "${githubpath}\PowerShell Transcript"
     $transcriptPath = "$transcriptDir\PStranscript-$hostname-$username-$timestamp.txt"
     
     if (!(Test-Path $transcriptDir)) {
@@ -42,7 +42,7 @@ if ($profileContent -notmatch 'Import-Module\s+Terminal-Icons') {
 
 # Load credentials from the file for each computer
 # Construct the path to the credential file based on the computer name
-$credPath = Join-Path -Path "C:\users\jason.lamb\OneDrive - middough\Documents\GitHub" -ChildPath "admincred-$env:COMPUTERNAME.xml"
+$credPath = Join-Path -Path ${githubpath} -ChildPath "admincred-$env:COMPUTERNAME.xml"
 
 # Check if the credential file exists
 if (Test-Path $credPath) {
@@ -56,10 +56,10 @@ if (Test-Path $credPath) {
 } else {
     Write-Warning "Credential file not found: $credPath"
 Write-Warning "ENTER ADM CREDENTIALS"
-#. "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\set-save-admincred-per-computer.ps1"
+#. "${githubpath}\set-save-admincred-per-computer.ps1"
 }
 
-# $admincred = Import-Clixml -Path "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\admincred.xml"
+# $admincred = Import-Clixml -Path "${githubpath}\admincred.xml"
 
 ####################
 
@@ -73,7 +73,7 @@ Write-Warning "ENTER ADM CREDENTIALS"
 
 function Git-PowerShell-Private-Sync {
 
-    $repoPath = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-Private"
+    $repoPath = "${githubpath}\PowerShell-Private"
 
 #START RENAME FILES WITH SPACES TO DASHES - PRIVATE
 
@@ -165,7 +165,7 @@ if ($trackedChanges) {
 function Git-PowerShell-Sync {
     param()
 
-    $repoPath = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell"
+    $repoPath = "${githubpath}\PowerShell"
     $datetime = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
 
     if (-not (Test-Path -LiteralPath $repoPath)) {
@@ -266,7 +266,7 @@ function Git-PowerShell-Sync {
 
 function Git-Commit-PowerShell-Private {
 
-    $repoPath  = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-Private"
+    $repoPath  = "${githubpath}\PowerShell-Private"
     $datetime  = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
 
     if (-not (Test-Path -LiteralPath $repoPath)) {
@@ -352,7 +352,7 @@ function Git-Commit-PowerShell-Private {
 ####################
 
 function Git-Commit-PowerShell {
-    $repoPath = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell"
+    $repoPath = "${githubpath}\PowerShell"
 
 #START RENAME FILES WITH SPACES TO DASHES
 
@@ -433,7 +433,7 @@ if ($trackedChanges) {
 ###################
 
 function Git-jasrasr-Sync {
-    $repoPath = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\jasrasr.github.io"
+    $repoPath = "${githubpath}\jasrasr.github.io"
 
 #START RENAME FILES WITH SPACES TO DASHES
 
@@ -509,7 +509,7 @@ Set-Alias jlgjs Git-jasrasr-Sync
 
 ####################
 
-import-module 'C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-Private\MyCustomModule\mycustommodule.psm1'
+import-module '${githubpath}\PowerShell-Private\MyCustomModule\mycustommodule.psm1'
 
 
 ####################
@@ -1149,7 +1149,7 @@ function Track-Package {
 
 ######################
 
-. 'C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\!PS-custom-faq-help.ps1'
+. '${githubpath}\!PS-custom-faq-help.ps1'
 
 ######################
 
@@ -1180,7 +1180,7 @@ function dell {
 # https://www.dell.com/support/home/en-us/product-support/servicetag/7QBMYK3
 # launches chrome in new window
 
-#. 'C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-Private\File-Management-Scripts\compare-source-destination-files-and-csv-export-diff.ps1'
+#. '${githubpath}\PowerShell-Private\File-Management-Scripts\compare-source-destination-files-and-csv-export-diff.ps1'
 
 ######################
 
@@ -1234,10 +1234,10 @@ if ($last -ne $today) {
     # ===== Your once-per-day steps =====
     try {
         # 1) Security Now! fetch
-        & 'C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell\GRC-TWIT-SecurityNow-Transcripts\download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com.ps1'
+        & '${githubpath}\PowerShell\GRC-TWIT-SecurityNow-Transcripts\download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com.ps1'
 
         # 2) File compare + CSV diff
-        & 'C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-Private\File-Management-Scripts\compare-source-destination-files-and-csv-export-diff.ps1'
+        & '${githubpath}\PowerShell-Private\File-Management-Scripts\compare-source-destination-files-and-csv-export-diff.ps1'
 
         # 3) Git sync function
         jlgps2
