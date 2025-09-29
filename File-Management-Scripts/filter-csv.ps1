@@ -63,4 +63,4 @@ Write-Host "Output file $OutputCsv : wrote $linesKept lines"
 Write-Host "Filtered value $FilterText : removed $linesRemoved lines"
 
 # --- Example run for your file ---
-# .\filter-csv.ps1 -InputCsv 'C:\Temp\csv-split-staging\NTFS Permissions Report R drive 092525 CSV.csv'
+# .\filter-csv.ps1 -InputCsv 'C:\file.csv'
