@@ -1,0 +1,4 @@
+AppName,Publisher,Version,IconPath,DeployType,ContentPath,InstallCmd,UninstallCmd,MsiProductCode,ExpectedMsiVersion,DetectFilePath,DPNames
+#7-Zip 23.01,7-Zip.org,23.01,\\clesccm\icons\7zip.png,MSI,\\clesccm\sources\apps\7zip\7z2301-x64.msi,,,"{23170F69-40C1-2702-2301-000001000000}",23.01,,
+#Acme Tool 1.2.3,Acme,1.2.3,,Script,\\clesccm\sources\apps\AcmeTool,setup.exe /quiet /norestart,setup.exe /uninstall /quiet,,,"C:\Program Files\Acme\tool.exe",ashut01.middough.local,bufut01.middough.local
+RealDWG 2024.1.8, Autodesk, 2024.1.8,\\clesccm\Application Source\Cad Applications\RealDWG\Logo.png,Script,\\clesccm\Application Source\Cad Applications\RealDWG\2024.1.8,RealDWG-2024.1.8-Autodesk_RealDWG_Shared_2024.exe /quiet /norestart,\\clesccm\Application Source\Cad Applications\RealDWG\2024.1.8\RealDWG-2024.1.8-Autodesk_RealDWG_Shared_2024.exe /uninstall /quiet,,,"C:\ProgramData\Autodesk\Uninstallers\RealDWG 2024.1.8 Update 64-Bit\bundle_data.xml",clesccm.middough.local
