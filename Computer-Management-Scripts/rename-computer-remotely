@@ -1,0 +1,6 @@
+# passes credential and prompts for password
+# this does NOT force a reboot, a reboot is required for full name change
+# computer has to be on corporate network or vpn for script to work and contact computer
+
+$cred = Get-Credential 'domain\admin.username'
+Rename-Computer -ComputerName 'oldname' -NewName 'newname' -DomainCredential $cred -Force
