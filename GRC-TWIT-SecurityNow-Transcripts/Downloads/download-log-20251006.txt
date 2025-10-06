@@ -1,0 +1,34 @@
+[2025-10-06 08:25:36] Resuming from last-downloaded.json
+[2025-10-06 08:25:36] Checking TXT: sn-1046.txt
+[2025-10-06 08:25:37] Error: https://www.grc.com/sn/sn-1046.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-10-06 08:25:37] Checking TXT: sn-1047.txt
+[2025-10-06 08:25:37] Error: https://www.grc.com/sn/sn-1047.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-10-06 08:25:37] TXT stopped after 2 consecutive failures at sn-1048.txt
+[2025-10-06 08:25:37] Checking PDF: sn-1052-notes.pdf
+[2025-10-06 08:25:38] Error: https://www.grc.com/sn/sn-1052-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-06 08:25:38] Checking PDF: sn-1053-notes.pdf
+[2025-10-06 08:25:38] Error: https://www.grc.com/sn/sn-1053-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-06 08:25:38] PDF stopped after 2 consecutive failures at sn-1054-notes.pdf
+[2025-10-06 08:25:38] TXT files downloaded: 0
+[2025-10-06 08:25:38] PDF files downloaded: 0
+[2025-10-06 08:25:38] No downloads — last-downloaded.json was NOT updated
+[2025-10-06 08:25:38] Log complete.
+[2025-10-06 08:25:38] ~~~
+
+[2025-10-06 08:26:17] Resuming from last-downloaded.json
+[2025-10-06 08:26:17] Checking TXT: sn-1046.txt
+[2025-10-06 08:26:17] Error: https://www.grc.com/sn/sn-1046.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-10-06 08:26:17] Checking TXT: sn-1047.txt
+[2025-10-06 08:26:18] Error: https://www.grc.com/sn/sn-1047.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-10-06 08:26:18] TXT stopped after 2 consecutive failures at sn-1048.txt
+[2025-10-06 08:26:18] Checking PDF: sn-1052-notes.pdf
+[2025-10-06 08:26:18] Error: https://www.grc.com/sn/sn-1052-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-06 08:26:18] Checking PDF: sn-1053-notes.pdf
+[2025-10-06 08:26:19] Error: https://www.grc.com/sn/sn-1053-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-06 08:26:19] PDF stopped after 2 consecutive failures at sn-1054-notes.pdf
+[2025-10-06 08:26:19] TXT files downloaded: 0
+[2025-10-06 08:26:19] PDF files downloaded: 0
+[2025-10-06 08:26:19] No downloads — last-downloaded.json was NOT updated
+[2025-10-06 08:26:19] Log complete.
+[2025-10-06 08:26:19] ~~~
+
