@@ -1,0 +1,17 @@
+[2025-10-07 10:34:31] Resuming from last-downloaded.json
+[2025-10-07 10:34:31] Checking TXT: sn-1046.txt
+[2025-10-07 10:34:52] Error: https://www.grc.com/sn/sn-1046.txt - A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond.
+[2025-10-07 10:34:52] Checking TXT: sn-1047.txt
+[2025-10-07 10:35:13] Error: https://www.grc.com/sn/sn-1047.txt - A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond.
+[2025-10-07 10:35:13] TXT stopped after 2 consecutive failures at sn-1048.txt
+[2025-10-07 10:35:13] Checking PDF: sn-1052-notes.pdf
+[2025-10-07 10:35:34] Error: https://www.grc.com/sn/sn-1052-notes.pdf - A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond.
+[2025-10-07 10:35:34] Checking PDF: sn-1053-notes.pdf
+[2025-10-07 10:35:34] Error: https://www.grc.com/sn/sn-1053-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-07 10:35:34] PDF stopped after 2 consecutive failures at sn-1054-notes.pdf
+[2025-10-07 10:35:34] TXT files downloaded: 0
+[2025-10-07 10:35:34] PDF files downloaded: 0
+[2025-10-07 10:35:34] No downloads — last-downloaded.json was NOT updated
+[2025-10-07 10:35:34] Log complete.
+[2025-10-07 10:35:34] ~~~
+
