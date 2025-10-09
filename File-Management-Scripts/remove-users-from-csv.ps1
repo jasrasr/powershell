@@ -1,5 +1,5 @@
-# Revision : 1.7
-# Description : Validate paths, then build a unique list of "Display Name" excluding names in an exclude CSV (header "Display Name"). Optionally filter the source CSV rows. Shows progress and writes outputs next to input. Rev 1.7
+# Revision : 1.8
+# Description : Robust header handling + exclude filtering. Extract/keep unique "Display Name" values excluding a provided CSV list, optionally filter source rows. Fixes "Display Name not found" by normalizing header quotes/whitespace/BOM. Shows progress. Rev 1.8
 # Author : Jason Lamb (with help from ChatGPT)
 # Created Date : 2025-09-29
 # Modified Date : 2025-09-29
@@ -22,7 +22,7 @@ function Get-UniqueDisplayNamesFiltered {
         [switch]$FilterSourceRows
     )
 
-    # --- Path validation ---
+    # --- Path validation
     if (-not (Test-Path -LiteralPath $InputCsv)) {
         Write-Host "Input CSV $InputCsv : NOT FOUND" -ForegroundColor Red
         return
@@ -31,56 +31,64 @@ function Get-UniqueDisplayNamesFiltered {
         Write-Host "Exclude CSV $ExcludeListCsv : NOT FOUND" -ForegroundColor Red
         return
     }
-
-    # Resolve to full paths for clarity
     $InputCsv       = (Resolve-Path -LiteralPath $InputCsv).Path
     $ExcludeListCsv = (Resolve-Path -LiteralPath $ExcludeListCsv).Path
-
     Write-Host "Input CSV $InputCsv : OK" -ForegroundColor Green
     Write-Host "Exclude CSV $ExcludeListCsv : OK" -ForegroundColor Green
 
+    # --- Load exclude set (one-column CSV with header "Display Name" OR any CSV with that column)
     function Get-ExcludeSet {
         param(
-            [Parameter(Mandatory)]
-            [string]$ExcludeListCsv,
-            [string]$ExcludeColumn = 'Display Name'
+            [Parameter(Mandatory)] [string]$CsvPath,
+            [string]$ColName = 'Display Name'
         )
-
         $set = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
-        $reader = [System.IO.StreamReader]::new($ExcludeListCsv)
+        $r = [System.IO.StreamReader]::new($CsvPath)
         try {
-            $first = $reader.ReadLine()
+            $first = $r.ReadLine()
             if (-not $first) { return $set }
 
-            $cellsFirst = $first -split ',(?=(?:[^""]*""[^""]*"")*[^""]*$)'
-            $hasHeader  = $cellsFirst -contains ('"'+$ExcludeColumn+'"')
-
-            if ($hasHeader) {
-                $headers  = $cellsFirst
-                $colIndex = $headers.IndexOf('"' + $ExcludeColumn + '"')
-                if ($colIndex -lt 0) { $colIndex = 0 }
-            } else {
-                $colIndex = 0
-                $value = $cellsFirst[$colIndex].Trim('"').Trim()
-                if ($value) { $null = $set.Add($value) }
+            $hdrRaw = $first -split ',(?=(?:[^"]*"[^"]*")*[^"]*$)'
+            # Normalize headers: trim whitespace, trim quotes, strip BOM
+            $hdr = $hdrRaw | ForEach-Object {
+                $s = $_.Trim()
+                if ($s.Length -gt 0 -and [int][char]$s[0] -eq 0xFEFF) { $s = $s.Substring(1) } # strip BOM
+                $s.Trim('"')
             }
 
-            while (-not $reader.EndOfStream) {
-                $line = $reader.ReadLine()
-                if (-not $line) { continue }
-                $cells = $line -split ',(?=(?:[^""]*""[^""]*"")*[^""]*$)'
-                if ($cells.Count -gt $colIndex) {
-                    $value = $cells[$colIndex].Trim('"').Trim()
-                    if ($value) { $null = $set.Add($value) }
+            $idx = [Array]::IndexOf(($hdr | ForEach-Object { $_.ToLowerInvariant() }), $ColName.ToLowerInvariant())
+            if ($idx -ge 0) {
+                # file has header row; read remaining lines as data
+                while (-not $r.EndOfStream) {
+                    $line  = $r.ReadLine()
+                    if (-not $line) { continue }
+                    $cells = $line -split ',(?=(?:[^"]*"[^"]*")*[^"]*$)'
+                    if ($cells.Count -gt $idx) {
+                        $val = $cells[$idx].Trim().Trim('"')
+                        if ($val) { $null = $set.Add($val) }
+                    }
+                }
+            } else {
+                # no header; treat first line as value
+                $val = $hdrRaw[0].Trim().Trim('"')
+                if ($val) { $null = $set.Add($val) }
+                while (-not $r.EndOfStream) {
+                    $line = $r.ReadLine()
+                    if (-not $line) { continue }
+                    $val = ($line -split ',(?=(?:[^"]*"[^"]*")*[^"]*$)')[0].Trim().Trim('"')
+                    if ($val) { $null = $set.Add($val) }
                 }
             }
-        }
-        finally {
-            if ($reader) { $reader.Dispose() }
+        } finally {
+            if ($r) { $r.Dispose() }
         }
         return $set
     }
 
+    $excludeSet = Get-ExcludeSet -CsvPath $ExcludeListCsv -ColName $ExcludeColumn
+    Write-Host "Exclude list entries loaded $($excludeSet.Count) : names to remove" -ForegroundColor Yellow
+
+    # --- Prep outputs
     $inputFolder = Split-Path $InputCsv
     $inputName   = [System.IO.Path]::GetFileNameWithoutExtension($InputCsv)
     $inputExt    = [System.IO.Path]::GetExtension($InputCsv)
@@ -88,12 +96,7 @@ function Get-UniqueDisplayNamesFiltered {
     $uniqueOut   = Join-Path $inputFolder "$inputName-UniqueDisplayNames-Filtered.csv"
     $rowsOut     = Join-Path $inputFolder "$inputName-filteredByList$inputExt"
 
-    Write-Host "Loading exclude list from $ExcludeListCsv ..." -ForegroundColor Cyan
-    $excludeSet = Get-ExcludeSet -ExcludeListCsv $ExcludeListCsv -ExcludeColumn $ExcludeColumn
-    Write-Host "Exclude list entries loaded $($excludeSet.Count) : names to remove" -ForegroundColor Yellow
-
     $unique = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
-
     $sw = [System.Diagnostics.Stopwatch]::StartNew()
     $lastUpdate = Get-Date
     $totalBytes = (Get-Item -LiteralPath $InputCsv).Length
@@ -109,25 +112,38 @@ function Get-UniqueDisplayNamesFiltered {
     $rowsRemoved = 0
 
     try {
+        # --- Read & normalize header
         $headerLine = $reader.ReadLine()
         if (-not $headerLine) { Write-Host "Input appears empty $InputCsv :" -ForegroundColor Red; return }
 
         if ($FilterSourceRows) { $writerRows.WriteLine($headerLine) }
 
-        $headers  = $headerLine -split ',(?=(?:[^""]*""[^""]*"")*[^""]*$)'
-        $dnIndex  = $headers.IndexOf('"Display Name"')
-        if ($dnIndex -lt 0) { Write-Host "Column `"Display Name`" $InputCsv : NOT FOUND" -ForegroundColor Red; return }
+        $hdrRaw = $headerLine -split ',(?=(?:[^"]*"[^"]*")*[^"]*$)'
+        $hdr = $hdrRaw | ForEach-Object {
+            $s = $_.Trim()
+            if ($s.Length -gt 0 -and [int][char]$s[0] -eq 0xFEFF) { $s = $s.Substring(1) } # strip BOM if present
+            $s.Trim('"')
+        }
+
+        # --- Find "Display Name" column index case-insensitively
+        $dnIndex = [Array]::IndexOf(($hdr | ForEach-Object { $_.ToLowerInvariant() }), 'display name')
+        if ($dnIndex -lt 0) {
+            Write-Host "Column `"Display Name`" $InputCsv : NOT FOUND" -ForegroundColor Red
+            Write-Host "Detected columns $InputCsv : $($hdr -join '; ')" -ForegroundColor Yellow
+            return
+        }
 
         $dataTotal = if ($TotalLines -gt 0) { [math]::Max(1, $TotalLines - 1) } else { 0 }
 
+        # --- Stream rows
         while (-not $reader.EndOfStream) {
             $line = $reader.ReadLine()
             if (-not $line) { continue }
             $linesProcessed++
 
-            $cells = $line -split ',(?=(?:[^""]*""[^""]*"")*[^""]*$)'
+            $cells = $line -split ',(?=(?:[^"]*"[^"]*")*[^"]*$)'
             if ($cells.Count -gt $dnIndex) {
-                $name = $cells[$dnIndex].Trim('"').Trim()
+                $name = $cells[$dnIndex].Trim().Trim('"')
                 if ($name) {
                     if (-not $excludeSet.Contains($name)) {
                         $null = $unique.Add($name)
@@ -142,6 +158,7 @@ function Get-UniqueDisplayNamesFiltered {
                 if ($FilterSourceRows) { $writerRows.WriteLine($line); $rowsKept++ }
             }
 
+            # --- Progress
             $now = Get-Date
             if ( ($now - $lastUpdate).TotalMilliseconds -ge $ProgressIntervalMS ) {
                 if ($TotalLines -gt 0) {
@@ -168,6 +185,7 @@ function Get-UniqueDisplayNamesFiltered {
         $sw.Stop()
     }
 
+    # --- Write outputs
     "Display Name" | Set-Content -Path $uniqueOut -Encoding UTF8
     $unique | Sort-Object | ForEach-Object { '"{0}"' -f $_ } | Add-Content -Path $uniqueOut -Encoding UTF8
 
@@ -177,9 +195,9 @@ function Get-UniqueDisplayNamesFiltered {
     }
 }
 
-# --- Example usage with FULL PATHS (avoids .\ current-folder issues) ---
-$SourceCsv  = 'C:\Temp\csv-split-staging\NTFS Permissions Report R drive 092525 CSV-filtered.csv'
-$ExcludeCsv = 'C:\Temp\csv-split-staging\NTFS Permissions Report R drive 092525 CSV-filtered-UniqueDisplayNames-removed.csv'
-$TotalLines = 1994689  # includes header
-
-Get-UniqueDisplayNamesFiltered -InputCsv $SourceCsv -ExcludeListCsv $ExcludeCsv -TotalLines $TotalLines -FilterSourceRows
+# --- Example usage with your files and exact line count ---
+Get-UniqueDisplayNamesFiltered `
+  -InputCsv 'C:\Temp\csv-split-staging\NTFS Permissions Report R drive 092525 CSV-filtered.csv' `
+  -ExcludeListCsv 'C:\Temp\csv-split-staging\NTFS Permissions Report R drive 092525 CSV-filtered-UniqueDisplayNames-removed.csv' `
+  -TotalLines 1994689 `
+  -FilterSourceRows
