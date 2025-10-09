@@ -9,10 +9,10 @@ param(
 $config = Import-PowerShellDataFile -Path $ConfigFile
 
 # Now extract your values if present, or fallback defaults
-$SiteCode = if ($null -ne $config.SiteCode) { $config.SiteCode } else { 'MTS' }
-$SiteServer = if ($null -ne $config.SiteServer) { $config.SiteServer } else { 'clesccm.middough.local' }
+$SiteCode = if ($null -ne $config.SiteCode) { $config.SiteCode } else { 'ABC' } # replace with your default site code
+$SiteServer = if ($null -ne $config.SiteServer) { $config.SiteServer } else { 'server.domain.local' } # replace with your default site server
 $DefaultDPNames = if ($null -ne $config.DefaultDPNames) { $config.DefaultDPNames } else {
-    @('ashut01.middough.local','bufut01.middough.local','chiut01.middough.local','nwiut01.middough.local','pitut01.middough.local','tolut01.middough.local','clesccm.middough.local')
+    @('server1.domain.local','server2.domain.local')  # example defaults
 }
 
 # Import CSV rows

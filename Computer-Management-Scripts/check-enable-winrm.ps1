@@ -71,30 +71,37 @@ $list2array = @(
     "TOLW11HY720J3",
     "TOLW11JLBMKY3"
 )
+
+$offlinecomputers = @()
+
+
 foreach ($item in $list2array){
-   
     if (Test-Connection -ComputerName $item -Count 1 -Quiet) {
         Write-Host "$item : Online" -ForegroundColor Green
-    # check if winrm is enabled
-    $winrmStatus = (Get-Service -Name WinRM -ComputerName $item -ErrorAction SilentlyContinue).Status
-    if ($winrmStatus -eq 'Running') {   
-        Write-Host "$item : WinRM is already enabled" -ForegroundColor Yellow
-        continue
-    } else {
-        Write-Host "$item : Enabling WinRM..." -ForegroundColor Cyan
+        # check if winrm is enabled using Invoke-Command
         try {
-            Invoke-Command -ComputerName $item -ScriptBlock {
-                Enable-PSRemoting -Force -SkipNetworkProfileCheck
+            $winrmStatus = Invoke-Command -ComputerName $item -ScriptBlock {
+                (Get-Service -Name WinRM).Status
             } -ErrorAction Stop
-            Write-Host "$item : WinRM enabled successfully." -ForegroundColor Green
+            if ($winrmStatus -eq 'Running') {   
+                Write-Host "$item : WinRM is already enabled" -ForegroundColor Yellow
+                continue
+            } else {
+                Write-Host "$item : Enabling WinRM..." -ForegroundColor Cyan
+                Invoke-Command -ComputerName $item -ScriptBlock {
+                    Enable-PSRemoting -Force -SkipNetworkProfileCheck
+                } -ErrorAction Stop
+                Write-Host "$item : WinRM enabled successfully." -ForegroundColor Green
+            }
         } catch {
-            Write-Host "$item : Failed to enable WinRM. Error: $_" -ForegroundColor Red
+            Write-Host "$item : Failed to check/enable WinRM. Error: $_" -ForegroundColor Red
         }
+    } else {
         Write-Host "$item : Offline" -ForegroundColor Red
-        # add $item to new array $offlinecomputers
         $offlinecomputers += $item
     }
-    
 }
+
+
 Write-Host "Offline computers:" -ForegroundColor Red
 $offlinecomputers | ForEach-Object { Write-Host $_ -ForegroundColor Red }
