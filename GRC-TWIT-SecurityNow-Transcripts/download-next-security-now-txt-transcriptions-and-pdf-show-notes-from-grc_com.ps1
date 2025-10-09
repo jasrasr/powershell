@@ -21,7 +21,11 @@ $txtFolder = "$global:downloadbase\TXT-Transcriptions"
 $pdfFolder = "$global:downloadbase\PDF-Show-Notes"
 
 # Init log
-$global:logFile = "$global:downloadbase\download-log-$(Get-Date -Format 'yyyyMMdd').txt"
+$global:logFile = "$global:downloadbase\Download-Logs\download-log-$(Get-Date -Format 'yyyyMMdd').txt"
+# Test if log file exist and create if not
+if(-not(Test-Path $global:logFile)) {
+    New-Item -Path "$global:downloadbase\Download-Logs" -ItemType Directory -Force | Out-Null
+}
 
 function Write-Log {
     param ([string]$Message)
