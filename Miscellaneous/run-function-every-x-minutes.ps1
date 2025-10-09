@@ -1,5 +1,5 @@
-# Revision : 1.0
-# Description : Run a target function every N minutes until you stop it (Ctrl+C or create a stop file). Rev 1.0
+# Revision : 1.1
+# Description : Run a target function every N minutes until you stop it, with a live countdown to next iteration. Rev 1.1
 # Author : Jason Lamb (with help from ChatGPT)
 # Created Date : 2025-10-09
 # Modified Date : 2025-10-09
@@ -27,24 +27,20 @@
     .\run-function-every-x-minutes.ps1 -FunctionName 'Do-Work' -FunctionArgs 'Jason' -IntervalMinutes 1
 #>
 
+
 [CmdletBinding()]
 param(
-    # The name of the function to invoke each cycle
     [Parameter(Mandatory)]
     [ValidateNotNullOrEmpty()]
     [string]$FunctionName,
 
-    # Optional arguments to pass to the function
     [object[]]$FunctionArgs = @(),
 
-    # Interval in minutes between runs
     [ValidateRange(1, 1440)]
     [int]$IntervalMinutes = 5,
 
-    # Create this empty file to request a graceful stop (checked once per second)
     [string]$StopFile = 'C:\Temp\stop.loop',
 
-    # Suppress host chatter (logs still written)
     [switch]$Quiet
 )
 
@@ -57,7 +53,6 @@ if (-not (Test-Path $ExportFolder)) {
 $TimeStamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $LogFile   = Join-Path $ExportFolder "invoke-repeated-$TimeStamp.log"
 
-# Utility for consistent logging
 function Write-Log {
     param(
         [string]$Message,
@@ -71,23 +66,20 @@ function Write-Log {
     }
 }
 
-# Validate function exists in current session
 if (-not (Get-Command -Name $FunctionName -CommandType Function -ErrorAction SilentlyContinue)) {
     Write-Host "Function '$FunctionName' was not found in the current session. Define it before running." -ForegroundColor Red
     exit 1
 }
 
-# Informational header
 Write-Log "Starting Invoke-Repeated for function '$FunctionName' every $IntervalMinutes minute(s)."
 Write-Log "Stop file path : $StopFile"
 Write-Log "Log file path  : $LogFile"
 
-# Tip to user about stopping
 if (-not $Quiet) {
     Write-Host "Press Ctrl+C to stop at any time, or create the stop file : $StopFile" -ForegroundColor DarkYellow
 }
 
-# Ensure stop-file directory exists (only the folder path)
+# Ensure stop-file directory exists
 try {
     $stopDir = Split-Path -Path $StopFile -ErrorAction Stop
     if ($stopDir -and -not (Test-Path $stopDir)) {
@@ -99,7 +91,7 @@ catch {
     Write-Log "Could not prepare stop-file directory. Proceeding anyway. Error : $_" ([ConsoleColor]::DarkYellow)
 }
 
-# --- Main loop ---
+# --- Main loop with countdown ---
 $iteration = 0
 try {
     while ($true) {
@@ -119,29 +111,46 @@ try {
             Write-Log "Iteration #$iteration : Error during function execution : $_" ([ConsoleColor]::Red)
         }
 
-        # Sleep with 1-second checks so we can exit quickly if stop requested
+        # Countdown to next run
         $totalSeconds = $IntervalMinutes * 60
-        for ($i = 1; $i -le $totalSeconds; $i++) {
+        for ($remaining = $totalSeconds; $remaining -gt 0; $remaining--) {
             if (Test-Path $StopFile) {
+                if (-not $Quiet) { Write-Progress -Activity "Waiting for next iteration" -Completed }
                 Write-Log "Stop file detected : $StopFile. Exiting loop." ([ConsoleColor]::Yellow)
                 Remove-Item -Path $StopFile -ErrorAction SilentlyContinue | Out-Null
                 throw [System.OperationCanceledException]::new("Stop file triggered")
             }
+
+            if (-not $Quiet) {
+                $elapsed = $totalSeconds - $remaining
+                $pct     = [int](($elapsed / [double]$totalSeconds) * 100)
+                $ts      = [TimeSpan]::FromSeconds($remaining)
+                $status  = ("Next run in {0:mm\:ss}" -f $ts)
+                Write-Progress -Activity "Waiting for next iteration" -Status $status -PercentComplete $pct
+            }
+
             Start-Sleep -Seconds 1
+        }
+
+        if (-not $Quiet) {
+            Write-Progress -Activity "Waiting for next iteration" -Completed
+            Write-Host "Starting next iteration now : $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" -ForegroundColor Cyan
         }
     }
 }
 catch [System.OperationCanceledException] {
+    if (-not $Quiet) { Write-Progress -Activity "Waiting for next iteration" -Completed }
     Write-Log "Loop cancelled by request : $($_.Exception.Message)" ([ConsoleColor]::Yellow)
 }
 catch {
+    if (-not $Quiet) { Write-Progress -Activity "Waiting for next iteration" -Completed }
     Write-Log "Unhandled error in loop : $_" ([ConsoleColor]::Red)
 }
 finally {
     Write-Log "Invoke-Repeated finished."
     if (-not $Quiet) {
         Write-Host "Finished. Full log path : $LogFile" -ForegroundColor Green
-        # Auto-open the log for convenience
         try { Invoke-Item -Path $LogFile } catch { Write-Host "Could not open log : $_" -ForegroundColor DarkYellow }
     }
 }
+
