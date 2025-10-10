@@ -1,3 +1,9 @@
+# Revision : 1.0
+# Description : String statistics script — counts chars, words, vowels, etc. with random color output. Rev 1.0
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-10-10
+# Modified Date : 2025-10-10
+
 # Define an array of color names (must match valid console color names)
 $colors = @('White','Gray','DarkGray','Black','Green','DarkGreen','Cyan','DarkCyan','Red','DarkRed','Magenta','DarkMagenta','Yellow','DarkYellow','Blue','DarkBlue')
 
