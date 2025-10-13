@@ -1,4 +1,4 @@
-# Revision : 2.7
+# Revision : 2.9
 # Description : Timestamped backup, then (optionally) apply selected filters:
 #   (1) remove lines with 11+ backslashes,
 #   (2) remove lines ending in specific file extensions (includes .mp4, .lnk, .mpg),
@@ -6,8 +6,9 @@
 #   (4) remove rows under a provided child-folder list (proper "\*" handling; includes '5.1 Quality Checklist*' and 'Field Measurements*'),
 #   (5) remove children under '11.0 Issued Documents' (keep folder root),
 #   (6) remove children under _Gen, _Stds, _Transfer at archive\<*>\ (keep roots) + general Issued Documents and Photos children removal,
-#   (7) remove duplicate lines (case-insensitive; keeps first occurrence).
-# Includes progress bar and final report. Rev 2.7
+#   (7) remove duplicate lines (case-insensitive; keeps first occurrence),
+#   (8) export (do NOT delete) any rows containing a comma to a separate file.
+# Includes progress bar and final report. Rev 2.9
 # Author : Jason Lamb (with help from ChatGPT)
 # Created Date : 2025-10-12
 # Modified Date : 2025-10-13
@@ -23,11 +24,12 @@ param(
     [switch]$RemoveChildFolders,       # Rule 4
     [switch]$RemoveIssuedChildren,     # Rule 5
     [switch]$RemoveGSTChildren,        # Rule 6 (_Gen, _Stds, _Transfer + Issued/Photos children)
-    [switch]$RemoveDuplicates          # Rule 7 (deduplicate lines)
+    [switch]$RemoveDuplicates,         # Rule 7 (deduplicate lines)
+    [switch]$ExportCommaRows           # Rule 8 (export rows containing commas, do not delete)
 )
 
 # If no switches provided, enable all rules by default
-if (-not ($RemoveSlash11 -or $RemoveExtensions -or $RemoveNewformaChildren -or $RemoveChildFolders -or $RemoveIssuedChildren -or $RemoveGSTChildren -or $RemoveDuplicates)) {
+if (-not ($RemoveSlash11 -or $RemoveExtensions -or $RemoveNewformaChildren -or $RemoveChildFolders -or $RemoveIssuedChildren -or $RemoveGSTChildren -or $RemoveDuplicates -or $ExportCommaRows)) {
     $RemoveSlash11 = $true
     $RemoveExtensions = $true
     $RemoveNewformaChildren = $true
@@ -35,14 +37,16 @@ if (-not ($RemoveSlash11 -or $RemoveExtensions -or $RemoveNewformaChildren -or $
     $RemoveIssuedChildren = $true
     $RemoveGSTChildren = $true
     $RemoveDuplicates = $true
+    $ExportCommaRows = $true
     Write-Host "No filters specified, applying all filters by default." -ForegroundColor DarkYellow
 }
 
 # Timestamp for backup name
 $datetime = Get-Date -Format 'yyyyMMdd-HHmmss'
 
-# Backup path
+# Backup path(s)
 $backupFile = "$($InputFile)-backup-$datetime.txt"
+$commaFile  = "$($InputFile)-comma-$datetime.txt"
 
 # Backup original
 Copy-Item -Path $InputFile -Destination $backupFile -Force
@@ -52,6 +56,7 @@ Write-Host "Backup created : $backupFile" -ForegroundColor Cyan
 $allLines = Get-Content -Path $InputFile
 $total = $allLines.Count
 $filteredLines = New-Object System.Collections.Generic.List[string]
+$commaLines    = New-Object System.Collections.Generic.List[string]
 $removedCount = 0
 
 # -------------------------------
@@ -65,8 +70,9 @@ $extPatterns = @(
 # -------------------------------------------
 # Rule 3 : Newforma - remove specific children (not the Newforma root)
 # Keep root ...\Newforma but remove: Email, Field Notes, PunchList, Record Copies
+# Note : allow one-or-more folders between "archive\" and "Newforma\"
 # -------------------------------------------
-$rxNewformaChildren = '^\\\\middough\.local\\corp\\data\\archive\\(?:[^\\]+\\){1,}Newforma\\(NewForma|Email|Field Notes|PunchList|Record Copies)(?:\\|$)'
+$rxNewformaChildren = '^\\\\middough\.local\\corp\\data\\archive\\(?:[^\\]+\\){1,}Newforma\\(Email|Field Notes|PunchList|Record Copies)(?:\\|$)'
 
 # -------------------------------------------
 # Rule 4 : Remove any of these folders + subfolders (match anywhere in the path)
@@ -223,7 +229,9 @@ $childFolders = @(
     '4.19 Change Management\*',
     '10.7 NAVIS\*',
     '3.8 DQR',
-    '3.9 ICOR'
+    '3.9 ICOR',
+    '1.3 Change Authorization (ICOR, CN, COR)',
+    '1.12 Mandatory Gates Log'
 )
 
 # Build regexes that match "\<FolderName>(\|$)" anywhere in the path
@@ -235,8 +243,8 @@ $childFolderRegexes = foreach ($p in $childFolders) {
 
 # -------------------------------------------
 # Rule 5 : Remove children under "11.0 Issued Documents" but keep the folder root
-# Examples to REMOVE:  \\...\archive\*\*\11.0 Issued Documents\something
-# Example to KEEP:     \\...\archive\*\*\11.0 Issued Documents
+# Examples to REMOVE : \\...\archive\*\*\11.0 Issued Documents\something
+# Example to KEEP    : \\...\archive\*\*\11.0 Issued Documents
 # -------------------------------------------
 $rxIssuedChildren = '^\\\\middough\.local\\corp\\data\\archive\\(?:[^\\]+\\){2,}11\.0 Issued Documents\\.+'
 
@@ -260,6 +268,11 @@ Write-Host "Processing $total lines ..." -ForegroundColor Yellow
 for ($i = 0; $i -lt $total; $i++) {
     $line = $allLines[$i]
     $remove = $false
+
+    # Rule 8 : Export comma rows (do NOT delete)
+    if ($ExportCommaRows -and ($line -like '*,*')) {
+        $commaLines.Add($line) | Out-Null
+    }
 
     # Rule 1 : 11+ backslashes
     if (-not $remove -and $RemoveSlash11) {
@@ -321,6 +334,14 @@ for ($i = 0; $i -lt $total; $i++) {
 # Save cleaned file
 $filteredLines | Set-Content -Path $InputFile -Encoding UTF8
 
+# Save comma rows (if any)
+$commaExported = 0
+if ($ExportCommaRows -and $commaLines.Count -gt 0) {
+    $commaLines | Set-Content -Path $commaFile -Encoding UTF8
+    $commaExported = $commaLines.Count
+    Write-Host "Comma rows exported to : $commaFile" -ForegroundColor Magenta
+}
+
 # Report
 $keptCount = $filteredLines.Count
 $removedPercent = if ($total -gt 0) { [math]::Round(($removedCount / $total) * 100, 2) } else { 0 }
@@ -332,6 +353,7 @@ Write-Host "-------------------------" -ForegroundColor DarkGray
 Write-Host "Total lines processed : $total" -ForegroundColor Yellow
 Write-Host "Lines removed         : $removedCount ($removedPercent%)" -ForegroundColor Red
 Write-Host "Lines kept            : $keptCount" -ForegroundColor Green
+Write-Host "Comma rows exported   : $commaExported" -ForegroundColor Magenta
 Write-Host "Clean file saved to   : $InputFile" -ForegroundColor Cyan
 Write-Host "Backup created at     : $backupFile" -ForegroundColor Gray
 Write-Host "Operation complete at : $(Get-Date)" -ForegroundColor Yellow
@@ -339,20 +361,17 @@ Write-Host "Operation complete at : $(Get-Date)" -ForegroundColor Yellow
 <# -----------------
 Usage examples
 -------------------
-# Apply ALL filters (default if none specified)
+# Apply ALL rules (default if none specified)
 .\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt'
 
-# Only specific rules
-.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveSlash11
-.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveExtensions
-.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveNewformaChildren
-.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveChildFolders
-.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveIssuedChildren
-.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveGSTChildren
-.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveDuplicates
+# Only export comma rows (no deletions)
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -ExportCommaRows
+
+# Export comma rows AND remove duplicates
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -ExportCommaRows -RemoveDuplicates
 
 # Combine as needed
-.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveExtensions -RemoveNewformaChildren -RemoveIssuedChildren -RemoveGSTChildren -RemoveDuplicates
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveExtensions -RemoveNewformaChildren -RemoveIssuedChildren -RemoveGSTChildren -RemoveDuplicates -ExportCommaRows
 #>
 
 <# -----------------
@@ -387,15 +406,12 @@ Rule examples (kept vs removed)
 \\middough.local\corp\data\archive\Basf\ENG1830B\9.0 Health & Safety
 # Removed:
 \\middough.local\corp\data\archive\Basf\ENG1830B\9.0 Health & Safety\9.5 Report
-\\middough.local\corp\data\archive\Basf\ENG1830B\9.0 Health & Safety\9.5 Report\file
-\\middough.local\corp\data\archive\Basf\ENG1830B\9.0 Health & Safety\9.5 Report\folder
 
 # Rule 5 : "11.0 Issued Documents" children (keep the root)
 # Kept:
 \\middough.local\corp\data\archive\Basf\ENG1840\11.0 Issued Documents
 # Removed:
 \\middough.local\corp\data\archive\Basf\ENG1840\11.0 Issued Documents\Rev A
-\\middough.local\corp\data\archive\Basf\ENG1840\11.0 Issued Documents\Rev A\file.pdf
 
 # Rule 6 : _Gen / _Stds / _Transfer + Issued/Photos children (keep roots)
 # Kept:
@@ -416,8 +432,14 @@ Rule examples (kept vs removed)
 \\server\share\path\example
 # Removed (duplicate lines later in the file):
 \\server\share\path\example
-\\SERVER\SHARE\PATH\Example   # also considered duplicate due to case-insensitive compare
+\\SERVER\SHARE\PATH\Example
 
+# Rule 8 : Export comma rows (do NOT delete)
+# Kept in main file, but written to a separate export file:
+#   Export path : <InputFile>-comma-<timestamp>.txt
+# Examples exported:
+\\server\path\with,comma
+"Quoted, CSV, like, line"
 #>
 <# -----------------
 Revision History (recap)
@@ -434,4 +456,6 @@ Revision History (recap)
 2.5 : Added Rule 6 case to remove Issued Documents\2010_9-10-10 children.
 2.6 : Generalized Rule 6 to remove any children under Issued Documents and Photos (kept roots).
 2.7 : Added Rule 7 to remove duplicate lines (case-insensitive; keeps first occurrence).
+2.8 : Rule 3 regex loosened to allow one-or-more folders before "Newforma\".
+2.9 : Added Rule 8 to export comma rows to a separate file without deleting them.
 #>
