@@ -25,7 +25,7 @@ param(
     [switch]$RemoveIssuedChildren,     # Rule 5
     [switch]$RemoveGSTChildren,        # Rule 6 (_Gen, _Stds, _Transfer + Issued/Photos children)
     [switch]$RemoveDuplicates,         # Rule 7 (deduplicate lines)
-    [switch]$ExportCommaRows           # Rule 8 (export rows containing commas, do not delete)
+    [switch]$RemoveCommaRows           # Rule 8 (REMOVE rows containing commas)
 )
 
 # If no switches provided, enable all rules by default
@@ -43,10 +43,6 @@ if (-not ($RemoveSlash11 -or $RemoveExtensions -or $RemoveNewformaChildren -or $
 
 # Timestamp for backup name
 $datetime = Get-Date -Format 'yyyyMMdd-HHmmss'
-
-# Backup path(s)
-$backupFile = "$($InputFile)-backup-$datetime.txt"
-$commaFile  = "$($InputFile)-comma-$datetime.txt"
 
 # Backup original
 Copy-Item -Path $InputFile -Destination $backupFile -Force
@@ -269,10 +265,10 @@ for ($i = 0; $i -lt $total; $i++) {
     $line = $allLines[$i]
     $remove = $false
 
-    # Rule 8 : Export comma rows (do NOT delete)
-    if ($ExportCommaRows -and ($line -like '*,*')) {
-        $commaLines.Add($line) | Out-Null
-    }
+ # Rule 8 : remove rows containing a comma
+if (-not $remove -and $RemoveCommaRows) {
+    if ($line -like '*,*') { $remove = $true }
+}
 
     # Rule 1 : 11+ backslashes
     if (-not $remove -and $RemoveSlash11) {
@@ -334,13 +330,6 @@ for ($i = 0; $i -lt $total; $i++) {
 # Save cleaned file
 $filteredLines | Set-Content -Path $InputFile -Encoding UTF8
 
-# Save comma rows (if any)
-$commaExported = 0
-if ($ExportCommaRows -and $commaLines.Count -gt 0) {
-    $commaLines | Set-Content -Path $commaFile -Encoding UTF8
-    $commaExported = $commaLines.Count
-    Write-Host "Comma rows exported to : $commaFile" -ForegroundColor Magenta
-}
 
 # Report
 $keptCount = $filteredLines.Count
@@ -353,7 +342,6 @@ Write-Host "-------------------------" -ForegroundColor DarkGray
 Write-Host "Total lines processed : $total" -ForegroundColor Yellow
 Write-Host "Lines removed         : $removedCount ($removedPercent%)" -ForegroundColor Red
 Write-Host "Lines kept            : $keptCount" -ForegroundColor Green
-Write-Host "Comma rows exported   : $commaExported" -ForegroundColor Magenta
 Write-Host "Clean file saved to   : $InputFile" -ForegroundColor Cyan
 Write-Host "Backup created at     : $backupFile" -ForegroundColor Gray
 Write-Host "Operation complete at : $(Get-Date)" -ForegroundColor Yellow
@@ -364,11 +352,11 @@ Usage examples
 # Apply ALL rules (default if none specified)
 .\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt'
 
-# Only export comma rows (no deletions)
-.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -ExportCommaRows
+# Remove comma rows only
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveCommaRows
 
-# Export comma rows AND remove duplicates
-.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -ExportCommaRows -RemoveDuplicates
+# Remove comma rows AND duplicates
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveCommaRows -RemoveDuplicates
 
 # Combine as needed
 .\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveExtensions -RemoveNewformaChildren -RemoveIssuedChildren -RemoveGSTChildren -RemoveDuplicates -ExportCommaRows
@@ -434,12 +422,13 @@ Rule examples (kept vs removed)
 \\server\share\path\example
 \\SERVER\SHARE\PATH\Example
 
-# Rule 8 : Export comma rows (do NOT delete)
-# Kept in main file, but written to a separate export file:
-#   Export path : <InputFile>-comma-<timestamp>.txt
-# Examples exported:
-\\server\path\with,comma
-"Quoted, CSV, like, line"
+
+# Rule 8 : Remove rows containing a comma
+# Removed:
+# \\server\path\with,comma
+# "Quoted, CSV, like, line"
+# Kept:
+# \\server\path\without_commas
 #>
 <# -----------------
 Revision History (recap)
