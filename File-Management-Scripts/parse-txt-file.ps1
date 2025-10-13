@@ -66,7 +66,7 @@ $extPatterns = @(
 # Rule 3 : Newforma - remove specific children (not the Newforma root)
 # Keep root ...\Newforma but remove: Email, Field Notes, PunchList, Record Copies
 # -------------------------------------------
-$rxNewformaChildren = '^\\\\middough\.local\\corp\\data\\archive\\(?:[^\\]+\\){1,}Newforma\\(Email|Field Notes|PunchList|Record Copies)(?:\\|$)'
+$rxNewformaChildren = '^\\\\middough\.local\\corp\\data\\archive\\(?:[^\\]+\\){1,}Newforma\\(NewForma|Email|Field Notes|PunchList|Record Copies)(?:\\|$)'
 
 # -------------------------------------------
 # Rule 4 : Remove any of these folders + subfolders (match anywhere in the path)
@@ -216,7 +216,10 @@ $childFolders = @(
     '4.19 Construction Administration\*',
     '4.20 Pending Release\*',
     '10.8 Naviswork\*',
-    '3.8 Database\*'
+    '3.8 Database\*',
+    '1.12 Working Docs Logs\*',
+    '4.22 Change Management - ICORs\*',
+    '1.18 SPM Email Archives\*'
 )
 
 # Build regexes that match "\<FolderName>(\|$)" anywhere in the path
