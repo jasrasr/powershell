@@ -56,8 +56,7 @@ $removedCount = 0
 # Rule 2 : File extension patterns (END OF LINE)
 # -------------------------------
 $extPatterns = @(
-    '\.msg$', '\.xlsx$', '\.docx$', '\.pdf$', '\.xls$', '\.doc$', '\.pptx$', '\.csv$', '\.zip$',
-    '\.log$', '\.txt$', '\.dcf$', '\.dcfx$', '\.xml$', '\.xml\.lock$', '\.dwg$', '\.mp4$', '\.lnk$', '\.mpg$'
+    '\.msg$', '\.xlsx$', '\.docx$', '\.pdf$', '\.xls$', '\.doc$', '\.pptx$', '\.csv$', '\.zip$', '\.log$', '\.txt$', '\.dcf$', '\.dcfx$', '\.xml$', '\.xml\.lock$', '\.dwg$', '\.mp4$', '\.lnk$', '\.mpg$', '\.dgn$', '\.mpp$'
 )
 
 # -------------------------------------------
@@ -139,6 +138,9 @@ $childFolders = @(
     '4.16 Vendor Files\*',
     '4.17 Photos\*',
     '4.18 Discipline\*',
+    '4.19 Word templates\*',
+    '4.19 Word template\*',
+    '4.19 ICORs\*',
     '5.1 TQI Checklist\*',
     '5.1 Quality Checklist\*',
     '5.2 Design Reviews\*',
@@ -200,7 +202,12 @@ $childFolders = @(
     '10.8 CADWorx\*',
     '10.8 Navisworks\*',
     '10.9 SOLIDWORKS\*',
-    'Field Measurements\*'
+    'Field Measurements\*',
+    '10.10 Inventor\*',
+    '10.12 Scanning\*',
+    '10.13 Exports\*',
+    '3.2a Change Management\*',
+    '3.8 Client Comments\*'
 )
 
 # Build regexes that match "\<FolderName>(\|$)" anywhere in the path
