@@ -221,7 +221,9 @@ $childFolders = @(
     '4.22 Change Management - ICORs\*',
     '1.18 SPM Email Archives\*',
     '4.19 Change Management\*',
-    '10.7 NAVIS\*'
+    '10.7 NAVIS\*',
+    '3.8 DQR',
+    '3.9 ICOR'
 )
 
 # Build regexes that match "\<FolderName>(\|$)" anywhere in the path
