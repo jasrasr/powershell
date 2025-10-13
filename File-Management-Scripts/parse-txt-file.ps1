@@ -1,5 +1,12 @@
-# Revision : 1.8
-# Description : Timestamped backup, then apply selected filters: (1) remove lines with 11+ backslashes, (2) remove lines ending in specific file extensions (includes .mp4, .lnk), (3) remove specific Newforma child folders (keep Newforma root), (4) remove rows under a provided child-folder list, (5) remove children under '11.0 Issued Documents' but keep the folder root. Progress bar + final report. Rev 1.8
+# Revision : 2.0
+# Description : Timestamped backup, then (optionally) apply selected filters:
+#   (1) remove lines with 11+ backslashes,
+#   (2) remove lines ending in specific file extensions (includes .mp4, .lnk),
+#   (3) remove specific Newforma child folders (keep Newforma root),
+#   (4) remove rows under a provided child-folder list (fixed trailing \* handling),
+#   (5) remove children under '11.0 Issued Documents' (keep folder root),
+#   (6) remove children under _Gen, _Stds, _Transfer at archive\<*>\ (keep those roots).
+# Includes progress bar and final report. Rev 2.0
 # Author : Jason Lamb (with help from ChatGPT)
 # Created Date : 2025-10-12
 # Modified Date : 2025-10-13
@@ -13,16 +20,18 @@ param(
     [switch]$RemoveExtensions,         # Rule 2
     [switch]$RemoveNewformaChildren,   # Rule 3
     [switch]$RemoveChildFolders,       # Rule 4
-    [switch]$RemoveIssuedChildren      # Rule 5
+    [switch]$RemoveIssuedChildren,     # Rule 5
+    [switch]$RemoveGSTChildren         # Rule 6 (_Gen, _Stds, _Transfer children)
 )
 
 # If no switches provided, enable all rules by default
-if (-not ($RemoveSlash11 -or $RemoveExtensions -or $RemoveNewformaChildren -or $RemoveChildFolders -or $RemoveIssuedChildren)) {
+if (-not ($RemoveSlash11 -or $RemoveExtensions -or $RemoveNewformaChildren -or $RemoveChildFolders -or $RemoveIssuedChildren -or $RemoveGSTChildren)) {
     $RemoveSlash11 = $true
     $RemoveExtensions = $true
     $RemoveNewformaChildren = $true
     $RemoveChildFolders = $true
     $RemoveIssuedChildren = $true
+    $RemoveGSTChildren = $true
     Write-Host "No filters specified, applying all filters by default." -ForegroundColor DarkYellow
 }
 
@@ -58,6 +67,7 @@ $rxNewformaChildren = '^\\\\middough\.local\\corp\\data\\archive\\(?:[^\\]+\\){2
 
 # -------------------------------------------
 # Rule 4 : Remove any of these folders + subfolders (match anywhere in the path)
+# NOTE: trailing "\*" means "this folder and below" — handled by trimming "\*"
 # -------------------------------------------
 $childFolders = @(
     '1.1 Proposal Cover Letter\*',
@@ -191,21 +201,25 @@ $childFolders = @(
 )
 
 # Build regexes that match "\<FolderName>(\|$)" anywhere in the path
-# Strip a single trailing "\*" (meaning "this folder and below") before escaping.
+# Strip a trailing "\*" if present (meaning "this folder and below")
 $childFolderRegexes = foreach ($p in $childFolders) {
-    $base = ($p -replace '\\\*$', '')  # removes trailing "\*" if present (and leaves no trailing "\")
+    $base = ($p -replace '\\\*$', '')
     '\\' + [regex]::Escape($base) + '(\\|$)'
 }
 
 # -------------------------------------------
 # Rule 5 : Remove children under "11.0 Issued Documents" but keep the folder root
-# Examples to REMOVE:
-#   \\...\archive\*\*\11.0 Issued Documents\[folder or file]
-#   \\...\archive\Basf\ENG1840\11.0 Issued Documents\*
-# Example to KEEP:
-#   \\...\archive\*\*\11.0 Issued Documents
+# Examples to REMOVE:  \\...\archive\*\*\11.0 Issued Documents\something
+# Example to KEEP:     \\...\archive\*\*\11.0 Issued Documents
 # -------------------------------------------
 $rxIssuedChildren = '^\\\\middough\.local\\corp\\data\\archive\\(?:[^\\]+\\){2,}11\.0 Issued Documents\\.+'
+
+# -------------------------------------------
+# Rule 6 : Remove children under _Gen, _Stds, _Transfer at:
+#   \\middough.local\corp\data\archive\<one-folder>\(_Gen|_Stds|_Transfer)\[child...]
+# Keep the root folders themselves.
+# -------------------------------------------
+$rxGSTChildren = '^\\\\middough\.local\\corp\\data\\archive\\[^\\]+\\_(Gen|Stds|Transfer)\\.+'
 
 Write-Host "Processing $total lines ..." -ForegroundColor Yellow
 
@@ -244,6 +258,12 @@ for ($i = 0; $i -lt $total; $i++) {
         if ($line -match $rxIssuedChildren) { $remove = $true }
     }
 
+    # Rule 6 : _Gen, _Stds, _Transfer children (keep roots)
+    if (-not $remove -and $RemoveGSTChildren) {
+        $trimmed2 = $line.Trim()
+        if ($trimmed2 -match $rxGSTChildren) { $remove = $true }
+    }
+
     if (-not $remove) {
         $filteredLines.Add($line)
     }
@@ -280,21 +300,19 @@ Usage examples
 # Apply ALL filters (default if none specified)
 .\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt'
 
-# Only Rule 1
-.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveSlash11
+# Only Rule 6 (_Gen/_Stds/_Transfer children)
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveGSTChildren
 
-# Only Rule 2
-.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveExtensions
+# Combine as needed
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveExtensions -RemoveNewformaChildren -RemoveIssuedChildren -RemoveGSTChildren
+#>
 
-# Only Rule 3
-.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveNewformaChildren
-
-# Only Rule 4
-.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveChildFolders
-
-# Only Rule 5
-.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveIssuedChildren
-
-# Any combination
-.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveSlash11 -RemoveExtensions -RemoveIssuedChildren
+<# -----------------
+Revision History (recap)
+-------------------
+1.6 : Added selectable switches for Rules 1–3 (no longer forced); summary report.
+1.7 : Added Rule 4 (child folder list removal) and included .mp4; kept roots.
+1.8 : Added .lnk to Rule 2 and Rule 5 (Issued Documents children).
+1.9 : Fixed Rule 4 regex builder (proper trimming of trailing "\*").
+2.0 : Added Rule 6 for _Gen/_Stds/_Transfer children at archive\<*> roots; kept base folders.
 #>
