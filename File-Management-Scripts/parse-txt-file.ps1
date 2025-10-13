@@ -59,7 +59,7 @@ $removedCount = 0
 # -------------------------------
 $extPatterns = @(
     '\.msg$', '\.xlsx$', '\.docx$', '\.pdf$', '\.xls$', '\.doc$', '\.pptx$', '\.csv$', '\.zip$',
-    '\.log$', '\.txt$', '\.dcf$', '\.dcfx$', '\.xml$', '\.xml\.lock$', '\.dwg$', '\.mp4$', '\.lnk$', '\.mpg$'
+    '\.log$', '\.txt$', '\.dcf$', '\.dcfx$', '\.xml$', '\.xml\.lock$', '\.dwg$', '\.mp4$', '\.lnk$', '\.mpg$', '\.nwc$'
 )
 
 # -------------------------------------------
@@ -220,7 +220,8 @@ $childFolders = @(
     '1.12 Working Docs Logs\*',
     '4.22 Change Management - ICORs\*',
     '1.18 SPM Email Archives\*',
-    '4.19 Change Management\*'
+    '4.19 Change Management\*',
+    '10.7 NAVIS\*'
 )
 
 # Build regexes that match "\<FolderName>(\|$)" anywhere in the path
