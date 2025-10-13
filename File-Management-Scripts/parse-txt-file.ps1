@@ -1,13 +1,13 @@
-# Revision : 2.2
+# Revision : 2.7
 # Description : Timestamped backup, then (optionally) apply selected filters:
 #   (1) remove lines with 11+ backslashes,
-#   (2) remove lines ending in specific file extensions (added .mpg; includes .mp4, .lnk),
+#   (2) remove lines ending in specific file extensions (includes .mp4, .lnk, .mpg),
 #   (3) remove specific Newforma child folders (keep Newforma root),
-#   (4) remove rows under a provided child-folder list (proper "\*" handling),
+#   (4) remove rows under a provided child-folder list (proper "\*" handling; includes '5.1 Quality Checklist*' and 'Field Measurements*'),
 #   (5) remove children under '11.0 Issued Documents' (keep folder root),
-#   (6) remove children under _Gen, _Stds, _Transfer at archive\<*>\ (keep roots) +
-#       special cases for Issued Documents\...V&M Uploads and Photos\01-18-10 Sebek.
-# Includes progress bar and final report. Rev 2.2
+#   (6) remove children under _Gen, _Stds, _Transfer at archive\<*>\ (keep roots) + general Issued Documents and Photos children removal,
+#   (7) remove duplicate lines (case-insensitive; keeps first occurrence).
+# Includes progress bar and final report. Rev 2.7
 # Author : Jason Lamb (with help from ChatGPT)
 # Created Date : 2025-10-12
 # Modified Date : 2025-10-13
@@ -22,17 +22,19 @@ param(
     [switch]$RemoveNewformaChildren,   # Rule 3
     [switch]$RemoveChildFolders,       # Rule 4
     [switch]$RemoveIssuedChildren,     # Rule 5
-    [switch]$RemoveGSTChildren         # Rule 6 (_Gen, _Stds, _Transfer + special cases)
+    [switch]$RemoveGSTChildren,        # Rule 6 (_Gen, _Stds, _Transfer + Issued/Photos children)
+    [switch]$RemoveDuplicates          # Rule 7 (deduplicate lines)
 )
 
 # If no switches provided, enable all rules by default
-if (-not ($RemoveSlash11 -or $RemoveExtensions -or $RemoveNewformaChildren -or $RemoveChildFolders -or $RemoveIssuedChildren -or $RemoveGSTChildren)) {
+if (-not ($RemoveSlash11 -or $RemoveExtensions -or $RemoveNewformaChildren -or $RemoveChildFolders -or $RemoveIssuedChildren -or $RemoveGSTChildren -or $RemoveDuplicates)) {
     $RemoveSlash11 = $true
     $RemoveExtensions = $true
     $RemoveNewformaChildren = $true
     $RemoveChildFolders = $true
     $RemoveIssuedChildren = $true
     $RemoveGSTChildren = $true
+    $RemoveDuplicates = $true
     Write-Host "No filters specified, applying all filters by default." -ForegroundColor DarkYellow
 }
 
@@ -56,7 +58,8 @@ $removedCount = 0
 # Rule 2 : File extension patterns (END OF LINE)
 # -------------------------------
 $extPatterns = @(
-    '\.msg$', '\.xlsx$', '\.docx$', '\.pdf$', '\.xls$', '\.doc$', '\.pptx$', '\.csv$', '\.zip$', '\.log$', '\.txt$', '\.dcf$', '\.dcfx$', '\.xml$', '\.xml\.lock$', '\.dwg$', '\.mp4$', '\.lnk$', '\.mpg$', '\.dgn$', '\.mpp$'
+    '\.msg$', '\.xlsx$', '\.docx$', '\.pdf$', '\.xls$', '\.doc$', '\.pptx$', '\.csv$', '\.zip$',
+    '\.log$', '\.txt$', '\.dcf$', '\.dcfx$', '\.xml$', '\.xml\.lock$', '\.dwg$', '\.mp4$', '\.lnk$', '\.mpg$'
 )
 
 # -------------------------------------------
@@ -233,18 +236,17 @@ $rxIssuedChildren = '^\\\\middough\.local\\corp\\data\\archive\\(?:[^\\]+\\){2,}
 # -------------------------------------------
 # Rule 6 : Remove children under:
 #   - _Gen, _Stds, _Transfer at \\...archive\<one-folder>\
-#   - Issued Documents\_V&M TWO LLC-DOWN-UP LOADS\V&M Uploads
-#   - Photos\01-18-10 Sebek
-# Keep the roots:
-#   - \\...\archive\<one-folder>\_Gen
-#   - \\...\archive\<one-folder>\_Stds
-#   - \\...\archive\<one-folder>\_Transfer
-#   - \\...\archive\<one-folder>\Issued Documents
-#   - \\...\archive\<one-folder>\Photos
+#   - Any children beneath Issued Documents (keep root)
+#   - Any children beneath Photos (keep root)
 # -------------------------------------------
 $rxGST_TripletChildren = '^\\\\middough\.local\\corp\\data\\archive\\[^\\]+\\_(Gen|Stds|Transfer)\\.+'
-$rxGST_IssuedChildren = '^\\\\middough\.local\\corp\\data\\archive\\[^\\]+\\Issued Documents\\.+'
-$rxGST_PhotosChildren = '^\\\\middough\.local\\corp\\data\\archive\\[^\\]+\\Photos\\.+'
+$rxGST_IssuedChildren  = '^\\\\middough\.local\\corp\\data\\archive\\[^\\]+\\Issued Documents\\.+'
+$rxGST_PhotosChildren  = '^\\\\middough\.local\\corp\\data\\archive\\[^\\]+\\Photos\\.+'
+
+# -------------------------------------------
+# Rule 7 : Duplicate lines (case-insensitive) — keep first occurrence only
+# -------------------------------------------
+$seen = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
 
 Write-Host "Processing $total lines ..." -ForegroundColor Yellow
 
@@ -283,14 +285,19 @@ for ($i = 0; $i -lt $total; $i++) {
         if ($line -match $rxIssuedChildren) { $remove = $true }
     }
 
-    # Rule 6 : _Gen/_Stds/_Transfer children + special cases (keep their roots)
-       if (-not $remove -and $RemoveGSTChildren) {
-          if ( ($line -match $rxGST_TripletChildren) -or
-                 ($line -match $rxGST_IssuedChildren) -or
-                 ($line -match $rxGST_PhotosChildren) ) {
-                $remove = $true
-            }
-         }
+    # Rule 6 : _Gen/_Stds/_Transfer + Issued/Photos children (keep their roots)
+    if (-not $remove -and $RemoveGSTChildren) {
+        if ( ($line -match $rxGST_TripletChildren) -or
+             ($line -match $rxGST_IssuedChildren) -or
+             ($line -match $rxGST_PhotosChildren) ) {
+            $remove = $true
+        }
+    }
+
+    # Rule 7 : remove duplicates (keep first occurrence)
+    if (-not $remove -and $RemoveDuplicates) {
+        if (-not $seen.Add($line)) { $remove = $true }
+    }
 
     if (-not $remove) {
         $filteredLines.Add($line)
@@ -335,9 +342,10 @@ Usage examples
 .\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveChildFolders
 .\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveIssuedChildren
 .\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveGSTChildren
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveDuplicates
 
 # Combine as needed
-.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveExtensions -RemoveNewformaChildren -RemoveIssuedChildren -RemoveGSTChildren
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveExtensions -RemoveNewformaChildren -RemoveIssuedChildren -RemoveGSTChildren -RemoveDuplicates
 #>
 
 <# -----------------
@@ -345,7 +353,6 @@ Rule examples (kept vs removed)
 -------------------
 
 # Rule 1 : 11+ backslashes
-# (Counts '\' in the whole line)
 # Kept:
 \\middough.local\corp\data\archive\Basf\ENG1\Folder
 # Removed (>= 11 slashes):
@@ -383,7 +390,7 @@ Rule examples (kept vs removed)
 \\middough.local\corp\data\archive\Basf\ENG1840\11.0 Issued Documents\Rev A
 \\middough.local\corp\data\archive\Basf\ENG1840\11.0 Issued Documents\Rev A\file.pdf
 
-# Rule 6 : _Gen / _Stds / _Transfer children + special cases (keep roots)
+# Rule 6 : _Gen / _Stds / _Transfer + Issued/Photos children (keep roots)
 # Kept:
 \\middough.local\corp\data\archive\Basf\_Gen
 \\middough.local\corp\data\archive\Basf\_Stds
@@ -394,8 +401,15 @@ Rule examples (kept vs removed)
 \\middough.local\corp\data\archive\Basf\_Gen\folder
 \\middough.local\corp\data\archive\Basf\_Stds\folder
 \\middough.local\corp\data\archive\Basf\_Transfer\folder
-\\middough.local\corp\data\archive\Basf\Issued Documents\_V&M TWO LLC-DOWN-UP LOADS\V&M Uploads\file.txt
+\\middough.local\corp\data\archive\Basf\Issued Documents\2010_9-10-10
 \\middough.local\corp\data\archive\Basf\Photos\01-18-10 Sebek\image.jpg
+
+# Rule 7 : Duplicates (case-insensitive)
+# Kept (first occurrence only):
+\\server\share\path\example
+# Removed (duplicate lines later in the file):
+\\server\share\path\example
+\\SERVER\SHARE\PATH\Example   # also considered duplicate due to case-insensitive compare
 
 #>
 <# -----------------
@@ -408,4 +422,9 @@ Revision History (recap)
 2.0 : Added Rule 6 for _Gen/_Stds/_Transfer children at archive\<*> roots; kept base folders.
 2.1 : Added Rule 6 special cases: Issued Documents\...\V&M Uploads and Photos\01-18-10 Sebek.
 2.2 : Added .mpg to Rule 2; appended detailed examples for each rule.
+2.3 : Added '5.1 Quality Checklist*' to Rule 4 list.
+2.4 : Added 'Field Measurements*' to Rule 4 list.
+2.5 : Added Rule 6 case to remove Issued Documents\2010_9-10-10 children.
+2.6 : Generalized Rule 6 to remove any children under Issued Documents and Photos (kept roots).
+2.7 : Added Rule 7 to remove duplicate lines (case-insensitive; keeps first occurrence).
 #>
