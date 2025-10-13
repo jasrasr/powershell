@@ -237,8 +237,8 @@ $rxIssuedChildren = '^\\\\middough\.local\\corp\\data\\archive\\(?:[^\\]+\\){2,}
 #   - \\...\archive\<one-folder>\Photos
 # -------------------------------------------
 $rxGST_TripletChildren = '^\\\\middough\.local\\corp\\data\\archive\\[^\\]+\\_(Gen|Stds|Transfer)\\.+'
-$rxGST_IssuedUploads   = '^\\\\middough\.local\\corp\\data\\archive\\[^\\]+\\Issued Documents\\_V&M TWO LLC\-DOWN\-UP LOADS\\V&M Uploads\\.+'
-$rxGST_PhotosSebek     = '^\\\\middough\.local\\corp\\data\\archive\\[^\\]+\\Photos\\01\-18\-10 Sebek\\.+'
+$rxGST_IssuedChildren = '^\\\\middough\.local\\corp\\data\\archive\\[^\\]+\\Issued Documents\\.+'
+$rxGST_PhotosChildren = '^\\\\middough\.local\\corp\\data\\archive\\[^\\]+\\Photos\\.+'
 
 Write-Host "Processing $total lines ..." -ForegroundColor Yellow
 
@@ -278,13 +278,13 @@ for ($i = 0; $i -lt $total; $i++) {
     }
 
     # Rule 6 : _Gen/_Stds/_Transfer children + special cases (keep their roots)
-    if (-not $remove -and $RemoveGSTChildren) {
-        if ( ($line -match $rxGST_TripletChildren) -or
-             ($line -match $rxGST_IssuedUploads) -or
-             ($line -match $rxGST_PhotosSebek) ) {
-            $remove = $true
-        }
-    }
+       if (-not $remove -and $RemoveGSTChildren) {
+          if ( ($line -match $rxGST_TripletChildren) -or
+                 ($line -match $rxGST_IssuedChildren) -or
+                 ($line -match $rxGST_PhotosChildren) ) {
+                $remove = $true
+            }
+         }
 
     if (-not $remove) {
         $filteredLines.Add($line)
