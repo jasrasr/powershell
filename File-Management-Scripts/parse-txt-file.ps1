@@ -140,6 +140,7 @@ $childFolders = @(
     '4.17 Photos\*',
     '4.18 Discipline\*',
     '5.1 TQI Checklist\*',
+    '5.1 Quality Checklist\*',
     '5.2 Design Reviews\*',
     '5.3 Safety-HAZOP Reviews\*',
     '5.4 Constructability Reviews\*',
