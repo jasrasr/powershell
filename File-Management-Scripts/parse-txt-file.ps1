@@ -64,8 +64,7 @@ $removedCount = 0
 # Rule 2 : File extension patterns (END OF LINE)  -- includes .nwc per your update
 # -------------------------------
 $extPatterns = @(
-    '\.msg$', '\.xlsx$', '\.docx$', '\.pdf$', '\.xls$', '\.doc$', '\.pptx$', '\.csv$', '\.zip$',
-    '\.log$', '\.txt$', '\.dcf$', '\.dcfx$', '\.xml$', '\.xml\.lock$', '\.dwg$', '\.mp4$', '\.lnk$', '\.mpg$', '\.nwc$'
+    '\.msg$', '\.xlsx$', '\.docx$', '\.pdf$', '\.xls$', '\.doc$', '\.pptx$', '\.csv$', '\.zip$','\.log$', '\.txt$', '\.dcf$', '\.dcfx$', '\.xml$', '\.xml\.lock$', '\.dwg$', '\.mp4$', '\.lnk$', '\.mpg$', '\.nwc$', '\.jpg$', '\.p3$'
 )
 
 # -------------------------------------------
@@ -265,7 +264,8 @@ $childFolders = @(
   '9.5 Report\*',
   'Field Measurements\*',
   'Formal Proposal\*',
-  'sept 23\*'
+  'sept 23\*',
+  'Working Drawings\*'
 )
 <#
 #remove duplicates from list
