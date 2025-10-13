@@ -1,12 +1,13 @@
-# Revision : 2.0
+# Revision : 2.2
 # Description : Timestamped backup, then (optionally) apply selected filters:
 #   (1) remove lines with 11+ backslashes,
-#   (2) remove lines ending in specific file extensions (includes .mp4, .lnk),
+#   (2) remove lines ending in specific file extensions (added .mpg; includes .mp4, .lnk),
 #   (3) remove specific Newforma child folders (keep Newforma root),
-#   (4) remove rows under a provided child-folder list (fixed trailing \* handling),
+#   (4) remove rows under a provided child-folder list (proper "\*" handling),
 #   (5) remove children under '11.0 Issued Documents' (keep folder root),
-#   (6) remove children under _Gen, _Stds, _Transfer at archive\<*>\ (keep those roots).
-# Includes progress bar and final report. Rev 2.0
+#   (6) remove children under _Gen, _Stds, _Transfer at archive\<*>\ (keep roots) +
+#       special cases for Issued Documents\...V&M Uploads and Photos\01-18-10 Sebek.
+# Includes progress bar and final report. Rev 2.2
 # Author : Jason Lamb (with help from ChatGPT)
 # Created Date : 2025-10-12
 # Modified Date : 2025-10-13
@@ -21,7 +22,7 @@ param(
     [switch]$RemoveNewformaChildren,   # Rule 3
     [switch]$RemoveChildFolders,       # Rule 4
     [switch]$RemoveIssuedChildren,     # Rule 5
-    [switch]$RemoveGSTChildren         # Rule 6 (_Gen, _Stds, _Transfer children)
+    [switch]$RemoveGSTChildren         # Rule 6 (_Gen, _Stds, _Transfer + special cases)
 )
 
 # If no switches provided, enable all rules by default
@@ -56,7 +57,7 @@ $removedCount = 0
 # -------------------------------
 $extPatterns = @(
     '\.msg$', '\.xlsx$', '\.docx$', '\.pdf$', '\.xls$', '\.doc$', '\.pptx$', '\.csv$', '\.zip$',
-    '\.log$', '\.txt$', '\.dcf$', '\.dcfx$', '\.xml$', '\.xml\.lock$', '\.dwg$', '\.mp4$', '\.lnk$'
+    '\.log$', '\.txt$', '\.dcf$', '\.dcfx$', '\.xml$', '\.xml\.lock$', '\.dwg$', '\.mp4$', '\.lnk$', '\.mpg$'
 )
 
 # -------------------------------------------
@@ -197,7 +198,8 @@ $childFolders = @(
     '10.7 Microstation\*',
     '10.8 CADWorx\*',
     '10.8 Navisworks\*',
-    '10.9 SOLIDWORKS\*'
+    '10.9 SOLIDWORKS\*',
+    'Field Measurements\*'
 )
 
 # Build regexes that match "\<FolderName>(\|$)" anywhere in the path
@@ -215,11 +217,20 @@ $childFolderRegexes = foreach ($p in $childFolders) {
 $rxIssuedChildren = '^\\\\middough\.local\\corp\\data\\archive\\(?:[^\\]+\\){2,}11\.0 Issued Documents\\.+'
 
 # -------------------------------------------
-# Rule 6 : Remove children under _Gen, _Stds, _Transfer at:
-#   \\middough.local\corp\data\archive\<one-folder>\(_Gen|_Stds|_Transfer)\[child...]
-# Keep the root folders themselves.
+# Rule 6 : Remove children under:
+#   - _Gen, _Stds, _Transfer at \\...archive\<one-folder>\
+#   - Issued Documents\_V&M TWO LLC-DOWN-UP LOADS\V&M Uploads
+#   - Photos\01-18-10 Sebek
+# Keep the roots:
+#   - \\...\archive\<one-folder>\_Gen
+#   - \\...\archive\<one-folder>\_Stds
+#   - \\...\archive\<one-folder>\_Transfer
+#   - \\...\archive\<one-folder>\Issued Documents
+#   - \\...\archive\<one-folder>\Photos
 # -------------------------------------------
-$rxGSTChildren = '^\\\\middough\.local\\corp\\data\\archive\\[^\\]+\\_(Gen|Stds|Transfer)\\.+'
+$rxGST_TripletChildren = '^\\\\middough\.local\\corp\\data\\archive\\[^\\]+\\_(Gen|Stds|Transfer)\\.+'
+$rxGST_IssuedUploads   = '^\\\\middough\.local\\corp\\data\\archive\\[^\\]+\\Issued Documents\\_V&M TWO LLC\-DOWN\-UP LOADS\\V&M Uploads\\.+'
+$rxGST_PhotosSebek     = '^\\\\middough\.local\\corp\\data\\archive\\[^\\]+\\Photos\\01\-18\-10 Sebek\\.+'
 
 Write-Host "Processing $total lines ..." -ForegroundColor Yellow
 
@@ -258,10 +269,13 @@ for ($i = 0; $i -lt $total; $i++) {
         if ($line -match $rxIssuedChildren) { $remove = $true }
     }
 
-    # Rule 6 : _Gen, _Stds, _Transfer children (keep roots)
+    # Rule 6 : _Gen/_Stds/_Transfer children + special cases (keep their roots)
     if (-not $remove -and $RemoveGSTChildren) {
-        $trimmed2 = $line.Trim()
-        if ($trimmed2 -match $rxGSTChildren) { $remove = $true }
+        if ( ($line -match $rxGST_TripletChildren) -or
+             ($line -match $rxGST_IssuedUploads) -or
+             ($line -match $rxGST_PhotosSebek) ) {
+            $remove = $true
+        }
     }
 
     if (-not $remove) {
@@ -300,7 +314,12 @@ Usage examples
 # Apply ALL filters (default if none specified)
 .\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt'
 
-# Only Rule 6 (_Gen/_Stds/_Transfer children)
+# Only specific rules
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveSlash11
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveExtensions
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveNewformaChildren
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveChildFolders
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveIssuedChildren
 .\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveGSTChildren
 
 # Combine as needed
@@ -308,11 +327,71 @@ Usage examples
 #>
 
 <# -----------------
+Rule examples (kept vs removed)
+-------------------
+
+# Rule 1 : 11+ backslashes
+# (Counts '\' in the whole line)
+# Kept:
+\\middough.local\corp\data\archive\Basf\ENG1\Folder
+# Removed (>= 11 slashes):
+\\middough.local\corp\data\archive\Basf\ENG1\A\B\C\D\E\F\G\H
+
+# Rule 2 : File extensions (line must END with one of these)
+# Extensions : .msg .xlsx .docx .pdf .xls .doc .pptx .csv .zip .log .txt .dcf .dcfx .xml .xml.lock .dwg .mp4 .lnk .mpg
+# Kept:
+\\server\share\folder\readme.md
+# Removed:
+\\server\share\folder\mail.msg
+\\server\share\folder\video.mpg
+
+# Rule 3 : Newforma children (keep Newforma root)
+# Kept:
+\\middough.local\corp\data\archive\Basf\ENG1840\Newforma
+# Removed:
+\\middough.local\corp\data\archive\Basf\ENG1840\Newforma\Email
+\\middough.local\corp\data\archive\Basf\ENG1840\Newforma\Field Notes
+\\middough.local\corp\data\archive\Basf\ENG1840\Newforma\PunchList
+\\middough.local\corp\data\archive\Basf\ENG1840\Newforma\Record Copies
+
+# Rule 4 : Listed child folders (keep parents like "\9.0 Health & Safety")
+# Kept:
+\\middough.local\corp\data\archive\Basf\ENG1830B\9.0 Health & Safety
+# Removed:
+\\middough.local\corp\data\archive\Basf\ENG1830B\9.0 Health & Safety\9.5 Report
+\\middough.local\corp\data\archive\Basf\ENG1830B\9.0 Health & Safety\9.5 Report\file
+\\middough.local\corp\data\archive\Basf\ENG1830B\9.0 Health & Safety\9.5 Report\folder
+
+# Rule 5 : "11.0 Issued Documents" children (keep the root)
+# Kept:
+\\middough.local\corp\data\archive\Basf\ENG1840\11.0 Issued Documents
+# Removed:
+\\middough.local\corp\data\archive\Basf\ENG1840\11.0 Issued Documents\Rev A
+\\middough.local\corp\data\archive\Basf\ENG1840\11.0 Issued Documents\Rev A\file.pdf
+
+# Rule 6 : _Gen / _Stds / _Transfer children + special cases (keep roots)
+# Kept:
+\\middough.local\corp\data\archive\Basf\_Gen
+\\middough.local\corp\data\archive\Basf\_Stds
+\\middough.local\corp\data\archive\Basf\_Transfer
+\\middough.local\corp\data\archive\Basf\Issued Documents
+\\middough.local\corp\data\archive\Basf\Photos
+# Removed:
+\\middough.local\corp\data\archive\Basf\_Gen\folder
+\\middough.local\corp\data\archive\Basf\_Stds\folder
+\\middough.local\corp\data\archive\Basf\_Transfer\folder
+\\middough.local\corp\data\archive\Basf\Issued Documents\_V&M TWO LLC-DOWN-UP LOADS\V&M Uploads\file.txt
+\\middough.local\corp\data\archive\Basf\Photos\01-18-10 Sebek\image.jpg
+
+#>
+<# -----------------
 Revision History (recap)
 -------------------
-1.6 : Added selectable switches for Rules 1–3 (no longer forced); summary report.
+1.6 : Added selectable switches for Rules 1–3; summary report.
 1.7 : Added Rule 4 (child folder list removal) and included .mp4; kept roots.
 1.8 : Added .lnk to Rule 2 and Rule 5 (Issued Documents children).
 1.9 : Fixed Rule 4 regex builder (proper trimming of trailing "\*").
 2.0 : Added Rule 6 for _Gen/_Stds/_Transfer children at archive\<*> roots; kept base folders.
+2.1 : Added Rule 6 special cases: Issued Documents\...\V&M Uploads and Photos\01-18-10 Sebek.
+2.2 : Added .mpg to Rule 2; appended detailed examples for each rule.
 #>
