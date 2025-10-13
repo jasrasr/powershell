@@ -1,75 +1,282 @@
-# Revision : 1.2
-# Description : Make a timestamped copy of a .txt file and remove lines ending with file extensions (.msg, .xlsx, .docx, .pdf, etc.) or containing 11+ backslashes, with progress bar and summary. Rev 1.2
+# Revision : 1.7
+# Description : Timestamped backup, then apply selected filters: (1) remove lines with 11+ backslashes, (2) remove lines ending in specific file extensions (now includes .mp4), (3) remove specific Newforma child folders (keep Newforma root), (4) remove rows under specific child folders list. Progress bar + final report. Rev 1.7
 # Author : Jason Lamb (with help from ChatGPT)
 # Created Date : 2025-10-12
 # Modified Date : 2025-10-12
 
 param(
-    [Parameter(Mandatory = $true)]
-    [string]$InputFile
+    [Parameter(Position = 0, Mandatory = $true)]
+    [string]$InputFile,
+
+    # Choose which filters to apply. If none specified, all enabled by default.
+    [switch]$RemoveSlash11,           # Rule 1
+    [switch]$RemoveExtensions,        # Rule 2
+    [switch]$RemoveNewformaChildren,  # Rule 3
+    [switch]$RemoveChildFolders       # Rule 4
 )
 
-# Create timestamp for backup suffix
+# If no switches provided, enable all rules by default
+if (-not ($RemoveSlash11 -or $RemoveExtensions -or $RemoveNewformaChildren -or $RemoveChildFolders)) {
+    $RemoveSlash11 = $true
+    $RemoveExtensions = $true
+    $RemoveNewformaChildren = $true
+    $RemoveChildFolders = $true
+    Write-Host "No filters specified, applying all filters by default." -ForegroundColor DarkYellow
+}
+
+# Timestamp for backup name
 $datetime = Get-Date -Format 'yyyyMMdd-HHmmss'
 
-# Define backup path
+# Backup path
 $backupFile = "$($InputFile)-backup-$datetime.txt"
 
-# Copy the original file to backup
+# Backup original
 Copy-Item -Path $InputFile -Destination $backupFile -Force
 Write-Host "Backup created : $backupFile" -ForegroundColor Cyan
 
-# Get all lines
+# Load file
 $allLines = Get-Content -Path $InputFile
 $total = $allLines.Count
-$filteredLines = @()
+$filteredLines = New-Object System.Collections.Generic.List[string]
 $removedCount = 0
 
-# Define patterns to remove
-$patterns = '\.msg$', '\.xlsx$', '\.docx$', '\.pdf$', '\.xls$', '\.doc$', '\.pptx$', '\.csv$', '\.zip$','\.log$','\.txt$','\.dcf$','\.dcfx$','\.xml$','\.xml.lock$','\.dwg$'
+# -------------------------------
+# Rule 2 : File extension patterns
+# -------------------------------
+$extPatterns = @(
+    '\.msg$', '\.xlsx$', '\.docx$', '\.pdf$', '\.xls$', '\.doc$', '\.pptx$', '\.csv$', '\.zip$',
+    '\.log$', '\.txt$', '\.dcf$', '\.dcfx$', '\.xml$', '\.xml\.lock$', '\.dwg$', '\.mp4$'
+)
 
+# -------------------------------------------
+# Rule 3 : Newforma - remove specific children
+# Keep root ...\Newforma but remove these kids:
+# Email, Field Notes, PunchList, Record Copies
+# -------------------------------------------
+$rxNewformaChildren = '^\\\\middough\.local\\corp\\data\\archive\\(?:[^\\]+\\){2,}Newforma\\(Email|Field Notes|PunchList|Record Copies)(?:\\|$)'
+
+# -------------------------------------------
+# Rule 4 : Remove any of these folders + subfolders
+# (match anywhere in the path)
+# -------------------------------------------
+$childFolders = @(
+    '1.1 Proposal Cover Letter\*',
+    '1.10 Project Closeout\*',
+    '1.10 Project Profile\*',
+    '1.11 Standard File Index\*',
+    '1.12 Hours Tracking and Forecast\*',
+    '1.12 MAPP\*',
+    '1.12 Middough-JSW Reports\*',
+    '1.12 Local Backup\*',
+    '1.12 Received Monthly Reports\*',
+    '1.12 Special Inspections\*',
+    '1.13 Dastur Danieli Scopes of Work\*',
+    '1.13 Fee Estimate\*',
+    '1.13 TPT Documents\*',
+    '1.14 Proposal Sign Off\*',
+    '1.2 Contract Release PO-CO\*',
+    '1.3 CA-Change Authorization\*',
+    '1.4 Secrecy Agreements\*',
+    '1.6 Patents\*',
+    '1.5 Subconsultant Prop Contract-PO\*',
+    '1.7 Invoices\*',
+    '1.8 Sr. Mgmt. Review\*',
+    '1.8 Sr. Mgmt. Review-\*',
+    '1.9 Close-Out Report\*',
+    '2.0 Correspondence\*',
+    '7.0 Construction\*',
+    '1.12 Rate Override\*',
+    '1.12 PCA Rate Override\*',
+    '_General\*',
+    '1.12 Manditory Gates Log\*',
+    '1.12 Manditory Gates.Log\*',
+    '1.16 Negotiate Agreement\*',
+    '1.17 Signature Authority\*',
+    'Formal Proposal\*',
+    '2.1 Distribution-Communication Matrix\*',
+    '2.2 Internal\*',
+    '2.3 External\*',
+    '2.3 Client\*',
+    '2.4 Transmittals\*',
+    '2.5 Meeting Minutes\*',
+    '2.6 Action Item List\*',
+    '2.7 Regulatory Agencies\*',
+    '2.8 Vendor-Subconsultant\*',
+    '2.9 Logos\*',
+    '3.1 PDS\*',
+    '3.2 DTSR\*',
+    '3.3 PSR\*',
+    '3.4 Schedule\*',
+    '3.5 Project Evaluation Report\*',
+    '3.6 Project Plan\*',
+    '3.7 Misc. Status Reports\*',
+    '4.1 Scope of Services\*',
+    '4.2 Coordination Manual\*',
+    '4.3 Design Manual\*',
+    '4.4 Statement-Requirements\*',
+    '4.5 Design Spec\*',
+    '4.6 Environ-Geotech Data Surveys\*',
+    '4.7 Design Basis\*',
+    '4.8 Middough Tech Reports\*',
+    '4.9 Drawing List\*',
+    '4.10 Equipment List\*',
+    '4.11 Piping Line List\*',
+    '4.12 Tie-In List\*',
+    '4.13 Instrument List\*',
+    '4.14 Deliverables List-File\*',
+    '4.15 I-O List\*',
+    '4.16 Vendor Files\*',
+    '4.17 Photos\*',
+    '4.18 Discipline\*',
+    '5.1 TQI Checklist\*',
+    '5.2 Design Reviews\*',
+    '5.3 Safety-HAZOP Reviews\*',
+    '5.4 Constructability Reviews\*',
+    '5.5 Operability Reviews\*',
+    '5.6 Procedures\*',
+    '6.1 Capital Cost Estimate\*',
+    '6.2 Back-up - Take-offs\*',
+    '6.3 Cost Report\*',
+    '6.4 Overall Project\*',
+    '7.1 Status Reports\*',
+    '7.10 Field CO Request\*',
+    '7.11 Punch List\*',
+    '7.12 Execution Plan\*',
+    '7.13 Field Study\*',
+    '7.2 Schedules\*',
+    '7.3 Constr Package\*',
+    '7.4 Meeting Minutes\*',
+    '7.5 Submittals - Approvals\*',
+    '7.6 Contractor Correspondence\*',
+    '7.7 Constr Permits\*',
+    '7.8 Field Test Reports\*',
+    '7.9 Field Design CA\*',
+    '8.1 Project Purchasing Procedure\*',
+    '8.2 Purchase Orders - Bid Packages\*',
+    '8.3 Subcontracts\*',
+    '8.4 Vendor Data\*',
+    '9.1 Plant Safety Procedure\*',
+    '9.2 Site Specific Plan\*',
+    '9.3 Incident Reports\*',
+    '9.4 Training Records\*',
+    '9.5 Report\*',
+    'sept 23\*',
+    '10.1 Blocks\*',
+    '10.2 Client Originals\*',
+    '10.3 Temp Wrk Files\*',
+    '10.4 Vendor Dwgs\*',
+    '10.5 Wrk Dwgs\*',
+    '10.6 Discipline\*',
+    '10.6 Laser Scan Data\*',
+    '10.7 Laser Scan Data\*',
+    '10.7 Laser Scan\*',
+    '10.7 Navisworks\*',
+    '10.8 Laser Scan from Becht\*',
+    '10.8 Laser Scan Data\*',
+    '10.1 Support\*',
+    '10.1 Inventor\*',
+    '10.11 Navis\*',
+    '10.13 Export\*',
+    '10.14 Vendor\*',
+    '10.15 Visualization\*',
+    '10.2 AutoCAD\*',
+    '10.3 Revit\*',
+    '10.4 Plant 3D\*',
+    '10.5 Civil 3D\*',
+    '10.6 Advance Steel\*',
+    '10.7 Microstation\*',
+    '10.8 CADWorx\*',
+    '10.8 Navisworks\*',
+    '10.9 SOLIDWORKS\*'
+)
+
+# Build regexes that match "\<FolderName>(\|$)" anywhere in the path
+# We interpret the trailing "\*" as "this folder and anything below it".
+$childFolderRegexes = foreach ($p in $childFolders) {
+    $base = $p.TrimEnd('*', ' ')
+    '\\' + [regex]::Escape($base) + '(\\|$)'
+}
 
 Write-Host "Processing $total lines ..." -ForegroundColor Yellow
 
-# Process lines with progress bar
 for ($i = 0; $i -lt $total; $i++) {
     $line = $allLines[$i]
     $remove = $false
 
-    # Rule 1: remove if ends with certain file extensions
-    foreach ($pattern in $patterns) {
-        if ($line -match $pattern) {
-            $remove = $true
-            break
+    # Rule 1 : 11+ backslashes
+    if (-not $remove -and $RemoveSlash11) {
+        $slashCount = [regex]::Matches($line, '\\').Count
+        if ($slashCount -ge 11) { $remove = $true }
+    }
+
+    # Rule 2 : ends with specified extension
+    if (-not $remove -and $RemoveExtensions) {
+        foreach ($pattern in $extPatterns) {
+            if ($line -match $pattern) { $remove = $true; break }
         }
     }
 
-    # Rule 2: remove if contains 11 or more backslashes
-    if (-not $remove) {
-        $slashCount = ($line.ToCharArray() | Where-Object { $_ -eq '\' }).Count
-        if ($slashCount -ge 11) {
-            $remove = $true
+    # Rule 3 : Newforma children
+    if (-not $remove -and $RemoveNewformaChildren) {
+        $trimmed = $line.Trim()
+        if ($trimmed -match $rxNewformaChildren) { $remove = $true }
+    }
+
+    # Rule 4 : listed child folders + subfolders
+    if (-not $remove -and $RemoveChildFolders) {
+        foreach ($rx in $childFolderRegexes) {
+            if ($line -match $rx) { $remove = $true; break }
         }
     }
 
     if (-not $remove) {
-        $filteredLines += $line
+        $filteredLines.Add($line)
     }
     else {
         $removedCount++
     }
 
-    # Update progress bar
-    $percent = [math]::Round(($i / $total) * 100, 2)
-    Write-Progress -Activity "Parsing text file" -Status "Processing line $i of $total" -PercentComplete $percent
+    # Progress
+    $percent = if ($total -gt 0) { [math]::Round((($i + 1) / $total) * 100, 2) } else { 100 }
+    Write-Progress -Activity "Parsing text file" -Status "Processing line $($i + 1) of $total" -PercentComplete $percent
 }
 
-# Overwrite original file with cleaned content
+# Save cleaned file
 $filteredLines | Set-Content -Path $InputFile -Encoding UTF8
 
-# Show summary
+# Report
 $keptCount = $filteredLines.Count
-Write-Host "Removed lines : $removedCount" -ForegroundColor Red
-Write-Host "Kept lines : $keptCount" -ForegroundColor Green
-Write-Host "Clean file saved to : $InputFile" -ForegroundColor Cyan
-Write-Host "Operation complete at $(Get-Date)" -ForegroundColor Yellow
+$removedPercent = if ($total -gt 0) { [math]::Round(($removedCount / $total) * 100, 2) } else { 0 }
+
+Write-Host ""
+Write-Host "-------------------------" -ForegroundColor DarkGray
+Write-Host "       FINAL REPORT       " -ForegroundColor Cyan
+Write-Host "-------------------------" -ForegroundColor DarkGray
+Write-Host "Total lines processed : $total" -ForegroundColor Yellow
+Write-Host "Lines removed         : $removedCount ($removedPercent%)" -ForegroundColor Red
+Write-Host "Lines kept            : $keptCount" -ForegroundColor Green
+Write-Host "Clean file saved to   : $InputFile" -ForegroundColor Cyan
+Write-Host "Backup created at     : $backupFile" -ForegroundColor Gray
+Write-Host "Operation complete at : $(Get-Date)" -ForegroundColor Yellow
+
+<# -----------------
+Usage examples
+-------------------
+# Apply ALL filters (default if none specified)
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt'
+
+# Only Rule 1
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveSlash11
+
+# Only Rule 2
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveExtensions
+
+# Only Rule 3
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveNewformaChildren
+
+# Only Rule 4
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveChildFolders
+
+# Any combination
+.\parse-txt-file.ps1 'K:\101225 txt\archive-depth3.txt' -RemoveSlash11 -RemoveExtensions -RemoveChildFolders
+#>
