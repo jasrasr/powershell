@@ -1,2 +1,5 @@
 * text=auto
+<<<<<<< HEAD
 File-Management-Scripts/csv-parsing/*.csv filter=lfs diff=lfs merge=lfs -text
+=======
+>>>>>>> e7c53efeac09b4c9f4448abbe6b9eb2405ff0a98
