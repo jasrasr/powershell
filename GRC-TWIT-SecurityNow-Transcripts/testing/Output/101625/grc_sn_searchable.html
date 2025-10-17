@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='UTF-8'>
+  <title>Security Now! Archive</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .episode { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }\n
+    .fullTranscript { display: none; white-space: pre-wrap; margin-top: 10px; }\n
+    button { margin-top: 5px; }\n
+    input[type=text] { width: 100%; padding: 8px; margin-bottom: 20px; font-size: 16px; }\n
+  </style>
+</head>
+<body>
+  <h1>Security Now! Episodes Archive</h1>
+  <input type='text' id='searchBox' onkeyup='searchEpisodes()' placeholder='Search transcripts or tags...'>
+  <div id='episodesContainer'></div>
+
+  <script>
+    // Fetch the index JSON and render episode previews
+    fetch('index.json')
+      .then(response => response.json())
+      .then(data => {
+        window.episodesIndex = data;
+        renderEpisodes(data);
+      })
+      .catch(err => console.error('Error loading index.json:', err));
+
+    function renderEpisodes(episodes) {
+      const container = document.getElementById('episodesContainer');
+      container.innerHTML = '';
+      episodes.forEach((ep, index) => {
+        const epDiv = document.createElement('div');
+        epDiv.className = 'episode';
+        epDiv.setAttribute('data-tags', ep.Tags.join(','));
+        epDiv.setAttribute('data-preview', ep.Preview.toLowerCase());
+        epDiv.innerHTML = 
+          <h2></h2>
+          <p></p>
+          <p>Tags: </p>
+          ${ ep.JsonFile ? <button onclick="loadFull()" id="btn_">Show Full Transcript</button> : '' }
+          <div class="fullTranscript" id="full_"></div>
+          ${ ep.JsonFile && ep.NotesPdf ? <p><a href="">PDF Show Notes</a></p> : '' }
+        ;
+        container.appendChild(epDiv);
+      });
+    }
+
+    function searchEpisodes() {
+      const query = document.getElementById('searchBox').value.toLowerCase();
+      const episodes = document.getElementsByClassName('episode');
+      for (let i = 0; i < episodes.length; i++) {
+        const preview = episodes[i].getAttribute('data-preview');
+        const tags = episodes[i].getAttribute('data-tags').toLowerCase();
+        episodes[i].style.display = (preview.includes(query) || tags.includes(query)) ? 'block' : 'none';
+      }
+    }
+
+    function loadFull(index) {
+      const ep = window.episodesIndex[index];
+      const fullDiv = document.getElementById('full_' + index);
+      const btn = document.getElementById('btn_' + index);
+      
+      // Check if full text is already loaded
+      if (fullDiv.innerHTML) {
+        // Toggle visibility
+        if (fullDiv.style.display === 'none' || fullDiv.style.display === '') {\n          fullDiv.style.display = 'block';\n          btn.innerText = 'Hide Full Transcript';\n        } else {\n          fullDiv.style.display = 'none';\n          btn.innerText = 'Show Full Transcript';\n        }\n        return;\n      }
+      
+      // Otherwise, fetch the individual JSON file
+      fetch(ep.JsonFile)
+        .then(response => response.json())
+        .then(data => {\n          fullDiv.innerHTML = data.FullContent.replace(/\\r?\\n/g, '<br/>');\n          fullDiv.style.display = 'block';\n          btn.innerText = 'Hide Full Transcript';\n        })\n        .catch(err => {\n          console.error('Error loading episode JSON:', err);\n          fullDiv.innerHTML = 'Error loading transcript.';\n        });\n    }\n  </script>\n</body>\n</html>

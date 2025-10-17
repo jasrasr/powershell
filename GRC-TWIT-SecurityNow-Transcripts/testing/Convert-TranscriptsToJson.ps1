@@ -1,8 +1,8 @@
 # Requires: PowerShell 7+, optional: pdftotext.exe or similar to extract PDF text
 
-$TranscriptFolder = "$onedrivepath\Downloads\GRC_SN_Files\Transcriptions"
-$JsonOutputFolder = "$TranscriptFolder\data"
-$IndexFile = "$JsonOutputFolder\index.json"
+$TranscriptFolder = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\TXT-Transcriptions"
+$JsonOutputFolder = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Testing\data"
+$IndexFile = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Testing\index.json"
 
 # Optional: function to extract tags using OpenAI (or simulate locally)
 function Get-TagsFromText {
@@ -24,9 +24,19 @@ function Get-TagsFromText {
 New-Item -ItemType Directory -Force -Path $JsonOutputFolder | Out-Null
 $episodeList = @()
 
+# Get all transcript files and count them for progress bar
+$transcriptFiles = Get-ChildItem "$TranscriptFolder\*.txt"
+$totalFiles = $transcriptFiles.Count
+$currentFile = 0
+
 # Loop through all transcripts
-Get-ChildItem "$TranscriptFolder\*.txt" | ForEach-Object {
+$transcriptFiles | ForEach-Object {
+    $currentFile++
     $file = $_.FullName
+    
+    # Update progress bar
+    Write-Progress -Activity "Processing Transcripts" -Status "Processing $($_.Name)" -PercentComplete (($currentFile / $totalFiles) * 100) -CurrentOperation "File $currentFile of $totalFiles"
+    
     $text = Get-Content $file -Raw
 
     # Try to parse metadata from header
@@ -70,6 +80,9 @@ Get-ChildItem "$TranscriptFolder\*.txt" | ForEach-Object {
         file           = "$($baseName).json"
     }
 }
+
+# Complete the progress bar
+Write-Progress -Activity "Processing Transcripts" -Completed
 
 # Save index.json
 $episodeList | ConvertTo-Json -Depth 5 | Set-Content $IndexFile -Encoding UTF8

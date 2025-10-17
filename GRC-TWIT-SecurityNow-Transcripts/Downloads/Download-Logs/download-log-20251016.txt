@@ -1,0 +1,119 @@
+[2025-10-16 10:18:21] Resuming from last-downloaded.json
+[2025-10-16 10:18:21] Resuming from last-downloaded.json
+[2025-10-16 10:18:21] Checking TXT: sn-1047.txt
+[2025-10-16 10:18:21] Checking TXT: sn-1047.txt
+[2025-10-16 10:18:22] Error: https://www.grc.com/sn/sn-1047.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:22] Error: https://www.grc.com/sn/sn-1047.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:22] Checking TXT: sn-1048.txt
+[2025-10-16 10:18:22] Checking TXT: sn-1048.txt
+[2025-10-16 10:18:23] Error: https://www.grc.com/sn/sn-1048.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:23] TXT stopped after 2 consecutive failures at sn-1049.txt
+[2025-10-16 10:18:23] Error: https://www.grc.com/sn/sn-1048.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:23] TXT stopped after 2 consecutive failures at sn-1049.txt
+[2025-10-16 10:18:23] Checking PDF: sn-1048-notes.pdf
+[2025-10-16 10:18:23] Checking PDF: sn-1048-notes.pdf
+[2025-10-16 10:18:24] Error: https://www.grc.com/sn/sn-1048-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:24] Error: https://www.grc.com/sn/sn-1048-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:24] Checking PDF: sn-1049-notes.pdf
+[2025-10-16 10:18:24] Checking PDF: sn-1049-notes.pdf
+[2025-10-16 10:18:25] Error: https://www.grc.com/sn/sn-1049-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:25] PDF stopped after 2 consecutive failures at sn-1050-notes.pdf
+[2025-10-16 10:18:25] Error: https://www.grc.com/sn/sn-1049-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:25] PDF stopped after 2 consecutive failures at sn-1050-notes.pdf
+[2025-10-16 10:18:25] TXT files downloaded: 0
+[2025-10-16 10:18:25] PDF files downloaded: 0
+[2025-10-16 10:18:25] TXT files downloaded: 0
+[2025-10-16 10:18:25] PDF files downloaded: 0
+[2025-10-16 10:18:25] No downloads — last-downloaded.json was NOT updated
+[2025-10-16 10:18:25] Log complete.
+[2025-10-16 10:18:25] ~~~
+
+[2025-10-16 10:18:25] No downloads — last-downloaded.json was NOT updated
+[2025-10-16 10:18:25] Log complete.
+[2025-10-16 10:18:25] ~~~
+
+[2025-10-16 10:18:27] Resuming from last-downloaded.json
+[2025-10-16 10:18:27] Checking TXT: sn-1047.txt
+[2025-10-16 10:18:27] Resuming from last-downloaded.json
+[2025-10-16 10:18:28] Resuming from last-downloaded.json
+[2025-10-16 10:18:28] Error: https://www.grc.com/sn/sn-1047.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:28] Checking TXT: sn-1048.txt
+[2025-10-16 10:18:28] Checking TXT: sn-1047.txt
+[2025-10-16 10:18:28] Checking TXT: sn-1047.txt
+[2025-10-16 10:18:29] Error: https://www.grc.com/sn/sn-1048.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:29] TXT stopped after 2 consecutive failures at sn-1049.txt
+[2025-10-16 10:18:29] Checking PDF: sn-1048-notes.pdf
+[2025-10-16 10:18:30] Error: https://www.grc.com/sn/sn-1047.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:30] Checking TXT: sn-1048.txt
+[2025-10-16 10:18:30] Error: https://www.grc.com/sn/sn-1048-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:30] Checking PDF: sn-1049-notes.pdf
+[2025-10-16 10:18:30] Error: https://www.grc.com/sn/sn-1047.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:30] Checking TXT: sn-1048.txt
+[2025-10-16 10:18:30] Resuming from last-downloaded.json
+[2025-10-16 10:18:30] Error: https://www.grc.com/sn/sn-1048.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:30] TXT stopped after 2 consecutive failures at sn-1049.txt
+[2025-10-16 10:18:30] Error: https://www.grc.com/sn/sn-1049-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:30] Checking PDF: sn-1048-notes.pdf
+[2025-10-16 10:18:30] PDF stopped after 2 consecutive failures at sn-1050-notes.pdf
+[2025-10-16 10:18:30] TXT files downloaded: 0
+[2025-10-16 10:18:30] PDF files downloaded: 0
+[2025-10-16 10:18:31] Checking TXT: sn-1047.txt
+[2025-10-16 10:18:31] No downloads — last-downloaded.json was NOT updated
+[2025-10-16 10:18:31] Log complete.
+[2025-10-16 10:18:31] ~~~
+
+[2025-10-16 10:18:31] Resuming from last-downloaded.json
+[2025-10-16 10:18:31] Checking TXT: sn-1047.txt
+[2025-10-16 10:18:31] Error: https://www.grc.com/sn/sn-1048-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:31] Checking PDF: sn-1049-notes.pdf
+[2025-10-16 10:18:31] Error: https://www.grc.com/sn/sn-1048.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:31] TXT stopped after 2 consecutive failures at sn-1049.txt
+[2025-10-16 10:18:31] Checking PDF: sn-1048-notes.pdf
+[2025-10-16 10:18:32] Error: https://www.grc.com/sn/sn-1049-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:32] Error: https://www.grc.com/sn/sn-1048-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:32] Checking PDF: sn-1049-notes.pdf
+[2025-10-16 10:18:32] Error: https://www.grc.com/sn/sn-1047.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:32] PDF stopped after 2 consecutive failures at sn-1050-notes.pdf
+[2025-10-16 10:18:32] Error: https://www.grc.com/sn/sn-1047.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:32] Checking TXT: sn-1048.txt
+[2025-10-16 10:18:32] Checking TXT: sn-1048.txt
+[2025-10-16 10:18:33] Error: https://www.grc.com/sn/sn-1049-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:33] TXT files downloaded: 0
+[2025-10-16 10:18:33] PDF files downloaded: 0
+[2025-10-16 10:18:33] PDF stopped after 2 consecutive failures at sn-1050-notes.pdf
+[2025-10-16 10:18:33] TXT files downloaded: 0
+[2025-10-16 10:18:33] PDF files downloaded: 0
+[2025-10-16 10:18:33] No downloads — last-downloaded.json was NOT updated
+[2025-10-16 10:18:33] Log complete.
+[2025-10-16 10:18:33] Error: https://www.grc.com/sn/sn-1048.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:33] ~~~
+
+[2025-10-16 10:18:33] TXT stopped after 2 consecutive failures at sn-1049.txt
+[2025-10-16 10:18:33] No downloads — last-downloaded.json was NOT updated
+[2025-10-16 10:18:33] Log complete.
+[2025-10-16 10:18:33] ~~~
+
+[2025-10-16 10:18:33] Error: https://www.grc.com/sn/sn-1048.txt - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:33] TXT stopped after 2 consecutive failures at sn-1049.txt
+[2025-10-16 10:18:33] Checking PDF: sn-1048-notes.pdf
+[2025-10-16 10:18:34] Checking PDF: sn-1048-notes.pdf
+[2025-10-16 10:18:34] Error: https://www.grc.com/sn/sn-1048-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:34] Error: https://www.grc.com/sn/sn-1048-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:34] Checking PDF: sn-1049-notes.pdf
+[2025-10-16 10:18:34] Checking PDF: sn-1049-notes.pdf
+[2025-10-16 10:18:35] Error: https://www.grc.com/sn/sn-1049-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:35] Error: https://www.grc.com/sn/sn-1049-notes.pdf - Response status code does not indicate success: 404 (Not Found).
+[2025-10-16 10:18:35] PDF stopped after 2 consecutive failures at sn-1050-notes.pdf
+[2025-10-16 10:18:35] PDF stopped after 2 consecutive failures at sn-1050-notes.pdf
+[2025-10-16 10:18:35] TXT files downloaded: 0
+[2025-10-16 10:18:35] TXT files downloaded: 0
+[2025-10-16 10:18:35] PDF files downloaded: 0
+[2025-10-16 10:18:35] PDF files downloaded: 0
+[2025-10-16 10:18:35] No downloads — last-downloaded.json was NOT updated
+[2025-10-16 10:18:35] No downloads — last-downloaded.json was NOT updated
+[2025-10-16 10:18:35] Log complete.
+[2025-10-16 10:18:35] Log complete.
+[2025-10-16 10:18:35] ~~~
+
+[2025-10-16 10:18:35] ~~~
+

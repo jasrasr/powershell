@@ -1,11 +1,11 @@
 # generate-episodesearchsite.ps1
 
 # Directories for transcripts and PDF show notes
-$TranscriptsDir = '$onedrivepath\Downloads\GRC_SN_Files\Transcriptions'
-$PdfNotesDir    = '$onedrivepath\Downloads\GRC_SN_Files\PDF Show Notes'
+$TranscriptsDir = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\TXT-Transcriptions"
+$PdfNotesDir    = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\PDF-Show-Notes"
 
 # Output folders and files
-$OutputFolder   = '$onedrivepath\Documents\GitHub\PowerShell\File-Management-Scripts\GRC-Transcripts'
+$OutputFolder   = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\testing\Output\101625"
 $EpisodesJsonDir = Join-Path $OutputFolder 'episodes'
 $IndexJsonFile  = Join-Path $OutputFolder 'index.json'
 $OutputHtml     = Join-Path $OutputFolder 'grc_sn_searchable.html'
@@ -88,10 +88,10 @@ function Generate-HTML {
   <title>Security Now! Archive</title>
   <style>
     body { font-family: sans-serif; padding: 20px; }
-    .episode { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }\n
-    .fullTranscript { display: none; white-space: pre-wrap; margin-top: 10px; }\n
-    button { margin-top: 5px; }\n
-    input[type=text] { width: 100%; padding: 8px; margin-bottom: 20px; font-size: 16px; }\n
+    .episode { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+    .fullTranscript { display: none; white-space: pre-wrap; margin-top: 10px; }
+    button { margin-top: 5px; }
+    input[type=text] { width: 100%; padding: 8px; margin-bottom: 20px; font-size: 16px; }
   </style>
 </head>
 <body>
@@ -147,12 +147,32 @@ function Generate-HTML {
       // Check if full text is already loaded
       if (fullDiv.innerHTML) {
         // Toggle visibility
-        if (fullDiv.style.display === 'none' || fullDiv.style.display === '') {\n          fullDiv.style.display = 'block';\n          btn.innerText = 'Hide Full Transcript';\n        } else {\n          fullDiv.style.display = 'none';\n          btn.innerText = 'Show Full Transcript';\n        }\n        return;\n      }
+        if (fullDiv.style.display === 'none' || fullDiv.style.display === '') {
+          fullDiv.style.display = 'block';
+          btn.innerText = 'Hide Full Transcript';
+        } else {
+          fullDiv.style.display = 'none';
+          btn.innerText = 'Show Full Transcript';
+        }
+        return;
+      }
       
       // Otherwise, fetch the individual JSON file
       fetch(ep.JsonFile)
         .then(response => response.json())
-        .then(data => {\n          fullDiv.innerHTML = data.FullContent.replace(/\\r?\\n/g, '<br/>');\n          fullDiv.style.display = 'block';\n          btn.innerText = 'Hide Full Transcript';\n        })\n        .catch(err => {\n          console.error('Error loading episode JSON:', err);\n          fullDiv.innerHTML = 'Error loading transcript.';\n        });\n    }\n  </script>\n</body>\n</html>
+        .then(data => {
+          fullDiv.innerHTML = data.FullContent.replace(/\r?\n/g, '<br/>');
+          fullDiv.style.display = 'block';
+          btn.innerText = 'Hide Full Transcript';
+        })
+        .catch(err => {
+          console.error('Error loading episode JSON:', err);
+          fullDiv.innerHTML = 'Error loading transcript.';
+        });
+    }
+  </script>
+</body>
+</html>
 "@
 
     Set-Content -Path $OutputHtml -Value $html -Encoding UTF8
