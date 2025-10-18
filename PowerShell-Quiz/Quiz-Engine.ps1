@@ -1,27 +1,23 @@
+# Revision : 1.8
+# Description : Quiz-Engine.ps1 — PS7+ compatibility hotfix, shuffle-by-default, cooldown + logging (Rev 1.8)
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-10-17
+# Modified Date : 2025-10-17
+
 <#
-  File        : QuizEngine.ps1
-  Revision    : 1.5
-  Author      : You + ChatGPT
-  Purpose     : Reusable PowerShell Quiz Engine (WinForms)
-  Notes       : - Loads question set via -QuestionSetPath (dot-sourced)
-                - Answers kept XOR-obfuscated in set file; engine never stores plaintext
-                - Reveals plaintext answers ONLY if score == 100%
-                - If <100%, offers Restart with a forced cooldown timer
-                - Logs include duration, per-question timing & behavior, encoded key, and SHA256 of plaintext
-
-  Revision Log:
-  - 1.2: Per-question timing & change counts
-  - 1.3: Encoded key + SHA256 in log
-  - 1.4: Reveal plaintext only on perfect score; restart prompt otherwise
-  - 1.5: Split engine from question sets; added retry cooldown & attempt counter in logs
-
+  File     : Quiz-Engine.ps1
+  Purpose  : Reusable PowerShell Quiz Engine (WinForms) with automatic question shuffling per attempt.
+  Notes    : - Loads question set via -QuestionSetPath (dot-sourced)
+             - Automatically shuffles question order at load and on every reset
+             - Answers remain XOR-obfuscated in the question set files
+             - Reveals plaintext answers ONLY when score == 100%
+             - If <100%, offers Restart with forced cooldown and logs attempts
 #>
 
 param(
     [Parameter(Mandatory)]
-    [string] $QuestionSetPath,                 # e.g. ".\questions-easy.ps1" or ".\questions-medium.ps1"
-
-    [int] $RetryCooldownSeconds = 10           # forced wait before retry, if not perfect
+    [string] $QuestionSetPath,                 # path to a question set file (dot-source)
+    [int] $RetryCooldownSeconds = 10           # forced cooldown before retry (seconds)
 )
 
 # ---------------------------
@@ -32,24 +28,17 @@ if (-not (Test-Path -LiteralPath $QuestionSetPath)) {
 }
 . $QuestionSetPath
 
-# The set must define: $Questions (array of 10), [byte[]] $ObfuscatedAnswers, $AnswerKeyXor
+# Validate required variables
 if (-not $Questions -or -not $ObfuscatedAnswers -or -not $AnswerKeyXor) {
-    throw "Question set did not define required variables `$Questions, `$ObfuscatedAnswers, `$AnswerKeyXor."
+    throw "Question set must define `$Questions (array), `$ObfuscatedAnswers ([byte[]]) and `$AnswerKeyXor."
 }
 
 # ---------------------------
-# Imports
-# ---------------------------
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-Add-Type -AssemblyName System.Security
-
-# ---------------------------
-# Helpers
+# Helpers: decode / encoders / hash (PS7-safe)
 # ---------------------------
 function Get-DecodedAnswers {
     param([byte[]] $Blob, [byte] $Key)
-    -join (foreach ($b in $Blob) { [char] ($b -bxor $Key) })
+    ($Blob | ForEach-Object { [char]($_ -bxor $Key) }) -join ''
 }
 
 function To-Base64 {
@@ -76,7 +65,41 @@ function Format-TimeSpan {
 }
 
 # ---------------------------
-# Logging / Session
+# Shuffle helper (always used)
+# ---------------------------
+function Invoke-QuestionShuffle {
+    param(
+        [Parameter(Mandatory=$true)][object[]] $Qs,
+        [Parameter(Mandatory=$true)][byte[]] $Obf
+    )
+
+    $indices = 0..($Qs.Count - 1)
+    $perm = Get-Random -InputObject $indices -Count $indices.Count
+
+    $newQs = @()
+    $newObf = New-Object byte[] ($Obf.Length)
+    for ($i = 0; $i -lt $perm.Count; $i++) {
+        $srcIndex = $perm[$i]
+        $newQs += $Qs[$srcIndex]
+        $newObf[$i] = $Obf[$srcIndex]
+    }
+    return ,($newQs, $newObf)
+}
+
+# Always shuffle at initial load so the first attempt is randomized
+$shRes = Invoke-QuestionShuffle -Qs $Questions -Obf $ObfuscatedAnswers
+$Questions = $shRes[0]
+$ObfuscatedAnswers = $shRes[1]
+
+# ---------------------------
+# Imports / UI types
+# ---------------------------
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName System.Security
+
+# ---------------------------
+# Logging / Session variables
 # ---------------------------
 $LogRoot = 'C:\temp\powershell-exports'
 if (-not (Test-Path $LogRoot)) { New-Item -Path $LogRoot -ItemType Directory -Force | Out-Null }
@@ -86,7 +109,8 @@ $LogPath = Join-Path $LogRoot "powershell-quiz-$SessionStamp.log"
 $AttemptNumber = 0
 
 # ---------------------------
-# Timing / Tracking State
+# Timing / Tracking arrays (init sized to questions count)
+# * PS7 fix: use [datetime] instead of Nullable[datetime]
 # ---------------------------
 $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 $QuizStartTime = $null
@@ -94,98 +118,98 @@ $QuizEndTime = $null
 
 $QuestionEnterAt      = New-Object 'System.Collections.Generic.List[datetime]'
 $QuestionTimeSpent    = New-Object 'System.Collections.Generic.List[TimeSpan]'
-$AnswerFirstAt        = New-Object 'System.Collections.Generic.List[Nullable[datetime]]'
+$AnswerFirstAt        = New-Object 'System.Collections.Generic.List[datetime]'  # PS7-safe
 $AnswerChangeCount    = New-Object 'System.Collections.Generic.List[int]'
 1..$Questions.Count | ForEach-Object {
     [void]$QuestionEnterAt.Add([datetime]::MinValue)
     [void]$QuestionTimeSpent.Add([TimeSpan]::Zero)
-    [void]$AnswerFirstAt.Add([Nullable[datetime]]::new())
+    [void]$AnswerFirstAt.Add([datetime]::MinValue)
     [void]$AnswerChangeCount.Add(0)
 }
 
 # ---------------------------
-# GUI
+# UI Build (PS7-safe ::new() constructors)
 # ---------------------------
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "PowerShell Quiz"
-$form.Size = New-Object System.Drawing.Size(720, 560)
+$form.Size = [System.Drawing.Size]::new(720, 560)
 $form.StartPosition = "CenterScreen"
 
 $lblQuestionNum = New-Object System.Windows.Forms.Label
-$lblQuestionNum.Location = New-Object System.Drawing.Point(20, 15)
-$lblQuestionNum.Size = New-Object System.Drawing.Size(300, 20)
+$lblQuestionNum.Location = [System.Drawing.Point]::new(20, 15)
+$lblQuestionNum.Size = [System.Drawing.Size]::new(300, 20)
 $form.Controls.Add($lblQuestionNum)
 
 $txtQuestion = New-Object System.Windows.Forms.Label
-$txtQuestion.Location = New-Object System.Drawing.Point(20, 45)
-$txtQuestion.Size = New-Object System.Drawing.Size(660, 40)
+$txtQuestion.Location = [System.Drawing.Point]::new(20, 45)
+$txtQuestion.Size = [System.Drawing.Size]::new(660, 40)
 $txtQuestion.Font = New-Object System.Drawing.Font("Segoe UI", 11, [System.Drawing.FontStyle]::Bold)
 $form.Controls.Add($txtQuestion)
 
 $grpAnswers = New-Object System.Windows.Forms.GroupBox
-$grpAnswers.Location = New-Object System.Drawing.Point(20, 95)
-$grpAnswers.Size = New-Object System.Drawing.Size(660, 200)
+$grpAnswers.Location = [System.Drawing.Point]::new(20, 95)
+$grpAnswers.Size = [System.Drawing.Size]::new(660, 200)
 $grpAnswers.Text = "Choose one:"
 $form.Controls.Add($grpAnswers)
 
 $radioButtons = @()
 for ($i = 0; $i -lt 4; $i++) {
     $rb = New-Object System.Windows.Forms.RadioButton
-    $rb.Location = New-Object System.Drawing.Point(15, 30 + ($i * 35))
-    $rb.Size = New-Object System.Drawing.Size(620, 30)
+    $rb.Location = [System.Drawing.Point]::new(15, (30 + ($i * 35)))
+    $rb.Size = [System.Drawing.Size]::new(620, 30)
     $grpAnswers.Controls.Add($rb)
     $radioButtons += $rb
 }
 
 $btnPrev = New-Object System.Windows.Forms.Button
-$btnPrev.Location = New-Object System.Drawing.Point(20, 310)
-$btnPrev.Size = New-Object System.Drawing.Size(90, 35)
+$btnPrev.Location = [System.Drawing.Point]::new(20, 310)
+$btnPrev.Size = [System.Drawing.Size]::new(90, 35)
 $btnPrev.Text = "Previous"
 $form.Controls.Add($btnPrev)
 
 $btnNext = New-Object System.Windows.Forms.Button
-$btnNext.Location = New-Object System.Drawing.Point(120, 310)
-$btnNext.Size = New-Object System.Drawing.Size(90, 35)
+$btnNext.Location = [System.Drawing.Point]::new(120, 310)
+$btnNext.Size = [System.Drawing.Size]::new(90, 35)
 $btnNext.Text = "Next"
 $form.Controls.Add($btnNext)
 
 $btnSubmit = New-Object System.Windows.Forms.Button
-$btnSubmit.Location = New-Object System.Drawing.Point(230, 310)
-$btnSubmit.Size = New-Object System.Drawing.Size(90, 35)
+$btnSubmit.Location = [System.Drawing.Point]::new(230, 310)
+$btnSubmit.Size = [System.Drawing.Size]::new(90, 35)
 $btnSubmit.Text = "Submit"
 $form.Controls.Add($btnSubmit)
 
 $btnReveal = New-Object System.Windows.Forms.Button
-$btnReveal.Location = New-Object System.Drawing.Point(330, 310)
-$btnReveal.Size = New-Object System.Drawing.Size(120, 35)
+$btnReveal.Location = [System.Drawing.Point]::new(330, 310)
+$btnReveal.Size = [System.Drawing.Size]::new(120, 35)
 $btnReveal.Text = "Reveal Answers"
 $btnReveal.Enabled = $false
 $form.Controls.Add($btnReveal)
 
 $lblStatus = New-Object System.Windows.Forms.Label
-$lblStatus.Location = New-Object System.Drawing.Point(20, 360)
-$lblStatus.Size = New-Object System.Drawing.Size(660, 40)
+$lblStatus.Location = [System.Drawing.Point]::new(20, 360)
+$lblStatus.Size = [System.Drawing.Size]::new(660, 40)
 $lblStatus.Text = "Answer all questions, then click Submit."
 $form.Controls.Add($lblStatus)
 
 $lblLegend = New-Object System.Windows.Forms.Label
-$lblLegend.Location = New-Object System.Drawing.Point(20, 405)
-$lblLegend.Size = New-Object System.Drawing.Size(660, 35)
+$lblLegend.Location = [System.Drawing.Point]::new(20, 405)
+$lblLegend.Size = [System.Drawing.Size]::new(660, 35)
 $lblLegend.Text = "Perfect score reveals answers. Otherwise, retry after cooldown."
 $lblLegend.ForeColor = [System.Drawing.Color]::Gray
 $form.Controls.Add($lblLegend)
 
 $lblCooldown = New-Object System.Windows.Forms.Label
-$lblCooldown.Location = New-Object System.Drawing.Point(20, 445)
-$lblCooldown.Size = New-Object System.Drawing.Size(660, 35)
+$lblCooldown.Location = [System.Drawing.Point]::new(20, 445)
+$lblCooldown.Size = [System.Drawing.Size]::new(660, 35)
 $lblCooldown.Text = ""
 $lblCooldown.ForeColor = [System.Drawing.Color]::Tomato
 $form.Controls.Add($lblCooldown)
 
 # ---------------------------
-# Quiz State
+# State
 # ---------------------------
-$currentIndex = 0
+$script:currentIndex = 0
 $userSelections = New-Object System.Collections.Generic.List[string]
 1..$Questions.Count | ForEach-Object { [void]$userSelections.Add($null) }
 
@@ -201,25 +225,38 @@ function Disable-Navigation {
 }
 
 function Enable-Navigation {
-    $btnPrev.Enabled = ($currentIndex -gt 0)
-    $btnNext.Enabled = ($currentIndex -lt ($Questions.Count - 1))
+    $btnPrev.Enabled = ($script:currentIndex -gt 0)
+    $btnNext.Enabled = ($script:currentIndex -lt ($Questions.Count - 1))
     $btnSubmit.Enabled = $true
     foreach ($rb in $radioButtons) { $rb.Enabled = $true }
 }
 
-function Reset-Tracking {
-    0..($Questions.Count - 1) | ForEach-Object {
-        $userSelections[$_] = $null
-        $QuestionEnterAt[$_] = [datetime]::MinValue
-        $QuestionTimeSpent[$_] = [TimeSpan]::Zero
-        $AnswerFirstAt[$_] = [Nullable[datetime]]::new()
-        $AnswerChangeCount[$_] = 0
+function Reset-TrackingArrays {
+    $QuestionEnterAt.Clear()
+    $QuestionTimeSpent.Clear()
+    $AnswerFirstAt.Clear()
+    $AnswerChangeCount.Clear()
+    1..$Questions.Count | ForEach-Object {
+        [void]$QuestionEnterAt.Add([datetime]::MinValue)
+        [void]$QuestionTimeSpent.Add([TimeSpan]::Zero)
+        [void]$AnswerFirstAt.Add([datetime]::MinValue)   # PS7-safe
+        [void]$AnswerChangeCount.Add(0)
     }
 }
 
 function Reset-Quiz {
-    Reset-Tracking
-    $currentIndex = 0
+    # Always reshuffle on restart so each attempt is randomized
+    $reshuf = Invoke-QuestionShuffle -Qs $Questions -Obf $ObfuscatedAnswers
+    $Questions = $reshuf[0]
+    $ObfuscatedAnswers = $reshuf[1]
+
+    0..($Questions.Count - 1) | ForEach-Object {
+        if ($userSelections.Count -le $_) { $userSelections.Add($null) } else { $userSelections[$_] = $null }
+    }
+
+    Reset-TrackingArrays
+
+    $script:currentIndex = 0
     $script:HasEntered = $false
     $script:PrevIndex = 0
     $btnReveal.Enabled = $false
@@ -265,25 +302,25 @@ function Capture-Selection {
         if ($radioButtons[$i].Checked) { $selected = $mapBack[$i]; break }
     }
 
-    $prior = $userSelections[$currentIndex]
-    if ($selected -and -not $AnswerFirstAt[$currentIndex].HasValue) {
-        $AnswerFirstAt[$currentIndex] = Get-Date
+    $prior = $userSelections[$script:currentIndex]
+    if ($selected -and $AnswerFirstAt[$script:currentIndex] -eq [datetime]::MinValue) {
+        $AnswerFirstAt[$script:currentIndex] = Get-Date
     }
     if ($prior -ne $selected -and $prior -ne $null -and $selected -ne $null) {
-        $AnswerChangeCount[$currentIndex] = $AnswerChangeCount[$currentIndex] + 1
+        $AnswerChangeCount[$script:currentIndex] = $AnswerChangeCount[$script:currentIndex] + 1
     }
-    $userSelections[$currentIndex] = $selected
+    $userSelections[$script:currentIndex] = $selected
 }
 
 foreach ($rb in $radioButtons) { $rb.Add_CheckedChanged({ Capture-Selection }) }
 
 $btnPrev.Add_Click({
     Capture-Selection
-    if ($currentIndex -gt 0) { $currentIndex--; Load-Question -index $currentIndex }
+    if ($script:currentIndex -gt 0) { $script:currentIndex--; Load-Question -index $script:currentIndex }
 })
 $btnNext.Add_Click({
     Capture-Selection
-    if ($currentIndex -lt ($Questions.Count - 1)) { $currentIndex++; Load-Question -index $currentIndex }
+    if ($script:currentIndex -lt ($Questions.Count - 1)) { $script:currentIndex++; Load-Question -index $script:currentIndex }
 })
 
 $form.Add_Shown({
@@ -309,8 +346,8 @@ $btnSubmit.Add_Click({
 
     # Accumulate time for the current question
     $now = Get-Date
-    if ($QuestionEnterAt[$currentIndex] -ne [datetime]::MinValue) {
-        $QuestionTimeSpent[$currentIndex] = $QuestionTimeSpent[$currentIndex] + ($now - $QuestionEnterAt[$currentIndex])
+    if ($QuestionEnterAt[$script:currentIndex] -ne [datetime]::MinValue) {
+        $QuestionTimeSpent[$script:currentIndex] = $QuestionTimeSpent[$script:currentIndex] + ($now - $QuestionEnterAt[$script:currentIndex])
     }
 
     # Validate completeness
@@ -387,7 +424,7 @@ $btnSubmit.Add_Click({
             $isCorrect = if ($u -eq $c) { "Correct" } else { "Wrong" }
             $dwell = $QuestionTimeSpent[$i]
             $dwellFmt = Format-TimeSpan $dwell
-            $firstAns = if ($AnswerFirstAt[$i].HasValue) { $AnswerFirstAt[$i].Value } else { "<none>" }
+            $firstAns = if ($AnswerFirstAt[$i] -ne [datetime]::MinValue) { $AnswerFirstAt[$i] } else { "<none>" }
             $changes = $AnswerChangeCount[$i]
             "Q$($i+1) : You=$u | Correct=$c | $isCorrect | Dwell=$dwellFmt | FirstAnswerAt=$firstAns | Changes=$changes"
         }
@@ -416,11 +453,5 @@ $btnReveal.Add_Click({
     [System.Windows.Forms.MessageBox]::Show("Plain key: $plainKey`nBase64: $b64`nBinary: $binary", "Answer Key") | Out-Null
 })
 
-# Show the form
+# Show form
 [void]$form.ShowDialog()
-
-# ---------------------------
-# Usage examples (commented)
-# . .\Quiz-Engine.ps1 -QuestionSetPath ".\questions-easy.ps1" -RetryCooldownSeconds 10
-# . .\Quiz-Engine.ps1 -QuestionSetPath ".\questions-medium.ps1" -RetryCooldownSeconds 15
-# ---------------------------
