@@ -292,8 +292,14 @@ function Load-Question {
     $QuestionEnterAt[$index] = Get-Date
     $script:HasEntered = $true
     $script:PrevIndex = $index
-    Enable-Navigation
+
+    # use script-scoped current index for nav enable/disable
+    $btnPrev.Enabled = ($script:currentIndex -gt 0)
+    $btnNext.Enabled = ($script:currentIndex -lt ($Questions.Count - 1))
+    $btnSubmit.Enabled = $true
+    foreach ($rb in $radioButtons) { $rb.Enabled = $true }
 }
+
 
 function Capture-Selection {
     $mapBack = @('A','B','C','D')
@@ -312,16 +318,19 @@ function Capture-Selection {
     $userSelections[$script:currentIndex] = $selected
 }
 
+
 foreach ($rb in $radioButtons) { $rb.Add_CheckedChanged({ Capture-Selection }) }
 
 $btnPrev.Add_Click({
     Capture-Selection
     if ($script:currentIndex -gt 0) { $script:currentIndex--; Load-Question -index $script:currentIndex }
 })
+
 $btnNext.Add_Click({
     Capture-Selection
     if ($script:currentIndex -lt ($Questions.Count - 1)) { $script:currentIndex++; Load-Question -index $script:currentIndex }
 })
+
 
 $form.Add_Shown({
     $Stopwatch.Restart()

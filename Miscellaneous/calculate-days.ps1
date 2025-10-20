@@ -49,9 +49,16 @@
 # Two blank lines before code/functions
 
 function Read-DateWithDefault {
+    # error 102025
+    <#
     param(
         [string]$Prompt = 'Enter a date (MM/dd/yyyy)',
         [DateTime]$Default = (Get-Date).Date
+    )
+        #>
+    param(
+        [Parameter(Mandatory = $false)]
+        [Nullable[DateTime]]$TargetDate
     )
 
     do {
