@@ -1,6 +1,31 @@
-# passes credential and prompts for password
+# Revision : 1.2
+# Description : Prompts for old and new computer names, domain admin username, and password to rename a remote computer (no reboot)
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-10-20
+# Modified Date : 2025-10-20
+
+# prompts for domain, then admin user, then password, then old name, then new name
+# this does not rename the AD object, it only renames the computer by invoking the script
 # this does NOT force a reboot, a reboot is required for full name change
 # computer has to be on corporate network or vpn for script to work and contact computer
 
-$cred = Get-Credential 'domain\admin.username'
-Rename-Computer -ComputerName 'oldname' -NewName 'newname' -DomainCredential $cred -Force
+
+# Prompt for details
+$domain = Read-Host "Enter the domain name (example : doamin)"
+$username = Read-Host "Enter the admin username (example : adm.username)"
+$oldName = Read-Host "Enter the current (old) computer name"
+$newName = Read-Host "Enter the new computer name"
+
+
+# Build credential
+$fullUser = "$domain\$username"
+$cred = Get-Credential -UserName $fullUser -Message "Enter password for $fullUser"
+
+# Rename computer
+Rename-Computer -ComputerName $oldName -NewName $newName -DomainCredential $cred -Force
+
+Write-Host "Computer rename initiated. A reboot is required for the change to take effect." -ForegroundColor Yellow
+Write-Host "Old name : $oldName"
+Write-Host "New name : $newName"
+Write-Host "Renamed using account : $fullUser"
+
