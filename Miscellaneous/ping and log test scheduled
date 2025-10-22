@@ -1,0 +1,74 @@
+# Revision : 2.0
+# Description : Single-shot internet speed test for Task Scheduler. Writes immediately to a pinned .log file. Rev 2.0
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-10-21
+# Modified Date : 2025-10-21
+
+param(
+    [string]$LogPath = "C:\temp\powershell-exports\speedtest-network.log",
+    [switch]$AutoInstall
+)
+
+# --- Ensure log folder exists ---
+$logFolder = Split-Path -Path $LogPath -Parent
+if (-not (Test-Path $logFolder)) {
+    New-Item -Path $logFolder -ItemType Directory -Force | Out-Null
+}
+
+# --- Locate or install Ookla CLI (speedtest.exe) ---
+function Get-OklaSpeedtestPath {
+    $cmd = Get-Command speedtest -ErrorAction SilentlyContinue
+    if ($cmd) { return $cmd.Source }
+
+    if ($AutoInstall) {
+        try {
+            Add-Content -Path $LogPath -Value "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] speedtest.exe not found, attempting winget install : Ookla.Speedtest.CLI"
+            winget install --id Ookla.Speedtest.CLI -e --accept-package-agreements --accept-source-agreements | Out-Null
+            Start-Sleep -Seconds 3
+            $cmd = Get-Command speedtest -ErrorAction SilentlyContinue
+            if ($cmd) { return $cmd.Source }
+        } catch {
+            Add-Content -Path $LogPath -Value "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] Auto-install failed : $_"
+        }
+    }
+
+    return $null
+}
+
+$speedtestPath = Get-OklaSpeedtestPath
+if (-not $speedtestPath) {
+    $msg = "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] ERROR : speedtest.exe not found. Install from https://www.speedtest.net/apps/cli or register task with -AutoInstall."
+    Add-Content -Path $LogPath -Value $msg
+    exit 1
+}
+
+# --- Run a single test and append to log ---
+try {
+    $raw = & $speedtestPath --accept-license --accept-gdpr -f json 2>$null
+    if ([string]::IsNullOrWhiteSpace($raw)) { throw "speedtest returned no output." }
+
+    $j = $raw | ConvertFrom-Json
+    $dlMbps = [math]::Round(($j.download.bandwidth * 8) / 1MB, 2)
+    $ulMbps = [math]::Round(($j.upload.bandwidth * 8) / 1MB, 2)
+    $lat    = $j.ping.latency
+    $loss   = $j.packetLoss
+    $isp    = $j.isp
+    $srvN   = $j.server.name
+    $srvL   = $j.server.location
+    $url    = $j.result.url
+    $ts     = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+
+    $entry = "[${ts}] DL : ${dlMbps} Mbps  UL : ${ulMbps} Mbps  Ping : ${lat} ms  Loss : ${loss}%  ISP : ${isp}  Server : ${srvN} (${srvL})  URL : ${url}"
+    Add-Content -Path $LogPath -Value $entry
+}
+catch {
+    $ts = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+    $err = "[${ts}] ERROR running speed test : $_"
+    Add-Content -Path $LogPath -Value $err
+    exit 2
+}
+
+<# =========================
+USAGE (single-shot; ideal for Task Scheduler)
+pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "C:\Path\To\Run-SpeedTest-Once.ps1" -LogPath "C:\temp\powershell-exports\speedtest-network.log" -AutoInstall
+========================= #>
