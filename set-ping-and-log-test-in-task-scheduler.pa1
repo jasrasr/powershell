@@ -1,0 +1,101 @@
+# Revision : 2.0
+# Description : Create or update a repeating Scheduled Task to run the single-shot speed test on an interval under SYSTEM. Rev 2.0
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-10-21
+# Modified Date : 2025-10-21
+
+param(
+    [string]$TaskName = "Network Speed Test Logger",
+    [string]$TaskPath = "\Middough\Network",
+    [int]$IntervalMinutes = 5,                                     # how often to run
+    [datetime]$StartAt = (Get-Date).AddMinutes(1),                  # first run
+    [string]$SpeedTestScriptPath = "C:\Scripts\Run-SpeedTest-Once.ps1",
+    [string]$LogPath = "C:\temp\powershell-exports\speedtest-network.log",
+    [switch]$AutoInstall,                                           # pass through to script
+    [switch]$RunOnBatteries,                                        # allow on battery (laptops)
+    [switch]$WakeIfNeeded                                           # wake the computer to run
+)
+
+# --- Resolve pwsh path for action ---
+$pwsh = (Get-Command pwsh -ErrorAction SilentlyContinue).Source
+if (-not $pwsh) {
+    $candidate = "C:\Program Files\PowerShell\7\pwsh.exe"
+    if (Test-Path $candidate) { $pwsh = $candidate } else {
+        throw "pwsh.exe not found. Install PowerShell 7 first."
+    }
+}
+
+# --- Validate target script path ---
+if (-not (Test-Path $SpeedTestScriptPath)) {
+    throw "Speed test script not found at $SpeedTestScriptPath . Update -SpeedTestScriptPath."
+}
+
+# --- Ensure task path folders exist (Task Scheduler virtual path) ---
+# Note : Register-ScheduledTask will create the TaskPath if needed.
+
+# --- Build arguments for the action ---
+# Example : -NoLogo -NoProfile -ExecutionPolicy Bypass -File "C:\Scripts\Run-SpeedTest-Once.ps1" -LogPath "C:\temp\powershell-exports\speedtest-network.log" -AutoInstall
+$args = @(
+    "-NoLogo",
+    "-NoProfile",
+    "-ExecutionPolicy Bypass",
+    "-File `"$SpeedTestScriptPath`"",
+    "-LogPath `"$LogPath`""
+)
+if ($AutoInstall) { $args += "-AutoInstall" }
+$argString = $args -join ' '
+
+# --- Define the scheduled task components ---
+$action    = New-ScheduledTaskAction -Execute $pwsh -Argument $argString
+$trigger   = New-ScheduledTaskTrigger -Once -At $StartAt -RepetitionInterval (New-TimeSpan -Minutes $IntervalMinutes) -RepetitionDuration (New-TimeSpan -Days 36500)
+$principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -RunLevel Highest -LogonType ServiceAccount
+$settings  = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries:$RunOnBatteries -DisallowStartIfOnBatteries:$false -StartWhenAvailable `
+                                           -MultipleInstances IgnoreNew -Compatibility Win8 -WakeToRun:$WakeIfNeeded -ExecutionTimeLimit (New-TimeSpan -Hours 2)
+
+# --- Register or update the task ---
+try {
+    $task = New-ScheduledTask -Action $action -Trigger $trigger -Principal $principal -Settings $settings
+    Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -InputObject $task -Force | Out-Null
+    Write-Host "Scheduled task created $TaskPath$TaskName : runs every ${IntervalMinutes} minute(s) starting $(Get-Date $StartAt -Format 'yyyy-MM-dd HH:mm:ss')"
+    Write-Host "Action command $pwsh : $argString"
+} catch {
+    Write-Host "Failed to register task $TaskPath$TaskName : $_"
+    throw
+}
+
+<# =========================
+USAGE EXAMPLES
+
+# 1) Create a 5-minute repeating task under SYSTEM, starting one minute from now
+#    Assumes the single-shot script is saved at C:\Scripts\Run-SpeedTest-Once.ps1
+pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "C:\Scripts\Register-SpeedTest-Task.ps1" `
+    -IntervalMinutes 5 `
+    -SpeedTestScriptPath "C:\Scripts\Run-SpeedTest-Once.ps1" `
+    -LogPath "C:\temp\powershell-exports\speedtest-network.log" `
+    -AutoInstall `
+    -RunOnBatteries `
+    -WakeIfNeeded
+
+# 2) Update the same task to run every 10 minutes
+pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "C:\Scripts\Register-SpeedTest-Task.ps1" `
+    -IntervalMinutes 10 `
+    -SpeedTestScriptPath "C:\Scripts\Run-SpeedTest-Once.ps1" `
+    -LogPath "C:\temp\powershell-exports\speedtest-network.log"
+
+# 3) Manually trigger once to test
+Start-ScheduledTask -TaskName "Network Speed Test Logger" -TaskPath "\Middough\Network"
+
+# 4) View last run info
+Get-ScheduledTaskInfo -TaskName "Network Speed Test Logger" -TaskPath "\Middough\Network" | Format-List *
+
+# 5) Remove task if needed
+Unregister-ScheduledTask -TaskName "Network Speed Test Logger" -TaskPath "\Middough\Network" -Confirm:$false
+========================= #>
+
+<# =========================
+CHANGELOG / WHAT CHANGED (Rev 2.0)
+- Added a single-shot logger script for Task Scheduler friendly execution.
+- Added a companion script to create or update a repeating Scheduled Task under SYSTEM.
+- Task uses pwsh.exe with -ExecutionPolicy Bypass and repeats every N minutes for ~100 years.
+- Passes through -LogPath and optional -AutoInstall to ensure CLI availability.
+========================= #>
