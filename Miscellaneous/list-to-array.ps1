@@ -8,9 +8,9 @@ $datetime = Get-Date -Format "yyyyMMdd-HHmmss"
 $outputPath = "C:\temp\powershell-exports\path-array-output-$datetime.ps1"
 
 $textToArray = @'
-alpha
-beta
-charlie
+item1
+item2
+item3
 '@ -split "`r?`n"
 
 New-Item -ItemType File -Path $outputPath -Force | Out-Null
@@ -39,4 +39,4 @@ Add-Content -Path $outputPath -Value '}'
 Add-Content -Path $outputPath -Value ''
 
 Write-Host "Array output saved to : $outputPath" -ForegroundColor Green
-notepad $outputPath
+code $outputPath
