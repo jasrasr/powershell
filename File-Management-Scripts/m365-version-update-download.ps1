@@ -108,6 +108,18 @@ try {
         $officeRoot   = Join-Path $clesccm 'Microsoft\Office 365'
         $officeTarget = Join-Path $officeRoot $versionBuild
 
+        if (-not (Test-Path $officeTarget)) {
+            New-Item -Path $officeTarget -ItemType Directory | Out-Null
+        }
+
+        # Verify destination is accessible
+        if (-not (Test-Path $officeTarget)) {
+            Write-Log "Cannot access destination $officeTarget" 'ERROR'
+            throw "Destination path unavailable: $officeTarget"
+        }
+
+        $robocopy = "$env:SystemRoot\System32\robocopy.exe"
+
         if (-not (Test-Path $officeRoot)) {
             Write-Log "Creating Office root $officeRoot"
             New-Item -Path $officeRoot -ItemType Directory -Force | Out-Null
@@ -120,15 +132,31 @@ try {
 
         $robocopy = "$env:SystemRoot\System32\robocopy.exe"
         if (Test-Path $robocopy) {
-            $rcArgs = @($targetFolder, $officeTarget, '/MIR', '/R:2', '/W:2', '/NFL', '/NDL', '/NP', '/NJH', '/NJS')
+            $rcArgs = @($targetFolder, $officeTarget, '/E', '/R:2', '/W:2', '/NFL', '/NDL', '/NP', '/NJH', '/NJS')
             Write-Log "Running robocopy $($rcArgs -join ' ')"
             & $robocopy @rcArgs | Out-Null
             $rcExit = $LASTEXITCODE
             if ($rcExit -ge 8) {
                 Write-Log "Robocopy failed with exit code $rcExit" 'ERROR'
                 throw "Robocopy failure $rcExit to $officeTarget"
+
             } else {
                 Write-Log "Robocopy completed with exit code $rcExit"
+            }
+
+            # Verify last 5 folders copied successfully
+            $sourceFolders = Get-ChildItem -Path $targetFolder -Directory | Select-Object -Last 5
+            $missingFolders = @()
+            foreach ($folder in $sourceFolders) {
+                $destPath = Join-Path $officeTarget $folder.Name
+                if (-not (Test-Path $destPath)) {
+                    $missingFolders += $folder.Name
+                }
+            }
+            if ($missingFolders.Count -gt 0) {
+                Write-Log "Missing folders at destination: $($missingFolders -join ', ')" 'WARN'
+            } else {
+                Write-Log "Verified: Last 5 folders exist at destination"
             }
         } else {
             Write-Log "Robocopy not found, using Copy-Item fallback"
@@ -136,6 +164,7 @@ try {
         }
 
         exit 1
+
     }
     else {
         Write-Log "No change. Still at $previousBuild."
