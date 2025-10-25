@@ -78,11 +78,11 @@ function Convert-PngToMultiResIco {
 }
 
 
-Convert-PngToMultiResIco -PngPath "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell\HEIC-Convert-To-JPG\icon.png"
+Convert-PngToMultiResIco -PngPath "C:\Users\jason.lamb\OneDrive - ${domain}\Documents\GitHub\PowerShell\HEIC-Convert-To-JPG\icon.png"
 
 
 <#
-$pngPath = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell\HEIC-Convert-To-JPG\icon.png"
+$pngPath = "C:\Users\jason.lamb\OneDrive - ${domain}\Documents\GitHub\PowerShell\HEIC-Convert-To-JPG\icon.png"
 
 if (Test-Path $pngPath) {
     Write-Host "✅ File exists : $pngPath"
