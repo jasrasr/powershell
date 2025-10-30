@@ -6,6 +6,10 @@ Yes, you can and this is how.
 1.1. better yet, create a $commonProfilePath in your $profile to have one file to edit across all PowerShell sessions and terminals, PS5, PS7, VSC, and admin, etc.
 2. create this file: invoke-chatgpt.ps1
 3. make sure to edit or point to an existing folder: $githubpath
-4. run command, chatgpt "tell me a joke"
-4.1. this will default to project1 folder with a timestamped file. One file for chat log per day (this can be modified)
-4.2. I am now testing if reference files can be uploaded to the project file for use in that project chats.
+4. set the environmental variable for your openai api key - KEEP THIS SECRET
+4.1 get api key from here: https://platform.openai.com/api-keys
+4.2 setx OPENAI_API_KEY "sk-yourkeyhere"
+5. reload powershell session so it knows about the env variable for OPENAI_API_KEY
+6. run command, chatgpt "tell me a joke"
+6.1. this will default to project1 folder with a timestamped file. One file for chat log per day (this can be modified)
+6.2. I am now testing if reference files can be uploaded to the project file for use in that project chats.
