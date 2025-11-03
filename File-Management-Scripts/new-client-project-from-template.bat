@@ -1,5 +1,5 @@
 :: Created by Jason Lamb
-:: Middough IT Department
+:: ${domain} IT Department
 :: Updated 12/30/22
 :: Edited 1/30/23 to reflect the 10.0 BIM folder changes
 :: Edited 5/30/24 to add a 'created' file to the 'new project folder'
@@ -33,7 +33,7 @@ cls :: Clears screen
 set SAVESTAMP=%DATE:/=-%@%TIME::=-%
 set SAVESTAMP=%SAVESTAMP: =%
 set SAVESTAMP=%SAVESTAMP:,=.%
-echo log file location: \\middough.local\corp\data\proj\!TEMPLATE\logs\robocopylog-%savestamp%.txt
+echo log file location: \\${domain}.local\corp\data\proj\!TEMPLATE\logs\robocopylog-%savestamp%.txt
 
 echo.
 echo . . . . . . . . . . . . . . . . . . . . . .
@@ -72,7 +72,7 @@ set /p newclientname= "New Client Name?"
 echo.
 echo New Client Name is: %newclientname%
 
-if exist "\\middough.local\corp\data\proj\%newclientname%\" (
+if exist "\\${domain}.local\corp\data\proj\%newclientname%\" (
 echo.
 echo CLIENT ALREADY EXIST!
 set "existingclientname=%newclientname%"
@@ -92,16 +92,16 @@ echo START lblcreatenewclient
 echo.
 echo Creating Client folder...
 
-robocopy "\\middough.local\corp\data\proj\!newclienttemplate\_Gen" "\\middough.local\corp\data\proj\%newclientname%\_Gen" /e /copyall /secfix /log+:"\\middough.local\corp\data\proj\!TEMPLATE\logs\robocopylog-%savestamp%.txt"
-fsutil file createnew "\\middough.local\corp\data\proj\%newclientname%\created-%savestamp%.txt" 0
-fsutil file createnew "\\middough.local\corp\data\proj\%newclientname%\_Gen\created-%savestamp%.txt" 0
-robocopy "\\middough.local\corp\data\proj\!newclienttemplate\_Stds" "\\middough.local\corp\data\proj\%newclientname%\_Stds" /e /copyall /secfix /log+:"\\middough.local\corp\data\proj\!TEMPLATE\logs\robocopylog-%savestamp%.txt"
-fsutil file createnew "\\middough.local\corp\data\proj\%newclientname%\_Stds\created-%savestamp%.txt" 0
+robocopy "\\${domain}.local\corp\data\proj\!newclienttemplate\_Gen" "\\${domain}.local\corp\data\proj\%newclientname%\_Gen" /e /copyall /secfix /log+:"\\${domain}.local\corp\data\proj\!TEMPLATE\logs\robocopylog-%savestamp%.txt"
+fsutil file createnew "\\${domain}.local\corp\data\proj\%newclientname%\created-%savestamp%.txt" 0
+fsutil file createnew "\\${domain}.local\corp\data\proj\%newclientname%\_Gen\created-%savestamp%.txt" 0
+robocopy "\\${domain}.local\corp\data\proj\!newclienttemplate\_Stds" "\\${domain}.local\corp\data\proj\%newclientname%\_Stds" /e /copyall /secfix /log+:"\\${domain}.local\corp\data\proj\!TEMPLATE\logs\robocopylog-%savestamp%.txt"
+fsutil file createnew "\\${domain}.local\corp\data\proj\%newclientname%\_Stds\created-%savestamp%.txt" 0
 
 echo.
 echo ......................................
 echo.
-if exist "\\middough.local\corp\data\proj\%newclientname%\" (
+if exist "\\${domain}.local\corp\data\proj\%newclientname%\" (
 echo Client folder %newclientname% created.
 echo.
 echo ......................................
@@ -122,7 +122,7 @@ set /p existingclientname= "Existing Client Name?"
 echo Existing Client Name is: %existingclientname%
 
 :: check for existing client folder
-if exist "\\middough.local\corp\data\proj\%existingclientname%\" (
+if exist "\\${domain}.local\corp\data\proj\%existingclientname%\" (
 echo.
 echo Client DOES exist.
 ::goto lblcontecnewprojectname
@@ -151,17 +151,17 @@ echo START lblnewprojectname
 echo.
 set /p newprojectname= "New Project Name?"
 
-if exist "\\middough.local\corp\data\proj\%newclientname%\%newprojectname%\" (
+if exist "\\${domain}.local\corp\data\proj\%newclientname%\%newprojectname%\" (
 echo.
 echo Project already exists.
 goto lblnewprojectname 
 ) else (
 echo Project doesn't currently exist...
 echo Creating Project folder...
-robocopy "\\middough.local\corp\data\proj\!newprojecttemplate-BIM" "\\middough.local\corp\data\proj\%newclientname%\%newprojectname%" /e /copyall /secfix /log+:"\\middough.local\corp\data\proj\!TEMPLATE\logs\robocopylog-%savestamp%.txt"
-fsutil file createnew "\\middough.local\corp\data\proj\%newclientname%\%newprojectname%\created-%savestamp%.txt" 0
+robocopy "\\${domain}.local\corp\data\proj\!newprojecttemplate-BIM" "\\${domain}.local\corp\data\proj\%newclientname%\%newprojectname%" /e /copyall /secfix /log+:"\\${domain}.local\corp\data\proj\!TEMPLATE\logs\robocopylog-%savestamp%.txt"
+fsutil file createnew "\\${domain}.local\corp\data\proj\%newclientname%\%newprojectname%\created-%savestamp%.txt" 0
 
-if exist "\\middough.local\corp\data\proj\%newclientname%\%newprojectname%" (
+if exist "\\${domain}.local\corp\data\proj\%newclientname%\%newprojectname%" (
 echo.
 echo ......................................
 echo.
@@ -201,18 +201,18 @@ echo START lblcontecnewprojectname
 echo.
 set /p ecnewprojectname= "Enter New Project Name for Client: %existingclientname% ? "
 
-if exist "\\middough.local\corp\data\proj\%existingclientname%\%ecnewprojectname%\" (
+if exist "\\${domain}.local\corp\data\proj\%existingclientname%\%ecnewprojectname%\" (
 echo Project already exists.
 
 goto lblcontecnewprojectname 
 
 ) else (
 echo Creating New Project...
-robocopy "\\middough.local\corp\data\proj\!newprojecttemplate-BIM" "\\middough.local\corp\data\proj\%existingclientname%\%ecnewprojectname%" /e /copyall /secfix /secfix /log+:"\\middough.local\corp\data\proj\!TEMPLATE\logs\robocopylog-%savestamp%.txt"
-fsutil file createnew "\\middough.local\corp\data\proj\%existingclientname%\%ecnewprojectname%\created-%savestamp%.txt" 0
+robocopy "\\${domain}.local\corp\data\proj\!newprojecttemplate-BIM" "\\${domain}.local\corp\data\proj\%existingclientname%\%ecnewprojectname%" /e /copyall /secfix /secfix /log+:"\\${domain}.local\corp\data\proj\!TEMPLATE\logs\robocopylog-%savestamp%.txt"
+fsutil file createnew "\\${domain}.local\corp\data\proj\%existingclientname%\%ecnewprojectname%\created-%savestamp%.txt" 0
 echo ......................................
 echo.
-if exist "\\middough.local\corp\data\proj\%existingclientname%\%ecnewprojectname%" (
+if exist "\\${domain}.local\corp\data\proj\%existingclientname%\%ecnewprojectname%" (
 echo ......................................
 echo.
 echo %existingclientname%\%ecnewprojectname% created
@@ -247,8 +247,8 @@ if %errorlevel% ==2 goto lblecnewprojectname
 :: sub folder for new client
 echo START lblsubfoldercreate
 set /p subfolder= "Enter Subfolder for Client: %newclientname%? "
-mkdir "\\middough.local\corp\data\proj\%newclientname%\%subfolder%"
-fsutil file createnew "\\middough.local\corp\data\proj\%newclientname%\%subfolder%\created-%savestamp%.txt" 0
+mkdir "\\${domain}.local\corp\data\proj\%newclientname%\%subfolder%"
+fsutil file createnew "\\${domain}.local\corp\data\proj\%newclientname%\%subfolder%\created-%savestamp%.txt" 0
 goto :lblnewprojectnamesubfolder
 
 :lbluseitno
@@ -256,15 +256,15 @@ goto :lblnewprojectnamesubfolder
 :: sub folder for existing client
 echo START lblsubfoldercreateec
 set /p subfolderec= "Enter Subfolder for Client: %existingclientname%? "
-if exist "\\middough.local\corp\data\proj\%existingclientname%\%subfolderec%" (
+if exist "\\${domain}.local\corp\data\proj\%existingclientname%\%subfolderec%" (
 echo %existingclientname%\%subfolderec% 
 choice /c yn /m "That folder already exist, use it?"
 if %errorlevel% ==1 goto lblnewprojectnamesubfolderecesf
 if %errorlevel% ==2 goto lbluseitno
 ) else (
 echo sub folder does not exist, creating now
-mkdir "\\middough.local\corp\data\proj\%existingclientname%\%subfolderec%"
-fsutil file createnew ""\\middough.local\corp\data\proj\%existingclientname%\%subfolderec%\created-%savestamp%.txt" 0
+mkdir "\\${domain}.local\corp\data\proj\%existingclientname%\%subfolderec%"
+fsutil file createnew ""\\${domain}.local\corp\data\proj\%existingclientname%\%subfolderec%\created-%savestamp%.txt" 0
 )
 echo WTH
 pause
@@ -273,7 +273,7 @@ goto :lblnewprojectnamesubfolderecesf
 
 ::lblsubfoldercreate-useit
 :: use existing subfolder
-:: mkdir "\\middough.local\corp\data\proj\%existingclientname%\%subfolderec%"
+:: mkdir "\\${domain}.local\corp\data\proj\%existingclientname%\%subfolderec%"
 :: goto :lblnewprojectnamesubfolderecesf
 
 :lblnewprojectnamesubfolder
@@ -283,7 +283,7 @@ echo START lblnewprojectnamesubfolder
 echo.
 set /p newprojectnamesubfolder= "New Project Name?"
 
-::if exist "\\middough.local\corp\data\proj\%newclientname%\%subfolder%\%newprojectname%\" (
+::if exist "\\${domain}.local\corp\data\proj\%newclientname%\%subfolder%\%newprojectname%\" (
 :: echo.
 :: echo Project already exists.
 :: goto lblnewprojectnamesubfolder 
@@ -293,10 +293,10 @@ echo Creating Project folder...
 echo client name: %newclientname%
 echo sub folder: %subfolder%
 echo project name: %newprojectnamesubfolder%
-robocopy "\\middough.local\corp\data\proj\!newprojecttemplate-BIM" "\\middough.local\corp\data\proj\%newclientname%\%subfolder%\%newprojectnamesubfolder%" /e /copyall /secfix /log+:"\\middough.local\corp\data\proj\!TEMPLATE\logs\robocopylog-%savestamp%.txt"
-fsutil file createnew "\\middough.local\corp\data\proj\%newclientname%\%subfolder%\%newprojectnamesubfolder%\created-%savestamp%.txt" 0
+robocopy "\\${domain}.local\corp\data\proj\!newprojecttemplate-BIM" "\\${domain}.local\corp\data\proj\%newclientname%\%subfolder%\%newprojectnamesubfolder%" /e /copyall /secfix /log+:"\\${domain}.local\corp\data\proj\!TEMPLATE\logs\robocopylog-%savestamp%.txt"
+fsutil file createnew "\\${domain}.local\corp\data\proj\%newclientname%\%subfolder%\%newprojectnamesubfolder%\created-%savestamp%.txt" 0
 
-:: if exist "\\middough.local\corp\data\proj\%newclientname%\%subfolder%\%newprojectname%" (
+:: if exist "\\${domain}.local\corp\data\proj\%newclientname%\%subfolder%\%newprojectname%" (
 :: echo.
 :: echo ......................................
 :: echo.
@@ -323,8 +323,8 @@ echo Creating Project folder...
 echo client name: %existingclientname%
 echo sub folder: %subfolderec%
 echo project name: %newprojectnamesubfolderec%
-robocopy "\\middough.local\corp\data\proj\!newprojecttemplate-BIM" "\\middough.local\corp\data\proj\%existingclientname%\%subfolderec%\%newprojectnamesubfolderec%" /e /copyall /secfix /log+:"\\middough.local\corp\data\proj\!TEMPLATE\logs\robocopylog-%savestamp%.txt"
-fsutil file createnew "\\middough.local\corp\data\proj\%existingclientname%\%subfolderec%\%newprojectnamesubfolderec%\created-%savestamp%.txt" 0
+robocopy "\\${domain}.local\corp\data\proj\!newprojecttemplate-BIM" "\\${domain}.local\corp\data\proj\%existingclientname%\%subfolderec%\%newprojectnamesubfolderec%" /e /copyall /secfix /log+:"\\${domain}.local\corp\data\proj\!TEMPLATE\logs\robocopylog-%savestamp%.txt"
+fsutil file createnew "\\${domain}.local\corp\data\proj\%existingclientname%\%subfolderec%\%newprojectnamesubfolderec%\created-%savestamp%.txt" 0
 goto lblstartend
 
 
@@ -338,8 +338,8 @@ echo Creating Project folder...
 echo client name: %existingclientname%
 echo sub folder: %subfolderec%
 echo project name: %newprojectnamesubfolderec-esf%
-robocopy "\\middough.local\corp\data\proj\!newprojecttemplate-BIM" "\\middough.local\corp\data\proj\%existingclientname%\%subfolderec%\%newprojectnamesubfolderec-esf%" /e /copyall /secfix /log+:"\\middough.local\corp\data\proj\!TEMPLATE\logs\robocopylog-%savestamp%.txt"
-fsutil file createnew "\\middough.local\corp\data\proj\%existingclientname%\%subfolderec%\%newprojectnamesubfolderec-esf%\created-%savestamp%.txt" 0
+robocopy "\\${domain}.local\corp\data\proj\!newprojecttemplate-BIM" "\\${domain}.local\corp\data\proj\%existingclientname%\%subfolderec%\%newprojectnamesubfolderec-esf%" /e /copyall /secfix /log+:"\\${domain}.local\corp\data\proj\!TEMPLATE\logs\robocopylog-%savestamp%.txt"
+fsutil file createnew "\\${domain}.local\corp\data\proj\%existingclientname%\%subfolderec%\%newprojectnamesubfolderec-esf%\created-%savestamp%.txt" 0
 goto lblstartend
 
 :lblstartend

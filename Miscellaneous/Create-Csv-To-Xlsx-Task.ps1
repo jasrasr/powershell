@@ -1,7 +1,7 @@
 # CreateCsvToXlsxTask.ps1
 
 # Define the path to the PowerShell script
-$scriptPath = 'C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell\Miscellaneous\ConvertCsvToXlsx.ps1'
+$scriptPath = 'C:\Users\jason.lamb\OneDrive - ${domain}\Documents\GitHub\PowerShell\Miscellaneous\ConvertCsvToXlsx.ps1'
 
 # Define the action to execute the PowerShell script
 $action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`""
