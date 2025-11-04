@@ -8,6 +8,15 @@ foreach ($user in $users) {
     Write-Host "Processing : $user"
      # get username from email in ad
     $username = (Get-ADUser -Filter {EmailAddress -eq $user} -Properties SamAccountName | Select-Object -ExpandProperty SamAccountName)
+ 
+    #check if user exists
+    if ($username) {
+        Write-Host "Found user: $username"
+    } else {
+        Write-Host "User not found for email: $user"
+    }
+
+    
 # get ad user manager email
    
     $managerEmail = (Get-ADUser -Identity $username -Properties Manager | Select-Object -ExpandProperty Manager)
@@ -20,4 +29,3 @@ foreach ($user in $users) {
 # get unique manager emails
 $managerEmails = $managerEmails | Select-Object -Unique
 $managerEmails
-
