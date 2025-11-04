@@ -56,7 +56,7 @@ foreach ($file in $files) {
                                      $true)
         $isShared = $wb.MultiUserEditing
         if ($VerboseScan) {
-            Write-Host "    Shared Workbook mode = $isShared" -ForegroundColor Green
+            Write-Host "    Shared Workbook mode = $isShared" -ForegroundColor yellow
         }
         $results += [PSCustomObject]@{
             FilePath     = $file.FullName
