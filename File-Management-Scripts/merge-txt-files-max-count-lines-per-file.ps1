@@ -71,3 +71,6 @@ for ($i = 0; $i -lt $allLines.Count; $i += $MaxLinesPerFile) {
 $summary | Export-Csv -Path $summaryFile -NoTypeInformation -Encoding UTF8
 Write-Host "Merge complete. Created $($chunkIndex - 1) merged files in $FolderPath" -ForegroundColor Cyan
 Write-Host "Summary log saved to $summaryFile" -ForegroundColor Green
+
+# example usage
+# "$githubpath\PowerShell\File-Management-Scripts\merge-txt-files-max-count-lines-per-file.ps1" -FolderPath "C:\Temp\egnyte-110425" -MaxLinesPerFile 1000

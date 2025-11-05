@@ -57,3 +57,6 @@ $summaryCsv = Join-Path $FolderPath "all-merged-summary.csv"
 } | Export-Csv -Path $summaryCsv -NoTypeInformation -Encoding UTF8
 
 Write-Host "Summary CSV saved to $summaryCsv" -ForegroundColor Green
+
+# example usage
+# "$githubpath\PowerShell\File-Management-Scripts\merge-all-txt-files-into-one.ps1" -FolderPath "C:\Temp\folder" -FinalFileName "all-merged.txt"
