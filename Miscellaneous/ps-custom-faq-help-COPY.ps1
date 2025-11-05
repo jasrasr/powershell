@@ -23,7 +23,7 @@ function Show-JasonHelp {
     # --- Help Text ---
     $helpText = @"
 # FAQ File Location
-C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\!PS-custom-faq-help.ps1
+$githubpath\!PS-custom-faq-help.ps1
 
 # Common Paths
 C:\temp\powershell-exports\
