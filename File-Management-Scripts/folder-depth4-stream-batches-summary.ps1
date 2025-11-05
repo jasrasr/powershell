@@ -1,8 +1,7 @@
-# Revision : 2.6
+# Revision : 2.7
 # Description : Stream folders exactly at depth 4 with live progress, timestamped incremental batch output every 1000 items,
-#               Egnyte-offline retry detection, diagnostic comfort output, persistent heartbeats with visible countdown timer,
-#               checkpoint resume mid-batch, safe checkpoint retention, cached enumeration, and automatic switch from
-#               countdown-to-baseline mode to progress-past-baseline mode.
+#               Egnyte-offline retry detection, diagnostic comfort output, persistent heartbeats with smart countdown timer,
+#               checkpoint resume mid-batch, safe checkpoint retention, cached enumeration, and ETA/time-to-baseline tracking.
 # Author : Jason Lamb (with help from ChatGPT)
 # Created Date : 2025-11-04
 # Modified Date : 2025-11-05
@@ -75,7 +74,7 @@ Get-ChildItem -Path $BasePath -Directory -Recurse -Depth 4 -ErrorAction Silently
 ForEach-Object {
     $processed++
 
-    # diagnostic output every 1000
+    # diagnostic output every 1000 processed
     if ($processed % 1000 -eq 0) {
         $statusText = Get-StatusText -processed $processed -KnownProcessed $KnownProcessed -AfterBaseline $AfterBaseline
         Write-Host ("Still enumerating... processed {0} so far | {1}" -f $processed, $statusText) -ForegroundColor Gray
@@ -92,9 +91,24 @@ ForEach-Object {
         Add-Content -Path $SummaryFile -Value ("[Heartbeat] {0} — Processed {1} | {2} | Batch {3}" -f $Now.ToString("yyyy-MM-dd HH:mm:ss"), $processed, $statusText, $batchNum)
         $LastHeartbeat = $Now
     }
-    elseif ($processed % 250 -eq 0) {
-        # Show timer countdown between heartbeats for reassurance
-        Write-Host ("Next heartbeat in {0}s..." -f $NextBeatSeconds) -ForegroundColor DarkGray
+    elseif ($processed % 5000 -eq 0) {
+        # --- Smarter countdown + ETA ---
+        $elapsedSec = (Get-Date) - $StartTime
+        $elapsedSec = [math]::Max($elapsedSec.TotalSeconds, 1)
+        $rate = $processed / $elapsedSec   # folders per second
+        $remaining = [Math]::Max($KnownProcessed - $processed, 0)
+        $etaSec = if ($rate -gt 0) { [int]($remaining / $rate) } else { 0 }
+
+        $NextBeatSeconds = [int][Math]::Round($HeartbeatInterval.TotalSeconds - ($Now - $LastHeartbeat).TotalSeconds)
+        if ($NextBeatSeconds -lt 0) { $NextBeatSeconds = 0 }
+
+        $etaStr = if ($remaining -gt 0) {
+            ("ETA to baseline ≈ {0:00}:{1:00}" -f ($etaSec/60), ($etaSec%60))
+        } else {
+            "Baseline passed {0:N0} folders ago" -f ($processed - $KnownProcessed)
+        }
+
+        Write-Host ("Next heartbeat in ~{0}s — {1}" -f $NextBeatSeconds, $etaStr) -ForegroundColor DarkGray
     }
 
     # Egnyte offline detection
