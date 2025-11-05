@@ -1,7 +1,7 @@
-# Revision : 2.4
+# Revision : 2.5
 # Description : Stream folders exactly at depth 4 with live progress, timestamped incremental batch output every 1000 items,
-#               Egnyte-offline retry detection, checkpoint resume mid-batch, diagnostic comfort messages during catch-up,
-#               persistent heartbeats, safe checkpoint retention, and local caching of all enumerated folders.
+#               Egnyte-offline retry detection, diagnostic comfort output, persistent heartbeats every minute (even below 1000),
+#               checkpoint resume mid-batch, safe checkpoint retention, cached enumeration, and visual countdown to known baseline.
 # Author : Jason Lamb (with help from ChatGPT)
 # Created Date : 2025-11-04
 # Modified Date : 2025-11-05
@@ -9,7 +9,8 @@
 param(
     [string]$BasePath   = "I:\",
     [string]$OutputRoot = "C:\temp",
-    [int]   $BatchSize  = 1000
+    [int]   $BatchSize  = 1000,
+    [int]   $KnownProcessed = 396094   # baseline from last run (for countdown display)
 )
 
 # --- constants ---
@@ -17,7 +18,7 @@ $BaseDepth  = ($BasePath.TrimEnd('\') -split '\\').Count
 $found      = 0
 $processed  = 0
 $results    = @()
-$HeartbeatInterval = [timespan]::FromMinutes(2)
+$HeartbeatInterval = [timespan]::FromMinutes(1)     # heartbeat every minute
 $LastHeartbeat = Get-Date
 $RunStamp   = "20251104-1155"   # reuse timestamp from current run
 $SummaryFile = "C:\temp\egnyte-depth4-summary-20251104-1155.txt"
@@ -59,9 +60,20 @@ Get-ChildItem -Path $BasePath -Directory -Recurse -Depth 4 -ErrorAction Silently
 ForEach-Object {
     $processed++
 
-    # diagnostic heartbeat during long pre-checkpoint crawl
+    # diagnostic heartbeat every 1000 processed
     if ($processed % 1000 -eq 0) {
-        Write-Host "Still enumerating... processed $processed so far" -ForegroundColor Gray
+        $remaining = [Math]::Max($KnownProcessed - $processed, 0)
+        Write-Host ("Still enumerating... processed {0} so far | remaining to baseline : {1:N0}" -f $processed, $remaining) -ForegroundColor Gray
+    }
+
+    # time-based heartbeat every minute even if <1000
+    $Now = Get-Date
+    if ($Now - $LastHeartbeat -ge $HeartbeatInterval) {
+        $remaining = [Math]::Max($KnownProcessed - $processed, 0)
+        $NextBeat  = 60 - ((Get-Date).Second)
+        Write-Host ("[Heartbeat] {0} — Processed {1} | Remaining to baseline : {2:N0} | Next update in {3}s" -f $Now.ToString("HH:mm:ss"), $processed, $remaining, $NextBeat) -ForegroundColor DarkCyan
+        Add-Content -Path $SummaryFile -Value ("[Heartbeat] {0} — Processed {1} | Remaining {2:N0} | Batch {3}" -f $Now.ToString("yyyy-MM-dd HH:mm:ss"), $processed, $remaining, $batchNum)
+        $LastHeartbeat = $Now
     }
 
     # Egnyte offline detection
@@ -88,14 +100,6 @@ ForEach-Object {
     # progress bar
     if ($processed % 100 -eq 0) {
         Write-Progress -Activity "Scanning directories..." -Status "Processed $processed | Found $found | Current batch $batchNum" -PercentComplete 0
-    }
-
-    # heartbeat logging every 2 minutes
-    $Now = Get-Date
-    if ($Now - $LastHeartbeat -ge $HeartbeatInterval) {
-        Add-Content -Path $SummaryFile -Value ("[Heartbeat] {0} — Processed {1} | Found {2} | Batch {3}" -f $Now.ToString("yyyy-MM-dd HH:mm:ss"), $processed, $found, $batchNum)
-        $LastHeartbeat = $Now
-        Write-Host "Heartbeat logged at $($Now.ToString('HH:mm:ss')) — Processed $processed" -ForegroundColor DarkCyan
     }
 
     # only count depth 4
