@@ -1,77 +1,134 @@
-# Revision : 1.2
-# Description : Stop Egnyte processes, uninstall Egnyte Desktop App, install 3.28.0.167, and verify elevation. Rev 1.2
+# Revision : 1.8
+# Description : Self-elevate, stop Egnyte Desktop App processes, uninstall all versions with reboot suppression, copy MSI local, install Egnyte 3.29.1.175, and wait for keypress. Rev 1.8
 # Author : Jason Lamb (with help from ChatGPT)
 # Created Date : 2025-11-17
 # Modified Date : 2025-11-17
 
 # ------------------------
-# Admin Check
+# Self Elevation Block
 # ------------------------
 $windowsIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $windowsPrincipal = New-Object Security.Principal.WindowsPrincipal($windowsIdentity)
 $isAdmin = $windowsPrincipal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
 
 if (-not $isAdmin) {
-    Write-Host "❌ This script must be run as Administrator. Exiting ..." -ForegroundColor Red
-    exit 1
-}
+    Write-Host "⚠ Not running as Administrator. Attempting to relaunch with elevation ..." -ForegroundColor Yellow
 
-Write-Host "✔ Running with administrative privileges." -ForegroundColor Green
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName = "powershell.exe"
+    $psi.Arguments = "-ExecutionPolicy Bypass -File `"$PSCommandPath`""
+    $psi.Verb = "runas"
 
-# ------------------------
-# Stop Egnyte Processes
-# ------------------------
-Write-Host "`nStopping Egnyte processes ..."
-
-$processes = Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.Name -like "*egnyte*" }
-
-foreach ($p in $processes) {
-    Write-Host "Stopping $($p.Name) : PID $($p.Id)"
-    Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
-}
-
-# ------------------------
-# Uninstall Existing Egnyte
-# ------------------------
-Write-Host "`nChecking for installed Egnyte app ..."
-
-$egnyteUninstall = Get-ChildItem "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" |
-    ForEach-Object { Get-ItemProperty $_.PsPath } |
-    Where-Object { $_.DisplayName -like "*Egnyte*" }
-
-if (-not $egnyteUninstall) {
-    $egnyteUninstall = Get-ChildItem "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall" |
-        ForEach-Object { Get-ItemProperty $_.PsPath } |
-        Where-Object { $_.DisplayName -like "*Egnyte*" }
-}
-
-if ($egnyteUninstall) {
-    Write-Host "Found installed Egnyte version : $($egnyteUninstall.DisplayName)"
-    Write-Host "Uninstalling Egnyte ..."
-
-    $guid = $egnyteUninstall.PSChildName
-
-    if ($guid -match "^\{.*\}$") {
-        Write-Host "Using MSI uninstall GUID : $guid"
-        Start-Process "msiexec.exe" -ArgumentList "/x $guid /qn" -Wait
+    try {
+        [System.Diagnostics.Process]::Start($psi) | Out-Null
+        exit
     }
-    elseif ($egnyteUninstall.UninstallString) {
-        Write-Host "Using UninstallString : $($egnyteUninstall.UninstallString)"
-        Start-Process "cmd.exe" -ArgumentList "/c $($egnyteUninstall.UninstallString) /qn" -Wait
+    catch {
+        Write-Host "❌ User declined elevation. Continuing without admin ..." -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "✔ Running with administrative privileges." -ForegroundColor Green
+}
+
+# ------------------------
+# Stop Egnyte Desktop App Processes
+# ------------------------
+Write-Host "`nStopping Egnyte Desktop App processes ..."
+
+$egnyteProcesses = @(
+    "Egnyte WebEdit",
+    "EgnyteClient",
+    "EgnyteDrive",
+    "EgnyteSyncService",
+    "EgnyteUpdate"
+)
+
+foreach ($proc in $egnyteProcesses) {
+    $p = Get-Process -Name $proc -ErrorAction SilentlyContinue
+    if ($p) {
+        Write-Host "Stopping process $proc : PID $($p.Id)"
+        Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
+    }
+}
+
+# ------------------------
+# Uninstall Egnyte Desktop App (ALL versions)
+# ------------------------
+Write-Host "`nChecking for installed Egnyte Desktop App entries ..."
+
+$uninstallRoot = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
+
+$egnyteApps = Get-ChildItem $uninstallRoot -ErrorAction SilentlyContinue |
+    ForEach-Object {
+        $props = Get-ItemProperty $_.PsPath -ErrorAction SilentlyContinue
+        if ($props.DisplayName -eq "Egnyte Desktop App" -or $props.Publisher -eq "Egnyte, Inc.") {
+            $props
+        }
     }
 
-    Write-Host "Egnyte uninstall complete."
+if ($egnyteApps.Count -eq 0) {
+    Write-Host "No Egnyte Desktop App installations found. Skipping uninstall."
 }
 else {
-    Write-Host "Egnyte not found. Skipping uninstall."
+    foreach ($app in $egnyteApps) {
+        Write-Host "`nFound Egnyte Desktop App : $($app.DisplayName)"
+        Write-Host "Version installed : $($app.DisplayVersion)"
+        Write-Host "MSI GUID : $($app.PSChildName)"
+
+        $guid = $app.PSChildName
+
+        if ($guid -and $guid -match "^\{.*\}$") {
+            Write-Host "Uninstalling Egnyte Desktop App with REBOOT suppression ..."
+            $proc = Start-Process "msiexec.exe" -ArgumentList "/x $guid /qn REBOOT=ReallySuppress" -PassThru
+            $proc.WaitForExit()
+            Write-Host "MSI uninstall exit code : $($proc.ExitCode)"
+        }
+        elseif ($app.UninstallString) {
+            Write-Host "Using UninstallString : $($app.UninstallString) REBOOT=ReallySuppress"
+            $cmd = "$($app.UninstallString) REBOOT=ReallySuppress"
+            $proc = Start-Process "cmd.exe" -ArgumentList "/c $cmd" -PassThru
+            $proc.WaitForExit()
+            Write-Host "UninstallString exit code : $($proc.ExitCode)"
+        }
+        else {
+            Write-Host "⚠ No uninstall method found for this entry."
+        }
+    }
+
+    Write-Host "`n✔ Attempted uninstall for all Egnyte Desktop App entries."
 }
 
 # ------------------------
-# Install New Egnyte
+# Copy MSI Local and Install
 # ------------------------
-$msiPath = "\\clesccm\Application Source\Accessories\Egnyte\3.28\EgnyteDesktopApp_3.28.0_167.msi"
+$sourceMsi  = "\\clesccm\Application Source\Accessories\Egnyte\3.29.1.175\EgnyteDesktopApp_3.29.1_175.msi"
+$localFolder = "C:\Temp"
+$localMsi    = Join-Path $localFolder "EgnyteDesktopApp_3.29.1_175.msi"
 
-Write-Host "`nInstalling Egnyte from $msiPath ..."
-Start-Process "msiexec.exe" -ArgumentList "/i `"$msiPath`" /qn" -Wait
+if (-not (Test-Path $localFolder)) {
+    Write-Host "Creating folder $localFolder ..."
+    New-Item -Path $localFolder -ItemType Directory | Out-Null
+}
 
-Write-Host "`n✔ Egnyte installation complete."
+Write-Host "`nCopying MSI to $localMsi ..."
+Copy-Item -Path $sourceMsi -Destination $localMsi -Force
+
+Write-Host "`nInstalling Egnyte from $localMsi with REBOOT suppression ..."
+$installProc = Start-Process "msiexec.exe" -ArgumentList "/i `"$localMsi`" /qn REBOOT=ReallySuppress" -PassThru
+$installProc.WaitForExit()
+Write-Host "Install MSI exit code : $($installProc.ExitCode)"
+
+Write-Host "`n✔ Egnyte installation complete from local source."
+
+# ------------------------
+# Finished — Press Any Key to Exit
+# ------------------------
+Write-Host "`n------------------------------------------"
+Write-Host "✔ Script completed. Press any key to exit ..."
+Write-Host "------------------------------------------"
+$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+
+# ------------------------
+# Example Usage
+# ------------------------
+#   .\Update-EgnyteDesktopApp.ps1
