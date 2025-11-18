@@ -1,7 +1,6 @@
-CURRENTLY BEING EDITED...
-Note: Info in this readme.me file mignt not be 100% accurate. 
+Note: Info in this readme.me file mignt not be 100% accurate as I am always adding/deleting/editing to this repo. 
 
-PowerShell Scripts
+# PowerShell Scripts
 
 A collection of useful PowerShell scripts designed for automating and managing IT operations. This repository includes scripts for system administration, file management, and general automation tasks.
 
