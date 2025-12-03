@@ -1,177 +1,169 @@
-# Revision : 1.0
-# Description : Simple WinForms GUI chat window with text prompt and bot-style responses. Rev 1.0
+# Revision : 1.1
+# Description : WinForms Chat Bot with external prompt-answer text file support. Rev 1.1
 # Author : Jason Lamb (with help from ChatGPT)
 # Created Date : 2025-12-03
 # Modified Date : 2025-12-03
 
-<#
-    Recap / Features
-    - Opens a small chat-style window.
-    - Top box shows the running conversation (read-only).
-    - Bottom box is where you type your message.
-    - Click "Send" or press Enter to get a simple bot response.
-    - Basic canned responses for greetings, time, date, and fallback echo.
+<# 
+    Recap / Changes in Rev 1.1
+    - Added Get-StoredReply function to load prompts + answers from file
+    - Prompts file format:
+           prompt=hello|hi|hey
+           reply=Hello there, human.
 
-    Revision History
-    - 1.0 : Initial GUI chat bot mockup.
+           prompt=time
+           reply=The current time is $(Get-Date).
+
+           prompt=weather
+           reply=I am not a weather bot, but it's probably cold. Because Ohio.
+
+    - Script now checks keywords in the message and returns the stored reply
+    - Falls back to default "I heard you" answer if no match exists
 #>
 
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
-function Get-ChatBotReply {
+# Path to prompts file (modify as needed)
+$PromptsFile = "C:\temp\chatbot-prompts.txt"
+
+function Get-StoredReply {
     param(
         [Parameter(Mandatory = $true)]
+        [string]$UserMessage
+    )
+
+    if (-not (Test-Path $PromptsFile)) {
+        return "Prompts file missing at $PromptsFile , so I'm just guessing."
+    }
+
+    $content = Get-Content $PromptsFile -Raw
+    $blocks  = $content -split '(?=prompt=)'  # split on each "prompt=" line
+
+    $msgLower = $UserMessage.ToLower()
+
+    foreach ($block in $blocks) {
+        if ($block.Trim().Length -eq 0) { continue }
+
+        # Extract prompt keywords
+        if ($block -match "prompt=(.+)"){
+            $keywords = $Matches[1].Split("|") | ForEach-Object { $_.Trim().ToLower() }
+        }
+
+        # Extract reply text
+        if ($block -match "reply=(.+)") {
+            $reply = $Matches[1].Trim()
+        }
+
+        # Keyword match — any keyword must appear in message
+        foreach ($k in $keywords) {
+            if ($msgLower -like "*$k*") {
+                # Evaluate PowerShell inside the reply if it exists
+                if ($reply -match '\$\(') {
+                    return (Invoke-Expression "`"$reply`"")
+                }
+                return $reply
+            }
+        }
+    }
+
+    return $null  # No match found
+}
+
+function Get-ChatBotReply {
+    param(
         [string]$Message
     )
 
-    $trimmed = $Message.Trim().ToLower()
-
-    if ([string]::IsNullOrWhiteSpace($trimmed)) {
+    if ([string]::IsNullOrWhiteSpace($Message)) {
         return "Please type something so I can respond."
     }
 
-    switch -regex ($trimmed) {
-        '^(hi|hello|hey)\b' {
-            return "Hello $env:USERNAME, how can I help you today?"
-        }
-        'time' {
-            $now = Get-Date
-            return "Current time on this machine is $now"
-        }
-        'date' {
-            $today = Get-Date -Format 'yyyy-MM-dd'
-            return "Today's date is $today"
-        }
-        'who are you' {
-            return "I am a tiny fake chat bot living inside PowerShell."
-        }
-        'clear chat' {
-            return "Type '/clear' to clear the chat window."
-        }
-        default {
-            return "You said : '$Message'. I am just a demo bot, but I heard you."
-        }
-    }
+    $stored = Get-StoredReply -UserMessage $Message
+
+    if ($stored) { return $stored }
+
+    return "You said : '$Message' ... and I have no clue what that means yet."
 }
 
 function Start-ChatBotGui {
 
-    # --- Form setup ---
+    # --- Main Form ---
     $form = New-Object System.Windows.Forms.Form
     $form.Text = "PowerShell Chat Bot Demo"
     $form.StartPosition = "CenterScreen"
     $form.Size = New-Object System.Drawing.Size(700, 450)
-    $form.MinimumSize = New-Object System.Drawing.Size(600, 400)
 
-    # --- Conversation textbox (top, multiline, read-only) ---
+    # Conversation window
     $txtConversation = New-Object System.Windows.Forms.TextBox
     $txtConversation.Multiline = $true
     $txtConversation.ReadOnly = $true
     $txtConversation.ScrollBars = "Vertical"
-    $txtConversation.WordWrap = $true
-    $txtConversation.Font = New-Object System.Drawing.Font("Consolas", 10)
-    $txtConversation.BackColor = [System.Drawing.Color]::White
     $txtConversation.Location = New-Object System.Drawing.Point(10, 10)
-    $txtConversation.Size = New-Object System.Drawing.Size(($form.ClientSize.Width - 20), 280)
-    $txtConversation.Anchor = "Top,Left,Right"
-    $txtConversation.Text = "Bot : Hello $env:USERNAME, I am your PowerShell chat demo. Type a message below and click Send.`r`n"
+    $txtConversation.Font = "Consolas,10"
+    $txtConversation.Size = New-Object System.Drawing.Size(660, 280)
 
-    # --- Input textbox (bottom, single-line) ---
+    $txtConversation.Text = "Bot : Hello $env:USERNAME , I loaded my brain from $PromptsFile .`r`n"
+
+    # Input
     $txtInput = New-Object System.Windows.Forms.TextBox
-    $txtInput.Multiline = $false
-    $txtInput.Font = New-Object System.Drawing.Font("Consolas", 10)
     $txtInput.Location = New-Object System.Drawing.Point(10, 310)
-    $txtInput.Size = New-Object System.Drawing.Size(($form.ClientSize.Width - 120), 30)
-    $txtInput.Anchor = "Bottom,Left,Right"
+    $txtInput.Size = New-Object System.Drawing.Size(560, 30)
+    $txtInput.Font = "Consolas,10"
 
-    # --- Send button ---
+    # Send button
     $btnSend = New-Object System.Windows.Forms.Button
     $btnSend.Text = "Send"
-    $btnSend.Font = New-Object System.Drawing.Font("Segoe UI", 10)
-    $btnSend.Size = New-Object System.Drawing.Size(80, 30)
-    $btnSend.Location = New-Object System.Drawing.Point(($form.ClientSize.Width - 90), 310)
-    $btnSend.Anchor = "Bottom,Right"
+    $btnSend.Location = New-Object System.Drawing.Point(580, 310)
+    $btnSend.Size = New-Object System.Drawing.Size(90, 30)
 
-    # --- Optional Clear button ---
+    # Clear button
     $btnClear = New-Object System.Windows.Forms.Button
     $btnClear.Text = "Clear"
-    $btnClear.Font = New-Object System.Drawing.Font("Segoe UI", 9)
-    $btnClear.Size = New-Object System.Drawing.Size(80, 28)
-    $btnClear.Location = New-Object System.Drawing.Point(($form.ClientSize.Width - 90), 350)
-    $btnClear.Anchor = "Bottom,Right"
+    $btnClear.Location = New-Object System.Drawing.Point(580, 350)
+    $btnClear.Size = New-Object System.Drawing.Size(90, 28)
 
-    # Make Enter key trigger Send
-    $form.AcceptButton = $btnSend
-
-    # --- Helper : append text to conversation box safely ---
+    # Add events
     $appendConversation = {
-        param(
-            [string]$newLine
-        )
-
-        if (-not [string]::IsNullOrEmpty($txtConversation.Text)) {
-            $txtConversation.AppendText("`r`n")
-        }
-        $txtConversation.AppendText($newLine)
-        $txtConversation.SelectionStart = $txtConversation.Text.Length
+        param([string]$line)
+        $txtConversation.AppendText("`r`n$line")
         $txtConversation.ScrollToCaret()
     }
 
-    # --- Send click event ---
+    # Send logic
     $btnSend.Add_Click({
-        $userText = $txtInput.Text.Trim()
-        if ([string]::IsNullOrWhiteSpace($userText)) {
-            return
-        }
+        $msg = $txtInput.Text.Trim()
+        if ($msg.Length -eq 0) { return }
 
-        # Allow a magic /clear command to wipe history
-        if ($userText -eq "/clear") {
-            $txtConversation.Text = "Bot : Chat cleared. Start again whenever you are ready."
+        if ($msg -eq "/clear") {
+            $txtConversation.Text = "Bot : Chat cleared. Ready again."
             $txtInput.Clear()
             return
         }
 
-        & $appendConversation.Invoke("You  : $userText")
+        & $appendConversation.Invoke("You  : $msg")
 
-        $reply = Get-ChatBotReply -Message $userText
+        $reply = Get-ChatBotReply -Message $msg
         & $appendConversation.Invoke("Bot : $reply")
 
         $txtInput.Clear()
-        $txtInput.Focus()
     })
 
-    # --- Clear button event (same as /clear) ---
+    # Clear logic
     $btnClear.Add_Click({
-        $txtConversation.Text = "Bot : Chat cleared. Start again whenever you are ready."
-        $txtInput.Clear()
-        $txtInput.Focus()
+        $txtConversation.Text = "Bot : Chat cleared."
     })
 
-    # --- Resize handler so controls follow the form size nicely ---
-    $form.Add_Resize({
-        $txtConversation.Size = New-Object System.Drawing.Size(($form.ClientSize.Width - 20), ($form.ClientSize.Height - 160))
-        $txtInput.Location     = New-Object System.Drawing.Point(10, ($form.ClientSize.Height - 90))
-        $txtInput.Size         = New-Object System.Drawing.Size(($form.ClientSize.Width - 120), 30)
-        $btnSend.Location      = New-Object System.Drawing.Point(($form.ClientSize.Width - 90), ($form.ClientSize.Height - 90))
-        $btnClear.Location     = New-Object System.Drawing.Point(($form.ClientSize.Width - 90), ($form.ClientSize.Height - 50))
-    })
-
-    # --- Add controls to form ---
+    # Show GUI
     $form.Controls.Add($txtConversation)
     $form.Controls.Add($txtInput)
     $form.Controls.Add($btnSend)
     $form.Controls.Add($btnClear)
-
-    # --- Show the form ---
-    [void]$form.ShowDialog()
+    $form.ShowDialog()
 }
 
-# Auto-start the GUI when the script is run directly
 Start-ChatBotGui
 
-# ============================================
-# Example usage (dot-sourcing style)
-# . .\chatbot-gui-demo.ps1
+# Example usage:
+# . .\ChatBot.ps1
 # Start-ChatBotGui
-# ============================================
