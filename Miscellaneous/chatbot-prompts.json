@@ -1,0 +1,28 @@
+[
+  {
+    "keywords": [ "hello", "hi", "hey" ],
+    "responses": [
+      "Hello there!",
+      "Hi! What’s up?",
+      "Hey $env:USERNAME , good to see you."
+    ]
+  },
+  {
+    "keywords": [ "time", "clock" ],
+    "responses": [
+      "The time is $(Get-Date)."
+    ]
+  },
+  {
+    "keywords": [ "date", "today" ],
+    "responses": [
+      "Today's date is $(Get-Date -Format 'yyyy-MM-dd')."
+    ]
+  },
+  {
+    "keywords": [ "weather", "forecast" ],
+    "responses": [
+      "Weather? I'm a PowerShell bot. My only climate is CPU heat."
+    ]
+  }
+]
