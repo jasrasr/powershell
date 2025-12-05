@@ -26,14 +26,14 @@
     Example Usage :
 
         # Run with prompts
-        .\Copy-OneFile.ps1
+        .\fast-robocopy-one-file.ps1
 
         # Run with parameters
-        .\Copy-OneFile.ps1 -source "C:\SourceFolder" -destination "C:\DestFolder" -file "example.txt"
+        .\fast-robocopy-one-file.ps1 -source "C:\SourceFolder" -destination "C:\DestFolder" -file "example.txt"
 
         # Dot-source then call manually
-        . .\Copy-OneFile.ps1
-        Copy-OneFile.ps1 -source "C:\src" -destination "D:\dst" -file "data.csv"
+        . .\fast-robocopy-one-file.ps1
+        fast-robocopy-one-file.ps1 -source "C:\src" -destination "D:\dst" -file "data.csv"
 #>
 
 param(
