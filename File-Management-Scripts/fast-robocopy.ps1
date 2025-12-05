@@ -1,10 +1,17 @@
-# this will robocopy one single file
-$date-time = get-date
+# This will robocopy one single file
+
+$datetime = Get-Date -Format 'yyyyMMdd-HHmmss'
 $logfolder = 'C:\temp\powershell-exports'
-$logfile = join-path $logfolder 'robocopy-$datetime.log'
-$file = 'file.txt' # enter single file name like 'file.txt'
-if (-not(test-path $logfolder){
-md $logfolder
+$logfile = Join-Path $logfolder "robocopy-$datetime.log"
+
+$source = 'C:\path\to\source'          # set this
+$destination = 'C:\path\to\destination' # set this
+$file = 'file.txt'                     # single file name only
+
+# Create log folder if missing
+if (-not (Test-Path $logfolder)) {
+    New-Item -ItemType Directory -Path $logfolder | Out-Null
 }
 
-robocopy $source $destination $file /MT:64 /W:1 /R:1 /J /LOG+:$logfile
+# Run Robocopy on one single file
+robocopy $source $destination $file /MT:64 /W:1 /R:1 /J /LOG+:"$logfile"
