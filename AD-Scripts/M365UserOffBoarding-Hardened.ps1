@@ -319,7 +319,7 @@ function Main {
     if (Test-Path $PasswordLog) { Write-Host "Passwords  : $PasswordLog" -ForegroundColor Yellow }
     if (Test-Path $InvalidUserLog) { Write-Host "Invalids   : $InvalidUserLog" -ForegroundColor Yellow }
 
-    DisconnectModules
+    # DisconnectModules
 }
 
 Main
