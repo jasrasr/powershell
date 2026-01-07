@@ -1,7 +1,8 @@
 # File-Management-Scripts
 
 ## Purpose
-Scripts focused on copying, moving, cleaning, and auditing files across local or network storage.
+Scripts focused on copying, moving, cleaning, and auditing files AND/OR FOLDERS across local or network storage.
+The Directory Listing below may not be updated with all the scripts in this directory. I don't have a way to udpate this dynamically or automatically, but I am sure I will create a workflow or script to do this soon.
 
 ## Directory listing
 | Name | Type | Description |
