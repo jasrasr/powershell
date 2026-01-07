@@ -8,8 +8,10 @@
 # Created Date : 2026-01-07
 # Modified Date : 2026-01-07
 
-write-host "MAKE SURE to setup $newfiles = @("file1", "file2") before running this." -forgroundcolor YELLOW
-write-host "Use double quotes in array because a folder/file with single quote will mess up the array." -forgroundcolor YELLOW
+# write-host needs to use single quotes for this alert
+write-host "MAKE SURE to setup newpaths = @('\\server\folder1', '\\server\folder2', '\\server\folder3') before running this." -foregroundcolor YELLOW
+write-host "USE DOUBLE QUOTES in array because a folder/file with single quote will mess up the array." -foregroundcolor YELLOW
+
 
 $WhatIfMode = $true   # set to $false when ready
 
@@ -146,13 +148,6 @@ $WhatIfMode = $false
 .\Clean-FileNames.ps1
 
 # 4. Review master log
-Invoke-Item "C:\temp\powershell-exports"
-
-# Notes:
-# - Folders are NEVER renamed
-# - Files starting with RE_ are excluded
-# - Script is idempotent (second run = no changes)
-# - Per-directory log files are created ONLY when files are renamed
-# - Master CSV log is always created
+Invoke-Item $masterlog
 
 #>
