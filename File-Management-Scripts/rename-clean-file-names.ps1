@@ -55,11 +55,11 @@ function Get-CleanFileName {
 foreach ($path in $newPaths | Sort-Object -Unique) {
 
     if (-not (Test-Path $path)) {
-        Write-Host "Path not found : $path"
+        Write-Host "Path not found : $path" -forgroundcolor red
         continue
     }
 
-    Write-Host "Processing folder : $path"
+    Write-Host "Processing folder : $path" -foregroundcolor cyan
 
     $directoryChanges = @()
 
@@ -121,11 +121,11 @@ foreach ($path in $newPaths | Sort-Object -Unique) {
             $header + $directoryChanges | Out-File -FilePath $dirLogPath -Encoding utf8
         }
 
-        Write-Host "Directory log created : $dirLogPath"
+        Write-Host "Directory log created : $dirLogPath"  -forgroundcolor green
     }
 }
 
-Write-Host "Master log written to $masterLog"
+Write-Host "Master log written to $masterLog" -foregroundcolor green
 
 <# 
 ===========================
