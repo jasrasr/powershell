@@ -21,3 +21,6 @@
         # add to clipboard
         $result | Set-Clipboard
     }
+
+# Example Usage:
+# & { . "$githubpath\PowerShell\Miscellaneous\remove-space-replace-underscore.ps1"; Remove-Spaces "my text here 2" }
