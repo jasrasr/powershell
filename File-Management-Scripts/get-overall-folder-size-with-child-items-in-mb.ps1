@@ -1,10 +1,7 @@
 ﻿# Define an array of project folders
 $projectfolders = @(
-    "N:\Citgo\CID 2024\CID2403",
-    "N:\Citgo\CID 2024\CID2404",
-    "N:\Citgo\CID 2024\CID2405",
-    "N:\Citgo\CID 2024\CID2406",
-    "N:\Citgo\CID 2024\CID2407"
+    "\\server\folder",
+    "C:\folder"
     )
 
     
