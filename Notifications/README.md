@@ -3,12 +3,12 @@
 ## Purpose
 Scripts and assets demonstrating how to send toast notifications, emails, or webhook alerts from PowerShell.
 
-## Directory listing
-| Name | Type | Description |
-| --- | --- | --- |
-| `Demo.ps1` | File | PowerShell script |
-| `Example-Usage.ps1` | File | PowerShell script |
-| `NotificationManager.ps1` | File | PowerShell script |
-| `README.md` | File | Markdown documentation |
-| `Test-Notifications.ps1` | File | PowerShell script |
-| `output.txt` | File | Text file |
+## Files
+| Name | Type | Rev | Description |
+| --- | --- | --- | --- |
+| `Demo.ps1` | ps1 | 3cfac93 | Demonstrates the notification system with read/unread status |
+| `Example-Usage.ps1` | ps1 | 3cfac93 | Shows common usage patterns for the notification system |
+| `NotificationManager.ps1` | ps1 | 3cfac93 | PowerShell module for managing notifications with read/unread status |
+| `output.txt` | txt | 3cfac93 | Notifications cleared successfully |
+| `README.md` | md | 3cfac93 | Documentation |
+| `Test-Notifications.ps1` | ps1 | 3cfac93 | Basic tests to verify notification system functionality |

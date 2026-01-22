@@ -3,8 +3,8 @@
 ## Purpose
 Scripts, assets, and helpers focused on Autodesk AutoCAD automation and deployment.
 
-## Directory listing
-| Name | Type | Description |
-| --- | --- | --- |
-| `README.md` | File | Markdown documentation |
-| `autopurge.ps1` | File | PowerShell script |
+## Files
+| Name | Type | Rev | Description |
+| --- | --- | --- | --- |
+| `autopurge.ps1` | ps1 | 3cfac93 | PowerShell script |
+| `README.md` | md | 3cfac93 | Documentation |
