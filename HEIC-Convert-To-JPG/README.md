@@ -14,5 +14,5 @@ Resources for converting HEIC images into the more widely supported JPG format.
 | `icon.ico` | ico | 3cfac93 | Icon file |
 | `icon.png` | png | 3cfac93 | Image file |
 | `ImageMagick-7.1.1-47-portable-Q16-x64.zip` | zip | 3cfac93 | Archive file |
-| `README.md` | md | 3cfac93 | Documentation |
+| `README.md` | md | 6fd63ee | Documentation |
 | `readme.txt` | txt | 3cfac93 | Documentation |

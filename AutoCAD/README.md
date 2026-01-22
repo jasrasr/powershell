@@ -7,4 +7,4 @@ Scripts, assets, and helpers focused on Autodesk AutoCAD automation and deployme
 | Name | Type | Rev | Description |
 | --- | --- | --- | --- |
 | `autopurge.ps1` | ps1 | 3cfac93 | PowerShell script |
-| `README.md` | md | 3cfac93 | Documentation |
+| `README.md` | md | 6fd63ee | Documentation |

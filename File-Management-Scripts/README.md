@@ -76,7 +76,7 @@ The Directory Listing below may not be updated with all the scripts in this dire
 | `ping-computer-and-move-file.ps1` | ps1 | 3cfac93 | PowerShell script |
 | `ping-get-folder-and-expand-c-drive-max.ps1` | ps1 | 3cfac93 | Define the list of computers |
 | `random-folder-creation.ps1` | ps1 | 3cfac93 | Count the number of child items in each directory |
-| `README.md` | md | 3cfac93 | Documentation |
+| `README.md` | md | 6fd63ee | Documentation |
 | `remove-duplicate-lines-in-txt-file.ps1` | ps1 | 3cfac93 | Remove duplicate lines (preserving first occurrence) from a specified text file and overwrite the original file atomically. |
 | `remove-empty-folders.ps1` | ps1 | 3cfac93 | Fast removal of empty subfolders using .NET enumeration (deepest-first) with progress bar and runtime timestamps. Default WhatIf; use -Delete to actually remove. Logs to parent.  Rev 1.8 |
 | `remove-empty-lines-from-txt-file.ps1` | ps1 | 3cfac93 | Remove empty lines from a specified text file and overwrite the original file. Added parameter input. Rev 1.1 |

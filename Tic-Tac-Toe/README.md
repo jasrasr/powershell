@@ -6,7 +6,7 @@ Console-based Tic-Tac-Toe game implemented in PowerShell for fun and learning.
 ## Files
 | Name | Type | Rev | Description |
 | --- | --- | --- | --- |
-| `README.md` | md | 3cfac93 | Documentation |
+| `README.md` | md | 6fd63ee | Documentation |
 | `readme.md` | md | 3cfac93 | Documentation |
 | `SuperTicTacToe-beta-legal-play-logic.ps1` | ps1 | 3cfac93 | Undo functionality fixed using ArrayList. Board redraws correctly. Cleaned logic. |
 | `SuperTicTacToe-beta-winner-animation.ps1` | ps1 | 3cfac93 | Undo functionality fixed using ArrayList. Board redraws correctly. Cleaned logic. |

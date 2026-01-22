@@ -33,7 +33,7 @@ A parking lot of assorted experiments, proofs of concept, and scratch scripts th
 | `ps-custom-faq-help-COPY.ps1` | ps1 | 3cfac93 | Jason's custom PowerShell quick reference with colored banner details (labels magenta, values white) |
 | `random-password-generator-10-chars.ps1` | ps1 | 3cfac93 | Define a character set for the password |
 | `random-password-generator.ps1` | ps1 | 3cfac93 | Generate 10 random passwords with complexity (uppercase, lowercase, digits, special chars). Rev 1.0 |
-| `README.md` | md | 3cfac93 | Documentation |
+| `README.md` | md | 6fd63ee | Documentation |
 | `remove-duplicates-from-array.ps1` | ps1 | 3cfac93 | remove duplicates |
 | `remove-space-replace-underscore.ps1` | ps1 | 3cfac93 | Example Usage: |
 | `replace-text.ps1` | ps1 | 3cfac93 | replace space with _ |

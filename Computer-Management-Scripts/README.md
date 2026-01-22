@@ -13,7 +13,7 @@ General purpose workstation management scripts for inventory, configuration, and
 | `Get-InstalledSoftware,ps1.ps1` | ps1 | 3cfac93 | Get InstalledSoftware,ps1 |
 | `get-task-and-runas-user.ps1` | ps1 | 3cfac93 | Retrieves all scheduled tasks on the local system and extracts the Task Name, Task Folder, and the user the task runs as. If the RunAsUser field is empty, it is resolved based on the LogonType. Results are sorted and displayed in a formatted table. |
 | `ping-and-reg-autodesk-access-revit-version.ps1` | ps1 | 3cfac93 | Query Autodesk Access and all Revit 2026 components (incl. FormIt Converter), return full table: Computer, RegistryPath, Publisher, DisplayVersion, DisplayName, InstallDate; run local when host matches; log to C:\temp\powershell-exports\  [Rev 1.7] |
-| `README.md` | md | 3cfac93 | Documentation |
+| `README.md` | md | 6fd63ee | Documentation |
 | `rename-computer-remotely` |  | 3cfac93 | File |
 | `rename-computer-remotely-multiple.ps1` | ps1 | 3cfac93 | Remotely rename one or more computers using OldName=NewName hashtable. |
 | `restart-egnyte.ps1` | ps1 | 3cfac93 | Restart only EgnyteClient/EgnyteDrive with rolling log; do NOT stop WebEdit/SyncService/Update  (Rev 1.6) |

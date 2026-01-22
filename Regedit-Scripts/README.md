@@ -13,4 +13,4 @@ Registry editing scripts that backup, modify, or clean Windows registry keys.
 | `enable-remote-registry-for-remote-computer.ps1` | ps1 | 3cfac93 | Remotely enables RemoteRegistry service and key firewall rules, with interactive computer name prompt |
 | `get-os-version-and-log-to-txt-file-with-date-time-stamp.ps1` | ps1 | 3cfac93 | This script retrieves and logs the Windows version, build number, and relevant registry values related to Windows Update and upgrade notifications. |
 | `get-os-version-update-to-screen.ps1` | ps1 | 3cfac93 | Check specific registry values (local or remote) and output results to screen only. Rev 1.1 |
-| `README.md` | md | 3cfac93 | Documentation |
+| `README.md` | md | 6fd63ee | Documentation |

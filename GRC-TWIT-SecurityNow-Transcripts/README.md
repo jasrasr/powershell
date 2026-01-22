@@ -13,4 +13,4 @@ Text transcripts sourced from the TWiT Security Now podcast for governance, risk
 | `download-missing-txt-files.ps1` | ps1 | 3cfac93 | PowerShell script |
 | `download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com.ps1` | ps1 | 3cfac93 | Downloads GRC Security Now transcripts and PDF show notes with resume, logging, and persistent tracking |
 | `README.MD` | MD | 3cfac93 | Documentation |
-| `README.md` | md | 3cfac93 | Documentation |
+| `README.md` | md | 6fd63ee | Documentation |

@@ -23,7 +23,7 @@ Collection of Active Directory automation scripts for managing users, computers,
 | `get-users-passwordlastset.ps1` | ps1 | 3cfac93 | Active Directory query and reporting script |
 | `install-msgraph.ps1` | ps1 | 3cfac93 | install msgraph |
 | `M365UserOffBoarding-Hardened.ps1` | ps1 | 3cfac93 | SAFE BY DEFAULT |
-| `README.md` | md | 3cfac93 | Documentation |
+| `README.md` | md | 6fd63ee | Documentation |
 | `remove-ad-group-members-via-ou.ps1` | ps1 | 3cfac93 | Enumerate all groups in an OU and remove members with mandatory OU prompt, YES/Y WhatIf confirmation, strict live-mode confirmation, and log path validation (Rev 1.6) |
 | `rename-ad-group-with-hashtable.ps1` | ps1 | 3cfac93 | PowerShell script |
 | `reset-user-password-enable-and-force.ps1` | ps1 | 3cfac93 | Define a character set for the password |

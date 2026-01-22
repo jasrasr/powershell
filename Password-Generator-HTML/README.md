@@ -7,4 +7,4 @@ A lightweight HTML + JavaScript password generator front end served by PowerShel
 | Name | Type | Rev | Description |
 | --- | --- | --- | --- |
 | `pw.html` | html | 3cfac93 | HTML page |
-| `README.md` | md | 3cfac93 | Documentation |
+| `README.md` | md | 6fd63ee | Documentation |

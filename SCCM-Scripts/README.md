@@ -14,6 +14,6 @@ Scripts tailored for Microsoft System Center Configuration Manager automation an
 | `new-app-via-csv.csv` | csv | 3cfac93 | File |
 | `new-app-via-csv.ps1` | ps1 | 3cfac93 | Import the PSD1 file (returns a hashtable) |
 | `new-cmapp.ps1` | ps1 | 3cfac93 | Create a ConfigMgr Application with MSI or Script deployment type + detection, then optionally distribute content. |
-| `README.md` | md | 3cfac93 | Documentation |
+| `README.md` | md | 6fd63ee | Documentation |
 | `Retrieve-all-Applications-from-sccm.ps1` | ps1 | 3cfac93 | Connection to SCCM server required before running this script |
 | `test-update.ps1` | ps1 | 3cfac93 | test update |

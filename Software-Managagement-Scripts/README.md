@@ -6,6 +6,6 @@ Application deployment and maintenance scripts for installing, updating, or remo
 ## Files
 | Name | Type | Rev | Description |
 | --- | --- | --- | --- |
-| `README.md` | md | 3cfac93 | Documentation |
+| `README.md` | md | 6fd63ee | Documentation |
 | `revit-2022-and-2024-force-update-only.ps1` | ps1 | 3cfac93 | Array of target computers |
 | `revit-2022-and-2024-force-update.ps1` | ps1 | 3cfac93 | PowerShell script with function: Copy |
