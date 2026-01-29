@@ -3,12 +3,12 @@
 ## Purpose
 Automation for networking tasks such as adapter configuration, diagnostics, and connectivity tests.
 
-## Directory listing
-| Name | Type | Description |
-| --- | --- | --- |
-| `README.md` | File | Markdown documentation |
-| `remote-computer-ping-and-ipconfig-(2).ps1` | File | PowerShell script |
-| `remote-computer-ping-and-ipconfig.ps1` | File | PowerShell script |
-| `test-(2).ps1` | File | PowerShell script |
-| `test-(3).ps1` | File | PowerShell script |
-| `test.ps1` | File | PowerShell script |
+## Files
+| Name | Type | Rev | Description |
+| --- | --- | --- | --- |
+| `README.md` | md | 6fd63ee | Documentation |
+| `remote-computer-ping-and-ipconfig-(2).ps1` | ps1 | 3cfac93 | Invoke ipconfig on the remote computer and display the output |
+| `remote-computer-ping-and-ipconfig.ps1` | ps1 | 3cfac93 | Invoke ipconfig on the remote computer and display the output |
+| `test-(2).ps1` | ps1 | 3cfac93 | PowerShell script |
+| `test-(3).ps1` | ps1 | 3cfac93 | PowerShell script |
+| `test.ps1` | ps1 | 3cfac93 | PowerShell script |
