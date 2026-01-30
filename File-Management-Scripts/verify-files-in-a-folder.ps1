@@ -13,7 +13,7 @@ Write-Host "Expected range: chunk_$($StartChunk.ToString('0000')) to chunk_$($En
 # Check if folder exists
 if (-not (Test-Path $FolderPath)) {
     Write-Host "ERROR: Folder not found: $FolderPath" -ForegroundColor Red
-    exit 1
+    return
 }
 
 # Get all files matching the chunk pattern
@@ -21,7 +21,7 @@ $allFiles = Get-ChildItem -Path $FolderPath -File | Where-Object { $_.Name -matc
 
 if ($allFiles.Count -eq 0) {
     Write-Host "ERROR: No chunk files found in the folder!" -ForegroundColor Red
-    exit 1
+    return
 }
 
 Write-Host "Total files found: $($allFiles.Count)`n" -ForegroundColor Gray
