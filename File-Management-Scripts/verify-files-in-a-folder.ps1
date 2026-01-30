@@ -68,6 +68,18 @@ if (-not (Test-Path -Path $FolderPath)) {
     exit 1
 }
 
+# Validate file extension
+if ($FileExtension -match '[\\/:*?"<>|]') {
+    Write-Host "Error: FileExtension contains invalid characters. Use only valid filename characters without special symbols." -ForegroundColor Red
+    exit 1
+}
+
+# Validate file prefix
+if ($FilePrefix -match '[\\/:*?"<>|]') {
+    Write-Host "Error: FilePrefix contains invalid characters. Use only valid filename characters without wildcards or special symbols." -ForegroundColor Red
+    exit 1
+}
+
 # Validate chunk numbers
 if ($StartChunk -le 0) {
     Write-Host "Error: StartChunk must be a positive number (greater than 0)" -ForegroundColor Red
@@ -106,8 +118,10 @@ for ($i = $StartChunk; $i -le $EndChunk; $i++) {
     # Get all files matching the pattern
     $matchingFiles = Get-ChildItem -Path $FolderPath -Filter $searchPattern -File -ErrorAction SilentlyContinue
     
-    # Filter out backup files (files containing -backup followed by numbers before the extension)
-    $nonBackupFiles = $matchingFiles | Where-Object { $_.Name -notmatch '-backup\d+\.' }
+    # Filter out backup files (files containing -backup followed by numbers immediately before the extension)
+    $escapedExtension = [regex]::Escape($FileExtension)
+    $backupPattern = "-backup\d+\.$escapedExtension$"
+    $nonBackupFiles = $matchingFiles | Where-Object { $_.Name -notmatch $backupPattern }
     
     if ($nonBackupFiles.Count -eq 0) {
         $missingChunks += $chunkNumber
