@@ -70,13 +70,13 @@ if (-not (Test-Path -Path $FolderPath)) {
 
 # Validate file extension
 if ($FileExtension -match '[\\/:*?"<>|]') {
-    Write-Host "Error: FileExtension contains invalid characters. Use only valid filename characters without special symbols." -ForegroundColor Red
+    Write-Host "Error: FileExtension contains invalid characters. Disallowed characters: \ / : * ? `" < > |" -ForegroundColor Red
     exit 1
 }
 
 # Validate file prefix
 if ($FilePrefix -match '[\\/:*?"<>|]') {
-    Write-Host "Error: FilePrefix contains invalid characters. Use only valid filename characters without wildcards or special symbols." -ForegroundColor Red
+    Write-Host "Error: FilePrefix contains invalid characters. Disallowed characters: \ / : * ? `" < > |" -ForegroundColor Red
     exit 1
 }
 
