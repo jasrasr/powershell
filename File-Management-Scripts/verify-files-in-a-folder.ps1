@@ -64,23 +64,23 @@ param(
 
 # Verify the folder exists
 if (-not (Test-Path -Path $FolderPath)) {
-    Write-Error "Folder path does not exist: $FolderPath"
+    Write-Host "Error: Folder path does not exist: $FolderPath" -ForegroundColor Red
     exit 1
 }
 
 # Validate chunk numbers
 if ($StartChunk -le 0) {
-    Write-Error "StartChunk must be a positive number (greater than 0)"
+    Write-Host "Error: StartChunk must be a positive number (greater than 0)" -ForegroundColor Red
     exit 1
 }
 
 if ($EndChunk -le 0) {
-    Write-Error "EndChunk must be a positive number (greater than 0)"
+    Write-Host "Error: EndChunk must be a positive number (greater than 0)" -ForegroundColor Red
     exit 1
 }
 
 if ($StartChunk -gt $EndChunk) {
-    Write-Error "StartChunk ($StartChunk) cannot be greater than EndChunk ($EndChunk)"
+    Write-Host "Error: StartChunk ($StartChunk) cannot be greater than EndChunk ($EndChunk)" -ForegroundColor Red
     exit 1
 }
 
@@ -106,8 +106,8 @@ for ($i = $StartChunk; $i -le $EndChunk; $i++) {
     # Get all files matching the pattern
     $matchingFiles = Get-ChildItem -Path $FolderPath -Filter $searchPattern -File -ErrorAction SilentlyContinue
     
-    # Filter out backup files (files containing -backup followed by numbers)
-    $nonBackupFiles = $matchingFiles | Where-Object { $_.Name -notmatch '-backup\d+' }
+    # Filter out backup files (files containing -backup followed by numbers before the extension)
+    $nonBackupFiles = $matchingFiles | Where-Object { $_.Name -notmatch '-backup\d+\.' }
     
     if ($nonBackupFiles.Count -eq 0) {
         $missingChunks += $chunkNumber
