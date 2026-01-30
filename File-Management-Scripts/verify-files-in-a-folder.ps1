@@ -68,8 +68,27 @@ if (-not (Test-Path -Path $FolderPath)) {
     exit 1
 }
 
+# Validate chunk numbers
+if ($StartChunk -le 0) {
+    Write-Error "StartChunk must be a positive number (greater than 0)"
+    exit 1
+}
+
+if ($EndChunk -le 0) {
+    Write-Error "EndChunk must be a positive number (greater than 0)"
+    exit 1
+}
+
+if ($StartChunk -gt $EndChunk) {
+    Write-Error "StartChunk ($StartChunk) cannot be greater than EndChunk ($EndChunk)"
+    exit 1
+}
+
+$startChunkFormatted = $StartChunk.ToString("D4")
+$endChunkFormatted = $EndChunk.ToString("D4")
+
 Write-Host "Verifying files in folder: $FolderPath" -ForegroundColor Cyan
-Write-Host "Looking for files matching pattern: $FilePrefix{0001..$EndChunk}*.$FileExtension" -ForegroundColor Cyan
+Write-Host "Looking for files matching pattern: $FilePrefix$startChunkFormatted to $FilePrefix$endChunkFormatted*.$FileExtension" -ForegroundColor Cyan
 Write-Host "Excluding files with backup suffixes (-backup1, -backup2, etc.)" -ForegroundColor Cyan
 Write-Host ""
 
@@ -95,7 +114,11 @@ for ($i = $StartChunk; $i -le $EndChunk; $i++) {
         Write-Host "✗ Missing: $FilePrefix$chunkNumber*.$FileExtension" -ForegroundColor Red
     } else {
         $foundChunks += $chunkNumber
-        Write-Host "✓ Found: $($nonBackupFiles[0].Name)" -ForegroundColor Green
+        if ($nonBackupFiles.Count -eq 1) {
+            Write-Host "✓ Found: $($nonBackupFiles[0].Name)" -ForegroundColor Green
+        } else {
+            Write-Host "✓ Found: $($nonBackupFiles[0].Name) (+$($nonBackupFiles.Count - 1) more)" -ForegroundColor Green
+        }
     }
 }
 
