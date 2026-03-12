@@ -1,13 +1,20 @@
 <# 
 1. save files on a server somewhere accessible
-1.1 \\servername\images\
-1.2 files: Laptop_16-10.jpg, Portrait.jpg, Standard_16-9.jpg, SuperUltrawide_32-9.jpg, Ultrawide_21-9.jpg
+    1.1 \\servername\images\
+    1.2 files: Laptop_16-10.jpg, Portrait.jpg, Standard_16-9.jpg, SuperUltrawide_32-9.jpg, Ultrawide_21-9.jpg
+    1.3 run as admin/system
 2. copy files to local computer example c:\ProgramData\CompanyBranding
+    1.2 run as admin/system
 3. powershell to determine proper image
+    3.1 run as admin/system
 4. powershell to set registry keys and services for notifications and widgets
+    4.1 run as admin/system
 5. powershell to set registry keys for other lock screen items
+    5.1 run as logged on user
 6. CMD/BAT to disable lockscreen panning
+    6.1 as logged on user
 7. CMD/BAT to lock down changes
+    7.1 run as admin/system
 #>
 
 # Step 1
@@ -126,19 +133,28 @@ if (Test-Path $spotlightPath) {
 
 #######
 
-# Step 6 (cmd/bat)
+# Step 6
 
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Lock Screen" /v SlideshowLayout /t REG_DWORD /d 0 /f
+$lockScreenKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Lock Screen'
+if (-not (Test-Path $lockScreenKey)) { New-Item -Path $lockScreenKey -Force | Out-Null }
+
+New-ItemProperty -Path $lockScreenKey -Name 'SlideshowLayout' -PropertyType DWord -Value 0 -Force | Out-Null
 
 #######
 
-# Step 7 (cmd/bat)
+# Step 7
 
-# :: 1. Lock down the image so users can't change it
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization" /v NoChangingLockScreen /t REG_DWORD /d 1 /f
+# Prevent changing lock screen
+$polPersonalization = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization'
+if (-not (Test-Path $polPersonalization)) { New-Item -Path $polPersonalization -Force | Out-Null }
+New-ItemProperty -Path $polPersonalization -Name 'NoChangingLockScreen' -PropertyType DWord -Value 1 -Force | Out-Null
 
-# :: 2. Disable Lock Screen App Notifications (Global)
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /v DisableLockScreenAppNotifications /t REG_DWORD /d 1 /f
+# Disable lock screen app notifications (global)
+$polSystem = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\System'
+if (-not (Test-Path $polSystem)) { New-Item -Path $polSystem -Force | Out-Null }
+New-ItemProperty -Path $polSystem -Name 'DisableLockScreenAppNotifications' -PropertyType DWord -Value 1 -Force | Out-Null
 
-# :: 3. Force the image status to 'Active'
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\PersonalizationCSP" /v LockScreenImageStatus /t REG_DWORD /d 1 /f
+# Force the imace status to 'Active'
+$csp = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\PersonalizationCSP'
+if (-not (Test-Path $csp)) { New-Item -Path $csp -Force | Out-Null }
+New-ItemProperty -Path $csp -Name 'LockScreenImageStatus' -PropertyType DWord -Value 1 -Force | Out-Null
