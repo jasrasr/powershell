@@ -1,5 +1,5 @@
 # Filename: Message-Box.ps1
-# Revision : 1.1
+# Revision : 1.1.1
 # Description : PowerShell MessageBox reference guide - demonstrates all button and icon combinations
 # Author : Jason Lamb (with help from ChatGPT)
 # Created Date : 2025-03-13
@@ -7,6 +7,7 @@
 # Changelog :
 # 1.0 initial release
 # 1.1 add examples with notes
+# 1.1.1 add example usage to avoid session hung
 
 # Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("Your message here", "IT Notice", "OK", "Information")
 # SYNTAX INLINE EXPLANATION
@@ -59,3 +60,7 @@ Exclamation — same as Warning
 Hand — same as Error
 Stop — same as Error
 #>
+
+# Example Usage
+# one liner to show message without keeping powershell session hung waiting
+powershell.exe -NoProfile -Command "Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show('Your message here', 'IT Notice', 'OK', 'Information')"
