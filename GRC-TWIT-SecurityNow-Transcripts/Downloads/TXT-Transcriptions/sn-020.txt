@@ -1,7 +1,8 @@
+
 GIBSON RESEARCH CORPORATION	http://www.GRC.com/
 
 SERIES:		Security Now!
-EPISODE:	#20
+EPISODE:		#20
 DATE:		December 29, 2005
 TITLE:		A SERIOUS new Windows vulnerability - and Listener Q&A #2
 SPEAKERS:	Steve Gibson & Leo Laporte

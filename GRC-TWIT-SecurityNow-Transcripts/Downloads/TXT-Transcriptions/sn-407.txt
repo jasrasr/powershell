@@ -2,7 +2,7 @@ GIBSON RESEARCH CORPORATION		http://www.GRC.com/
 
 SERIES:		Security Now!
 EPISODE:	#407	
-DATE:		June 5, 2013
+DATE:		June 5th, 2013
 TITLE:		Listener Feedback #169
 SPEAKERS:	Steve Gibson & Leo Laporte
 SOURCE FILE:	http://media.GRC.com/sn/SN-407.mp3
