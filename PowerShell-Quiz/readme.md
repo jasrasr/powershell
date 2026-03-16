@@ -1,6 +1,8 @@
 # PowerShell Quiz — Engine + Question Sets
-
 Welcome to your modular PowerShell Quiz. This setup splits the **engine** (GUI/timing/logging/anti-cheat) from **question sets** (easy/medium/hard). Swap sets without touching the engine.
+
+## Purpose
+Interactive quiz exercises designed to practice PowerShell fundamentals.
 
 ## Files
 
