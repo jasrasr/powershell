@@ -10,9 +10,9 @@ FILE ARCHIVE:	http://www.GRC.com/securitynow.htm
 
 DESCRIPTION:  Having several times addressed the value and potential of the open source, open spec., and popular OpenID system, which is rapidly gaining traction as a convenient means for providing "single sign-on" identification on the Internet, this week Steve and Leo examine problems and concerns, both with OpenID and inherent in any centralized identity management solution.
 
-INTRO:  Netcasts you love, from people you trust.  This is TWiT.
+INTRO:  Netcasts you love, from people you trust.  This isï¿½TWiT.
 
-LEO LAPORTE:  Bandwidth for Security Now! is provided by AOL Radio at AOL.com/podcasting.
+LEO LAPORTE:  Bandwidth for Security Now! is provided by AOLï¿½Radio at AOL.com/podcasting.
 
 This is Security Now! with Steve Gibson, Episode 111 for September 27, 2007:  OpenID Precautions.
 
@@ -22,7 +22,7 @@ STEVE GIBSON:  Well, we know me with all of the Pretty Perfect Passwords and all
 
 LEO:  And it's binary, what, 16?
 
-STEVE:  And 7.  And 7.  Yeah.  If we ever get to binary 16...
+STEVE:  And 7.  And 7.  Yeah.  If we ever get to binaryï¿½16...
 
 LEO:  That's 65,635 podcasts, ladies and gentlemen.
 
@@ -56,7 +56,7 @@ STEVE:  That's good.  And...
 
 LEO:  That's really great.  I'll be thinking of you on Friday when you get that award.
 
-STEVE:  Speaking of alliteration, we have John J. Jost, I guess that's how I pronounce his name, JJJ.  He posted in the GRC newsgroup just a little snippet that I thought was kind of fun.  He mentioned that - he said actually ultraviolet, UV tattoos, which was what we discussed last week in our wacky number 13, are visible in ordinary light.  "My son and I were just at a tattoo shop, and he asked about getting one.  The shop owner recommended against getting it in any place that was visible anyway for ‘job application' reasons.  He said that the tattoo would be dull but still visible."  And so John says, "So I wouldn't recommend getting a tattoo for security purposes."  And then...
+STEVE:  Speaking of alliteration, we have John J. Jost, I guess that's how I pronounce his name, JJJ.  He posted in the GRC newsgroup just a little snippet that I thought was kind of fun.  He mentioned that - he said actually ultraviolet, UV tattoos, which was what we discussed last week in our wacky number 13, are visible in ordinary light.  "My son and I were just at a tattoo shop, and he asked about getting one.  The shop owner recommended against getting it in any place that was visible anyway for ï¿½job application' reasons.  He said that the tattoo would be dull but still visible."  And so John says, "So I wouldn't recommend getting a tattoo for security purposes."  And then...
 
 LEO:  We need to find an invisible ink tattoo technology.
 
@@ -72,7 +72,7 @@ STEVE:  Yup.
 
 LEO:  Boy, that was easy.
 
-STEVE:  Well, you and I are on a tight, tight schedule today because we're doing two, and then you're off to Vancouver, so...
+STEVE:  Well, you and I are on a tight, tight schedule todayï¿½because we're doing two, and then you're off to Vancouver, so...
 
 LEO:  Yeah, Amber and I are reunited tomorrow.
 
@@ -88,7 +88,7 @@ STEVE:  Uh-oh.
 
 LEO:  But that'll be fun.  So I'm just going up for the day.  And then I'm coming back on Friday, and then I'm going back up on Monday.  Fortunately it's easy to get to Vancouver, as you know.
 
-STEVE:  So we're squeezing two recordings of podcasts in before your plane leaves in about an hour and 50 minutes.  So our listeners don't have to worry about another 90-minute podcast.
+STEVE:  So we're squeezing two recordings of podcasts in before your plane leaves in about an hour and 50 minutes.  So our listeners don't have to worry about another 90-minuteï¿½podcast.
 
 [Talking simultaneously]
 
@@ -96,7 +96,7 @@ LEO:  Let's see.  You want to talk about SpinRite a little bit here?
 
 STEVE:  Well, I don't want to slow things down because we're on limited time.  Certainly all of our listeners have heard lots of testimonials.  And I'm getting lots of them, which I really appreciate.  Let's skip it this week and get right into our content.
 
-LEO:  Well, we'll just say:  Buy SpinRite.  That's all I need to say.  If you, you know - it's the ultimate disk recovery and maintenance utility.  It's really good.  Maybe next time then I'll talk a little bit about - I had a caller call in the radio show with a question that I think SpinRite was perfect for.  But anyway, we'll talk about that in a bit.
+LEO:  Well, we'll just say:  Buy SpinRite.  That's all I need to say.  If you, you know - it's the ultimate disk recovery and maintenance utility.  It's really good.  Maybe next time then I'll talk a little bit about - I had a caller call in the radio show with a question that I think SpinRite was perfect for.  But anyway, we'll talk about that in aï¿½bit.
 
 STEVE:  Okay, cool.
 
@@ -106,7 +106,7 @@ STEVE:  Well, we've talked about, yes, about OpenID specifically, about various 
 
 [Talking simultaneously]
 
-LEO:  ...called a single sign-on.  And that maybe is a little bit easier to understand in that context than OpenID, the idea of a single sign-on that applies to all of these sites.
+LEO:  ...called a single sign-on.  And that maybe is a little bit easier to understand in that context than OpenID, the idea of a single sign-on that applies to all of theseï¿½sites.
 
 STEVE:  Right.  Well, what happened was that a recent article that was put up, a blog posting essentially was put up by what is arguably a competitor of OpenID.  There is a commercial service called Credentica that is an industrial-strength, not free, patented eight ways from Sunday, these guys have eight patents that just lock up their technology.  And one of the guys that works there did a blog posting where, I mean, the guy must have gone a lot of Google searching because this is a long posting, full of all the horrors of OpenID.  And OpenID is becoming popular enough that something like this that tends to throw a lot of water on the concept came to a lot of people's attention.  Digg picked it up, and it got well dug.  I've been bombarded with people saying, hey, Steve, did you see this, did you see this?  Yes, I've seen this.
 
@@ -114,9 +114,9 @@ Well, I've since researched every single issue carefully, and I want to address 
 
 LEO:  Well, I think it's great that you have a lot of review of these kinds of things from a lot of experts.  I mean, if it's a competitor, especially if it's a commercial competitor, well, you have to take it with a grain of salt.  But hey, let's address these issues.  I mean, I think that is perfectly appropriate.
 
-STEVE:  Exactly.  And there's certainly more than a grain of salt.  I'm going to read from the top of Stefan Brands' posting just to give our listeners some quick sense for his take.  He says, "OpenID was designed as a lightweight solution for ‘trivial' use cases in identity management.  Its primary goal is to enable Internet surfers to replace self-generated usernames and passwords by a single log-in credential, without needing more than their browser.  Concretely, OpenID aims to enable individuals to post blog comments and log into social networking sites without having to remember multiple passwords.  (Of course local password store utilities already do that.  More on this later.)"
+STEVE:  Exactly.  And there's certainly more than a grain of salt.  I'm going to read from the top of Stefan Brands' posting just to give our listeners some quick sense for his take.  He says, "OpenID was designed as a lightweight solution for ï¿½trivial' use cases in identity management.  Its primary goal is to enable Internet surfers to replace self-generated usernames and passwords by a single log-in credential, without needing more than their browser.  Concretely, OpenID aims to enable individuals to post blog comments and log into social networking sites without having to remember multiple passwords.  (Of course local password store utilities already do that.  More on this later.)"
 
-And, he says, "Beyond this, OpenID is pretty much useless.  The reasons for this are many.  OpenID is highly vulnerable to phishing and other attacks, creates insurmountable privacy problems, is not a trust system, suffers from usability problems, and makes it unappealing to become an OpenID consumer.  Many smart people have already elaborated on these problems in various forums.  In the rest of this post I will be quoting from and pointing to their critiques."  Which is what Stefan does.  And he does so effectively because I don't argue with any of the things he said except that they've really been sort of taken out of context.
+And, he says, "Beyond this, OpenID is pretty much useless.  The reasons for this are many.  OpenID is highly vulnerable to phishing and other attacks, creates insurmountable privacy problems, is not a trust system, suffers from usability problems, and makes it unappealing to become an OpenID consumer.  Many smart people have already elaborated on these problems in various forums.  In the rest of this post I will be quoting from and pointing to their critiques."  Which is what Stefan does.  And he does so effectively because I don't argue with any of the things he said except that they've really been sort of taken out ofï¿½context.
 
 So let's step through some of these issues and precautions because certainly our listeners ought to understand what's going on with OpenID, what is the downside of using it, what are the dangers and precautions.  And it's also worth noting that there is some fundamental trouble because not everyone on the Internet is listening to this podcast.  And as we'll see here in a second, it is easy to be, unfortunately, lulled into a false sense of security to believe you're getting more than you really are from OpenID.  And that's really the only problem I have with it.
 
@@ -126,15 +126,15 @@ Well, it is probably the case, given that here we are on Episode 111 of Security
 
 LEO:  Yeah.  I mean, that's really becoming the number one vector for infection is the web browser.
 
-STEVE:  Because it's so popular, it's the way people view the Internet.  And unfortunately, many of the things we want to use are inherently hard to secure, difficult to secure.  And we know that security is not black and white.  It's all just kind of goo.  And so things that are harder to secure tend to be less secure than things that are easy.  So the browser is an inherent problem.  And unfortunately the power of OpenID is that it uses the browser, which we all have, and the browser experience, which we all have, to perform what it would like to have be a lot of security.  But it's using the browser.  So there we are sort of with this conundrum that it's just difficult to have a browser be secure.
+STEVE:  Because it's so popular, it's the way people view the Internet.  And unfortunately, many of the things we want to use are inherently hard to secure, difficult to secure.  And we know that security is not black and white.  It's all just kind of goo.  And so things that are harder to secure tend to be less secure than things that are easy.  So the browser is an inherent problem.  And unfortunately the power of OpenID is that it uses the browser, which we all have, and the browser experience, which we all have, to perform what it would like to have be a lot of security.  But it's using the browser.  So there we are sort of with this conundrum that it's just difficult to have a browser beï¿½secure.
 
 Now, the perhaps number one complaint people have with OpenID - and that's not just Stefan, but many of the links he provides are people who for whatever reason are upset about OpenID.  I'm sort of glad they're upset because it's certainly not a problem to raise these flags and to work to get the OpenID system bolted down tighter and to spread the news that people need to be concerned about the security of this.  But, for example, everyone talks about phishing attacks, how OpenID is, like, made for phishing attacks.  The reason is this whole browser redirect thing.  We know that phishing attacks are, for example, you get a link in spam email saying, "Click here because Bank of America needs to update your log-on information."  When you click the link, you don't go to Bank of America, you go to a Bank of America clone site which is hoping to trick you into giving them your Bank of America log-on information.
 
 Similarly, there's clearly an inherent vulnerability with this OpenID approach where you are bounced to a third-party site.  If you are bounced to something that looks like your OpenID authenticator, how do you know it really is?  Well, one simple thing, and that is, SSL, secure socket, HTTPS protocol.  We've talked about this over and over and over about how you can avoid the phishing problem by making sure you've got a secure connection, the page is secure, and the credentials for the site match the certificate.  There is no effective way for that to be subverted.  And that one fact is never mentioned in all of these examples and attacks on OpenID from a phishing standpoint because they all know, if we prevent phishing, then there's no way a site can pretend to be something it's not.
 
-LEO:  Furthermore, if SSL is vulnerable, then we're really in big trouble.  I mean, OpenID is the least of the problems.
+LEO:  Furthermore, if SSL is vulnerable, then we're reallyï¿½in big trouble.  I mean, OpenID is the least of theï¿½problems.
 
-STEVE:  Well, and it's not vulnerable.  And that's the point.  But here's the problem.  The onus is on the user because we know how many people get phishing attacks.  And so, I mean, this is really worth making sure we understand, and that is that, because we're browser based, that's convenient; but it's also a problem because obviously the whole browser experience is not very secure.  So if users did not verify that they were actually giving their credentials, that is, logging in, giving their OpenID verification to their real provider, then it absolutely could be a phishing attack where they went to FreeFlowersRUs.com that said, oh, give us your OpenID.  Well, that could be a malicious site.  And but here's what...
+STEVE:  Well, and it's not vulnerable.  And that's the point.  But here's the problem.  The onus is on the user because we know how many people get phishing attacks.  And so, I mean, this is really worth making sure we understand, and that is that, because we're browser based, that's convenient; but it's also a problem because obviously the whole browser experience is not very secure.  So if users did not verify that they were actually giving their credentials, that is, logging in, giving their OpenID verification to their real provider, then it absolutely could be a phishing attack where they went to FreeFlowersRUs.com that said, oh, give us your OpenID.  Well, that could be a malicious site.  And but here'sï¿½what...
 
 LEO:  Let me ask how the mechanics would work because the way I use OpenID is - maybe it's more secure, but I have, as we mentioned, an OpenID token on Leoville.com.  So I go to the flowers place, and all I do is give them Leoville.com.
 
@@ -166,7 +166,7 @@ STEVE:  Correct.  Correct.
 
 LEO:  Well, that is the flaw.  I mean, a lot of users won't notice that.
 
-STEVE:  Yes, it really is a problem.  I mean, and so it is really a precaution that comes along with this is people need to understand that - and I think this is people looking properly into the future as OpenID gets more traction, as it becomes more valuable, it's protecting not just blogging posting but more and more assets, as will inevitably happen unless the whole OpenID movement collapses.  And at this point there's more than 5,000 web services now using OpenID, giving users the option of using OpenID for their authentication.
+STEVE:  Yes, it really is a problem.  I mean, and so it is really a precaution that comes along with this is people need to understand that - and I think this is people lookingï¿½properly into the future as OpenID gets more traction, as it becomes more valuable, it's protecting not just blogging posting but more and more assets, as will inevitably happen unless the whole OpenID movement collapses.  And at this point there's more than 5,000 web services now using OpenID, giving users the option of using OpenID for their authentication.
 
 So this thing, I mean, the reason there's so much fur flying here is that it is gaining traction.  It's taking off.  It's a valuable thing.  The problem is we need to understand what the limitations are to essentially use it responsibly.  So we've got the fundamental problem of using a web browser and the problem with phishing, which is truly a concern.
 
@@ -174,7 +174,7 @@ Now, there's sort of an overall problem which is not OpenID's fault at all.  It'
 
 So there is a problem that's inherent in the benefit.  I mean, we want centralized identity management because that's the power of this approach.  But inherent in that is what happens if that breaks, what happens if it fails, what happens if it gets compromised.  So you want somebody you can trust with strong technology.  Again, I think one-time passwords is really the way to go for this approach.  And I've got a fun surprise in two weeks for people because I've come up with a free one-time password system that we're going to be talking about in two weeks.
 
-But the one-time password solution which you briefly mentioned, it solves the problem because your credential cannot be reused.  That is, if you were intercepted, and you logged on to a spoofed phishing OpenID page, well, it would get your log-on credential once, but it would never be valid again.  So some damage could be done based on where you were logging on.  But it wouldn't be an epidemic of you completely having lost control of your identity, which frankly, if your password and username for logging onto an OpenID server were not really protected, and it did get away from you, then users wouldn't be looking at having their identity lost.  And we know what a problem that's been for people who have been subject, for example, to real world identity theft that, you know, it takes them years to recover.
+But the one-time password solution which you briefly mentioned, it solves the problem because your credential cannot be reused.  That is, if you were intercepted, and you logged on to a spoofed phishing OpenID page, well, it would get your log-on credential once, but it would never be valid again.  So some damage could be done based on where you were logging on.  But it wouldn't be an epidemic of you completely having lost control of your identity, which frankly, if your password and username for logging onto an OpenID server were not really protected, and it did get away from you, then users wouldn't be looking at having their identity lost.  And we know what a problem that's been for people who have been subject, for example, to real world identity theft that, you know, it takes them years toï¿½recover.
 
 LEO:  Isn't it - I guess part of it is right now we're not using it for anything really serious.  I guess it becomes much more serious when we start using OpenID for banking and stuff like that.  But nobody's doing that yet.
 
@@ -190,11 +190,11 @@ Now, one interesting problem that had never occurred to me, but I'm glad that I 
 
 The problem is, that's a URL, johnjones.myopenid.org or whatever, which is used to identify not only the new John Jones, but the old one.  So if new John Jones went to a site where old John Jones had a history, maybe all of his photos uploaded or what else, since that's the token which is being used to identify the user, there is a real re-use problem because that site, unless there was some sort of one-time number or an incrementing token or some other means for identifying the account at the OpenID provider other than just that OpenID URL, you'd have a serious problem of confusing the John Joneses, and old John Jones could find new John Jones having access to his Internet assets, where he doesn't want that to be the case.
 
-LEO:  Clarify for me, this is because the OpenID provider maintained this account even after it was closed or moribund?
+LEO:  Clarify for me, this is because the OpenID providerï¿½maintained this account even after it was closed orï¿½moribund?
 
-STEVE:  Well, yes.  Say, for example, that we had myopenid.org was an OpenID provider.  And John Jones comes along and creates an account there.  Well, then his identification is johnjones.myopenid.org.  That's the URL that he uses to identify himself to all these different sites on the ‘Net.  So he then changes OpenID providers and creates an account somewhere else.  Then the original OpenID provider, myopenid.org, sees that this John Jones hasn't logged in or used his identity for a year, say.  I'm just making that up, but for some length of time.  And they decide, oh, let's just cancel that account.  We don't want to store any more information about this.  And in the process, that becomes available again.  Now a new John Jones creates an account; but his URL, johnjones.myopenid.org, is the same as the other guy.
+STEVE:  Well, yes.  Say, for example, that we had myopenid.org was an OpenID provider.  And John Jones comes along and creates an account there.  Well, then his identification is johnjones.myopenid.org.  That's the URL that he uses to identify himself to all these different sites on the ï¿½Net.  So he then changes OpenID providers and creates an account somewhere else.  Then the original OpenID provider, myopenid.org, sees that this John Jones hasn't logged in or used his identity for a year, say.  I'm just making that up, but for some length of time.  And they decide, oh, let's just cancel that account.  We don't want to store any more information about this.  And in the process, that becomes available again.  Now a new John Jones creates an account; but his URL, johnjones.myopenid.org, is the same as the other guy.
 
-LEO:  So how do OpenID providers handle this right now?  Do they deprecate the use of that name forever afterwards, or...
+LEO:  So how do OpenID providers handle this right now?  Doï¿½they deprecate the use of that name forever afterwards,ï¿½or...
 
 STEVE:  Well, you would like no one to ever be able to use the same account again.
 
@@ -214,7 +214,7 @@ STEVE:  Yes.  In fact, I've got a whole series of links of this stuff for people
 
 LEO:  So GRC.com is the place to go for Steve's website, and that's where you'll find the show notes.  That's where you'll find links to a 16KB version, all the links that we talked about, and transcripts, too, so you can kind of read along.  And a lot of times I think we get so meaty on these that it's useful to have a transcript to get the - to tease the details out.
 
-STEVE:  Oh, yeah, a lot of people really rely on the transcript in order to kind of go over it at their own speed.
+STEVE:  Oh, yeah, a lot of people really rely on the transcript in order to kind of go over it at their ownï¿½speed.
 
 LEO:  Absolutely.  So all of that is available at Security Now!'s website, GRC.com/securitynow.  By the way, Steve also at that site has, I don't know, more than a dozen free security utilities, including the world-famous ShieldsUP! to test your firewall.  It's just a really useful site that you ought to know about.  GRC.com.  And of course that's where you'll find SpinRite.  He doesn't want to talk about it, but I'm going to do it anyway.  It's the world's finest disk recovery and maintenance utility.  If you're not using SpinRite, you're missing out.  Nerds, by the way, also get a SpinRite license, which is kind of nice.  GRC.com.  So next week, Steve, we've got a Q&A section and lots of great questions.  If people want to add their questions to the mix, how do they do that?
 
@@ -222,7 +222,7 @@ STEVE:  They can just go to GRC.com/feedback, and that gives them a form where t
 
 LEO:  Good.  Well, thanks for this update on OpenID.  I'm still going to use it, but I'm going to make sure that I pay attention that, you know, SSL is turned on when I enter my password.  But you should do that anywhere you enter your password, I guess.
 
-STEVE:  Absolutely, that's a habit you want.  And really, if you do that, all of this other stuff is - it just falls away.  That really is the only real problem is, I mean, the major problem is phishing.  And the rest are just sort of, well, that we talked about are inherent aspects of the benefit of concentrating your authentication with a single provider.  I would just say you want to choose that provider well.
+STEVE:  Absolutely, that's a habit you want.  And really, if you do that, all of this other stuff is - it just falls away.  That really is the only real problem is, I mean, the major problem is phishing.  And the rest are just sort of, well, that we talked about are inherent aspects of the benefit of concentrating your authentication with a single provider.  I would just say you want to choose that providerï¿½well.
 
 LEO:  Well, and that's the balance.  Again, convenience versus security.  Sure, the best thing would be to have a 64-byte, completely random numbers, letters, and punctuation password for every site you visit.  I'm sorry, ain't gonna do that.  And for most people the alternative is far less secure.  They use one password for all sites, one easy-to-remember password for all sites.  And I don't think anybody would deny that that is a bad idea.  All right.  We're going to wrap this thing up.  Thank you, Steve.  We'll see you next week on Security Now!.
 

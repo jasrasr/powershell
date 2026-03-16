@@ -10,9 +10,9 @@ FILE ARCHIVE:	http://www.GRC.com/securitynow.htm
 
 DESCRIPTION:  Steve and Leo delve into some of the non-obvious problems encountered during the creation of a robust and secure eCommerce system.  Steve explains the hurdles he faced, the things that initially tripped him up, and the solutions he found when he was creating GRC's custom eCommerce system.
 
-INTRO:  Netcasts you love, from people you trust.  This is TWiT.
+INTRO:  Netcasts you love, from people you trust.  This isï¿½TWiT.
 
-LEO LAPORTE:  Bandwidth for Security Now! is provided by AOL Radio at AOL.com/podcasting.
+LEO LAPORTE:  Bandwidth for Security Now! is provided by AOLï¿½Radio at AOL.com/podcasting.
 	
 This is Security Now! with Steve Gibson, Episode 109 for September 13, 2007:  Steve's eCommerce System.
 
@@ -52,7 +52,7 @@ LEO:  I just never do it, so I'm so rusty it's not worth the energy anymore.  It
 
 STEVE:  Oh, yeah.
 
-LEO:  You've got to do it all the time.  Do you code every day?
+LEO:  You've got to do it all the time.  Do you code everyï¿½day?
 
 STEVE:  No.  I wish.  I mean, I really, really wish.  But there are, like, days I'm - at the moment I'm working on implementing a round of sort of internal updates to our eCommerce system.  Sue, my operations gal, had said hey, you know, it'd be nice to be able to search on email domain names, not just email addresses.  And, you know, I had just - I thought, oh, okay.  And she'd asked for that a while ago because, for example, people at IBM want to know if, like, who else at IBM has purchased copies of SpinRite.
 
@@ -82,13 +82,13 @@ STEVE:  Right, right, no, it was the fact that I told people the direct address.
 
 LEO:  Oh, you gave them an address, okay.
 
-STEVE:  Exactly.  Anyway, so I've had to shut that down.  Anybody who does try to send email there will get a polite bounce message saying, well, we're sorry, but the bots found this account, so we've had to close it.  What I did, what I've decided to do, though, because that Security Now! page has gotten quite long, is I decided to move that feedback form to its own page.  So I just wanted to let people know that there's a new page.  It's actually only linked at the moment from the bottom of the Security Now! page in case people are used to going, digging all the way down to the bottom, scrolling down to the bottom of that long page.  And I've got to do something about that.  That's part of the project I'm on now in sort of fixing a whole bunch of things that have been loose ends on the GRC site is I'm going to reorganize our Security Now! page because it's just, you know, right now it's a huge, long page of 108 individual podcast notes.  So I'm going to do something to fix that.  But GRC.com/feedback.  I know you like the nice, short URLs, Leo.
+STEVE:  Exactly.  Anyway, so I've had to shut that down.  Anybody who does try to send email there will get a polite bounce message saying, well, we're sorry, but the bots found this account, so we've had to close it.  What I did, what I've decided to do, though, because that Security Now! page has gotten quite long, is I decided to move that feedback form to its own page.  So I just wanted to let people know that there's a new page.  It's actually only linked at the moment from the bottom of the Security Now! page in case people are used to going, digging all the way down to the bottom, scrolling down to the bottom of that long page.  And I've got to do something about that.  That's part of the project I'm on now in sort of fixing a whole bunch of things that have been loose ends on the GRC site is I'm going to reorganize our Security Now! page because it's just, you know, right now it's a huge, long page of 108 individual podcast notes.  So I'm going to do something to fix that.  But GRC.com/feedback.  I know you like the nice, short URLs,ï¿½Leo.
 
 LEO:  I'm not the only one.
 
 STEVE:  So in your honor, GRC.com/feedback is a feedback page which replaces the form that used to be at the bottom of the Security Now! page.  And I did something this time different, and that is I added a subject line to the form.  It used to be that there was just sort of a big box where people could write what they wanted to send, and then optionally provide their name, their location, and email address so that we were able to say, hey, you know, Bob in New Brunswick has written to us, has a question and so forth, to allow people to put that stuff in if they wanted to.  But in the email that that form sent me, I had just a sort of a default Security Now! feedback subject line.  Now the user can put that in.  And oh, I tell you, I mean, I've been getting the feedback, and it's so nice to sort of just be able to scan the subject lines and see what people are writing about.  So it's an improved feedback form in addition to being a little more bot-obfuscational.
 
-So I experimented actually with putting reCAPTCHA on there.  And the reCAPTCHA API turns out to be very easy to use if you've got scripting enabled.  But it sort of fights you if you don't have scripting enabled.  And I didn't want to require our users to have scripting enabled.  So I ended up just sort of abandoning reCAPTCHA for the time being.  And it doesn't seem to be a problem with form spam here anyway, so...
+So I experimented actually with putting reCAPTCHA on there.  And the reCAPTCHA API turns out to be very easy to use if you've got scripting enabled.  But it sort of fights you if you don't have scripting enabled.  And I didn't want to require our users to have scripting enabled.  So I ended up just sort of abandoning reCAPTCHA for the time being.  And it doesn't seem to be a problem with form spam here anyway,ï¿½so...
 
 LEO:  No.  As you and I both know, CAPTCHA doesn't [indiscernible].  So it's just a nice - I still use it just because I want people to help write books, type in books.  But it's not, you know, it's not the best way to fight spam.  I like what you've done.
 
@@ -116,13 +116,13 @@ STEVE:  Exactly.  Because it's not like I'm giving away Yahoo! email accounts.  
 
 LEO:  Right, right.
 
-STEVE:  In talking about defragmentation, we talked - it may have been a comment last week, in last week's podcast, where a listener asked what was the free defragging tool that I had mentioned.  I said, well, the one I had mentioned wasn't free.  I had mentioned Vopt at v8, which I really like.  Wait, I think it's at v8.2.  But the one I'm using now is PerfectDisk.
+STEVE:  In talking about defragmentation, we talked - it may have been a comment last week, in last week's podcast, where a listener asked what was the free defragging tool that I had mentioned.  I said, well, the one I had mentioned wasn't free.  I had mentioned Vopt at v8, which I really like.  Wait, I think it's at v8.2.  But the one I'm using now isï¿½PerfectDisk.
 
 Well, it turns out that, first of all, I got two things.  Someone calling himself BotSing posted in the GRC newsgroups that there was something that Mark, our old friend Mark Russinovich, had done at Sysinternals, who of course has now been purchased by Microsoft, so it's over on the Microsoft site.  He's got something, a piece of freeware, called PageDefrag.  So if you just put PageDefrag into Google, the first thing that comes up is Microsoft's instance of that.  And it does, for free, does a defrag of the swap file, your registry hive files, event log files, hibernation files.  And basically those things which are in use at the time that you're defragging which would not otherwise be defraggable.  So if you were to use that and any other defragger, for example Vopt, then you sort of get the best of both worlds, even though PerfectDisk, which is really my current favorite, does that as well, and does a bunch of other things also.  Then we got a note...
 
 LEO:  So that doesn't - it doesn't do your whole drive.  It does the key things, though.
 
-STEVE:  It just does those main system files which are  normally not movable while the system is in use because they are in use.  And so Mark came up with a way to make that happen.
+STEVE:  It just does those main system files which are  normally not movable while the system is in use because theyï¿½are in use.  And so Mark came up with a way to make that happen.
 
 LEO:  That's free.  Microsoft offers that for free.  If you do a search for Microsoft and Sysinternals, you'll find that there's, like, a lot of programs there.
 
@@ -134,7 +134,7 @@ STEVE:  ...the years.
 
 LEO:  So I presume it's there as part of that package.
 
-STEVE:  Yup, it is.  And then we had a listener named Donn Edwards, who - I guess he's a longtime defrag fanatic, is the way I - I don't think he would mind me describing him that way.  He is also a listener.  And he made a blog posting whose title was Mr. Hard Drive - meaning me - "Mr. Hard Drive Uses PerfectDisk."  Which turns out to have been his favorite defragger after extensive defragger analysis.  I'm mentioning this, and we will have a link in our episode notes, because he's got extensive reviews of 20 commercial defraggers and 20 freeware defraggers.
+STEVE:  Yup, it is.  And then we had a listener named Donn Edwards, who - I guess he's a longtime defrag fanatic, is the way I - I don't think he would mind me describing him that way.  He is also a listener.  And he made a blog posting whose title was Mr. Hard Drive - meaning me - "Mr.ï¿½Hard Drive Uses PerfectDisk."  Which turns out to have been his favorite defragger after extensive defragger analysis.  I'm mentioning this, and we will have a link in our episode notes, because he's got extensive reviews of 20 commercial defraggers and 20 freeware defraggers.
 
 LEO:  Wow.  I didn't know there were that many.
 
@@ -142,7 +142,7 @@ STEVE:  It's unbelievable.  And a little bit of the history here, I sort of brow
 
 LEO:  He uses both.
 
-STEVE:  ...is to use, exactly, is to use Vopt, like, more frequently to keep things under control, and then PerfectDisk occasionally to do major deep cleaning sort of defragging.
+STEVE:  ...is to use, exactly, is to use Vopt, like, more frequently to keep things under control, and then PerfectDisk occasionally to do major deep cleaning sort ofï¿½defragging.
 
 LEO:  Before we get too much farther, do you really think this is necessary?
 
@@ -178,7 +178,7 @@ LEO:  Oh, that's great  Now, all they have to do is buy a little advertising, an
 
 STEVE:  Yeah.  Or next time I talk to them, I mean, I want to keep our and my enthusiasm for...
 
-LEO:  Well, it wouldn't run in yours anyway.  You're sold out.  So it would have to run in other podcasts anyway.  But...
+LEO:  Well, it wouldn't run in yours anyway.  You're soldï¿½out.  So it would have to run in other podcasts anyway.ï¿½ï¿½But...
 
 STEVE:  Okay, yeah.  I just wanted - I want to make - I want to keep us, you know, clear in terms of, like, what's being paid for and what's not.  I just think...
 
@@ -222,15 +222,15 @@ STEVE:  I think I remembered that during our beta testing, but it's not somethin
 
 LEO:  Wow.
 
-STEVE:  And so he said, "I thought I'd share this in case other Linux users are also running into hard drive problems and are on the fence over buying a non-native Linux program."
+STEVE:  And so he said, "I thought I'd share this in case other Linux users are also running into hard drive problemsï¿½and are on the fence over buying a non-native Linuxï¿½program."
 
 LEO:  So you run it in Linux under Wine.
 
-STEVE:  Exactly.  So when you run SpinRite, the same SpinRite EXE that you normally boot and run, when you run it, it sees that it's being run under Windows or in a Windows clone environment.  It pops up its little graphical dialogue, and that allows you then to tell it to burn or to create for you an ISO image.  Then you use your regular Linux DVD or CD, I'm sorry, CD-R burning software to burn the ISO onto a CD, and that gives you a bootable CD that allows you to then run SpinRite on Linux, needing no Windows anywhere.
+STEVE:  Exactly.  So when you run SpinRite, the same SpinRite EXE that you normally boot and run, when you run it, it sees that it's being run under Windows or in a Windows clone environment.  It pops up its little graphical dialogue, and that allows you then to tell it to burn or to create for you an ISO image.  Then you use your regular Linux DVD or CD, I'm sorry, CD-R burning software to burn the ISO onto a CD, and that gives you a bootable CD that allows you to then run SpinRite on Linux, needing no Windowsï¿½anywhere.
 
 LEO:  So it's not for running SpinRite, it's for running the installer so that you can burn the CD, then you can run it.
 
-STEVE:  Right.  Because SpinRite does not run under any OS.  It brings a little copy of FreeDOS along for its own environment.  But you don't need Windows in order to run SpinRite.  And that was the point that Matt here was making was hey, you know, I ran it completely under native Linux, under Wine, and it allowed me to make my bootable CD.  Or for that matter you can make a bootable floppy, too, which is a lot easier for people who still have floppy drives on their machine.  And I do because I can't - I don't know, not having a floppy drive just really always makes me uncomfortable.
+STEVE:  Right.  Because SpinRite does not run under any OS.  It brings a little copy of FreeDOS along for its own environment.  But you don't need Windows in order to run SpinRite.  And that was the point that Matt here was making was hey, you know, I ran it completely under native Linux, under Wine, and it allowed me to make my bootable CD.  Or for that matter you can make a bootable floppy, too, which is a lot easier for people who still have floppy drives on their machine.  And I do because I can't - I don't know, notï¿½having a floppy drive just really always makes meï¿½uncomfortable.
 
 LEO:  Right.  Although you're going to be out of luck soon.
 
@@ -240,9 +240,9 @@ LEO:  I don't think anybody - in fact, I wonder how many machines are sold with 
 
 STEVE:  Yup, it's certainly endangered at this point.
 
-LEO:  Yeah.  Okey-dokey, let's talk about your eCommerce system.
+LEO:  Yeah.  Okey-dokey, let's talk about your eCommerceï¿½system.
 
-STEVE:  Well, it's funny.  When I was getting going, many people said, wait a minute, you're writing an eCommerce system.
+STEVE:  Well, it's funny.  When I was getting going, many people said, wait a minute, you're writing an eCommerceï¿½system.
 
 LEO:  You know there's a thousand prepackaged eCommerce systems out there.
 
@@ -256,7 +256,7 @@ LEO:  And I should say it's not just because you don't trust the other ones.  Yo
 
 STEVE:  Well, okay.  To be fair, there was some of that.  But we were, you know, being involved in security, I was seeing constant reports of flaws being found in the so-called "shopping cart" systems.  So my question was, how can I trust, I mean, how can I trust and expect my customers to trust some software that I did not write?
 
-The other thing is there are third-party services like Digital River.  And unfortunately Digital River are just horrible people.  I've had bad experiences with them.  They pursued me for years to let them sell SpinRite.  They want to take a huge percentage of the retail sales, like 30 percent they take.  They also - I've had to buy other software through them, and then I start getting spammed by them because I have to give them my email address when I use them to buy somebody else's software.
+The other thing is there are third-party services like Digital River.  And unfortunately Digital River are just horrible people.  I've had bad experiences with them.  They pursued me for years to let them sell SpinRite.  They want to take a huge percentage of the retail sales, like 30ï¿½percent they take.  They also - I've had to buy other software through them, and then I start getting spammed by them because I have to give them my email address when I use them to buy somebody else's software.
 
 LEO:  So you're protecting your users, too, really.
 
@@ -268,7 +268,7 @@ STEVE:  Agh.
 
 LEO:  I just want to buy this.  Even if I, you know, maybe I am going to be back.  I don't want to create an account.
 
-STEVE:  Yes, that whole notion of, like, needing to go fill out all this paperwork and questionnaire on the web to create an account.  It's like, ugh.  So there are sites that are - that give you the choice.  You can create an account, and they'll, like, hold onto some of your stuff to make it easier if you come back later.  Or they'll allow you to, like, bypass the create-an-account phase.  And I'm always so glad when I'm given that option.  Well, I thought, my system isn't going to have any of that nonsense.  You provide only the information that we need in order to process the purchase transaction and nothing more.  So that's the way I designed it.  Because I was writing it myself, I was able to do this exactly the way I wanted to.  So that was the final reason really for doing this.  And the problem has been also that people have liked my system and have wanted to buy it.  And...
+STEVE:  Yes, that whole notion of, like, needing to go fill out all this paperwork and questionnaire on the web to create an account.  It's like, ugh.  So there are sites that are - that give you the choice.  You can create an account, and they'll, like, hold onto some of your stuff to make it easier if you come back later.  Or they'll allow you to, like, bypass the create-an-account phase.  And I'm always so glad when I'm given that option.  Well, I thought, my system isn't going to have any of that nonsense.  You provide only the information that we need in order to process the purchase transaction and nothing more.  So that's the way I designed it.  Because I was writing it myself, I was able to do this exactly the way I wanted to.  So that was the final reason really for doing this.  And the problem has been also that people have liked my system and have wanted to buy it.ï¿½ï¿½And...
 
 LEO:  That's interesting.
 
@@ -306,13 +306,13 @@ Well, over on the server, the server's waiting for them to proceed.  It's waitin
 
 LEO:  Of course you did.
 
-STEVE:  My system has no storage on the server side.  Instead, what I do I've never seen anyone do before.  But it's worked out really well, and I think it's really neat.  And that is that we'll start, for example, at the first form page.  The user fills out their information and submits it to the server.  So that goes to the server.  The server, because I'm requiring no scripting, the server runs through the data that they've submitted, makes sure that their email address looks like an email address, makes a quick check of their credit card number to make sure that it passes the Mod 9 credit card number check, which we've talked about a long time because it turns out that there's a simple formula you can run on a credit card number that will catch digit transpositions, and basically that's pretty much all it's useful for.  But it does, if you just had a typo in the credit card number, it would catch that.  Basically it's sort of a first pass to make sure that the fields we need to be filled in are filled in and that the user has, you know, is on their way, as far as we can tell, to a successful transaction.
+STEVE:  My system has no storage on the server side.  Instead, what I do I've never seen anyone do before.  But it's worked out really well, and I think it's really neat.  And that is that we'll start, for example, at the first form page.  The user fills out their information and submits it to the server.  So that goes to the server.  The server, because I'm requiring no scripting, the server runs through the data that they've submitted, makes sure that their email address looks like an email address, makes a quick check of their credit card number to make sure that it passes the Modï¿½9 credit card number check, which we've talked about a long time because it turns out that there's a simple formula you can run on a credit card number that will catch digit transpositions, and basically that's pretty much all it's useful for.  But it does, if you just had a typo in the credit card number, it would catch that.  Basically it's sort of a first pass to make sure that the fields we need toï¿½be filled in are filled in and that the user has, you know, is on their way, as far as we can tell, to a successful transaction.
 
 Okay.  Upon submitting that data - remember that that's a query that goes to the server.  And the browser's little globe is spinning, or whatever that it's doing, saying, okay, we're waiting to hear back from the server in response to our query.  Well, in my case what I ask for is - I want to show them everything they submitted and ask them again for their email address.  Because it's frankly surprising, Leo, I'm sure you've seen all these systems that ask your email address twice.  And it's annoying.  It turns out people really don't give you the same email address twice.  It's unbelievable how necessary it is to ask for it a second time.  And I didn't want to put it on the same page because I know what I do, I type it wrong once, then I cut, copy, and paste.  I mark and copy it and then paste it into the second field because I don't want to have to type it again.  But if it's wrong twice, then it's really wrong.  So I wanted to put it over on the second page.
 
 So I show the user everything that they filled in in the forms, sort of in a confirmation.  And I say, you know, please provide your email address again to confirm.  But that's all I'm asking for is the email address.  So what I do, which really worked out well, is I take essentially a binary image of all their data, of their purchase data.  And I encrypt it using a secret key on the server.  Then I digitally sign it using a cryptographic hash, as we've talked about before, tacking that on the end.  Then I turn it into ASCII so it's all just characters and numbers.  And I send that back to the web browser as a hidden field in the next form the user is going to fill out.
 
-So all I'm asking for on the second page is their email address.  And that would be one field.  But then there's a hidden field which is this ASCII blob which is completely secure because it's encrypted, and it's digitally signed.  Basically what I'm doing is I'm handing back to the user all of the data that would normally be kept temporarily on the server.  And I'm keeping nothing on the server.  I have no record at all that this user has ever done anything because there's...
+So all I'm asking for on the second page is their email address.  And that would be one field.  But then there's a hidden field which is this ASCII blob which is completely secure because it's encrypted, and it's digitally signed.  Basically what I'm doing is I'm handing back to the user all of the data that would normally be kept temporarily on the server.  And I'm keeping nothing on the server.  I have no record at all that this user has ever done anything becauseï¿½there's...
 
 LEO:  Do you think that's typical?  Is that how other commerce systems work?
 
@@ -342,7 +342,7 @@ LEO:  Because a lot of sites just throw it out.  Or they keep it for days, you k
 
 STEVE:  Yeah.  And what's very cool then is that, from my standpoint, basically I'm using the client-server model, and I'm using the browser to save the state of the purchase as we move forward, never needing to store anything at all on the server.  And just it really has worked out well.
 
-Now, one of the other things that was a bit of a runaround was I'm sure you've seen on many eCommerce sites these warnings on the final purchase confirmation button about only pressing this once and then waiting, or you may be double-charged.  I know I see that all the time.  Well, you know, this was my system.  I didn't want to have to have that.
+Now, one of the other things that was a bit of a runaround was I'm sure you've seen on many eCommerce sites these warnings on the final purchase confirmation button about only pressing this once and then waiting, or you may be double-charged.  I know I see that all the time.  Well, youï¿½know, this was my system.  I didn't want to have to haveï¿½that.
 
 LEO:  It happened to me the other day with Apple's system.  I bought two copies of something.
 
@@ -375,7 +375,7 @@ STEVE:  Well, and I did solve it.
 
 LEO:  Oh.  I guess it's not so intractable.
 
-STEVE:  What I do is, I have what I call "in-flight orders."  That is, I basically - I separated the user-side link from the back end.  So what happens is I'm tracking the orders which are in-flight, meaning from our server to the back-end credit processing server.  And I'm tracking any connections from the client.  So what I ended up - the way I ended up solving the problem is you say that user clicks first of a double-click, and the order is launched.  I then log this in a server data structure saying, okay, we have an in-flight order to the credit processor.  Then the user clicks a second time.  Well, now I can see that we've got an in-flight order already, that is, I'm now looking for anything pending.
+STEVE:  What I do is, I have what I call "in-flight orders."  That is, I basically - I separated the user-side link from the back end.  So what happens is I'm tracking the orders which are in-flight, meaning from our server to the back-end credit processing server.  And I'm tracking any connections from the client.  So what I ended up - the way I ended up solving the problem is you say that user clicks first of a double-click, and the order is launched.  I then log this in a server data structure saying, okay, we have an in-flight order to the credit processor.  Then the user clicks a second time.  Well, now I can see that we've got an in-flight order already, that is, I'm now looking for anythingï¿½pending.
 
 The problem is, and here was the tricky part, is that in the second click I dropped the first connection, the one that initiated the order, and now I'm waiting, I have a new connection to the server, and that's the connection that needs to receive the response.  So what's funky about this is that the query that initiated the order to our server is different from the one that needs to get the response.  And so by separating the relationship between the user's browser and our server, and the set of in-flight orders that may be underway, once I get confirmation back from the credit processing, I then have a list of potential queries.  A user could, for example, click 10 times, bang bang bang bang bang bang bang, and that would set up 10 connections to my server.  Because I'm now checking for duplicate in-flight orders, only one order goes back to VeriSign for credit card approval.  When the response comes back, I don't know for sure which connections are still alive because the browser will only have the most recent one.  So what I do is, I attempt to give all of them the good news or bad news, knowing that all but one will fail.  But that's okay because I want to get the answer back to the user.  And the whole system works, and we've never had another double charge in the last several years.
 
@@ -385,7 +385,7 @@ STEVE:  Yeah.  It ended up really working well.
 
 LEO:  You're doing this all in assembly, right?
 
-STEVE:  Yup.  Although, you know, just because that's who I am.
+STEVE:  Yup.  Although, you know, just because that's who Iï¿½am.
 
 LEO:  It's your language.
 
@@ -405,7 +405,7 @@ LEO:  Something you want to avoid, yeah.
 
 STEVE:  So what happened is we quickly contacted those people.  We invalidated their licenses, which I already had the facility to do built into...
 
-LEO:  See, you were smart.  You built this all in ahead of time.  The person's name was in there, and their license was there.
+LEO:  See, you were smart.  You built this all in ahead of time.  The person's name was in there, and their license wasï¿½there.
 
 STEVE:  Right.  Right.  Although of course they weren't happy that their copy had gotten loose.  But we said, well, it's not your fault, it's your download accelerator is spying on you and basically reporting to this third party every single thing they downloaded.  I mean, basically their privacy was being violated by this.  So anyway, what I did was I realized, okay, I can't ever allow a download link to be used more than once.  That is to say...
 
@@ -415,9 +415,9 @@ STEVE:  ...if they're going to be spied on, then they click it, and it downloads
 
 LEO:  Interesting.  Interesting.
 
-STEVE:  And then my final little quick story of the thing I messed up on that was, well, I thought it was humorous, but a couple customers didn't.  I had this generic hacker lockout, that is, I thought, you know, no matter what anything else is going on, I want my system to be a little - because it's an eCommerce system we want to take it seriously.  I want it to be intolerant of people screwing around with it, you know, like filling out the form, guessing credit card numbers, you know, finding a stolen credit card number and trying to guess the street address, you know, that kind of thing.  And I recognized that valid users might need - might trip themselves a little bit.  It turns out that people often use the wrong address.  They'll use their home address rather than the billing address, if the home address different than the billing address and so forth.  And since I'm not physically shipping any product, I'm only electronically delivering, I don't do that whole billing address/shipping address thing.  All I want I the billing address because that's what the credit card companies are locking to as part of their, it's called AVS, Address Verification System, in order to reduce credit card fraud.
+STEVE:  And then my final little quick story of the thing I messed up on that was, well, I thought it was humorous, but a couple customers didn't.  I had this generic hacker lockout, that is, I thought, you know, no matter what anything else is going on, I want my system to be a little - because it's an eCommerce system we want to take it seriously.  I want it to be intolerant of people screwing around with it, you know, like filling out the form, guessing credit card numbers, you know, finding a stolen credit card number and trying to guess the street address, you know, that kind of thing.  And I recognized that valid users might need - might trip themselves a little bit.  It turns out that people often use the wrong address.  They'll use their home address rather than the billing address, if the home address different than the billing address and so forth.  And since I'm not physically shipping any product, I'm only electronically delivering, I don't do that whole billing address/shipping address thing.  All I want I the billing address because that's what the credit card companies are locking to as part of their, it's called AVS, Address Verification System, in order to reduce credit cardï¿½fraud.
 
-So what I decided was I would have some fixed number of transactions with the eCommerce system, that is, those being clicking a button when you've got a form filled out.  For people who were upgrading from an earlier version of SpinRite, they receive an intermediate form where they provide the serial number of their down rev copy of SpinRite, which we then log in order to qualify them for the discounted upgrade price.  Anyway, so that number, we've moved it around a bit.  But I think it's at 12 right now.  So 12 interactions with our system, and then I simply lock them out.  I give them a page and I say - and this was sort of a stern page because I don't expect anybody to hit this by mistake.  It's like, you know, your conduct is incompatible with this eCommerce system's policies or something.
+So what I decided was I would have some fixed number of transactions with the eCommerce system, that is, those being clicking a button when you've got a form filled out.  For people who were upgrading from an earlier version of SpinRite, they receive an intermediate form where they provide the serial number of their down rev copy of SpinRite, which we then log in order to qualify them for the discounted upgrade price.  Anyway, so that number, we've moved it around a bit.  But I think it's at 12 right now.  So 12 interactions with our system, and then I simply lock them out.  I give them a page and I say - and this was sort of a stern page because I don't expect anybody to hit this by mistake.  It's like, you know, your conduct is incompatible with this eCommerce system's policies orï¿½something.
 
 LEO:  They get spanked.
 
@@ -453,7 +453,7 @@ STEVE:  Exactly.
 
 LEO:  Hey, you've got very nice users, and I'm sure they were very tolerant.
 
-STEVE:  Yeah.  We'd say, oops, sorry about that.  And I quickly went in, I mean, it took me two seconds to change the code so that, upon successfully purchasing a product, I removed them from my hacker tracking queue, and then they're able to actually download the product that they just purchased.
+STEVE:  Yeah.  We'd say, oops, sorry about that.  And I quickly went in, I mean, it took me two seconds to change the code so that, upon successfully purchasing a product, I removed them from my hacker tracking queue, and then they'reï¿½able to actually download the product that they justï¿½purchased.
 
 LEO:  Cool.  There you go.
 
@@ -461,11 +461,11 @@ STEVE:  And anyway, I haven't been back in the eCommerce system for several year
 
 LEO:  That's great.  That's great, yeah.
 
-STEVE:  I thought our listeners would get a kick out of a little bit of behind-the-scenes of a real-world eCommerce system.
+STEVE:  I thought our listeners would get a kick out of aï¿½little bit of behind-the-scenes of a real-world eCommerceï¿½system.
 
 LEO:  And now it's working flawlessly.  When's the last time you had a bug you had to go in there and fix?
 
-STEVE:  It's about, as far as I know, well, actually I never have.  It's like SpinRite that hasn't had a byte change ever since SpinRite 6 was launched two and a half years ago.  I haven't - I ought to tell people, the system's name is Bam Bam.  I've been avoiding saying that all during this podcast, even though that's how I refer to it all the time.
+STEVE:  It's about, as far as I know, well, actually I never have.  It's like SpinRite that hasn't had a byte change ever since SpinRite 6 was launched two and a half years ago.  I haven't - I ought to tell people, the system's name is Bamï¿½Bam.  I've been avoiding saying that all during this podcast, even though that's how I refer to it all the time.
 
 LEO:  Bam Bam.
 
@@ -481,7 +481,7 @@ STEVE:  Pebbles is not that good.  But I thought, hey, wait, what about Pebbles'
 
 LEO:  That's truly amazing.
 
-STEVE:  Because I love to code.  And I love getting it right.
+STEVE:  Because I love to code.  And I love getting itï¿½right.
 
 LEO:  What fun.  What a fascinating story.  I think this is great.  Someday I would hope, when you're old and gray and you no longer care, you might open source this, at least let people look at the source code.  No.
 
@@ -495,7 +495,7 @@ LEO:  Well, you just say, I'm not going to support it.  I'm not going to do anyt
 
 STEVE:  You're right.  I can just give it away.
 
-LEO:  Yeah.  Or just leave out something so they can't use it.
+LEO:  Yeah.  Or just leave out something so they can't useï¿½it.
 
 STEVE:  Yeah.  Although - yeah, you're right.  No, I wouldn't do that.  I mean, I guess they - I don't know.  
 
@@ -519,7 +519,7 @@ LEO:  Brief, wow.
 
 STEVE:  ...because I use WordStar keystrokes, believe it or not, for...
 
-LEO:  You could program Briefs to have anything, to do anything.
+LEO:  You could program Briefs to have anything, to doï¿½anything.
 
 STEVE:  Yes.  Super macro-programmable.
 
@@ -569,7 +569,7 @@ STEVE:  Yeah, exactly.  As 64-bit begins to happen more and  more, it's like, ag
 
 LEO:  What would going to 64 do?  Would the op codes change?  Would the language change?  Or is it just you have to think in 64-bit registers?
 
-STEVE:  Yes.  You have 64-bit registers.  The op codes do change.  I've seen 64-bit assembler.  I'm trying to remember now what they did.  I think they use R.  So RAX for Register AX.
+STEVE:  Yes.  You have 64-bit registers.  The op codes do change.  I've seen 64-bit assembler.  I'm trying to remember now what they did.  I think they use R.  So RAX for Registerï¿½AX.
 
 LEO:  You'd have to rewrite everything.
 
@@ -577,7 +577,7 @@ STEVE:  That would be - oh, yeah, yeah.  I mean, there's no way I'm source-level
 
 LEO:  Right.  [Indiscernible], yeah.
 
-STEVE:  Yeah.  Although it is really convenient to use 32 bits.  But, you know, the world moves forward.
+STEVE:  Yeah.  Although it is really convenient to use 32ï¿½bits.  But, you know, the world moves forward.
 
 LEO:  Well, I wrote some assembler, 8086 assembler, in the good old days.  And then I moved to Mac and was writing 68000 assembler.  And it was, I hate to say this, but it was so much cleaner because you don't have to worry about extended registers.  You don't have to worry about the  memory issues.  And it seems like just such a nice assembly language.  You could learn another assembly language.  It wouldn't be that hard.
 

@@ -1,4 +1,4 @@
-﻿# Define the root folder to search
+# Define the root folder to search
 $rootFolder = "${onedrivepath}\Documents\GitHub\PowerShell"
 
 # Get all files and folders recursively from the root folder

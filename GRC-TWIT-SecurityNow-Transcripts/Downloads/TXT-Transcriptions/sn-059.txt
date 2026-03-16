@@ -8,17 +8,17 @@ SPEAKERS:	Steve Gibson & Leo Laporte
 SOURCE FILE:	http://media.GRC.com/sn/SN-059.mp3
 FILE ARCHIVE:	http://www.GRC.com/securitynow.htm
 
-DESCRIPTION:  Completing the topic of current virtual machine technology and products, Steve and Leo closely examine the commercial multiplatform virtual machine offerings from “Parallels,” comparing them to VMware and Virtual PC.  Steve also corrects an important incorrect statement he made the previous week about features missing from VMware’s free Server VM solution.
+DESCRIPTION:  Completing the topic of current virtual machine technology and products, Steve and Leo closely examine the commercial multiplatform virtual machine offerings from ï¿½Parallels,ï¿½ comparing them to VMware and Virtual PC.  Steve also corrects an important incorrect statement he made the previous week about features missing from VMwareï¿½s free Server VM solution.
 
-INTRO:  Netcasts you love, from people you trust.  This is TWiT.
+INTRO:  Netcasts you love, from people you trust.  This isï¿½TWiT.
 
 LEO LAPORTE:  Bandwidth for Security Now! is provided by AOL Radio at AOL.com/podcasting.
 
 This is Security Now! with Steve Gibson, Episode 59 for September 28, 2006:  Parallels.
 
-Security Now! is brought to you by Astaro, makers of the Astaro Security Gateway, on the web at www.astaro.com.  And by Dell.  For this week’s specials, visit TWiT.tv/dell.  And by Visa:  Safer, better money.  Life takes Visa.
+Security Now! is brought to you by Astaro, makers of the Astaro Security Gateway, on the web at www.astaro.com.  And by Dell.  For this weekï¿½s specials, visit TWiT.tv/dell.  And by Visa:  Safer, better money.  Life takes Visa.
 
-Welcome to Security Now!, Episode – I’m really confused.  I think this is 59.  It was going to be 58, but we deferred it.  Steve Gibson is on the line from Irvine.  Hi, Steve.
+Welcome to Security Now!, Episode ï¿½ Iï¿½m really confused.  I think this is 59.  It was going to be 58, but we deferred it.  Steve Gibson is on the line from Irvine.  Hi, Steve.
 
 STEVE GIBSON:  Hey, Leo.  Great to be back with you.
 
@@ -26,7 +26,7 @@ LEO:  So just a little, you know, behind the scenes here.  We had finished Episo
 
 STEVE:  We recorded it in the middle of last week, just...
 
-LEO:  Right, and it was all about Parallels.  And you’re going to hear it in a minute.  But what happened was there was a big security breakout all of a sudden.
+LEO:  Right, and it was all about Parallels.  And youï¿½re going to hear it in a minute.  But what happened was there was a big security breakout all of a sudden.
 
 STEVE:  Right.
 
@@ -36,55 +36,55 @@ STEVE:  Yeah.  Well, and it was great, too, because, you know, essentially you a
 
 LEO:  And at that time there was very little coverage of it.
 
-STEVE:  Exactly.  You commented at the time that, you know, it didn’t seem to have picked up nearly as much press as we would have expected.
+STEVE:  Exactly.  You commented at the time that, you know, it didnï¿½t seem to have picked up nearly as much press as we would have expected.
 
-LEO:  We’re talking about the Windows VLM – or VML flaw, which was a very serious flaw that allowed a malicious site using a kind of little-known graphics format called the Vector Markup Language format to infect any system arbitrarily, no matter how up-to-date its patches were.
+LEO:  Weï¿½re talking about the Windows VLM ï¿½ or VML flaw, which was a very serious flaw that allowed a malicious site using a kind of little-known graphics format called the Vector Markup Language format to infect any system arbitrarily, no matter how up-to-date its patches were.
 
 STEVE:  Well, yes.  And you and I jumped on this because it had all the earmarks of something that was going to be just irresistible for the malicious hacker community.
 
 LEO:  Well, it was already in the wild.  It was already on dozens of sites.
 
-STEVE:  Well, actually, yes.  And it spread very quickly through the end of last week and early this week.  It did exactly as we predicted.  It appeared in mass emailings and spam.  You know, basically this has become a bit of a black industry now on the Internet where vulnerabilities, as I mentioned before, are sold as commodities because organized crime is getting involved and trying to get this stuff installed on people’s computers, you know, their malicious code.  So the one bit of news that occurred yesterday – actually day before yesterday – was Microsoft recognized the severity of the problem.  And we were talking about how people may need to wait as many as three weeks for the second Tuesday in October, October 10th, before the next monthly set of patches were rolled out.  But Microsoft decided this thing was too serious to wait, so they issued one of their rare out-of-order, or out-of-sequence, out-of-cycle updates.  So I just wanted to make sure that everyone listening had received the news that Windows Update is now carrying the fix for this, the official fix.
+STEVE:  Well, actually, yes.  And it spread very quickly through the end of last week and early this week.  It did exactly as we predicted.  It appeared in mass emailings and spam.  You know, basically this has become a bit of a black industry now on the Internet where vulnerabilities, as I mentioned before, are sold as commodities because organized crime is getting involved and trying to get this stuff installed on peopleï¿½s computers, you know, their malicious code.  So the one bit of news that occurred yesterday ï¿½ actually day before yesterday ï¿½ was Microsoft recognized the severity of the problem.  And we were talking about how people may need to wait as many as three weeks for the second Tuesday in October, October 10th, before the next monthly set of patches were rolled out.  But Microsoft decided this thing was too serious to wait, so they issued one of their rare out-of-order, or out-of-sequence, out-of-cycle updates.  So I just wanted to make sure that everyone listening had received the news that Windows Update is now carrying the fix for this, the official fix.
 
-LEO:  Now, they’re not – it doesn’t look like they’re pushing it.  At least I haven’t – you have to go get it, don’t you, because I haven’t seen it yet.
+LEO:  Now, theyï¿½re not ï¿½ it doesnï¿½t look like theyï¿½re pushing it.  At least I havenï¿½t ï¿½ you have to go get it, donï¿½t you, because I havenï¿½t seen it yet.
 
-STEVE:  Yeah, in fact, if you run Windows Update on your machine, you will get the update.  But I think it’s being moved out relatively slowly.  So I wanted to let people know, you know, our best advice a week ago was to unregister the DLL.  Applying this patch does not reregister it.  So the proper sequence would be to go to Windows Update – normally you’ve got an entry there in the menu above your Start button – run Windows Update, see that it’s got the – it’s giving you this updated vulnerability patch.  It will – it may require you to boot Windows.  I had to, but I’ve heard reports that other people do not.  It may be that XP doesn’t need to; and Windows 2000, which I’m using, does require a reboot.  So reboot if it asks you to, and then reregister the DLL.
+STEVE:  Yeah, in fact, if you run Windows Update on your machine, you will get the update.  But I think itï¿½s being moved out relatively slowly.  So I wanted to let people know, you know, our best advice a week ago was to unregister the DLL.  Applying this patch does not reregister it.  So the proper sequence would be to go to Windows Update ï¿½ normally youï¿½ve got an entry there in the menu above your Start button ï¿½ run Windows Update, see that itï¿½s got the ï¿½ itï¿½s giving you this updated vulnerability patch.  It will ï¿½ it may require you to boot Windows.  I had to, but Iï¿½ve heard reports that other people do not.  It may be that XP doesnï¿½t need to; and Windows 2000, which Iï¿½m using, does require a reboot.  So reboot if it asks you to, and then reregister the DLL.
 
-One cool thing also has happened, and that is that a third party has come up with a – both their own patch, which we no longer need, but with a benign test page.  So what this allows people to do is to test that they are patched by displaying some Vector Markup Language rectangles, red rectangles, which won’t display at all if the DLL is still unregistered, which will crash your browser if you’re still vulnerable – but benignly crash your browser, it won’t hurt you in any way – or will display them if you are patched and the DLL is registered.  And I’ve got a link to that on the show notes from last week, the Episode 58 show notes, where we had the instructions for unregistering your DLL.
+One cool thing also has happened, and that is that a third party has come up with a ï¿½ both their own patch, which we no longer need, but with a benign test page.  So what this allows people to do is to test that they are patched by displaying some Vector Markup Language rectangles, red rectangles, which wonï¿½t display at all if the DLL is still unregistered, which will crash your browser if youï¿½re still vulnerable ï¿½ but benignly crash your browser, it wonï¿½t hurt you in any way ï¿½ or will display them if you are patched and the DLL is registered.  And Iï¿½ve got a link to that on the show notes from last week, the Episode 58 show notes, where we had the instructions for unregistering your DLL.
 
-LEO:  There’s another interesting bit of information that we got.  I got a number of emails about this.  I think I forwarded them along to you.  I think the first one was from Ian Shane, who said that DEP, the Data Execution Prevention that’s built into the new Intel and AMD processors, prevented this exploit.
+LEO:  Thereï¿½s another interesting bit of information that we got.  I got a number of emails about this.  I think I forwarded them along to you.  I think the first one was from Ian Shane, who said that DEP, the Data Execution Prevention thatï¿½s built into the new Intel and AMD processors, prevented this exploit.
 
-STEVE:  Well, yes.  There of course are two flavors of DEP.  There’s hardware and software DEP.  The newer processors support hardware execution prevention so that – and this is what we were talking about in our episode talking about buffer overruns.  Essentially, this buffer overrun is on the stack.  And so code is executing in the stack that should only be containing data.  Which means if Windows is told not to allow the stack to be executed or executable, it will raise an exception.  It’ll essentially detect that this is going on and say, hey, wait a minute, something’s fishy somewhere.  So both hardware and software DEP do catch, and did catch for some people, this VML exploit.  The earlier Windows Metafile exploit was not caught by software DEP, only by the more advanced and capable hardware DEP.
+STEVE:  Well, yes.  There of course are two flavors of DEP.  Thereï¿½s hardware and software DEP.  The newer processors support hardware execution prevention so that ï¿½ and this is what we were talking about in our episode talking about buffer overruns.  Essentially, this buffer overrun is on the stack.  And so code is executing in the stack that should only be containing data.  Which means if Windows is told not to allow the stack to be executed or executable, it will raise an exception.  Itï¿½ll essentially detect that this is going on and say, hey, wait a minute, somethingï¿½s fishy somewhere.  So both hardware and software DEP do catch, and did catch for some people, this VML exploit.  The earlier Windows Metafile exploit was not caught by software DEP, only by the more advanced and capable hardware DEP.
 
-LEO:  Now, for hardware DEP to work, you have to have a processor that supports it, one with NX or XD capability.  I guess...
+LEO:  Now, for hardware DEP to work, you have to have a processor that supports it, one with NX or XD capability.  Iï¿½guess...
 
 STEVE:  Yes.
 
-LEO:  ...one is AMD and one is Intel’s nomenclature for this.
+LEO:  ...one is AMD and one is Intelï¿½s nomenclature forï¿½this.
 
 STEVE:  And certainly all new processors do that and will be doing that.
 
 LEO:  Right.
 
-STEVE:  The capability exists in Service Pack 2 of XP, although it’s not enabled by default because it does create some false-positive problems.  You’re able to enable it per process or sort of globally.  And normally it’s not on.  Some people who have turned it on have then dealt with, you know, needing to create exceptions...
+STEVE:  The capability exists in Service Pack 2 of XP, although itï¿½s not enabled by default because it does create some false-positive problems.  Youï¿½re able to enable it per process or sort of globally.  And normally itï¿½s not on.  Some people who have turned it on have then dealt with, you know, needing to create exceptions...
 
 LEO:  Right.
 
 STEVE:  ...when it false-positives for them.  So, you know, it certainly is useful.  And for anyone who was using it already, they were always protected from any exploitation from this VML vulnerability.
 
-LEO:  Isn’t that interesting.  It just – you open the System Properties control panel, and you click the Advanced tab.  You click the Performance button, and then there’s a tab on XP Service Pack 2 and later, says Data Execution Prevention.  By default it says turn it off for essential Windows programs and services only.  I take it I need to turn it on for all of them, then.
+LEO:  Isnï¿½t that interesting.  It just ï¿½ you open the System Properties control panel, and you click the Advanced tab.  You click the Performance button, and then thereï¿½s a tab on XP Service Pack 2 and later, says Data Execution Prevention.  By default it says turn it off for essential Windows programs and services only.  I take it I need to turn it on for all of them, then.
 
 STEVE:  Yes, yes.
 
-LEO:  Okay.  So I’m going to click that button right now and hope it doesn’t crash our recording.
+LEO:  Okay.  So Iï¿½m going to click that button right now and hope it doesnï¿½t crash our recording.
 
 STEVE:  Well, and of course the reason is that the way this all operates is that that DLL is loaded into the context of IE, and so it may be running with administrator privileges or as a limited-user privilege or whatever.  So you really want the most comprehensive protection you can get there.
 
-LEO:  Right.  Well, that’s really good news.  And I think it was George Ou in the – the TechRepublic’s technical director who writes for a blog for ZDNet on security, a very good blog, I think it was the first to note this.  But it’s worth noting that it’s worth turning on DEP.  And certainly, if you buy new hardware, make sure you’ve got a processor that’s hardware DEP capable.
+LEO:  Right.  Well, thatï¿½s really good news.  And I think it was George Ou in the ï¿½ the TechRepublicï¿½s technical director who writes for a blog for ZDNet on security, a very good blog, I think it was the first to note this.  But itï¿½s worth noting that itï¿½s worth turning on DEP.  And certainly, if you buy new hardware, make sure youï¿½ve got a processor thatï¿½s hardware DEP capable.
 
-Well.  I think we did the right thing by breaking our format and getting to that story early.  But it does – did put off what we’re about to talk about, which is virtual machines.
+Well.  I think we did the right thing by breaking our format and getting to that story early.  But it does ï¿½ did put off what weï¿½re about to talk about, which is virtual machines.
 
-STEVE:  Well, we thought we were going to be done with virtual machines, but we’re not.
+STEVE:  Well, we thought we were going to be done with virtual machines, but weï¿½re not.
 
 LEO:  Okay.
 
@@ -92,11 +92,11 @@ STEVE:  Parallels.
 
 LEO:  Oh, the new Parallels.
 
-STEVE:  Well, I’ve drilled down completely into both the Mac and the Windows sides.
+STEVE:  Well, Iï¿½ve drilled down completely into both the Mac and the Windows sides.
 
 LEO:  Oh, good.
 
-STEVE:  And, you know, because you had mentioned it’d be nice if, you know, I took a look at that sometime.
+STEVE:  And, you know, because you had mentioned itï¿½d be nice if, you know, I took a look at that sometime.
 
 LEO:  Yeah.
 
@@ -104,19 +104,19 @@ STEVE:  And I thought, look, better now than later because...
 
 LEO:  Good.
 
-STEVE:  ...right now I have all this in my head.  I’ve got machines with known performance.  I’ve been comparing – well, and the good news is, Parallels outperforms everybody else.
+STEVE:  ...right now I have all this in my head.  Iï¿½ve got machines with known performance.  Iï¿½ve been comparing ï¿½ well, and the good news is, Parallels outperforms everybodyï¿½else.
 
 LEO:  Wow.
 
 STEVE:  Yeah.  I mean...
 
-LEO:  Okay.  Well, don’t tell me all the good news.  I want to hear...
+LEO:  Okay.  Well, donï¿½t tell me all the good news.  I want to hear...
 
-STEVE:  No, no, no, I won’t.  Cool.  We’ll keep it fresh.
+STEVE:  No, no, no, I wonï¿½t.  Cool.  Weï¿½ll keep it fresh.
 
 LEO:  All right.  Here we go.  Here we go.
 
-STEVE:  And I want to – oh, and also, just so you know where we’re headed, I also want to talk a little bit about intellectual property and patents because it turns out a hunch I had paid off.  The reason that VMware has some features nobody else has is they locked it up...
+STEVE:  And I want to ï¿½ oh, and also, just so you know where weï¿½re headed, I also want to talk a little bit about intellectual property and patents because it turns out a hunch I had paid off.  The reason that VMware has some features nobody else has is they locked it up...
 
 LEO:  Yeah.
 
@@ -124,89 +124,89 @@ STEVE:  ...with intellectual property.
 
 LEO:  Ah, very interesting.
 
-STEVE:  And so, you know, I’m – as you know, I’m moderately hostile to the notion of the Patent Office giving away this property which is just engineering.
+STEVE:  And so, you know, Iï¿½m ï¿½ as you know, Iï¿½m moderately hostile to the notion of the Patent Office giving away this property which is just engineering.
 
 LEO:  Right.
 
-STEVE:  So I thought it’d be fun to talk about that a little bit, too.
+STEVE:  So I thought itï¿½d be fun to talk about that a little bit, too.
 
 LEO:  Good.  Good.  And do you want to start with that, or do you want to just have that in the body of it, or do you have anything to catch up on or anything like that?
 
-STEVE:  Nothing to catch up on.  So we’ll just say, you know, what are we talking about?
+STEVE:  Nothing to catch up on.  So weï¿½ll just say, you know, what are we talking about?
 
 LEO:  Okay.  This is Security Now!, Episode 58, for September 21st.  And three, two, one.
 
 [PREVIOUSLY RECORDED]
 
-LEO LAPORTE:  Time to talk with our virtual security expert.  He’s not virtual, he’s real.  But he talks about virtual security and many other things.  Steve Gibson, hello.
+LEO LAPORTE:  Time to talk with our virtual security expert.  Heï¿½s not virtual, heï¿½s real.  But he talks about virtual security and many other things.  Steve Gibson, hello.
 
 STEVE GIBSON:  Hello, Leo.
 
-LEO:  Actually, we are going to talk about virtual stuff again.
+LEO:  Actually, we are going to talk about virtual stuffï¿½again.
 
-STEVE:  Well, yes.  You know, it’s funny.  I thought I was doing a wrap-up of the whole virtual machine topic last week.
+STEVE:  Well, yes.  You know, itï¿½s funny.  I thought I wasï¿½doing a wrap-up of the whole virtual machine topic lastï¿½week.
 
-LEO:  In fact, you wanted me to name it “The Wrap-Up.”  And instead I named it Virtual PC because that’s what you talked about.  And I’m glad.
+LEO:  In fact, you wanted me to name it ï¿½The Wrap-Up.ï¿½  And instead I named it Virtual PC because thatï¿½s what you talked about.  And Iï¿½m glad.
 
 STEVE:  Yeah, well...
 
-LEO:  Because there’s more to say.
+LEO:  Because thereï¿½s more to say.
 
-STEVE:  Well, it’s interesting because you had mentioned that it would be nice if I sometime took a look at Parallels, which is the third, you know, major commercial virtual machine offering in the industry.  A bunch of people wrote in asking the same thing.  It’s like, gee, Steve, you know, now we know how Virtual PC and VMware compare, but what about Parallels?  You know, I mean, there it is.  And so I thought, you know, better now than later.  I’ve got machines with known performance, you know, memory and so forth, that I’ve been comparing the performance of the other guys with.  That’s, you know, that’s always a moving target.  That’s going to change in a couple of years.  So I won’t really have that reference.  I’ve got all of the specifics of this stuff in my head right now.  So, you know, better now than later, especially when people were saying, hey, you know, what about it?  And Parallels just came out with – they’re at Version 2.2.  They’re at the release candidate of 2.2 for their PC-side virtual machine platform, which achieves, like, sort of the last little bit of icing on the cake.  I mean, it’s some additional really nice features.  So I thought, okay, let’s just – we’ll do one more on looking at Parallels, what it offers, how it compares to the others, so that we’ve really got the topic covered, you know, as sort of a checkpoint at this point in time.
+STEVE:  Well, itï¿½s interesting because you had mentioned that it would be nice if I sometime took a look at Parallels, which is the third, you know, major commercial virtual machine offering in the industry.  A bunch of people wrote in asking the same thing.  Itï¿½s like, gee, Steve, you know, now we know how Virtual PC and VMware compare, but what about Parallels?  You know, I mean, there it is.  And so I thought, you know, better now than later.  Iï¿½ve got machines with known performance, you know, memory and so forth, that Iï¿½ve been comparing the performance of the other guys with.  Thatï¿½s, you know, thatï¿½s always a moving target.  Thatï¿½s going to change in a couple of years.  So I wonï¿½t really have that reference.  Iï¿½ve got all of the specifics of this stuff in my head right now.  So, you know, better now than later, especially when people were saying, hey, you know, what about it?  And Parallels just came out with ï¿½ theyï¿½re at Version 2.2.  Theyï¿½re at the release candidate of 2.2 for their PC-side virtual machine platform, which achieves, like, sort of the last little bit of icing on the cake.  I mean, itï¿½s some additional really nice features.  So I thought, okay, letï¿½s just ï¿½ weï¿½ll do one more on looking at Parallels, what it offers, how it compares to the others, so that weï¿½ve really got the topic covered, you know, as sort of a checkpoint at this point in time.
 
-LEO:  You know, it’s funny, because I had never heard of Parallels.  I was very familiar with Virtual PC and VMware.  And I only heard about it as an alternative to run Windows on a Mac.  And so that’s pretty recent.  But they’re not new.  They’ve been around for a while, I gather.
+LEO:  You know, itï¿½s funny, because I had never heard of Parallels.  I was very familiar with Virtual PC and VMware.  And I only heard about it as an alternative to run Windows on a Mac.  And so thatï¿½s pretty recent.  But theyï¿½re not new.  Theyï¿½ve been around for a while, I gather.
 
-STEVE:  Well, yes.  They have been around for a while.  In fact...
+STEVE:  Well, yes.  They have been around for a while.  Inï¿½fact...
 
 LEO:  Where did they come from?
 
-STEVE:  I don’t know what their lineage is.  One thing I want to say, though, before we get into this in more detail, is that some – and it’s significant.  I was talking about the differences between Virtual PC and VMware’s offerings, and about the VMware Server, which is free, and has been, I guess, only since August.  So this is a pretty recent development, that VMware Server has been made free.  Versus VMware Workstation, which is certainly not free.  VMware Workstation is $189.  So it’s, you know, it’s a substantial chunk, just shy of, you know, $200 for their traditional workstation platform.
+STEVE:  I donï¿½t know what their lineage is.  One thing I want to say, though, before we get into this in more detail, is that some ï¿½ and itï¿½s significant.  I was talking about the differences between Virtual PC and VMwareï¿½s offerings, and about the VMware Server, which is free, and has been, I guess, only since August.  So this is a pretty recent development, that VMware Server has been made free.  Versus VMware Workstation, which is certainly not free.  VMware Workstation is $189.  So itï¿½s, you know, itï¿½s a substantial chunk, just shy of, you know, $200 for their traditional workstation platform.
 
-Remember that I said last week that one of the major failings of Server was that it lacked both sound and USB support.  Well, that was wrong.  What happens is, when you initially create a VMware Server virtual machine, they offer you a bunch of sort of default I/O devices.  And in Workstation, because it has a workstation profile, that includes by default your sound and USB devices.  Well, they’re there in Server, but they’re not populated by default because the VMware Server product, which is the free one, is sort of more oriented towards servers where they assume you’re not going to be needing sound and be plugging USB things in all the time.
+Remember that I said last week that one of the major failings of Server was that it lacked both sound and USB support.  Well, that was wrong.  What happens is, when you initially create a VMware Server virtual machine, they offer you a bunch of sort of default I/O devices.  And in Workstation, because it has a workstation profile, that includes by default your sound and USB devices.  Well, theyï¿½re there in Server, but theyï¿½re not populated by default because the VMware Server product, which is the free one, is sort of more oriented towards servers where they assume youï¿½re not going to be needing sound and be plugging USB things in all the time.
 
 LEO:  That makes sense.
 
-STEVE:  So it turns out that, when you’re creating the virtual machine over on the VMware server side, right then there’s a button below that says “Add,” which allows you to add other things in addition, for example, serial and parallel ports, additional hard drives, additional CD-ROMs and other stuff.  And you can add sound and USB at the same time.  So it really...
+STEVE:  So it turns out that, when youï¿½re creating the virtual machine over on the VMware server side, right then thereï¿½s a button below that says ï¿½Add,ï¿½ which allows you to add other things in addition, for example, serial and parallel ports, additional hard drives, additional CD-ROMs and other stuff.  And you can add sound and USB at the same time.  So it really...
 
 LEO:  Aha.
 
-STEVE:  Yes.  So it really does, it makes the server, the free server offering from VMware substantially more appealing.  You don’t have to pay $189 over on the Workstation platform to get sound and USB support.  So I wanted to really clarify that mistake that I made in last week’s podcast because, you know, it means that the free version can be useful for people who do want and need sound and USB support.
+STEVE:  Yes.  So it really does, it makes the server, the free server offering from VMware substantially more appealing.  You donï¿½t have to pay $189 over on the Workstation platform to get sound and USB support.  So I wanted to really clarify that mistake that I made in last weekï¿½s podcast because, you know, it means that the free version can be useful for people who do want and need sound and USB support.
 
-LEO:  All right.  So that’s in Virtual PC, or...
+LEO:  All right.  So thatï¿½s in Virtual PC, or...
 
-STEVE:  No, no, that’s...
+STEVE:  No, no, thatï¿½s...
 
-LEO:  Or, no, I’m sorry, VMware, the free version of VMware.
+LEO:  Or, no, Iï¿½m sorry, VMware, the free version of VMware.
 
-STEVE:  The so-called “Server” version.
+STEVE:  The so-called ï¿½Serverï¿½ version.
 
 LEO:  Okay.
 
-STEVE:  So I decided, okay, let’s take a look at Parallels.  Well, Parallels is this, you know, is a completely separate offering from a company called Parallels.  And they’re, you know, they’re just www.parallels.com on the ‘Net.  They’ve got a workstation that is a PC workstation platform which, very much like VMware, is actively friendly to Linux.  Whereas we’ll remember that Microsoft’s Virtual PC offering is almost openly hostile to anything that is not Windows.  Which is, you know, not...
+STEVE:  So I decided, okay, letï¿½s take a look at Parallels.  Well, Parallels is this, you know, is a completely separate offering from a company called Parallels.  And theyï¿½re, you know, theyï¿½re just www.parallels.com on the ï¿½Net.  Theyï¿½ve got a workstation that is a PC workstation platform which, very much like VMware, is actively friendly to Linux.  Whereas weï¿½ll remember that Microsoftï¿½s Virtual PC offering is almost openly hostile to anything that is not Windows.  Which is, you know, not...
 
-LEO:  It makes sense.  That’s their business.
+LEO:  It makes sense.  Thatï¿½s their business.
 
-STEVE:  It’s not – exactly.  It’s not surprising that that’s the case coming from Microsoft.  So VMware and Parallels are both absolutely happy and solicitous of installing non-Windows things.  They support every flavor of Linux you can imagine – FreeBSD, OS/2, Warp, Sun’s Solaris, I mean, virtually any – virtually – any operating system of a non-Windows nature, and of course all of the Windows platforms, as well.  So you really do have, you know, again, for people who are interested in experimenting with other operating systems and using the virtual machine as a platform, that really makes sense.  Now, the offerings are not free.  They’re $49 for either the Mac version or the Intel P – sorry.  The Intel Mac version or the Intel PC version are $49.  So it’s about a quarter the cost, well, a little more than a quarter of the cost of the VMware Workstation version.
+STEVE:  Itï¿½s not ï¿½ exactly.  Itï¿½s not surprising that thatï¿½s the case coming from Microsoft.  So VMware and Parallels are both absolutely happy and solicitous of installing non-Windows things.  They support every flavor of Linux you can imagine ï¿½ FreeBSD, OS/2, Warp, Sunï¿½s Solaris, I mean, virtually any ï¿½ virtually ï¿½ any operating system of a non-Windows nature, and of course all of the Windows platforms, as well.  So you really do have, you know, again, for peopleï¿½who are interested in experimenting with other operating systems and using the virtual machine as a platform, that really makes sense.  Now, the offerings are not free.  Theyï¿½re $49 for either the Mac version or the Intel P ï¿½ sorry.  The Intel Mac version or the Intel PC version are $49.  So itï¿½s about a quarter the cost, well, aï¿½little more than a quarter of the cost of the VMware Workstationï¿½version.
 
-LEO:  I think they raised the price, by the way.  I think it’s now $79.  Let me go look.
+LEO:  I think they raised the price, by the way.  I think itï¿½s now $79.  Let me go look.
 
 STEVE:  Oh, really.
 
-LEO:  Yeah, it was $49 in the pre-release, when you were – if you wanted to buy the Mac version before it was out officially.  But now it’s $79.99 for the Parallels Desktop for Mac.
+LEO:  Yeah, it was $49 in the pre-release, when you were ï¿½ if you wanted to buy the Mac version before it was out officially.  But now itï¿½s $79.99 for the Parallels Desktop for Mac.
 
 STEVE:  Okay.
 
 LEO:  Still a lot cheaper.  The PC version is $49.99.
 
-STEVE:  Okay.  That’s correct.
+STEVE:  Okay.  Thatï¿½s correct.
 
-LEO:  I don’t know why they charge more on the Mac side, but they do.
+LEO:  I donï¿½t know why they charge more on the Mac side, but they do.
 
-STEVE:  Well, probably because there’s less competition there.  And, you know, I mean...
+STEVE:  Well, probably because thereï¿½s less competition there.  And, you know, I mean...
 
-LEO:  Yeah, and there’s a lot of desire.  It was, you know, it was pretty cheap.  I bought it in the pre-release.  And it was – I think it was then it was $49 or less.  Anyway, it’s worth 80 bucks, I think.  It’s a very good...
+LEO:  Yeah, and thereï¿½s a lot of desire.  It was, you know, it was pretty cheap.  I bought it in the pre-release.  And it was ï¿½ I think it was then it was $49 or less.  Anyway, itï¿½s worth 80 bucks, I think.  Itï¿½s a very good...
 
-STEVE:  Well, what’s really interesting is performance.  It outperforms both of the other big guys.
+STEVE:  Well, whatï¿½s really interesting is performance.  It outperforms both of the other big guys.
 
 LEO:  Really.
 
@@ -218,97 +218,97 @@ STEVE:  Yes.
 
 LEO:  Okay.
 
-STEVE:  Yes.  I was using the 2.2 version because it was at release candidate at this point, and I figured it was, you know, I mean, if I had a problem with it, that would be one thing.  But it ran smoothly, with no trouble at all.  Now, they also offer something that nobody else does, which is not free.  I think it’s another $49.  And they call it their Virtual Machine Compressor.
+STEVE:  Yes.  I was using the 2.2 version because it was at release candidate at this point, and I figured it was, you know, I mean, if I had a problem with it, that would be one thing.  But it ran smoothly, with no trouble at all.  Now, they also offer something that nobody else does, which is not free.  I think itï¿½s another $49.  And they call it their Virtual Machine Compressor.
 
-LEO:  Yeah.  I’ve seen that.  And I’m trying to think if I need it or not.
+LEO:  Yeah.  Iï¿½ve seen that.  And Iï¿½m trying to think if I need it or not.
 
-STEVE:  Well, it’s interesting.  It does a really good job over on a Windows side.  In fact, I was really impressed.  I should step back a minute and talk about something in all of these virtual machine products that we haven’t addressed before.  And that’s the notion of a fixed-size virtual disk versus an expandable or expanding one.  Because the virtual disk is hosted in the host machine’s file system, it looks just like, and it is, just another file.  Well, as we know, files are able to grow.  You know, actual physical hard disks can’t.  They’re whatever size they are.  But files in a file system are inherently able to grow.  So everybody – Parallels, VMware, and Microsoft’s Virtual PC – they’ve got this notion of you don’t have to preallocate a blob of space on your file system to represent the virtual disk if you don’t want to.  You can instead sort of decide, well, we’ll start at a gig, or whatever size, and as we need more, we’ll just allocate that space, growing the virtual disk on the fly.
+STEVE:  Well, itï¿½s interesting.  It does a really good job over on a Windows side.  In fact, I was really impressed.  I should step back a minute and talk about something in all of these virtual machine products that we havenï¿½t addressed before.  And thatï¿½s the notion of a fixed-size virtual disk versus an expandable or expanding one.  Because the virtual disk is hosted in the host machineï¿½s file system, it looks just like, and it is, just another file.  Well, as we know, files are able to grow.  You know, actual physical hard disks canï¿½t.  Theyï¿½re whatever size they are.  But files in a file system are inherently able to grow.  So everybody ï¿½ Parallels, VMware, and Microsoftï¿½s Virtual PC ï¿½ theyï¿½ve got this notion of you donï¿½t have to preallocate a blob of space on your file system to represent the virtual disk if you donï¿½t want to.  You can instead sort of decide, well, weï¿½ll start at a gig, or whatever size, and as we need more, weï¿½ll just allocate that space, growing the virtual disk on theï¿½fly.
 
 LEO:  Yeah, which I think is fantastic.  I mean...
 
 STEVE:  Well, yes.
 
-LEO:  ...it’s wonderful.
+LEO:  ...itï¿½s wonderful.
 
-STEVE:  It’s fantastic, though there are some tradeoffs to this.  From a, you know, from my standpoint, you know, sort of an assembly-coding hardcore techie, the idea of doing that, and doing it efficiently, sort of makes my skin crawl because...
+STEVE:  Itï¿½s fantastic, though there are some tradeoffs to this.  From a, you know, from my standpoint, you know, sort of an assembly-coding hardcore techie, the idea of doing that, and doing it efficiently, sort of makes my skin crawlï¿½because...
 
-LEO:  You mean wasted time resizing the disk and so forth, or...
+LEO:  You mean wasted time resizing the disk and so forth,ï¿½or...
 
-STEVE:  Well, and fragmentation because you’re going to be – inherently, any file which is growing in a file system that’s got other files growing, they generally end up running into each other.  And that’s where fragmentation comes from.  So what you’d optimally like to do would be, for example, to defragment your hosts file system to get all of its, you know, to get all of its files contiguous and compress them so that there’s no empty space in between files.  Then you’d create a virtual disk which is one single large contiguous piece of hard disk space in the hosts file system.  And that would tend to give you overall much better performance.  And in fact that’s exactly the way any of our paging files or our swap files operate.  They sit there and, I mean, they really want to be a fixed size.
+STEVE:  Well, and fragmentation because youï¿½re going to be ï¿½ inherently, any file which is growing in a file system thatï¿½s got other files growing, they generally end up running into each other.  And thatï¿½s where fragmentation comes from.  So what youï¿½d optimally like to do would be, for example, to defragment your hosts file system to get all of its, you know, to get all of its files contiguous and compress them so that thereï¿½s no empty space in between files.  Then youï¿½d create a virtual disk which is one single large contiguous piece of hard disk space in the hosts file system.  And that would tend to give you overall much better performance.  And in fact thatï¿½s exactly the way any of our paging files or our swap files operate.  They sit there and, I mean, they really want to be a fixed size.
 
-Now, it is the case that Windows does sort of the same sort of thing with its paging file.  But everyone who knows how to optimize Windows performance deliberately keeps Windows from increasing and decreasing the size of its paging file.  You just always, when you’re setting up Windows, you set it to a fixed size, set the minimum and maximum size to the same value, so Windows is never able to change it.  And it does a substantially better job because it’s not then – the paging file is not then mixing itself in with all the other files on the file system.
+Now, it is the case that Windows does sort of the same sort of thing with its paging file.  But everyone who knows how to optimize Windows performance deliberately keeps Windows from increasing and decreasing the size of its paging file.  You just always, when youï¿½re setting up Windows, you set it to a fixed size, set the minimum and maximum size to the same value, so Windows is never able to change it.  And it does a substantially better job because itï¿½s not then ï¿½ the paging file is not then mixing itself in with all the other files on the file system.
 
-LEO:  Now, can’t you also do that with these virtual machines?  Can’t you say I don’t want a growing-size disk?  I want a static-size disk?
+LEO:  Now, canï¿½t you also do that with these virtual machines?  Canï¿½t you say I donï¿½t want a growing-size disk?  I want a static-size disk?
 
-STEVE:  Exactly.  And in fact, so I wanted to talk about this dynamic or growing option and explain that, in fact, the intuition about this sort of being a performance hit is exactly on the money.  They all say you can use a dynamic-size disk, but it will give you lower performance than laying out fixed-size disk from the beginning.  And there are substantial optimizations that the virtual machine can do.  And if it knows that this disk is not going to be changing size, it’s able to, like, predetermine where the pieces are and make its accesses into the file system substantially faster.
+STEVE:  Exactly.  And in fact, so I wanted to talk about this dynamic or growing option and explain that, in fact, the intuition about this sort of being a performance hit is exactly on the money.  They all say you can use a dynamic-size disk, but it will give you lower performance than laying out fixed-size disk from the beginning.  And there are substantial optimizations that the virtual machine can do.  And if it knows that this disk is not going to be changing size, itï¿½s able to, like, predetermine where the pieces are and make its accesses into the file system substantially faster.
 
-LEO:  So it’s not merely defragment – or fragmentation that’s the issue.  It’s just inherently inefficient.
+LEO:  So itï¿½s not merely defragment ï¿½ or fragmentation thatï¿½s the issue.  Itï¿½s just inherently inefficient.
 
-STEVE:  Yes.  It’s a convenience that comes at a cost.  So...
+STEVE:  Yes.  Itï¿½s a convenience that comes at a cost.ï¿½ï¿½So...
 
 LEO:  Now, did you benchmark the two different ways of doing it?  I mean, does it in fact hit the speed?
 
-STEVE:  Yes.  I didn’t benchmark to the degree that I have an exact number, like in terms of relative performance.  But you can feel that things are slower, especially on a system that has, you know, less than RAID-5 screaming SATA drives.  I mean, you can see more disk performance, and it’s clearly slower.  But all of this comes back to this compressor program, which is interesting, from Parallels because it will compress to varying degrees any of the virtual machines of any of these manufacturers.  It will work with Microsoft’s Virtual PC and VMware’s products, as well as their own.  And the results are very impressive.
+STEVE:  Yes.  I didnï¿½t benchmark to the degree that I have an exact number, like in terms of relative performance.  But you can feel that things are slower, especially on a system that has, you know, less than RAID-5 screaming SATA drives.  I mean, you can see more disk performance, and itï¿½s clearly slower.  But all of this comes back to this compressor program, which is interesting, from Parallels because it will compress to varying degrees any of the virtual machines of any of these manufacturers.  It will work with Microsoftï¿½s Virtual PC and VMwareï¿½s products, as well as their own.  And the results are very impressive.
 
-For example, I set up over on my Intel platform, a standard PC, I set up a 4-gig fixed partition in which I installed Windows XP, did all the security updates, you know, registered it with Microsoft, got it all up and going, you know, and all tuned up.  Then you can convert, with Parallels, you’re able to convert a static image into one of these dynamic images and back and forth.  So...
+For example, I set up over on my Intel platform, a standard PC, I set up a 4-gig fixed partition in which I installed Windows XP, did all the security updates, you know, registered it with Microsoft, got it all up and going, you know, and all tuned up.  Then you can convert, with Parallels, youï¿½re able to convert a static image into one of these dynamic images and back and forth.  So...
 
-LEO:  Oh, that’s nice.
+LEO:  Oh, thatï¿½s nice.
 
-STEVE:  It really is nice.  One of the things – one of the reasons you do that is, if you want to compact this, for example, to make it more portable, the dynamic disks naturally compact a great deal more because they’re not establishing, for example in this case, a 4-gig footprint that says, okay, I am, you know, this 4 gigs is all of my virtual disk.
+STEVE:  It really is nice.  One of the things ï¿½ one of the reasons you do that is, if you want to compact this, for example, to make it more portable, the dynamic disks naturally compact a great deal more because theyï¿½re not establishing, for example in this case, a 4-gig footprint that says, okay, I am, you know, this 4 gigs is all of my virtual disk.
 
-LEO:  There’s lots of slack space in there that’s not used, so you just take that out.
+LEO:  Thereï¿½s lots of slack space in there thatï¿½s not used, so you just take that out.
 
-STEVE:  Well, exactly.  And in fact, you know, people are used to laying up, you know, 80-, 100-, 120-gig drives and installing XP into it.  I’m, you know, being old-fashioned and remembering the days when we had, you know, 20-megabyte drives, I’ll often create a 4-gig partition to hold XP and then move all of the media files or other stuff I’m doing into its own partition so that I’m able to make reasonable-size backups or images of just the XP partition.
+STEVE:  Well, exactly.  And in fact, you know, people are used to laying up, you know, 80-, 100-, 120-gig drives and installing XP into it.  Iï¿½m, you know, being old-fashioned and remembering the days when we had, you know, 20-megabyte drives, Iï¿½ll often create a 4-gig partition to hold XP and then move all of the media files or other stuff Iï¿½m doing into its own partition so that Iï¿½m able to make reasonable-size backups or images of just the XP partition.
 
-So in this case I created a 4-gig partition and installed XP into it, a 4-gig Parallels partition, converting it from a static drive to a Parallels dynamic drive, you know, the variable sizing drive, brought that 4 gigs – it was actually 4096 megabytes, you know, binary megabytes – brought it down to 2406.  Then, running their compressor on it brought it down to 1028 megs, so just over 1 gig.  And then what’s very...
+So in this case I created a 4-gig partition and installed XPï¿½into it, a 4-gig Parallels partition, converting it from a static drive to a Parallels dynamic drive, you know, the variable sizing drive, brought that 4 gigs ï¿½ it was actuallyï¿½4096 megabytes, you know, binary megabytes ï¿½ brought it down to 2406.  Then, running their compressor on it brought it down to 1028 megs, so just over 1 gig.  And then whatï¿½sï¿½very...
 
 LEO:  Wow.
 
 STEVE:  Yeah.  I mean, a very, very huge reduction.
 
-LEO:  Is it actually compressing, like ZIP would compress, or...
+LEO:  Is it actually compressing, like ZIP would compress,ï¿½or...
 
-STEVE:  No.  I mean, what it does is it sort of – it squeezes out the air from the file, but it’s still completely usable.  You’re able to use it.  You’re able to mount it and boot it.  What’s very cool is then, exiting from the virtual machine, that is, shutting it down and zipping it, which, you know, basically containerizes it, of course, brought it down to 417 megs.  So almost...
+STEVE:  No.  I mean, what it does is it sort of ï¿½ it squeezes out the air from the file, but itï¿½s still completely usable.  Youï¿½re able to use it.  Youï¿½re able to mount it and boot it.  Whatï¿½s very cool is then, exiting from the virtual machine, that is, shutting it down and zipping it, which, you know, basically containerizes it, of course, brought it down to 417 megs.  So almost...
 
 LEO:  Whoa.
 
 STEVE:  Yeah, almost...
 
-LEO:  That’s a tenth the size.
+LEO:  Thatï¿½s a tenth the size.
 
-STEVE:  It’s a tenth the size of what it originally was.  And...
+STEVE:  Itï¿½s a tenth the size of what it originally was.ï¿½ï¿½And...
 
-LEO:  Now, you wouldn’t leave it like that, would you?  I mean, you’d...
+LEO:  Now, you wouldnï¿½t leave it like that, would you?  I mean, youï¿½d...
 
-STEVE:  Well, you couldn’t use it like that.
+STEVE:  Well, you couldnï¿½t use it like that.
 
 LEO:  Yeah.
 
-STEVE:  But you can transport it.  And that’s what I...
+STEVE:  But you can transport it.  And thatï¿½s what I...
 
-LEO:  I’m really interested in that because I just got a new Mac Pro, and I want to move my Parallels over to the Mac Pro so I wouldn’t have to...
+LEO:  Iï¿½m really interested in that because I just got a new Mac Pro, and I want to move my Parallels over to the Mac Pro so I wouldnï¿½t have to...
 
 STEVE:  Yes.
 
-LEO:  And I made a 10-gigabyte Parallels.  So I would like to just compress the heck out of it.  That’s great.
+LEO:  And I made a 10-gigabyte Parallels.  So I would like to just compress the heck out of it.  Thatï¿½s great.
 
 STEVE:  Yes.  And so...
 
 LEO:  But is it worth 50 bucks to do that?  I mean...
 
-STEVE:  Now, well, first of all, you got a free demo.  So you’re able to give it a try...
+STEVE:  Now, well, first of all, you got a free demo.  So youï¿½re able to give it a try...
 
 LEO:  Could just do it once, yeah.
 
-STEVE:  ...and, exactly, see what, you know, essentially what exact operation you get from it.  It’s also the case that zipping even the non-compressed one certainly did reduce it in size.  I didn’t write down the number, although I did that experiment, and it brought it way down.
+STEVE:  ...and, exactly, see what, you know, essentially what exact operation you get from it.  Itï¿½s also the case that zipping even the non-compressed one certainly did reduce it in size.  I didnï¿½t write down the number, although I did that experiment, and it brought it way down.
 
-LEO:  You’d expect it to because it knows about, you know, a string of zeroes, you know, empty space, and it would compress that very efficiently.
+LEO:  Youï¿½d expect it to because it knows about, you know, a string of zeroes, you know, empty space, and it would compress that very efficiently.
 
-STEVE:  Exactly.  Although I’ve got to say that what their compressor does, and the reason it’s cross-platform, that is, the reason it’s able to compress a VMware and a Virtual PC – and I watched it carefully as it was operating.  And it’s got a ton of features.  It looks like an ISO.  It is an ISO.
+STEVE:  Exactly.  Although Iï¿½ve got to say that what their compressor does, and the reason itï¿½s cross-platform, that is, the reason itï¿½s able to compress a VMware and a Virtual PC ï¿½ and I watched it carefully as it was operating.  And itï¿½s got a ton of features.  It looks like an ISO.  It is anï¿½ISO.
 
-LEO:  Oh, it’s an image file, sure.
+LEO:  Oh, itï¿½s an image file, sure.
 
-STEVE:  It’s a CD image.  So you – and you’re able...
+STEVE:  Itï¿½s a CD image.  So you ï¿½ and youï¿½re able...
 
 LEO:  See, now, if you can get it that small, you might even be able to burn it to a CD.
 
@@ -320,63 +320,63 @@ STEVE:  ...a standard CD.
 
 LEO:  Perfect.
 
-STEVE:  And you could imagine installing a bunch of more applications.  I mean, now, this was a recently installed and set up XP that didn’t have Office installed and, you know, all the apps and other stuff.  Certainly that would tend to make the resulting compressed one substantially bigger.  But, you know, here we are, I mean, it was a fully finished, configured, fully updated XP at 417 meg.  And Parallels itself is not very big.  You could put this and Parallels and your registration information on a CD, or even on a 512-meg dongle, and have basically a portable, installable, running Windows XP that you’re able to put wherever you are.
+STEVE:  And you could imagine installing a bunch of more applications.  I mean, now, this was a recently installed and set up XP that didnï¿½t have Office installed and, you know, all the apps and other stuff.  Certainly that would tend to make the resulting compressed one substantially bigger.  But, you know, here we are, I mean, it was a fully finished, configured, fully updated XP at 417 meg.  And Parallels itself is not very big.  You could put this and Parallels and your registration information on a CD, or even on a 512-meg dongle, and have basically a portable, installable, running Windows XP that youï¿½re able to put wherever you are.
 
-LEO:  Now, the compressor is Windows and Linux only.  But I could run it on – I could take my little thing and put it on my Linux machine and compress it there.
+LEO:  Now, the compressor is Windows and Linux only.  But I could run it on ï¿½ I could take my little thing and put it on my Linux machine and compress it there.
 
-STEVE:  There also.  Now, but getting back to what it does is, it’s very interesting.  It is – it mounts as an ISO, so that’s how it’s able to get into any of these virtual machines.  They’re all able to mount images that appear as...
+STEVE:  There also.  Now, but getting back to what it does is, itï¿½s very interesting.  It is ï¿½ it mounts as an ISO, soï¿½thatï¿½s how itï¿½s able to get into any of these virtual machines.  Theyï¿½re all able to mount images that appearï¿½as...
 
 LEO:  They look like CD-ROMs, yeah.
 
-STEVE:  Exactly.  They appear as a CD-ROM.  And then it executes as a CD-ROM, even though it’s actually just an image file, an ISO image of a CD-ROM.
+STEVE:  Exactly.  They appear as a CD-ROM.  And then it executes as a CD-ROM, even though itï¿½s actually just an image file, an ISO image of a CD-ROM.
 
-LEO:  That’s how I installed Windows in Parallels.  For some reason it couldn’t read my disk, but I just made an ISO of the disk, and it installed from that ISO very, very nicely.
+LEO:  Thatï¿½s how I installed Windows in Parallels.  For some reason it couldnï¿½t read my disk, but I just made an ISO of the disk, and it installed from that ISO very, very nicely.
 
 STEVE:  You just mounted the ISO.
 
 LEO:  Yeah, yeah.
 
-STEVE:  So what this thing does is it knows all about ways that Windows wastes space.  It knows about, you know, downloaded stuff you no longer need.  It knows about your temporary Internet folders.  It knows about your Windows temporary space.  It knows about, you know, all kinds of things.  It even does some registry compaction.  It really knows about what Windows is doing and, I mean, just squeezes it to pieces so that it’s substantially smaller than it was before.
+STEVE:  So what this thing does is it knows all about ways that Windows wastes space.  It knows about, you know, downloaded stuff you no longer need.  It knows about your temporary Internet folders.  It knows about your Windows temporary space.  It knows about, you know, all kinds of things.  It even does some registry compaction.  It really knows about what Windows is doing and, I mean, just squeezes it to pieces so that itï¿½s substantially smaller than it wasï¿½before.
 
-LEO:  Very cool.  Now, let me ask you a question.  And you may not know the answer to this.  But this really has been bugging me.  If I authenticate Windows in this virtual machine...
+LEO:  Very cool.  Now, let me ask you a question.  And youï¿½may not know the answer to this.  But this really has been bugging me.  If I authenticate Windows in this virtualï¿½machine...
 
 STEVE:  Ha ha ha.
 
-LEO:  You know where I’m going.
+LEO:  You know where Iï¿½m going.
 
 STEVE:  Yep, yep, yep.
 
 LEO:  And then I move it over to another machine, is the virtual machine the same?  Does it look the same to Microsoft?  Or is it a new machine?
 
-STEVE:  It’s the same.  So I was wondering...
+STEVE:  Itï¿½s the same.  So I was wondering...
 
 LEO:  Oh, wow.
 
-STEVE:  Yep, I was wondering the same thing myself.  And in fact...
+STEVE:  Yep, I was wondering the same thing myself.  And inï¿½fact...
 
 LEO:  This is great.
 
-STEVE:  It really is nice.  I mean, you know, you’re the owner.  You’re the user.  It’s your licensed copy of Windows.  Why shouldn’t you be able to run that one?  It’s not like you’re running, you know...
+STEVE:  It really is nice.  I mean, you know, youï¿½re the owner.  Youï¿½re the user.  Itï¿½s your licensed copy of Windows.  Why shouldnï¿½t you be able to run that one?  Itï¿½s not like youï¿½re running, you know...
 
-LEO:  No, but it means, for instance, I can move it to – I have it on my laptop.  I could put it on my desktop, and I can run it there.  I don’t have to reauthenticate.  And if I trash it, I throw it out, and I have another duplicate copy, now only 400 megabytes, and I restore it from that, and I’m back to where I was with no authentication involved.
+LEO:  No, but it means, for instance, I can move it to ï¿½ I have it on my laptop.  I could put it on my desktop, and I can run it there.  I donï¿½t have to reauthenticate.  And if I trash it, I throw it out, and I have another duplicate copy, now only 400 megabytes, and I restore it from that, and Iï¿½m back to where I was with no authentication involved.
 
 STEVE:  Yup.
 
-LEO:  No Windows Genuine Advantage bogosity.  It’s, oh, it’s great.
+LEO:  No Windows Genuine Advantage bogosity.  Itï¿½s, oh, itï¿½sï¿½great.
 
-STEVE:  It’s really interesting, too, because XP bit me very early on.  One of the things that I have always enjoyed doing, actually before I started using VMware Workstation as much, is I would create one install, for example, of Windows 2000, and make an image of it.  Then, using Partition Magic, I’d chop a big drive up into multiple, you know, 4-gig partitions, maybe have 20 of them.  And then I would un-image my image into each of those partitions, creating basically, you know, little clone 4-gig bootable Windows 2000 installations, and then I would boot them in turn and install different software.  For example, this is the way I used to be testing firewalls and things.
+STEVE:  Itï¿½s really interesting, too, because XP bit me very early on.  One of the things that I have always enjoyed doing, actually before I started using VMware Workstation as much, is I would create one install, for example, of Windows 2000, and make an image of it.  Then, using Partition Magic, Iï¿½d chop a big drive up into multiple, you know, 4-gig partitions, maybe have 20 of them.  And then I would un-image my image into each of those partitions, creating basically, you know, little clone 4-gig bootable Windows 2000 installations, and then I would boot them in turn and install different software.  For example, this is the way I used to be testing firewalls and things.
 
 LEO:  Perfect.
 
 STEVE:  Well...
 
-LEO:  Because they’re completely intact, and you don’t – they’re identical.
+LEO:  Because theyï¿½re completely intact, and you donï¿½t ï¿½ theyï¿½re identical.
 
 STEVE:  Exactly.
 
 LEO:  And you could start over at any point with an identical system.
 
-STEVE:  Exactly.  Well, Windows XP immediately put a halt to that.
+STEVE:  Exactly.  Well, Windows XP immediately put a halt toï¿½that.
 
 LEO:  Oh.
 
@@ -384,15 +384,15 @@ STEVE:  The moment, you know, I did the whole thing, I unpacked it into a new pa
 
 LEO:  Right.  Every time.
 
-STEVE:  And it’s like, ooh.  Well, packaging them in virtual machines avoids that problem.
+STEVE:  And itï¿½s like, ooh.  Well, packaging them in virtual machines avoids that problem.
 
-LEO:  So the MAC address is the same.  All the hardware looks the same, and it’s very generic.  That’s another advantage.  You mentioned this earlier that, you know, you don’t have ever hardware compatibility issues because it’s all very generic.
+LEO:  So the MAC address is the same.  All the hardware looks the same, and itï¿½s very generic.  Thatï¿½s another advantage.  You mentioned this earlier that, you know, you donï¿½t have ever hardware compatibility issues because itï¿½s all very generic.
 
-STEVE:  Well, and it’s absolutely true that using this kind of virtualization hides, I mean, it hides it perfectly from...
+STEVE:  Well, and itï¿½s absolutely true that using this kindï¿½of virtualization hides, I mean, it hides it perfectlyï¿½from...
 
 LEO:  It must have a MAC address.  It must have a common MAC address, then.
 
-STEVE:  Well, actually it’s got a completely virtual adapter, which is not even the same make or model...
+STEVE:  Well, actually itï¿½s got a completely virtual adapter, which is not even the same make or model...
 
 LEO:  Right.
 
@@ -400,219 +400,219 @@ STEVE:  ...as any of your external adapters.
 
 LEO:  Right, right.
 
-STEVE:  So it is absolutely creating an adapter.  And, you know, I’m sure this is a benefit which is not often spoken of and advertised.
+STEVE:  So it is absolutely creating an adapter.  And, you know, Iï¿½m sure this is a benefit which is not often spoken of and advertised.
 
 LEO:  No.
 
-STEVE:  But it’s very convenient.
+STEVE:  But itï¿½s very convenient.
 
 LEO:  Yeah.
 
 STEVE:  You know...
 
-LEO:  It would be great for me.  I mean, I bought – I went out and bought a full-bore copy of Windows for 300 bucks.  I’d like to be able to install it in a virtual machine on two different machines.  I’m never going to use it at the same time.
+LEO:  It would be great for me.  I mean, I bought ï¿½ I went out and bought a full-bore copy of Windows for 300 bucks.  Iï¿½d like to be able to install it in a virtual machine on two different machines.  Iï¿½m never going to use it at the same time.
 
-STEVE:  Right.  And there’s only one of you.
+STEVE:  Right.  And thereï¿½s only one of you.
 
-LEO:  There’s only one of me.  It’s the same copy of Windows.  I’m not...
+LEO:  Thereï¿½s only one of me.  Itï¿½s the same copy of Windows.  Iï¿½m not...
 
 STEVE:  Yup.
 
-LEO:  ...giving it to anybody.  This would be a great convenience.  I haven’t yet taken the Mac Pro out of the box.  But I will do some benchmarks before next week.
+LEO:  ...giving it to anybody.  This would be a great convenience.  I havenï¿½t yet taken the Mac Pro out of the box.  But I will do some benchmarks before next week.
 
 STEVE:  Well, and...
 
-LEO:  Because this is a quad processor, you know, it’s a Woodcrest...
+LEO:  Because this is a quad processor, you know, itï¿½s aï¿½Woodcrest...
 
 STEVE:  Ooooh.
 
-LEO:  It should run very nicely.  And I got 4 gigs of RAM, so I’ll be able to allocate a full gig or more to Windows.  And so...
+LEO:  It should run very nicely.  And I got 4 gigs of RAM, so Iï¿½ll be able to allocate a full gig or more to Windows.  And so...
 
-STEVE:  Well, that’s a very good point, too.  I want to make sure people understand that – we’ve been talking about virtual machines.  I haven’t talked about their consumption of resources explicitly.  But all of this virtual machine stuff is extremely resource hungry.  Basically, when you’re running a virtual machine, you are taking a chunk of RAM from your main machine.  And we all know our main machines need all the RAM they’ve got.  You’re taking a chunk of RAM completely away from your host machine and giving it to the virtual machine.  So it’s very much the case that, you know, these are RAM-hungry games that we’re playing.
+STEVE:  Well, thatï¿½s a very good point, too.  I want to make sure people understand that ï¿½ weï¿½ve been talking about virtual machines.  I havenï¿½t talked about their consumption of resources explicitly.  But all of this virtual machine stuff is extremely resource hungry.  Basically, when youï¿½re running a virtual machine, you are taking a chunk of RAM from your main machine.  And we all know our main machines need all the RAM theyï¿½ve got.  Youï¿½re taking a chunk of RAM completely away from your host machine and giving it to the virtual machine.  So itï¿½s very much the case that, you know, these are RAM-hungry games that weï¿½re playing.
 
 LEO:  Oh, yes.
 
-STEVE:  And so, yeah, 4 gigs, I mean, you know, it’s a good thing that the RAM cost has come down as much as it has because, you know, for people who want to really play with virtual machine technology, RAM is the asset which is most quickly consumed.
+STEVE:  And so, yeah, 4 gigs, I mean, you know, itï¿½s a good thing that the RAM cost has come down as much as it has because, you know, for people who want to really play with virtual machine technology, RAM is the asset which is most quickly consumed.
 
-LEO:  I can’t say what it’s like on Windows; but on a Mac running Intel, 2 gigs is the minimum.  You need a gig for the Mac OS and a gig for the Windows OS.
+LEO:  I canï¿½t say what itï¿½s like on Windows; but on a Mac running Intel, 2 gigs is the minimum.  You need a gig for the Mac OS and a gig for the Windows OS.
 
 STEVE:  Right.
 
 LEO:  And actually you end up allocating maybe something more like 900-some megabytes to the Windows OS.  But it runs very nicely when you have that much RAM.
 
-STEVE:  Well, let me tell you.  We’ll remember that, when I got this MacBook Pro, I immediately thought, well, what am I going to do with a Mac, aside from using it for the intended purpose, which was to do some iChat.  So I immediately installed Boot Camp, chopped the drive in half – remember, it was an 80-gig drive.  I chopped it into two 40-gig partitions.  Wait a minute, no.  I think I initially...
+STEVE:  Well, let me tell you.  Weï¿½ll remember that, when I got this MacBook Pro, I immediately thought, well, what am I going to do with a Mac, aside from using it for the intended purpose, which was to do some iChat.  So I immediately installed Boot Camp, chopped the drive in half ï¿½ remember, it was an 80-gig drive.  I chopped it into two 40-gig partitions.  Wait a minute, no.  I think I initially...
 
 LEO:  I think 10 is the default, so you might have done 10 and 70.
 
-STEVE:  Yeah.  Well, no.  I’m sure I did at least 40.  I was thinking maybe I gave Windows even more than half.  Because I thought, I’m never going to use this Mac.
+STEVE:  Yeah.  Well, no.  Iï¿½m sure I did at least 40.  I was thinking maybe I gave Windows even more than half.  Because I thought, Iï¿½m never going to use this Mac.
 
 LEO:  Oh, you bigot, you.
 
-STEVE:  So I set up Boot Camp, installed XP, you know, used it, got a feel for it.  And as I began to be more familiar with the Mac, I would kill off Windows and move the partition further and further over so that, you know, Windows was getting less and less memory, until finally it’s gone completely.  There’s no more Boot Camp.  Mac has...
+STEVE:  So I set up Boot Camp, installed XP, you know, used it, got a feel for it.  And as I began to be more familiar with the Mac, I would kill off Windows and move the partition further and further over so that, you know, Windows was getting less and less memory, until finally itï¿½s gone completely.  Thereï¿½s no more Boot Camp.  Mac has...
 
-LEO:  But with Parallels you can still run Windows.  You can use the Mac, and whenever you need Windows it’s there.  I mean, I...
+LEO:  But with Parallels you can still run Windows.  You can use the Mac, and whenever you need Windows itï¿½s there.  I mean, I...
 
-STEVE:  Well, that’s where I’m heading with this, Leo.
+STEVE:  Well, thatï¿½s where Iï¿½m heading with this, Leo.
 
 LEO:  Yeah.
 
-STEVE:  I can tell you now that there is no perceptible difference...
+STEVE:  I can tell you now that there is no perceptibleï¿½difference...
 
 LEO:  Wow.
 
-STEVE:  ...in – I mean none – in running Windows XP under Parallels in a virtual machine, especially if you go full screen.  I mean, even if you window the Windows in the Mac screen, it still is incredibly smooth.  It is better on this Mac Pro actually than it is over on my PC, that is, Parallels is, although the PC only has a gig of memory, and it’s got a 2-gig processor, so it’s not the Pro Duo, you know, triple-scoop machine that the Mac Pro has.  But it is – if you window it, there is – I can tell no difference between it and when I was booting Windows XP natively through Boot Camp.  It is an absolute solution – that is, Parallels is – for people with a strong MacBook that want to run Windows at the same time.
+STEVE:  ...in ï¿½ I mean none ï¿½ in running Windows XP under Parallels in a virtual machine, especially if you go full screen.  I mean, even if you window the Windows in the Mac screen, it still is incredibly smooth.  It is better on this Mac Pro actually than it is over on my PC, that is, Parallels is, although the PC only has a gig of memory, and itï¿½s got a 2-gig processor, so itï¿½s not the Pro Duo, you know, triple-scoop machine that the Mac Pro has.  But it isï¿½ï¿½ if you window it, there is ï¿½ I can tell no difference between it and when I was booting Windows XP natively through Boot Camp.  It is an absolute solution ï¿½ that is, Parallels is ï¿½ for people with a strong MacBook that want to run Windows at the same time.
 
-LEO:  Yeah, I have been very happy.  But I’m really glad that it is this fast because that’s really encouraging.  And I can’t wait to see how it runs on this giant Dual Xeon.  I mean, this should be fantastic.  I mean, it should be as good as my Windows machine.
+LEO:  Yeah, I have been very happy.  But Iï¿½m really glad that it is this fast because thatï¿½s really encouraging.  And I canï¿½t wait to see how it runs on this giant Dual Xeon.  I mean, this should be fantastic.  I mean, it should be as good as my Windows machine.
 
-STEVE:  Yeah.  I would challenge anyone to do a side-by-side comparison...
+STEVE:  Yeah.  I would challenge anyone to do a side-by-sideï¿½comparison...
 
 LEO:  I will, I will.
 
-STEVE:  ...and determine whether XP’s booted natively or running in a window.  And also Parallels has complete support for both the Intel VT and the AMD next-generation virtualization technology is already in Parallels.  So you are getting the advantage of the latest virtualization technology being leveraged in there.
+STEVE:  ...and determine whether XPï¿½s booted natively or running in a window.  And also Parallels has complete support for both the Intel VT and the AMD next-generation virtualization technology is already in Parallels.  So you are getting the advantage of the latest virtualization technology being leveraged in there.
 
-LEO:  Yeah, yeah.  It’s pretty – it’s, you know, as we’ve been talking about over the last few weeks, it’s really neat technology that has totally matured now and is usable.  And really, any serious computer user should be using one of these solutions.
+LEO:  Yeah, yeah.  Itï¿½s pretty ï¿½ itï¿½s, you know, as weï¿½ve been talking about over the last few weeks, itï¿½s really neat technology that has totally matured now and is usable.  And really, any serious computer user should be using one of these solutions.
 
-STEVE:  Well, I mean, these are heavyweight solutions.  And I’ll remind people that, if all you really want is browser containment or email containment, that a program that we talked about, you know, Sandboxie, is still a really nice alternative.  It is much lighter weight, doesn’t have the RAM consumption stuff and so forth.  But for ultimate security and for experimenting with other operating systems, for example, Windows on a Mac, Linux on a PC, where you want to install, oh, I mean, FreeBSD, you know, anything runs in these virtual machines.
+STEVE:  Well, I mean, these are heavyweight solutions.  And Iï¿½ll remind people that, if all you really want is browser containment or email containment, that a program that we talked about, you know, Sandboxie, is still a really nice alternative.  It is much lighter weight, doesnï¿½t have the RAM consumption stuff and so forth.  But for ultimate security and for experimenting with other operating systems, for example, Windows on a Mac, Linux on a PC, where you want to install, oh, I mean, FreeBSD, you know, anything runs in these virtual machines.
 
-Now, one feature is sort of – I noticed it wasn’t, well, it wasn’t present in Parallels that – and it’s something that the VMware guys have always had.  And it’s the notion of checkpointing your system.  In the Workstation product, the $189 VMware Workstation, they’ve got some extensive capabilities that allow you to, for example, create a checkpoint in time which you’re able to come back to easily if something damages one of your virtual machines.  And it’s very useful for software testing.  You could be, you know, single-step debugging and get to a point where you’re afraid you might lose control of the machine in the debugger, make a checkpoint in the virtual machine, and know that you’re able to, you know, virtually turn back the clock to exactly that point.
+Now, one feature is sort of ï¿½ I noticed it wasnï¿½t, well, it wasnï¿½t present in Parallels that ï¿½ and itï¿½s something that the VMware guys have always had.  And itï¿½s the notion of checkpointing your system.  In the Workstation product, the $189 VMware Workstation, theyï¿½ve got some extensive capabilities that allow you to, for example, create a checkpoint in time which youï¿½re able to come back to easily if something damages one of your virtual machines.  And itï¿½s very useful for software testing.  You could be, you know, single-step debugging and get to a point where youï¿½re afraid you might lose control of the machine in the debugger, make a checkpoint in the virtual machine, and know that youï¿½re able to, you know, virtually turn back the clock to exactly that point.
 
-Also in VMware, I mean, there are some fancy things they’ve got.  For example, you’re able to create a disk which is sort of the reference and always reboot with the same one, so that any changes made to it on the fly are not retained.  You’re also able to use a single disk and then branch from it other virtual machines where only the changes to that reference disk are maintained separately...
+Also in VMware, I mean, there are some fancy things theyï¿½ve got.  For example, youï¿½re able to create a disk which is sort of the reference and always reboot with the same one, so that any changes made to it on the fly are not retained.  Youï¿½re also able to use a single disk and then branch from it other virtual machines where only the changes to that reference disk are maintained separately...
 
 LEO:  Wow.
 
-STEVE:  ...so that you don’t have – so that you’re not – you don’t need to create, for example, you know, multiple 10-gig files, each in a virtual machine.  You can create one as the reference, and then you’re able to create other virtual machines branching off of that master copy.  Some very fancy things.  Those are missing in their Server product.  They do allow you to have a checkpoint, but only one, and you’re able to come back to that checkpoint.  Whereas under the Workstation you have multiple checkpoints.
+STEVE:  ...so that you donï¿½t have ï¿½ so that youï¿½re not ï¿½ you donï¿½t need to create, for example, you know, multiple 10-gig files, each in a virtual machine.  You can create one as the reference, and then youï¿½re able to create other virtual machines branching off of that master copy.  Some very fancy things.  Those are missing in their Server product.  They do allow you to have a checkpoint, but only one, and youï¿½re able to come back to that checkpoint.  Whereas under the Workstation you have multiple checkpoints.
 
-Well, it was interesting that that feature isn’t in Parallels nor in Virtual PC.  Microsoft has a cloning notion, but not all this fancy stuff.  And it was – I was thinking about, well, you know, maybe in the next version we would get that because, you know, it’s another feature that would be nice.  And then I had a hunch.  It’s like, wait a minute.  You know, I remember seeing a long list of patent numbers...
+Well, it was interesting that that feature isnï¿½t in Parallels nor in Virtual PC.  Microsoft has a cloning notion, but not all this fancy stuff.  And it was ï¿½ I was thinking about, well, you know, maybe in the next version weï¿½would get that because, you know, itï¿½s another feature that would be nice.  And then I had a hunch.  Itï¿½s like, wait a minute.  You know, I remember seeing a long list of patentï¿½numbers...
 
 LEO:  Ohhhhh.
 
-STEVE:  ...over on the VMware site and in the “About” box.  And so I did a little bit of research, and sure enough, I mean, for example, well, these guys are patent-happy, the VMware guys are.
+STEVE:  ...over on the VMware site and in the ï¿½Aboutï¿½ box.  And so I did a little bit of research, and sure enough, I mean, for example, well, these guys are patent-happy, the VMware guys are.
 
 LEO:  Well, now we know why.  They certainly have a business advantage for them.
 
-STEVE:  Well, filed back in October of ’98 is a, you know, Patent 6397242, which is titled “Virtualization System Including a Virtual Machine Monitor for a Computer with a Segmented Architecture.”  Which sort of sounds like a generic description of virtual machine technology.  And...
+STEVE:  Well, filed back in October of ï¿½98 is a, you know, Patent 6397242, which is titled ï¿½Virtualization System Including a Virtual Machine Monitor for a Computer with a Segmented Architecture.ï¿½  Which sort of sounds like a generic description of virtual machine technology.  And...
 
-LEO:  Well, that’s interesting.  I’m surprised then that we’re seeing so many competitors.
+LEO:  Well, thatï¿½s interesting.  Iï¿½m surprised then that weï¿½re seeing so many competitors.
 
-STEVE:  Well, the problem is that there are limits to what you can patent because some of this is just – is fundamental technology.
+STEVE:  Well, the problem is that there are limits to what you can patent because some of this is just ï¿½ is fundamentalï¿½technology.
 
 LEO:  Right.
 
 STEVE:  Some stuff...
 
-LEO:  I mean, if it’s built into the processor, you can’t very well claim you’ve got it exclusively.
+LEO:  I mean, if itï¿½s built into the processor, you canï¿½t very well claim youï¿½ve got it exclusively.
 
 STEVE:  Well, exactly.  And as we were saying, as Intel and AMD are putting more native virtualization support into the hardware, which of course is what all the Blue Pill stuff was that we talked about a couple weeks ago...
 
 LEO:  Right.
 
-STEVE:  ...as that’s happening, these early advantages are being lost.  Well, let’s see.  One, two, three, four, five, six, seven, eight, nine...
+STEVE:  ...as thatï¿½s happening, these early advantages are being lost.  Well, letï¿½s see.  One, two, three, four, five, six, seven, eight, nine...
 
 LEO:  Are you counting patents?
 
-STEVE:  ...10, 11, 12 – yes, I’m counting patents.  13 patents.  And I got down, as I was doing this research, to 6795966, filed on February 4th of 2000, and that was issued on September 21st of 2004.  Get this.  “Mechanism for Restoring, Porting, Replicating, and Checkpointing...”
+STEVE:  ...10, 11, 12 ï¿½ yes, Iï¿½m counting patents.  13 patents.  And I got down, as I was doing this research, to 6795966, filed on February 4th of 2000, and that was issued on September 21st of 2004.  Get this.  ï¿½Mechanism for Restoring, Porting, Replicating, and Checkpointing...ï¿½
 
 LEO:  Checkpoints, yup.
 
-STEVE:  “...Computer Systems Using State Extraction.”
+STEVE:  ï¿½...Computer Systems Using State Extraction.ï¿½
 
 LEO:  Yeah.  Well, there you go.
 
-STEVE:  And the abstract of the patent says:  “A computer system is interrupted and its entire state information is extracted as one or more checkpoints at one or more respective points during operation of the system.  The checkpoint may be restored into the system at any later time, even multiple times.  And it may also even be loaded into one or more other systems.  All systems loaded with the same checkpoint will then execute from the same checkpointed state.  The state extraction mechanism is preferably a virtual machine monitor on which one or more virtual machines are installed, each virtual machine constituting an encapsulated, virtualized computer system whose states can be checkpointed under control of the virtual machine monitor.  Checkpoints may be stored on a portable memory device or transmitted as a batch or dynamically over a network, so that even virtual machines installed at different sites may execute from the same state.”  That’s a patent.
+STEVE:  And the abstract of the patent says:  ï¿½A computer system is interrupted and its entire state information is extracted as one or more checkpoints at one or more respective points during operation of the system.  The checkpoint may be restored into the system at any later time, even multiple times.  And it may also even be loaded into one or more other systems.  All systems loaded with the same checkpoint will then execute from the same checkpointed state.  The state extraction mechanism is preferably a virtual machine monitor on which one or more virtual machines are installed, each virtual machine constituting an encapsulated, virtualized computer system whose states can be checkpointed under control of the virtual machine monitor.  Checkpoints may be stored on a portable memory device or transmitted as a batch or dynamically over a network, so that even virtual machines installed at different sites may execute from the same state.ï¿½  Thatï¿½s aï¿½patent.
 
-LEO:  Yeah.  And they pretty much – sounds like they’ve locked that down.
+LEO:  Yeah.  And they pretty much ï¿½ sounds like theyï¿½ve locked that down.
 
-STEVE:  Yes.  I don’t...
+STEVE:  Yes.  I donï¿½t...
 
-LEO:  That’s why you’re not seeing it in other programs.
+LEO:  Thatï¿½s why youï¿½re not seeing it in other programs.
 
-STEVE:  I don’t think we’re going to see that in...
+STEVE:  I donï¿½t think weï¿½re going to see that in...
 
-LEO:  That’s why you pay $189, ladies and gentlemen.
+LEO:  Thatï¿½s why you pay $189, ladies and gentlemen.
 
-STEVE:  Exactly.  I mean, that’s – basically that’s what it comes down to.  They have a patent on this.  Clearly, this is something that is cool technology.  They got...
+STEVE:  Exactly.  I mean, thatï¿½s ï¿½ basically thatï¿½s what it comes down to.  They have a patent on this.  Clearly, this is something that is cool technology.  They got...
 
-LEO:  But here’s the thing.  I mean, if you need it, it’s cool; and certainly if you’re a programmer, or you’re doing, you know, you’re messing with the system, or probably a lot of the things you do, that’s great.  But to me, raw speed is what I’m looking for.  I want just a standard Windows system that gives me the best speed.
+LEO:  But hereï¿½s the thing.  I mean, if you need it, itï¿½s cool; and certainly if youï¿½re a programmer, or youï¿½re doing, you know, youï¿½re messing with the system, or probably a lot of the things you do, thatï¿½s great.  But to me, raw speed is what Iï¿½m looking for.  I want just a standard Windows system that gives me the best speed.
 
-STEVE:  And I’m glad you said that, Leo, because Virtual PC from Microsoft and Parallels from Parallels, these are still completely usable systems.
+STEVE:  And Iï¿½m glad you said that, Leo, because Virtual PC from Microsoft and Parallels from Parallels, these are still completely usable systems.
 
 LEO:  Yeah, yeah.
 
-STEVE:  In fact, although they can’t and don’t call it – well, I guess they could call it a checkpoint.  But in Parallels you can.  They have UI support for cloning disks.  So you’re able to create one...
+STEVE:  In fact, although they canï¿½t and donï¿½t call it ï¿½ well, I guess they could call it a checkpoint.  But in Parallels you can.  They have UI support for cloning disks.  So youï¿½re able to create one...
 
-LEO:  Oh, you could always set a point by cloning it, basically.
+LEO:  Oh, you could always set a point by cloning it,ï¿½basically.
 
 STEVE:  Exactly.  Exactly.
 
-LEO:  That would be a good idea.  As you do your install and build, you clone it several times, if you’ve got the hard drive space, so that you can, you know, you can have a basic system with just Windows, and one with all of Office installed and so forth.  That would actually be useful to me.
+LEO:  That would be a good idea.  As you do your install and build, you clone it several times, if youï¿½ve got the hard drive space, so that you can, you know, you can have a basic system with just Windows, and one with all of Office installed and so forth.  That would actually be useful toï¿½me.
 
-STEVE:  Well, and in fact it would solve the problem that I had that I solved with VMware Workstation – which I had already owned so, you know, I’d already paid the money – where I had about 15 different Windows XP systems, all with different software firewalls installed.
+STEVE:  Well, and in fact it would solve the problem that I had that I solved with VMware Workstation ï¿½ which I had already owned so, you know, Iï¿½d already paid the money ï¿½ where I had about 15 different Windows XP systems, all with different software firewalls installed.
 
-LEO:  Right.  So you’d go right up to the point of installing the firewall.
+LEO:  Right.  So youï¿½d go right up to the point of installing the firewall.
 
 STEVE:  Yup.
 
-LEO:  You checkpoint it, and then you can make 15 different clones.
+LEO:  You checkpoint it, and then you can make 15 differentï¿½clones.
 
 STEVE:  Well, or you clone it, and then you just rubberstamp out these cloned copies...
 
-LEO:  Oh, I can’t wait to play with this.
+LEO:  Oh, I canï¿½t wait to play with this.
 
 STEVE:  ...and then you switch among them.  So...
 
-LEO:  I’m going to need a bigger hard drive in that machine.
+LEO:  Iï¿½m going to need a bigger hard drive in that machine.
 
 STEVE:  You know, and...
 
-LEO:  I’m sorry, I had to tell him to get a bigger one.  I want more copies of Windows.
+LEO:  Iï¿½m sorry, I had to tell him to get a bigger one.  I want more copies of Windows.
 
 STEVE:  Well, yes.  You do need memory, and certainly a bigger hard drive.  You know, all these little virtual machine checkpoints, or clones, give you, you know, something to do with all that hard drive space...
 
 LEO:  Right, yes.
 
-STEVE:  ...that you’ve got left around.  And then of course, managing them becomes a problem because it’s like, wait a minute, where’s the copy of the whole world that I...
+STEVE:  ...that youï¿½ve got left around.  And then of course, managing them becomes a problem because itï¿½s like, wait a minute, whereï¿½s the copy of the whole world that I...
 
-LEO:  Oh, but isn’t that cool?  It’s like a toy chest.  Well, let’s see.  Today shall I launch BSD, Linux, Windows XP, ME?  Oh, I can’t decide.
+LEO:  Oh, but isnï¿½t that cool?  Itï¿½s like a toy chest.  Well, letï¿½s see.  Today shall I launch BSD, Linux, Windows XP, ME?  Oh, I canï¿½t decide.
 
 STEVE:  Yes, and it really does allow you, I mean, to save what it is you were doing.  Many times...
 
 LEO:  Right.
 
-STEVE:  ...I’ll set up a system and say, well, okay, I probably don’t – I’m not going to need this again.  I’ll reformat the drive.  A couple weeks later it was like, oooh, I wish I had that still.
+STEVE:  ...Iï¿½ll set up a system and say, well, okay, I probably donï¿½t ï¿½ Iï¿½m not going to need this again.  Iï¿½ll reformat the drive.  A couple weeks later it was like, oooh, I wish I had that still.
 
 LEO:  Yup, yup, yup, yup.
 
-STEVE:  And this allows you to save those states, save those experiments on drives which are now so inexpensive and so large.
+STEVE:  And this allows you to save those states, save thoseï¿½experiments on drives which are now so inexpensive and soï¿½large.
 
-LEO:  Well, and it’s a good argument for spending the 50 bucks on Compressor.  Does VMware have something comparable to Compressor?
+LEO:  Well, and itï¿½s a good argument for spending the 50 bucks on Compressor.  Does VMware have something comparable to Compressor?
 
 STEVE:  No.
 
-LEO:  That’s a nice feature because if you do have, you know, 20 different builds, to get them down to a reasonable size makes a lot of sense.
+LEO:  Thatï¿½s a nice feature because if you do have, you know, 20 different builds, to get them down to a reasonable size makes a lot of sense.
 
-STEVE:  Yes.  VMware does have the notion of – well, okay.  I said they don’t have anything comparable to Compressor, which is true.  But they do have all these – well, the VMware Workstation has all these other features.  For example, if I had a single master copy of Windows that I then wanted to branch off 15 instances to install different software firewalls, I mean, that would be very efficient because I would then have one single master copy.  If all I’m doing is installing 15 different software firewalls, you would imagine that the forks from that master copy would each be relatively small, not 15 more sets of the entire hard drive.
+STEVE:  Yes.  VMware does have the notion of ï¿½ well, okay.  I said they donï¿½t have anything comparable to Compressor, which is true.  But they do have all these ï¿½ well, the VMware Workstation has all these other features.  For example, if I had a single master copy of Windows that I then wanted to branch off 15 instances to install different software firewalls, I mean, that would be very efficient because I would then have one single master copy.  If all Iï¿½m doing is installing 15 different software firewalls, you would imagine that the forks from that master copy would each be relatively small, not 15 more sets of the entire hard drive.
 
 LEO:  Right, right.
 
-STEVE:  So it is the case that the VMware Workstation, as you said, that’s what you’re getting for your $189 is you’re getting something that they patented starting, you know, six years ago, and then got the patent two years ago, that allows them this kind of flexibility that nobody else is able to copy.
+STEVE:  So it is the case that the VMware Workstation, as you said, thatï¿½s what youï¿½re getting for your $189 is youï¿½re getting something that they patented starting, you know, six years ago, and then got the patent two years ago, that allows them this kind of flexibility that nobody else is able to copy.
 
-LEO:  You know, it’s funny because, if you do a cooking show, you get very hungry sometimes, and you just can’t wait after the show to run out and eat.  This is the first time in a geek show I’ve gotten just – I cannot wait to start playing with this.  I’m just excited about this notion.  And, you know, the timing is right.  With Release Candidate 1 of Vista, and presumably a new release candidate soon, and a ready-to-manufacture, and a final release, I don’t mind testing Vista now because...
+LEO:  You know, itï¿½s funny because, if you do a cooking show, you get very hungry sometimes, and you just canï¿½t wait after the show to run out and eat.  This is the first time in a geek show Iï¿½ve gotten just ï¿½ I cannot wait to start playing with this.  Iï¿½m just excited about this notion.  And, you know, the timing is right.  With Release Candidateï¿½1 of Vista, and presumably a new release candidate soon, and a ready-to-manufacture, and a final release, I donï¿½t mind testing Vista now because...
 
 STEVE:  Well, yes.
 
 LEO:  ...I can do it safely.
 
-STEVE:  Yes.  You can do it safely.  You’ve got – and as we talked about before, the notion of running Vista in a system where even Windows XP runs more sluggishly, I would have a problem with that because Vista, by all reports, is a massive slowpoke.
+STEVE:  Yes.  You can do it safely.  Youï¿½ve got ï¿½ and as we talked about before, the notion of running Vista in a system where even Windows XP runs more sluggishly, I would have a problem with that because Vista, by all reports, is a massive slowpoke.
 
 LEO:  Yeah.  Hog.
 
-STEVE:  So, but, you know, over on the Mac, in Parallels, XP runs as fast as it does natively.  I mean, I see no difference there.  And I would imagine, on a really strong PC platform, which I was deliberately not using for these experiments because I wanted to get some – I wanted to be able to sense the relative performance of these things.  That’s how I was able to determine that Parallels, for its $49, is faster than VMware Server or even Virtual PC, which is free.  It’s faster on the platform where I was doing all of that common testing.
+STEVE:  So, but, you know, over on the Mac, in Parallels, XP runs as fast as it does natively.  I mean, I see no difference there.  And I would imagine, on a really strong PC platform, which I was deliberately not using for these experiments because I wanted to get some ï¿½ I wanted to be able to sense the relative performance of these things.  Thatï¿½s how I was able to determine that Parallels, for its $49, is faster than VMware Server or even Virtual PC, which is free.  Itï¿½s faster on the platform where I was doing all of that common testing.
 
-LEO:  I have some – I’ll run some of the standard benchmarks, but I have some other benchmarks that are CPU-bound that I might run.  For instance, I have a chess program called Junior, which is, I think, the current world champion chess program.  And it has a benchmarking.  It’s a multi – I have the multiprocessor-enabled version, and it has a benchmarking feature.  And that’s pure CPU.  So...
+LEO:  I have some ï¿½ Iï¿½ll run some of the standard benchmarks, but I have some other benchmarks that are CPU-bound that I might run.  For instance, I have a chess program called Junior, which is, I think, the current world champion chess program.  And it has a benchmarking.  Itï¿½s a multi ï¿½ I have the multiprocessor-enabled version, and it has a benchmarking feature.  And thatï¿½s pure CPU.  So...
 
-STEVE:  I’ll bet that wouldn’t give you a really, like, a user experience.
+STEVE:  Iï¿½ll bet that wouldnï¿½t give you a really, like, a user experience.
 
-LEO:  No, it’s very synthetic.  But it might be interesting to see how the CPUs run, comparing it to...
+LEO:  No, itï¿½s very synthetic.  But it might be interesting to see how the CPUs run, comparing it to...
 
 [Talking simultaneously]
 
@@ -622,83 +622,83 @@ LEO:  Yes.
 
 STEVE:  ...in the virtual machine.
 
-LEO:  I mean, we know that there’s other issues, of course, with the overall speed.  But CPU is the one you’re worried about, right, because that...
+LEO:  I mean, we know that thereï¿½s other issues, of course, with the overall speed.  But CPU is the one youï¿½re worried about, right, because that...
 
-STEVE:  It seems – yes.  It seems to be, well, I think UI is the more perceptible difference.
+STEVE:  It seems ï¿½ yes.  It seems to be, well, I think UI is the more perceptible difference.
 
 LEO:  Right, right.
 
-STEVE:  I mean, I wouldn’t want to do any, you know, intensive UI stuff in a virtual machine where, you know, just dragging windows around and resizing things and scrolling my browser was a lot slower.
+STEVE:  I mean, I wouldnï¿½t want to do any, you know, intensive UI stuff in a virtual machine where, you know, just dragging windows around and resizing things and scrolling my browser was a lot slower.
 
-LEO:  And those are very demanding.  And of course how well the graphics card is emulated is a key feature in performance.
+LEO:  And those are very demanding.  And of course how wellï¿½the graphics card is emulated is a key feature inï¿½performance.
 
 STEVE:  Yes.
 
-LEO:  And, you know, that is one of the things I check almost immediately is I click the Start menu.  How fast do I see that menu?  I deal a few hands in Solitaire.  Things like that are really good ways to kind of get a gauge how responsive it is.  And I have to say, Parallels, as far as I’m concerned, feels as responsive as Windows.  And you’re right, that’s the main issue.  Whether you lose 20 percent in your chess calculations is secondary to whether you can actually use a responsive computer.
+LEO:  And, you know, that is one of the things I check almost immediately is I click the Start menu.  How fast do I see that menu?  I deal a few hands in Solitaire.  Things like that are really good ways to kind of get a gauge how responsive it is.  And I have to say, Parallels, as far as Iï¿½m concerned, feels as responsive as Windows.  And youï¿½re right, thatï¿½s the main issue.  Whether you lose 20 percent in your chess calculations is secondary to whether you can actually use a responsive computer.
 
-STEVE:  Yes.  And essentially, for people who are browsing, certainly the UI is – the UI performance is important.  I would expect no CPU power reduction in a virtual machine because, you know, the CPU is the thing they have most in common...
+STEVE:  Yes.  And essentially, for people who are browsing, certainly the UI is ï¿½ the UI performance is important.  I would expect no CPU power reduction in a virtual machine because, you know, the CPU is the thing they have most inï¿½common...
 
 LEO:  Right.
 
-STEVE:  ...between the virtual environment and the host environment.
+STEVE:  ...between the virtual environment and the hostï¿½environment.
 
-LEO:  I guess you’re testing that layer between you and the processor and how much of that is getting involved.
+LEO:  I guess youï¿½re testing that layer between you and the processor and how much of that is getting involved.
 
-STEVE:  Yes.  And most of that abstraction layer, as it’s termed, is I/O and device oriented.  It is, you know, we’re virtualizing the SAN.  We’re virtualizing USB and the Ethernet adapter and the graphics card.  So it’s the I/O, which is where the virtual machine boundary intersects the host machine environment.
+STEVE:  Yes.  And most of that abstraction layer, as itï¿½s termed, is I/O and device oriented.  It is, you know, weï¿½re virtualizing the SAN.  Weï¿½re virtualizing USB and the Ethernet adapter and the graphics card.  So itï¿½s the I/O, which is where the virtual machine boundary intersects the host machine environment.
 
-LEO:  Right, right, right, right.  That’s kind of...
+LEO:  Right, right, right, right.  Thatï¿½s kind of...
 
 STEVE:  But anyway...
 
-LEO:  That’s kind of what I wanted to look at.
+LEO:  Thatï¿½s kind of what I wanted to look at.
 
 STEVE:  Yeah.
 
-LEO:  Anyway, this will be fun to – I’ll give you some benchmark results.  I’ll see if I can download one of the standard benchmarks and just give you some benchmark results.  Because, I mean, given that I’m throwing so much CPU at this thing, and so much memory, it should be as fast as my standalone Windows machines.
+LEO:  Anyway, this will be fun to ï¿½ Iï¿½ll give you some benchmark results.  Iï¿½ll see if I can download one of the standard benchmarks and just give you some benchmark results.  Because, I mean, given that Iï¿½m throwing so much CPU at this thing, and so much memory, it should be as fast as my standalone Windows machines.
 
 STEVE:  Yup.
 
-LEO:  That’s my hope.  I mean, what I did is I bought a large, 30-inch monitor.  Because right now I run side-by-side Windows and Mac.  And the editing software is running on Windows, and the recording software is running on Windows, but Skype’s running on the Mac.  I do all the editing on Windows, but I do a lot of the production of the website on the Mac.  And what I’d like to do is put it all in one window and have a Windows view in that window and a Mac view in that window and do them both together.
+LEO:  Thatï¿½s my hope.  I mean, what I did is I bought a large, 30-inch monitor.  Because right now I run side-by-side Windows and Mac.  And the editing software is running on Windows, and the recording software is running on Windows, but Skypeï¿½s running on the Mac.  I do all the editing on Windows, but I do a lot of the production of the website on the Mac.  And what Iï¿½d like to do is put it all in one window and have a Windows view in that window and a Mac view in that window and do them both together.
 
 STEVE:  Yup.
 
-LEO:  It’ll be very interesting to see how this works.
+LEO:  Itï¿½ll be very interesting to see how this works.
 
 STEVE:  Yup.
 
-LEO:  I’m excited.
+LEO:  Iï¿½m excited.
 
-STEVE:  Well, it’s really nice technology that has arrived.  And for anyone who’s a Mac user, take a look at Parallels.  Everything from Parallels has a 15-day free trial.  You register on their site, and they give you one of those, you know, humongous keys that Microsoft first popularized, you know, five groups of four characters and digits.  And you drop that in, and it just immediately authorizes your system with a 15-day trial.  I bought this stuff because, you know, like you, Leo, I really expect to be using it.  The idea of being able to easily fire up Windows – oh, and I ought to also comment, and I haven’t mentioned one other feature, a common feature of all of these is you’re able to pause the running Windows, very much like, you know, Windows can be put into standby or into hibernate.  You’re able to do that with any of these operating systems.
+STEVE:  Well, itï¿½s really nice technology that has arrived.  And for anyone whoï¿½s a Mac user, take a look at Parallels.  Everything from Parallels has a 15-day free trial.  You register on their site, and they give you one of those, you know, humongous keys that Microsoft first popularized, you know, five groups of four characters and digits.  And you drop that in, and it just immediately authorizes your system with a 15-day trial.  I bought this stuff because, you know, like you, Leo, I really expect to be using it.  The idea of being able to easily fire up Windows ï¿½ oh, and I ought to also comment, and I havenï¿½t mentioned one other feature, a common feature of all of these is youï¿½re able to pause the running Windows, very much like, you know, Windows can be put into standby or into hibernate.  Youï¿½re able to do that with any of these operating systems.
 
 LEO:  Yeah, yeah.
 
-STEVE:  So you could pause a FreeBSD, for example, that doesn’t have that sort of a standby feature, and what it does is it just saves the state of the entire machine in a file which you’re able to resume.  And it’s often the case that resuming a booted instance of Windows is much faster...
+STEVE:  So you could pause a FreeBSD, for example, that doesnï¿½t have that sort of a standby feature, and what it does is it just saves the state of the entire machine in a file which youï¿½re able to resume.  And itï¿½s often the case that resuming a booted instance of Windows is much faster...
 
 LEO:  Much faster.
 
 STEVE:  ...than firing up a blank virtual machine and then booting Windows in that virtual machine.
 
-LEO:  And imagine having, you know, three windows open at once, running three different operating systems.  I mean, that’s just really kind of nirvana.
+LEO:  And imagine having, you know, three windows open at once, running three different operating systems.  I mean, thatï¿½s just really kind of nirvana.
 
 STEVE:  Yeah.
 
 LEO:  Of course, you have to have a lot of memory for that.
 
-STEVE:  You really do.  And, you know, and again, I sort of – I think about the profile of, you know, of young hackers, you know, white hat hackers, good-guy hackers, who are just interested in experimenting with this.
+STEVE:  You really do.  And, you know, and again, I sort ofï¿½ï¿½ I think about the profile of, you know, of young hackers, you know, white hat hackers, good-guy hackers, who are just interested in experimenting with this.
 
 LEO:  Right, perfect.
 
 STEVE:  And for them, VMware Server, that does give you all these features, that is a mature product, and free, lets you create these virtual environments and install any operating system you can find.
 
-LEO:  Steve, once again a great subject.  I don’t think anybody minds hearing more about virtualization.  And of course, whenever a topic is worth talking about, Steve – that’s the great thing about podcasts.  We will take as long as we need to cover it.
+LEO:  Steve, once again a great subject.  I donï¿½t think anybody minds hearing more about virtualization.  And of course, whenever a topic is worth talking about, Steve ï¿½ thatï¿½s the great thing about podcasts.  We will take as long as we need to cover it.
 
 STEVE:  Well, it is clearly something which is moving to the fore as our hardware supports it to a greater and greater degree.  And from a security standpoint it provides the most robust form of protection you can get without using an entirely physically separate machine.
 
 LEO:  Right.
 
-STEVE:  You know, that’s one step further, but it’s much less convenient to do so.  And, I mean, it offers so many features and flexibilities for, like, running other operating systems.  And, you know, VMware also has those appliances that are readymade, launchable, open source, free appliances that you’re able to run in their free Server, or in their Workstation platform, to, like, you know...
+STEVE:  You know, thatï¿½s one step further, but itï¿½s much less convenient to do so.  And, I mean, it offers so many features and flexibilities for, like, running other operating systems.  And, you know, VMware also has those appliances that are readymade, launchable, open source, free appliances that youï¿½re able to run in their free Server, or in their Workstation platform, to, like, you know...
 
-LEO:  Yeah, that would be an argument to buy VMware.  That’s kind of a neat thing that VMware’s done.
+LEO:  Yeah, that would be an argument to buy VMware.  Thatï¿½s kind of a neat thing that VMwareï¿½s done.
 
 STEVE:  Yes.
 
@@ -708,7 +708,7 @@ STEVE:  I would...
 
 LEO:  I love the appliance idea.
 
-STEVE:  Yes, I do, too.  And my feeling is that the machine I was testing on was underpowered for running virtual machines.
+STEVE:  Yes, I do, too.  And my feeling is that the machineï¿½I was testing on was underpowered for running virtual machines.
 
 LEO:  Okay.
 
@@ -720,85 +720,85 @@ STEVE:  However, I have a much faster machine where I have VMware Workstation in
 
 LEO:  Right, right.
 
-STEVE:  And I’m sure there’s – I don’t feel any VM overhead on that platform.  So if you’ve got a state-of-the-art machine with, for example, 2 gigs of memory versus 1 gig, and plenty of hard drive space, I think the VMware solution is fine.  Of course, and they have announced – they announced at the most recent Mac Developers Conference, VMware said...
+STEVE:  And Iï¿½m sure thereï¿½s ï¿½ I donï¿½t feel any VM overhead on that platform.  So if youï¿½ve got a state-of-the-art machine with, for example, 2 gigs of memory versus 1 gig, and plenty of hard drive space, I think the VMware solution is fine.  Of course, and they have announced ï¿½ they announced at the most recent Mac Developers Conference, VMware said...
 
 LEO:  Oh, yeah.
 
-STEVE:  ...they would be moving over to the Mac.  We don’t know...
+STEVE:  ...they would be moving over to the Mac.  We donï¿½tï¿½know...
 
 LEO:  Yeah.  I signed up immediately, so, yeah.
 
-STEVE:  We don’t know if it’ll be free or commercial or what the pricing...
+STEVE:  We donï¿½t know if itï¿½ll be free or commercial or what the pricing...
 
-LEO:  Oh, I’m sure you’ll have to pay for it, but...
+LEO:  Oh, Iï¿½m sure youï¿½ll have to pay for it, but...
 
 STEVE:  I would imagine you probably will.
 
-LEO:  Yeah, yeah.  It’ll be worth it.  And I will certainly buy a copy of that, as well; and I’ll give you a report, at least from the Mac side, because that’s probably where I’m going to do it.  That’s where my – that’s the most powerful machine I have right now.
+LEO:  Yeah, yeah.  Itï¿½ll be worth it.  And I will certainly buy a copy of that, as well; and Iï¿½ll give you a report, at least from the Mac side, because thatï¿½s probably where Iï¿½m going to do it.  Thatï¿½s where my ï¿½ thatï¿½s the most powerful machine I have right now.
 
-STEVE:  So, yes.  I would say, on a strong machine, as long – if you don’t want all the fancy cloning, checkpointing, branching, forking, you know, fallback stuff that is patented and is available only, in the entire industry, only in VMware’s Workstation product, and if you have no interest at the moment in the Mac side, then VMware Server is a great solution.
+STEVE:  So, yes.  I would say, on a strong machine, as longï¿½ï¿½ if you donï¿½t want all the fancy cloning, checkpointing, branching, forking, you know, fallback stuff that is patented and is available only, in the entire industry, only in VMwareï¿½s Workstation product, and if you have no interest at the moment in the Mac side, then VMware Server is a great solution.
 
-LEO:  It’s free.  It’s free.
+LEO:  Itï¿½s free.  Itï¿½s free.
 
-STEVE:  And as I said, correcting my mistake before, they don’t default to those other devices, the sound and USB; but it’s readily addable right from the get-go when you’re setting up any virtual machine from scratch.
+STEVE:  And as I said, correcting my mistake before, they donï¿½t default to those other devices, the sound and USB; but itï¿½s readily addable right from the get-go when youï¿½re setting up any virtual machine from scratch.
 
 LEO:  VMworld is coming up in November at the L.A. Convention Center.  I have a feeling you may be there and have an update.
 
-STEVE:  Be really fun to see what’s going on.
+STEVE:  Be really fun to see whatï¿½s going on.
 
-LEO:  Wouldn’t that be fun?  I might come down to join you.
+LEO:  Wouldnï¿½t that be fun?  I might come down to join you.
 
 STEVE:  Yeah.  Yeah, cool.
 
-LEO:  That’d be fascinating.  Steve, once again a great show.  Thank you so much.
+LEO:  Thatï¿½d be fascinating.  Steve, once again a great show.  Thank you so much.
 
-We want to thank our sponsors for making this show possible.  And there are a number of sponsors.  This is our last week for Visa.  We do thank them.  It’s been a great month of September.  Visa was, as many agencies are doing and many companies are doing now, testing podcasting to see if it gives them the kind of results they want.  You know we’ve been talking all month long about Visa, Visa security, why it’s better to use your Visa card online.  Certainly, when I make purchases, I use my Visa.  And we encourage you to keep doing so.  And when you get a chance, take the survey we’re going to put on our site to see how well these Visa ads worked.  Remember the slogan:  Safer, better money.  Life and TWiT takes Visa.
+We want to thank our sponsors for making this show possible.  And there are a number of sponsors.  This is our last week for Visa.  We do thank them.  Itï¿½s been a great month of September.  Visa was, as many agencies are doing and many companies are doing now, testing podcasting to see if it gives them the kind of results they want.  You know weï¿½ve been talking all month long about Visa, Visa security, why itï¿½s better to use your Visa card online.  Certainly, when I make purchases, I use my Visa.  And we encourage you to keep doing so.  And when you get a chance, take the survey weï¿½re going to put on our site to see how well these Visa ads worked.  Remember the slogan:  Safer, better money.  Life and TWiT takes Visa.
 
-Also I want to thank Dell.  Dell’s going to be with us for a lot longer.  Dell is a sponsor of this show and TWiT and Inside the Net.  And you can find out more about our great Dell deals.  What we’ve done, because we can’t – these podcasts live on so long, we can’t really quote a price on Dell equipment because who knows what it’ll be next month or in six months.  So what we do is we send you the web page.  Dell has a special Leo’s Picks page at TWiT.tv/dell, and right now on the page the Dell Dimension B110, a great Vista-compatible computer for an amazing price.  And if you’re looking for a laptop, the Inspiron – or Inspiron, depending on your point of view – E1405 Dual Core for, again, an amazing price.  Just check it out.  TWiT.tv.  I can’t...
+Also I want to thank Dell.  Dellï¿½s going to be with us for a lot longer.  Dell is a sponsor of this show and TWiT and Inside the Net.  And you can find out more about our great Dell deals.  What weï¿½ve done, because we canï¿½t ï¿½ these podcasts live on so long, we canï¿½t really quote a price on Dell equipment because who knows what itï¿½ll be next month or in six months.  So what we do is we send you the web page.  Dell has a special Leoï¿½s Picks page at TWiT.tv/dell, and right now on the page the Dell Dimension B110, a great Vista-compatible computer for an amazing price.  And if youï¿½re looking for a laptop, the Inspiron ï¿½ or Inspiron, depending on your point of view ï¿½ E1405 Dual Core for, again, an amazing price.  Just check it out.  TWiT.tv.  Iï¿½canï¿½t...
 
-STEVE:  It’s hard.
+STEVE:  Itï¿½s hard.
 
-LEO:  It’s hard not to say it.
+LEO:  Itï¿½s hard not to say it.
 
-STEVE:  It’s hard not.
+STEVE:  Itï¿½s hard not.
 
-LEO:  The price is so low, I really want to; but I can’t because it may change.  So go to TWiT.tv/dell, and you’ll see.  And then I hope you will consider Dell for your next PC.  Certainly that’s what we’re going to do.  We’re buying new PCs at Call for Help.  And as always we’re using Dells.
+LEO:  The price is so low, I really want to; but I canï¿½t because it may change.  So go to TWiT.tv/dell, and youï¿½ll see.  And then I hope you will consider Dell for your next PC.  Certainly thatï¿½s what weï¿½re going to do.  Weï¿½re buying new PCs at Call for Help.  And as always weï¿½re using Dells.
 
-We also want to thank – I’m doing them all at once here, let’s get it all out of the way – Astaro, the great Astaro, who’s been with Security Now! from the very beginning.  I really appreciate our relationship with Astaro because they, early on, came forward and said we want to support Security Now!.  They’ve never asked us how many people listen.  They just believe in the show, and they wanted to keep it on the air.  And boy, that just really feels great.  So...
+We also want to thank ï¿½ Iï¿½m doing them all at once here, letï¿½s get it all out of the way ï¿½ Astaro, the great Astaro, whoï¿½s been with Security Now! from the very beginning.  I really appreciate our relationship with Astaro because they, early on, came forward and said we want to support Security Now!.  Theyï¿½ve never asked us how many people listen.  They just believe in the show, and they wanted to keep it on the air.  And boy, that just really feels great.  So...
 
-STEVE:  Well, and for what it’s worth, it’s about 100,000 listeners; right?
+STEVE:  Well, and for what itï¿½s worth, itï¿½s about 100,000 listeners; right?
 
-LEO:  Oh, yeah.  I mean, they’re getting their money’s worth, believe me.
+LEO:  Oh, yeah.  I mean, theyï¿½re getting their moneyï¿½s worth, believe me.
 
 STEVE:  Or, no, was it 120 last time?
 
-LEO:  I can’t remember what the last number is, but...
+LEO:  I canï¿½t remember what the last number is, but...
 
 STEVE:  Yeah, I think it had gone up a little bit since our last check.
 
-LEO:  As it turns out, if they were to ask for numbers, they would be getting a better deal than they thought.  But they don’t ask, and I kind of appreciate that.  They just believe in the show.  If you want to know about Astaro’s software, you can get, by the way, as a listener, a free demo in your office of the amazing Astaro gateways.  There’s a gateway to fit all of your needs, budget and price-wise.  You get security, you get firewalling, antispam, antivirus, really a powerful package.  You might want to give Astaro a ring to find out more.  Or you can go online, Astaro.com.  Or you can call them, 877-4AS-TARO.  That’s 877-4AS-TARO to schedule your free trial of an Astaro Security Gateway appliance in your business.
+LEO:  As it turns out, if they were to ask for numbers, they would be getting a better deal than they thought.  But they donï¿½t ask, and I kind of appreciate that.  They just believe in the show.  If you want to know about Astaroï¿½s software, you can get, by the way, as a listener, a free demo in your office of the amazing Astaro gateways.  Thereï¿½s a gateway to fit all of your needs, budget and price-wise.  You get security, you get firewalling, antispam, antivirus, really a powerful package.  You might want to give Astaro a ring to find out more.  Or you can go online, Astaro.com.  Or you can call them, 877-4AS-TARO.  Thatï¿½s 877-4AS-TARO to schedule your free trial of an Astaro Security Gateway appliance in your business.
 
-Thank you very much to Dell, to Visa, to Astaro for supporting Security Now!.  Normally we will not do three ads in one podcast, by the way.  Don’t freak out, folks.  That was just an accident.  This is the one podcast, Steve, where everybody wants to be on it.
+Thank you very much to Dell, to Visa, to Astaro for supporting Security Now!.  Normally we will not do three ads in one podcast, by the way.  Donï¿½t freak out, folks.  That was just an accident.  This is the one podcast, Steve, where everybody wants to be on it.
 
-STEVE:  Well, I’m glad.
+STEVE:  Well, Iï¿½m glad.
 
 LEO:  You should be proud of yourself.
 
 STEVE:  Yeah, we certainly give it our best.
 
-LEO:  Everybody wants to be on Security Now!.  Steve’s show notes and 16KB version for the bandwidth-challenged are online at his website, GRC.com, the Gibson Research Corporation.  That’s where you’ll also find ShieldsUP! and all of his free security programs, and of course the ultimate hard drive recovery and maintenance utility.  Everybody, if you’ve got a hard drive, you ought to have SpinRite.  If you want more information and some testimonials, SpinRite.info, or just go to GRC.com.  That’s the home of Steve Gibson and SpinRite.  How are those CSS menus working for you?
+LEO:  Everybody wants to be on Security Now!.  Steveï¿½s show notes and 16KB version for the bandwidth-challenged are online at his website, GRC.com, the Gibson Research Corporation.  Thatï¿½s where youï¿½ll also find ShieldsUP! and all of his free security programs, and of course the ultimate hard drive recovery and maintenance utility.  Everybody, if youï¿½ve got a hard drive, you ought to have SpinRite.  If you want more information and some testimonials, SpinRite.info, or just go to GRC.com.  Thatï¿½s the home of Steve Gibson and SpinRite.  How are those CSS menus working for you?
 
-STEVE:  Actually I’ve been getting ready to get back to that.  I haven’t yet deployed them site-wide.  But the page that we talked about really has been popular.  Last time I looked about 850 people a day...
+STEVE:  Actually Iï¿½ve been getting ready to get back to that.  I havenï¿½t yet deployed them site-wide.  But the page that we talked about really has been popular.  Last time I looked about 850 people a day...
 
 LEO:  Wow.
 
 STEVE:  ...were looking at that menu page.
 
-LEO:  I have to – when I see – we’re going to go down to Podcast Expo a week from today, actually, because I’m going down...
+LEO:  I have to ï¿½ when I see ï¿½ weï¿½re going to go down to Podcast Expo a week from today, actually, because Iï¿½m goingï¿½down...
 
 STEVE:  Oh, right.
 
-LEO:  ...to do Podcast Academy on Thursday.  I’m going to lecture at the Podcast Academy.  I think there are still a few seats there.  There’s a banner on the TWiT homepage, TWiT.tv, if you’re interested.  And then Podcast Expo, we’re going down there.  Steve is...
+LEO:  ...to do Podcast Academy on Thursday.  Iï¿½m going to lecture at the Podcast Academy.  I think there are still a few seats there.  Thereï¿½s a banner on the TWiT homepage, TWiT.tv, if youï¿½re interested.  And then Podcast Expo, weï¿½re going down there.  Steve is...
 
 STEVE:  We ought to tell people about it, Leo, in case we have listeners...
 
@@ -806,67 +806,67 @@ LEO:  Come see us.
 
 STEVE:  ...who want to come by, yeah.
 
-LEO:  Come see us.  It’s in Ontario, California.  It’ll be Friday the 29th and Saturday the 30th of September.
+LEO:  Come see us.  Itï¿½s in Ontario, California.  Itï¿½ll be Friday the 29th and Saturday the 30th of September.
 
 STEVE:  And you and I will both be there on Friday only.
 
-LEO:  Friday only, yeah.  I have to come back and do the radio show.  But I’m doing the keynote.  You know who’s following me on the keynote – I’m kind of excited – the producer of...
+LEO:  Friday only, yeah.  I have to come back and do the radio show.  But Iï¿½m doing the keynote.  You know whoï¿½s following me on the keynote ï¿½ Iï¿½m kind of excited ï¿½ the producer of...
 
 STEVE:  Yeah.
 
-LEO:  You’ve seen that?
+LEO:  Youï¿½ve seen that?
 
-STEVE:  “Battlestar Galactica.”
+STEVE:  ï¿½Battlestar Galactica.ï¿½
 
-LEO:  “Battlestar Galactica.”
+LEO:  ï¿½Battlestar Galactica.ï¿½
 
 STEVE:  Yeah.
 
-LEO:  I’m so excited.  So this will be a chance for me to – you know, I just started watching it.  And I’ve been loving it.  I’m a fanatic now.  So Ron Moore – and one of the reasons Ron’s there is because they’ve been very forward-looking, putting “Battlestar Galactica” online and so forth.  So he’ll be talking about that.  But I was just going to say, when I’m down there, Steve – and we’re doing a live podcast at 2:00 from the exhibit hall on the main stage there.
+LEO:  Iï¿½m so excited.  So this will be a chance for me to ï¿½ you know, I just started watching it.  And Iï¿½ve been loving it.  Iï¿½m a fanatic now.  So Ron Moore ï¿½ and one of the reasons Ronï¿½s there is because theyï¿½ve been very forward-looking, putting ï¿½Battlestar Galacticaï¿½ online and so forth.  So heï¿½ll be talking about that.  But I was just going to say, when Iï¿½m down there, Steve ï¿½ and weï¿½re doing a live podcast at 2:00 from the exhibit hall on the main stageï¿½there.
 
 STEVE:  Right.
 
-LEO:  But when I’m down there, I have a new book that I just got from O’Reilly, “CSS: The Missing Manual,” the book that should have been in the box.  Maybe I’ll give this to you.
+LEO:  But when Iï¿½m down there, I have a new book that I just got from Oï¿½Reilly, ï¿½CSS: The Missing Manual,ï¿½ the book that should have been in the box.  Maybe Iï¿½ll give this to you.
 
-STEVE:  I’d love to have it.
+STEVE:  Iï¿½d love to have it.
 
-LEO:  Yeah, because I think you need to – now that you actually understand CSS better than most, be kind of fun for you to see what they’re saying about it.
+LEO:  Yeah, because I think you need to ï¿½ now that you actually understand CSS better than most, be kind of fun for you to see what theyï¿½re saying about it.
 
-STEVE:  And it is a – it is spaghetti, yup.
+STEVE:  And it is a ï¿½ it is spaghetti, yup.
 
-LEO:  Yes.  So I’ll be talking about Podcasting’s Terrible Twos.
+LEO:  Yes.  So Iï¿½ll be talking about Podcastingï¿½s Terribleï¿½Twos.
 
 STEVE:  Very cool.
 
-LEO:  That will be at 9:00 o’clock in the morning on Friday.  And...
+LEO:  That will be at 9:00 oï¿½clock in the morning on Friday.ï¿½ï¿½And...
 
-STEVE:  And actually the timing of the “Battlestar” guy is great, too, because this Friday, I mean tomorrow, is the season finale of both “Stargate SG-1” and “Stargate Atlantis,” and “Battlestar” starts up with its...
+STEVE:  And actually the timing of the ï¿½Battlestarï¿½ guy is great, too, because this Friday, I mean tomorrow, is the season finale of both ï¿½Stargate SG-1ï¿½ and ï¿½Stargate Atlantis,ï¿½ and ï¿½Battlestarï¿½ starts up with its...
 
 LEO:  2.5.
 
-STEVE:  2.5, I was going to say, it’s like they have a funny season numbering.
+STEVE:  2.5, I was going to say, itï¿½s like they have a funny season numbering.
 
-LEO:  Yeah, Season 2.5, which is bizarre.  I’m just catching up.  I’m finishing up Season 1, and I’m going to catch up with Season 2, and then I’ll be ready.  But it’s, boy, is that a great show.
+LEO:  Yeah, Season 2.5, which is bizarre.  Iï¿½m just catching up.  Iï¿½m finishing up Season 1, and Iï¿½m going to catch up with Season 2, and then Iï¿½ll be ready.  But itï¿½s, boy, is that a great show.
 
 STEVE:  It is really good.
 
-LEO:  You know who told me about it, Megan Morrone and her husband, Marco.  They’re big fans.  And I said, wait a minute, you mean the one with the little robot and the guy and the cheesy – no, no, no, not the original “Battlestar Galactica,” the new one.  And then I started – I watched the miniseries.  Oh, boy.  Oh, is that a good show.
+LEO:  You know who told me about it, Megan Morrone and her husband, Marco.  Theyï¿½re big fans.  And I said, wait a minute, you mean the one with the little robot and the guy and the cheesy ï¿½ no, no, no, not the original ï¿½Battlestar Galactica,ï¿½ the new one.  And then I started ï¿½ I watched the miniseries.  Oh, boy.  Oh, is that a good show.
 
 STEVE:  Yeah.
 
-LEO:  Love it.  But that’s not an ad, we’re just talking.
+LEO:  Love it.  But thatï¿½s not an ad, weï¿½re just talking.
 
-STEVE:  That’s just us.
+STEVE:  Thatï¿½s just us.
 
-LEO:  That’s just us.  PodcastExpo.com, or just go to TWiT.tv for a link to that.  And I hope we’ll see you there.  It’d be fun to see everybody out there.  I also want to mention that our new Windows Vista podcast launches tomorrow.  Paul Thurrott of WinSuperSite.com and Windows IT Pro, one of the, I think, probably the best Windows guy out there because he’s honest, he’s outspoken, he really tells it like it is, will be our host.  It’s going to be very much in the format of Security Now!.  Paul and I will be talking about issues in Windows.  In fact, I think our first show will be a review of RC1 of Vista.  From time to time interviews, though.  In fact, one of our plans is to get Jim Allchin as he leaves Microsoft.
+LEO:  Thatï¿½s just us.  PodcastExpo.com, or just go to TWiT.tv for a link to that.  And I hope weï¿½ll see you there.  Itï¿½d be fun to see everybody out there.  I also want to mention that our new Windows Vista podcast launches tomorrow.  Paul Thurrott of WinSuperSite.com and Windows IT Pro, one of the, I think, probably the best Windows guy out there because heï¿½s honest, heï¿½s outspoken, he really tells it like it is, will be our host.  Itï¿½s going to be very much in the format of Security Now!.  Paul and I will be talking about issues in Windows.  In fact, I think our first show will be a review of RC1 of Vista.  From time to time interviews, though.  In fact, one of our plans is to get Jim Allchin as he leaves Microsoft.
 
 STEVE:  Yeah.
 
-LEO:  His exit interview.  So that’s going to be a fun podcast.  We don’t know what we’re going to call it yet, but you’ll find out tomorrow when we release it.  All right, enough business.  Time to say goodbye.  And thank you Steve, and I’ll see you next Thursday.
+LEO:  His exit interview.  So thatï¿½s going to be a fun podcast.  We donï¿½t know what weï¿½re going to call it yet, but youï¿½ll find out tomorrow when we release it.  All right, enough business.  Time to say goodbye.  And thank you Steve, and Iï¿½ll see you next Thursday.
 
 STEVE:  Always a pleasure, Leo.
 
-LEO:  Take care.  Thanks for joining us.  This is Leo Laporte.  We’ll see you next time on Security Now!.
+LEO:  Take care.  Thanks for joining us.  This is Leo Laporte.  Weï¿½ll see you next time on Security Now!.
 
 
 Copyright (c) 2006 by Steve Gibson and Leo Laporte. SOME RIGHTS RESERVED.  This work is licensed for the good of the Internet Community under the Creative Commons License v2.5. See the following Web page for details: http://creativecommons.org/licenses/by-nc-sa/2.5/

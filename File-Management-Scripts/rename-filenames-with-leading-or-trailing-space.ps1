@@ -6,7 +6,7 @@
 
 param(
     [string[]] $TargetFolders = @(
-        '\\middough.local\corp\data\dept\Cleveland\740'
+        '\\.local\corp\data\dept\Cleveland\740'
     ),
     [switch] $Recurse = $true,
     [switch] $DryRun

@@ -23,7 +23,7 @@ foreach ($txt in $txtfiles) {
     if (test-path $txt) {
         Write-Host "File exists: $txt" -ForegroundColor Green
         # download the file
-        $output = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\txt-transcriptions\" + ($txt -split '/' | Select-Object -Last 1)
+        $output = "C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\documents\github\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\TXT-Transcriptions\\" + ($txt -split '/' | Select-Object -Last 1)
         Invoke-WebRequest -Uri $txt -OutFile $output
     } else {
         Write-Host "File does not exist: $txt" -ForegroundColor Red

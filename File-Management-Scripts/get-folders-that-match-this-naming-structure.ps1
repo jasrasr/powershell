@@ -1,4 +1,4 @@
-﻿# Define the root folder to search
+# Define the root folder to search
 $rootFolder = "N:\"
 
 # Use Get-ChildItem to search for directories in the format "N:\*\*"

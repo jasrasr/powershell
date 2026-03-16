@@ -108,7 +108,7 @@ USAGE EXAMPLES (commented out)
 # Then run the script.
 
 # Example 3: with FQDN if SPN/DNS weirdness
-# $Computers = @{ 'CLEW10AAAAA1.middough.local' = 'CLEAAAAA1' }
+# $Computers = @{ 'CLEW10AAAAA1..local' = 'CLEAAAAA1' }
 # Note: NewName should be short host portion, not FQDN.
 
 # --------------------------- #>

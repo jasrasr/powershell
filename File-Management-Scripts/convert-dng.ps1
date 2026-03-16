@@ -5,7 +5,7 @@
 # Modified Date : 2025-10-07
 
 # --- CONFIG ---
-$DcrawPath    = 'C:\Users\jason.lamb\OneDrive - middough\Downloads\LibRaw-0.21.4-Win64\LibRaw-0.21.4\bin\dcraw_emu.exe'
+$DcrawPath    = "$Downloads\LibRaw-0.21.4-Win64\LibRaw-0.21.4\bin\dcraw_emu.exe" # $Downloads defined in '!commonpowershellprofilepath.ps1'
 $MagickCmd    = 'magick'
 $InputFolder  = 'X:\Shared\Documents\CLE Office Photo Upload'
 $OutputFolder = 'Converted'

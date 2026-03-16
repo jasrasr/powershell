@@ -1,4 +1,4 @@
-﻿# Define an array of project folders
+# Define an array of project folders
 $projectfolders = @(
     "\\server\folder",
     "C:\folder"

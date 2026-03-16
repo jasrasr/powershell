@@ -168,7 +168,7 @@ Write-Host ("Files {0} | Folders {1} | Size {2} | Duration {3}s" -f $final.Total
 USAGE
 ------------------------------
 # Monitor two paths with full recursion (default), show countdown:
-.\Folder-Monitor.ps1 -TargetPaths '\\middough.local\corp\data\dept\Chicago\740','\\middough.local\corp\data\dept\Cleveland\740'
+.\Folder-Monitor.ps1 -TargetPaths '\\.local\corp\data\dept\Chicago\740','\\.local\corp\data\dept\Cleveland\740'
 
 # Limit recursion depth to 1 (only top-level files/folders):
 .\Folder-Monitor.ps1 -TargetPaths 'C:\Temp\1','C:\Temp\2' -Depth 1

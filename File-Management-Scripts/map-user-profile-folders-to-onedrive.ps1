@@ -1,4 +1,4 @@
-﻿# Define user-specific paths using $env:USERNAME
+# Define user-specific paths using $env:USERNAME
 $sourceFolders = @(
     "C:\users\$env:USERNAME\Desktop",
     "C:\users\$env:USERNAME\Documents",

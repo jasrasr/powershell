@@ -1,4 +1,4 @@
-﻿# Import Active Directory module
+# Import Active Directory module
 Import-Module ActiveDirectory
 
 # Define the username you want to check

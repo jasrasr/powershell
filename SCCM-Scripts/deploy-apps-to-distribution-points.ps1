@@ -9,13 +9,13 @@ param(
     [string] $SiteCode,             # e.g. MTS
 
     [Parameter(Mandatory)]
-    [string] $SiteServer,           # e.g. clesccm.middough.local
+    [string] $SiteServer,           # e.g. clesccm..local
 
     [Parameter(Mandatory)]
     [string[]] $ApplicationNames,   # e.g. "7-Zip","VLC","Notepad++"
 
     [Parameter(Mandatory)]
-    [string[]] $DistributionPoints, # e.g. "ASHUT01.middough.local","BUFUT01.middough.local"
+    [string[]] $DistributionPoints, # e.g. "ASHUT01..local","BUFUT01..local"
 
     [switch] $WhatIf
 )
@@ -81,14 +81,14 @@ $results | Sort-Object Application, DistributionPoint | Format-Table -AutoSize
 <#
 $apps = (Import-Csv .\apps.csv).Name
 $dpList = @(
-    "ASHUT01.middough.local",
-    "BUFUT01.middough.local",
-    "CHIPT01.middough.local"
+    "ASHUT01..local",
+    "BUFUT01..local",
+    "CHIPT01..local"
 )
 
 # Distribute directly
-.\deploy-apps-to-distribution-points.ps1 -SiteCode MTS -SiteServer clesccm.middough.local -ApplicationNames $apps -DistributionPoints $dpList
+.\deploy-apps-to-distribution-points.ps1 -SiteCode MTS -SiteServer clesccm..local -ApplicationNames $apps -DistributionPoints $dpList
 
 # WhatIf example
-.\deploy-apps-to-distribution-points.ps1 -SiteCode MTS -SiteServer clesccm.middough.local -ApplicationNames $apps -DistributionPoints $dpList -WhatIf
+.\deploy-apps-to-distribution-points.ps1 -SiteCode MTS -SiteServer clesccm..local -ApplicationNames $apps -DistributionPoints $dpList -WhatIf
 #>

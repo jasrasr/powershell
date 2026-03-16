@@ -7,18 +7,18 @@
 
 param(
     # Where your dated project list XLSX files live
-    [string] $Folder = 'C:\Users\jason.lamb\OneDrive - middough\General - IT\U & N Drive clean up',
-    # Pattern to match the dated files (e.g., "Project List Download 090425.xlsx")
-    [string] $SearchMask = 'Project List Download*.xlsx',
+    [string] $Folder = '\\servername\foldername',
+    # Pattern to match the dated files (e.g., "filename.xlsx")
+    [string] $SearchMask = 'filename*.xlsx',
 
     # Excel compare settings
-    [string] $WorksheetName = 'MIDD0821_proj_list_weekly',
+    [string] $WorksheetName = 'worksheet1',
     [string] $KeyHeader = 'Project#',
     [string] $StatusHeader = 'Stat',
     [switch] $StrictMatch,
 
     # Output
-    [string] $OutputFolder = 'C:\temp\powershell-exports'
+    [string] $OutputFolder = "$psexports"
 )
 
 # --- Setup ---

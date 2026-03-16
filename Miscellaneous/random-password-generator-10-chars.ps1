@@ -1,4 +1,4 @@
-﻿function genrandpw {
+function genrandpw {
 # Define a character set for the password
 #$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-+=<>?"
 $chars = "abcdefghijkmnopqrstuvwxyz" #rmeoved lowercase 'l' lima and upper, num, symbols

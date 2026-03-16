@@ -1,4 +1,4 @@
-﻿$remoteComputer = "chiw113jvd814"  # Replace with the name or IP of the remote computer
+$remoteComputer = "chiw113jvd814"  # Replace with the name or IP of the remote computer
 
 ping $remotecomputer
 

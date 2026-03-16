@@ -1,4 +1,4 @@
-﻿Install-Module -Name AzureAD
+Install-Module -Name AzureAD
 Connect-AzureAD
 $userUPN = "user@example.com"  # Replace with the user's UPN
 Get-AzureADAuditDirectoryLogs -Filter "initiatedBy/userPrincipalName eq '$userUPN'"

@@ -1,4 +1,4 @@
-﻿# Revision : 1.2
+# Revision : 1.2
 # Description : Save a string list into an array-formatted PowerShell file, removing trailing comma on the last item, and append multiple foreach loop examples
 # Author : Jason Lamb
 # Created Date : 2025-07-23

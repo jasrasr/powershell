@@ -4,8 +4,8 @@
 [2025-11-02 14:40:48] Checking TXT: sn-1049.txt
 [2025-11-02 14:40:48] Checking TXT: sn-1049.txt
 [2025-11-02 14:40:48] Checking TXT: sn-1049.txt
-[2025-11-02 14:40:50] Error: https://www.grc.com/sn/sn-1049.txt - The process cannot access the file 'C:\users\jason.lamb\OneDrive - middough\documents\github\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\TXT-Transcriptions\sn-1049.txt' because it is being used by another process.
-[2025-11-02 14:40:50] Error: https://www.grc.com/sn/sn-1049.txt - The process cannot access the file 'C:\users\jason.lamb\OneDrive - middough\documents\github\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\TXT-Transcriptions\sn-1049.txt' because it is being used by another process.
+[2025-11-02 14:40:50] Error: https://www.grc.com/sn/sn-1049.txt - The process cannot access the file 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\documents\github\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\TXT-Transcriptions\\sn-1049.txt' because it is being used by another process.
+[2025-11-02 14:40:50] Error: https://www.grc.com/sn/sn-1049.txt - The process cannot access the file 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\documents\github\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\TXT-Transcriptions\\sn-1049.txt' because it is being used by another process.
 [2025-11-02 14:40:50] Checking TXT: sn-1050.txt
 [2025-11-02 14:40:50] Checking TXT: sn-1050.txt
 [2025-11-02 14:40:50] Downloaded: sn-1049.txt

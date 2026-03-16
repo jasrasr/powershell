@@ -1,8 +1,8 @@
 # Get folder permissions using icacls
 
 # Define folder paths
-$projectFolderPath = '\\middough.local\corp\data\proj\!newprojecttemplate-BIM'
-$clientFolderPath = '\\middough.local\corp\data\proj\!newclienttemplate'
+$projectFolderPath = '\\.local\corp\data\proj\!newprojecttemplate-BIM'
+$clientFolderPath = '\\.local\corp\data\proj\!newclienttemplate'
 
 # Array of folder paths to process
 $folders = @($projectFolderPath, $clientFolderPath)
@@ -13,21 +13,21 @@ foreach ($folder in $folders) {
 
         # Get only directories (folders) and process them
         Get-ChildItem -Path $folder -Directory -Recurse | ForEach-Object {
-            icacls $_.FullName | out-file "C:\users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-Private\File-Management-Scripts\n drive client and folder icacls1.txt" -Append
+            icacls $_.FullName | out-file "C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\documents\github\PowerShell-Private\File-Management-Scripts\n drive client and folder icacls1.txt" -Append
         }
     } else {
         Write-Host "The specified folder path does not exist: $folder" -ForegroundColor Red
     }
 }
-notepad "C:\users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-Private\File-Management-Scripts\n drive client and folder icacls.txt"
+notepad "C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\documents\github\PowerShell-Private\File-Management-Scripts\n drive client and folder icacls.txt"
 
 $files = @(
-    'C:\users\jason.lamb\OneDrive - middough\Documents\GitHub\robocopy Logs\clean\robocopy-2025-03-31-12-58-44.log',
-    'C:\users\jason.lamb\OneDrive - middough\Documents\GitHub\robocopy Logs\clean\largerobocopy-clean1-clean.log'
+    'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\documents\github\robocopy Logs\clean\robocopy-2025-03-31-12-58-44.log',
+    'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\documents\github\robocopy Logs\clean\largerobocopy-clean1-clean.log'
 )
 
 foreach ($file in $files) {
-#$logFilePath = "C:\users\jason.lamb\OneDrive - middough\Documents\GitHub\robo"
+#$logFilePath = "C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\documents\github\robo"
 
 if (Test-Path $file) {
     $lineCount = (Get-Content $file).Count
@@ -41,8 +41,8 @@ if (Test-Path $file) {
 
 foreach ($file in $files) {
     #$logFilePath = $file
-#$logFilePath = "C:\users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-Private\File-Management-Scripts\n drive client and folder icacls1.txt"
-#$logFilePath = "C:\users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell-Private\File-Management-Scripts\n drive client and folder icacls1.txt"
+#$logFilePath = "C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\documents\github\PowerShell-Private\File-Management-Scripts\n drive client and folder icacls1.txt"
+#$logFilePath = "C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\documents\github\PowerShell-Private\File-Management-Scripts\n drive client and folder icacls1.txt"
 if (Test-Path $file) {
     # Efficient way to count lines without reading entire file into memory
     $lineCount = [System.IO.File]::ReadLines($file) | Measure-Object -Line

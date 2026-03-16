@@ -134,7 +134,7 @@ EXAMPLE RUN / USAGE
 
 # 1. Define the folders to process
 $newPaths = @(
-    "\\middough.local\corp\data\dept\Cleveland\750\Share\Accts Payable\__PAID\2025 PAID\_ACHs\2025-12-23\Email"
+    "\\.local\corp\data\dept\Cleveland\750\Share\Accts Payable\__PAID\2025 PAID\_ACHs\2025-12-23\Email"
 )
 
 # 2. Dry run first (recommended)

@@ -1,4 +1,4 @@
-﻿# Import the Storage module (optional, depending on your system)
+# Import the Storage module (optional, depending on your system)
 #Import-Module Storage
 
 # Get the partition object for drive C

@@ -149,15 +149,15 @@ $distSummary | Sort-Object Application, DistributionPoint | Format-Table -AutoSi
 <#
 $apps = (Import-Csv .\apps.csv).Name
 $dpList = @(
-    "ashut01.middough.local",
-    "bufut01.middough.local",
-    "chiut01.middough.local",
-    "nwiut01.middough.local",
-    "pitut01.middough.local",
-    "tolut01.middough.local",
-    "clesccm.middough.local"
+    "ashut01..local",
+    "bufut01..local",
+    "chiut01..local",
+    "nwiut01..local",
+    "pitut01..local",
+    "tolut01..local",
+    "clesccm..local"
 )
-.\Deploy-AppsToUserCollection.ps1 -SiteCode MTS -SiteServer clesccm.middough.local -UserCollectionName "view all apps" -ApplicationNames $apps -DistributionPoints $dpList
+.\Deploy-AppsToUserCollection.ps1 -SiteCode MTS -SiteServer clesccm..local -UserCollectionName "view all apps" -ApplicationNames $apps -DistributionPoints $dpList
 
 # WhatIf example
 .\Deploy-AppsToUserCollection.ps1 -SiteCode ABC -SiteServer cm01.contoso.com -UserCollectionName "All Marketing Users" -ApplicationNames $apps -DistributionPoints $dpList -WhatIf
