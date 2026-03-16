@@ -3,8 +3,8 @@
 ## Purpose
 A lightweight HTML + JavaScript password generator front end served by PowerShell.
 
-## Directory listing
-| Name | Type | Description |
-| --- | --- | --- |
-| `README.md` | File | Markdown documentation |
-| `pw.html` | File | HTML page |
+## Files
+| Name | Type | Rev | Description |
+| --- | --- | --- | --- |
+| `pw.html` | html | 3cfac93 | HTML page |
+| `README.md` | md | 6fd63ee | Documentation |
