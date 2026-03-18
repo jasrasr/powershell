@@ -230,7 +230,7 @@ function Test-HardcodedPaths {
                 $results += [PSCustomObject]@{
                     Check    = 'HardcodedPaths'
                     Severity = [Severity]::Warning
-                    Message  = "... (additional hardcoded paths truncated)"
+                    Message  = "… (additional hardcoded paths truncated)"
                 }
                 break
             }
