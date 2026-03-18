@@ -1,0 +1,6 @@
+; start script
+_OPEN "C:\folder\file.dwg"
+-PURGE ALL *
+AUDIT N
+_SAVE
+_CLOSE

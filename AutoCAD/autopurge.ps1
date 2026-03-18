@@ -1,7 +1,7 @@
 # Paths
 $coreConsolePath = "C:\Program Files\Autodesk\AutoCAD 2026\accoreconsole.exe"
-$scriptFile     = "C:\Temp\193-Scrubber-Oil\autopurge.scr"
-$dwgFull        = "C:\Temp\193-Scrubber-Oil\193-P-1908.dwg"
+$scriptFile     = "C:\folder\autopurge.scr"
+$dwgFull        = "C:\folder\file.dwg"
 
 Write-Host "Purging file: $dwgFull" -ForegroundColor Cyan
 
