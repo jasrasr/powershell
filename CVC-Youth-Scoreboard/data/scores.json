@@ -1,42 +1,42 @@
 {
-    "title": "CVC Youth Scoreboard",
-    "updatedAt": null,
-    "teams": [
-        {
-            "id": "sixth-grade-boys",
-            "name": "6th Grade Boys",
-            "color": "#1d4ed8",
-            "score": 0
-        },
-        {
-            "id": "sixth-grade-girls",
-            "name": "6th Grade Girls",
-            "color": "#db2777",
-            "score": 0
-        },
-        {
-            "id": "seventh-grade-boys",
-            "name": "7th Grade Boys",
-            "color": "#0f766e",
-            "score": 0
-        },
-        {
-            "id": "seventh-grade-girls",
-            "name": "7th Grade Girls",
-            "color": "#7c3aed",
-            "score": 0
-        },
-        {
-            "id": "eighth-grade-boys",
-            "name": "8th Grade Boys",
-            "color": "#ea580c",
-            "score": 0
-        },
-        {
-            "id": "eighth-grade-girls",
-            "name": "8th Grade Girls",
-            "color": "#15803d",
-            "score": 0
-        }
-    ]
+  "title": "CVC Youth Scoreboard",
+  "updatedAt": "2026-03-19T11:42:44.895Z",
+  "teams": [
+    {
+      "id": "sixth-grade-boys",
+      "name": "6th Grade Boys",
+      "color": "#1d4ed8",
+      "score": 0
+    },
+    {
+      "id": "sixth-grade-girls",
+      "name": "6th Grade Girls",
+      "color": "#db2777",
+      "score": 0
+    },
+    {
+      "id": "seventh-grade-boys",
+      "name": "7th Grade Boys",
+      "color": "#0f766e",
+      "score": 0
+    },
+    {
+      "id": "seventh-grade-girls",
+      "name": "7th Grade Girls",
+      "color": "#7c3aed",
+      "score": 0
+    },
+    {
+      "id": "eighth-grade-boys",
+      "name": "8th Grade Boys",
+      "color": "#ea580c",
+      "score": 0
+    },
+    {
+      "id": "eighth-grade-girls",
+      "name": "8th Grade Girls",
+      "color": "#15803d",
+      "score": 0
+    }
+  ]
 }

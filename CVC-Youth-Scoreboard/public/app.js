@@ -1,28 +1,18 @@
 const quickValues = [1, 3, 5, 10];
 const pollIntervalMs = 2000;
-const apiEndpoint = './api.php';
 let currentData = null;
 
 async function fetchScores() {
-  const response = await fetch(`${apiEndpoint}?action=scores`, {
-    cache: 'no-store'
-  });
-
+  const response = await fetch('/api/scores');
   if (!response.ok) {
     throw new Error('Unable to load scores.');
   }
-
   currentData = await response.json();
   return currentData;
 }
 
-async function postJson(action, teamId, payload = {}) {
-  const params = new URLSearchParams({ action });
-  if (teamId) {
-    params.set('team', teamId);
-  }
-
-  const response = await fetch(`${apiEndpoint}?${params.toString()}`, {
+async function postJson(url, payload = {}) {
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -52,12 +42,10 @@ function formatUpdatedAt(updatedAt) {
 
 function createQuickButtons(teamId) {
   return quickValues
-    .map(
-      (value) => `
-        <button class="positive" type="button" data-action="adjust" data-team-id="${teamId}" data-amount="${value}">+${value}</button>
-        <button class="negative" type="button" data-action="adjust" data-team-id="${teamId}" data-amount="-${value}">-${value}</button>
-      `
-    )
+    .map((value) => `
+      <button class="positive" type="button" data-action="adjust" data-team-id="${teamId}" data-amount="${value}">+${value}</button>
+      <button class="negative" type="button" data-action="adjust" data-team-id="${teamId}" data-amount="-${value}">-${value}</button>
+    `)
     .join('');
 }
 
@@ -175,13 +163,13 @@ async function handleAdminAction(event) {
       const action = actionButton.dataset.action;
 
       if (action === 'adjust') {
-        await postJson('update', teamId, {
+        await postJson(`/api/scores/team/${teamId}`, {
           amount: Number(actionButton.dataset.amount)
         });
       }
 
       if (action === 'reset-team') {
-        await postJson('reset-team', teamId);
+        await postJson(`/api/scores/team/${teamId}/reset`);
       }
 
       renderAdmin(currentData);
@@ -190,12 +178,12 @@ async function handleAdminAction(event) {
     }
 
     if (event.target.id === 'open-viewer-button') {
-      window.open('./viewer.php', '_blank', 'noopener');
+      window.open('/viewer.html', '_blank', 'noopener');
       return;
     }
 
     if (event.target.id === 'reset-all-button') {
-      await postJson('reset-all');
+      await postJson('/api/scores/reset');
       renderAdmin(currentData);
       setStatus(`All teams reset at ${formatUpdatedAt(currentData.updatedAt)}`);
       return;
@@ -211,7 +199,7 @@ async function handleAdminAction(event) {
         return;
       }
 
-      await postJson('update', teamId, { amount });
+      await postJson(`/api/scores/team/${teamId}`, { amount });
       renderAdmin(currentData);
       setStatus(`Custom score saved at ${formatUpdatedAt(currentData.updatedAt)}`);
     }

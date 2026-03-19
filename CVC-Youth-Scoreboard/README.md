@@ -4,6 +4,10 @@ A small PHP scoreboard app for tracking six youth division scores with two pages
 
 - `index.php` for scorekeepers to update scores.
 - `viewer.php` for a read-only public display page.
+A small Node/Express web app for tracking six youth division scores with two pages:
+
+- `/` for scorekeepers to update scores.
+- `/viewer.html` for a read-only public display page.
 
 ## Features
 
@@ -21,6 +25,8 @@ A small PHP scoreboard app for tracking six youth division scores with two pages
 ```bash
 cd CVC-Youth-Scoreboard
 php -S 127.0.0.1:8000
+npm install
+npm start
 ```
 
 Then open:
@@ -39,3 +45,11 @@ Upload the contents of `CVC-Youth-Scoreboard` into your `scoreboard` folder on t
 Make sure the `data` folder is writable by PHP so the app can update `data/scores.json`.
 
 If your host supports directory index files, `index.php` should load automatically at `https://jasr.me/scoreboard/`.
+- `http://localhost:3000/` for the admin page.
+- `http://localhost:3000/viewer.html` for the viewer page.
+
+## Hosting notes
+
+Because this app writes to a JSON file, it needs a host that supports running Node.js server-side code and allows file writes to the app directory or a writable data location.
+
+If you later move it to `jasr.me/scoreboard`, point that path at this app and keep `data/scores.json` writable.
