@@ -9,6 +9,9 @@ Changes in 2.3:
 - Added: targeted group removal (allowlist) for Azure group-based licensing
 - Menu preserved: individual actions + Run All
 - Run All order: group removal BEFORE license removal to reduce group-license removal errors
+
+Jason Lamb did not create this script in any way. It is a heavily modified version of the original script created by Vlad Catrinescu, which can be found here:
+https://www.powershellgallery.com/packages/M365UserOffBoarding/1.0.0
 =============================================================================================
 #>
 

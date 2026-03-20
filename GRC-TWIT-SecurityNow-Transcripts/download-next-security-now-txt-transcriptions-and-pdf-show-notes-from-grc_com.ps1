@@ -1,9 +1,9 @@
 # Filename: download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com.ps1
-# Revision: 2.4
+# Revision: 2.6
 # Description: Downloads GRC Security Now TXT transcripts, PDF show notes, and JPG episode images (all weekly podcast) with smart empty folder detection and resume, logging, and persistent tracking
 # Author: Jason Lamb (with help from ChatGPT)
 # Created Date: 2025-05-16
-# Modified Date: 2026-03-13
+# Modified Date: 2026-03-20
 # Changelog:
 # 1.0 Initial release
 # 1.1 Added logging improvements
@@ -20,14 +20,16 @@
 # 2.2 Updated JPG to grab all available from 1 to 1069+
 # 2.3 Removed hard 1069 limit, JPG now runs indefinitely for weekly podcast with smart failure detection
 # 2.4 All three file types (TXT, PDF, JPG) now run indefinitely with independent empty folder detection - works with new and existing computers
+# 2.5 Fixed jpgDownloaded init from 19 to 0; fixed no-JSON path to scan existing files instead of always restarting from hardcoded starting points
+# 2.6 All three file types now run through all episodes below 1070 without stopping on failures; stop after 2 consecutive failures at 1070 and beyond; updated PDF start to 432, JPG start to 980
 
 $global:downloadbase = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads"
 $global:baseUrl = "https://www.grc.com/sn/"
 $global:jpgBaseUrl = "https://www.grc.com/sn/"
 
 $startingPointTXT = 1     # 001
-$startingPointPDF = 595
-$startingPointJPG = 1     # Changed from 999 to 1 to grab full range
+$startingPointPDF = 432   # Earliest available PDF on grc.com
+$startingPointJPG = 980   # Earliest available JPG on grc.com
 
 $trackingFile = Join-Path $global:downloadbase 'last-downloaded.json'
 
@@ -77,6 +79,11 @@ $txtFilesExist = (Get-ChildItem -Path $txtFolder -Filter "*.txt" -ErrorAction Si
 $pdfFilesExist = (Get-ChildItem -Path $pdfFolder -Filter "*.pdf" -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0
 $jpgFilesExist = (Get-ChildItem -Path $jpgFolder -Filter "*.jpg" -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0
 
+# ===== SCAN FOLDERS FOR HIGHEST EXISTING EPISODE =====
+$global:baselineLastTXT = Get-HighestEpisodeFromFolder -Folder $txtFolder -Filter "sn-*.txt" -Pattern '^sn-(\d+)\.txt$'
+$global:baselineLastPDF = Get-HighestEpisodeFromFolder -Folder $pdfFolder -Filter "sn-*-notes.pdf" -Pattern '^sn-(\d+)-notes\.pdf$'
+$global:baselineLastJPG = Get-HighestEpisodeFromFolder -Folder $jpgFolder -Filter "*.jpg" -Pattern '^(\d+)\.jpg$'
+
 # ===== LOAD TRACKING =====
 if (Test-Path $trackingFile) {
     try {
@@ -123,9 +130,10 @@ if (Test-Path $trackingFile) {
     }
 }
 else {
-    $global:nextTXT = $startingPointTXT
-    $global:nextPDF = $startingPointPDF
-    $global:nextJPG = $startingPointJPG
+    # No JSON - resume from highest file found on disk, or use hardcoded starting points for fresh installs
+    $global:nextTXT = if ($null -ne $global:baselineLastTXT) { $global:baselineLastTXT + 1 } else { $startingPointTXT }
+    $global:nextPDF = if ($null -ne $global:baselineLastPDF) { $global:baselineLastPDF + 1 } else { $startingPointPDF }
+    $global:nextJPG = if ($null -ne $global:baselineLastJPG) { $global:baselineLastJPG + 1 } else { $startingPointJPG }
 
     Write-Host ("No tracking file found. Starting from : TXT {0:000}, PDF {1}, JPG {2}" -f $global:nextTXT, $global:nextPDF, $global:nextJPG) -ForegroundColor Yellow
     Write-Log ("No tracking file found. Starting from : TXT {0:000}, PDF {1}, JPG {2}" -f $global:nextTXT, $global:nextPDF, $global:nextJPG)
@@ -133,20 +141,16 @@ else {
 
 $global:txtDownloaded = 0
 $global:pdfDownloaded = 0
-$global:jpgDownloaded = 19
+$global:jpgDownloaded = 0
 
 $global:lastTXT = $null
 $global:lastPDF = $null
 $global:lastJPG = $null
 
-$global:baselineLastTXT = Get-HighestEpisodeFromFolder -Folder $txtFolder -Filter "sn-*.txt" -Pattern '^sn-(\d+)\.txt$'
-$global:baselineLastPDF = Get-HighestEpisodeFromFolder -Folder $pdfFolder -Filter "sn-*-notes.pdf" -Pattern '^sn-(\d+)-notes\.pdf$'
-$global:baselineLastJPG = Get-HighestEpisodeFromFolder -Folder $jpgFolder -Filter "*.jpg" -Pattern '^(\d+)\.jpg$'
-
 # ===== TXT =====
 function Get-GRCTXT {
 
-    $txtMaxConsecutiveFailures = 2
+    $maxConsecutiveFailures = 2
     $failureCount = 0
 
     while ($true) {
@@ -177,10 +181,12 @@ function Get-GRCTXT {
         catch {
             $failureCount++
             Write-Log ("Missing TXT : sn-{0}.txt" -f $txtNumPadded)
-            
-            if ($failureCount -ge $txtMaxConsecutiveFailures) {
-                Write-Host ("Stopping TXT download after {0} consecutive failures at episode {1}" -f $txtMaxConsecutiveFailures, $txtNumPadded) -ForegroundColor Yellow
-                Write-Log ("Stopping TXT download after {0} consecutive failures at episode {1}" -f $txtMaxConsecutiveFailures, $txtNumPadded)
+
+            # Before episode 1070, keep going through gaps - all episodes are known to exist in this range
+            # At 1070 and beyond, stop after 2 consecutive failures (new episode territory)
+            if ($global:nextTXT -ge 1070 -and $failureCount -ge $maxConsecutiveFailures) {
+                Write-Host ("Stopping TXT download after {0} consecutive failures at episode {1}" -f $maxConsecutiveFailures, $txtNumPadded) -ForegroundColor Yellow
+                Write-Log ("Stopping TXT download after {0} consecutive failures at episode {1}" -f $maxConsecutiveFailures, $txtNumPadded)
                 break
             }
         }
@@ -192,7 +198,7 @@ function Get-GRCTXT {
 # ===== PDF =====
 function Get-GRCPDF {
 
-    $pdfMaxConsecutiveFailures = 2
+    $maxConsecutiveFailures = 2
     $failureCount = 0
 
     while ($true) {
@@ -222,10 +228,12 @@ function Get-GRCPDF {
         catch {
             $failureCount++
             Write-Log ("Missing PDF : sn-{0}-notes.pdf" -f $global:nextPDF)
-            
-            if ($failureCount -ge $pdfMaxConsecutiveFailures) {
-                Write-Host ("Stopping PDF download after {0} consecutive failures at episode {1}" -f $pdfMaxConsecutiveFailures, $global:nextPDF) -ForegroundColor Yellow
-                Write-Log ("Stopping PDF download after {0} consecutive failures at episode {1}" -f $pdfMaxConsecutiveFailures, $global:nextPDF)
+
+            # Before episode 1070, keep going through gaps - all episodes are known to exist in this range
+            # At 1070 and beyond, stop after 2 consecutive failures (new episode territory)
+            if ($global:nextPDF -ge 1070 -and $failureCount -ge $maxConsecutiveFailures) {
+                Write-Host ("Stopping PDF download after {0} consecutive failures at episode {1}" -f $maxConsecutiveFailures, $global:nextPDF) -ForegroundColor Yellow
+                Write-Log ("Stopping PDF download after {0} consecutive failures at episode {1}" -f $maxConsecutiveFailures, $global:nextPDF)
                 break
             }
         }
@@ -237,8 +245,8 @@ function Get-GRCPDF {
 # ===== JPG =====
 function Get-GRCJPG {
 
+    $maxConsecutiveFailures = 2
     $failureCount = 0
-    $failureThreshold = 200  # Allow up to 20 failures before 1070 (more tolerant for early gaps/missing episodes)
 
     while ($true) {
 
@@ -267,13 +275,12 @@ function Get-GRCJPG {
         catch {
             $failureCount++
             Write-Log ("Missing JPG : {0}.jpg" -f $global:nextJPG)
-            
-            # Adaptive failure threshold: before 1070 allow many gaps, after 1070 stop at 2 failures
-            $currentThreshold = if ($global:nextJPG -ge 1070) { 2 } else { $failureThreshold }
-            
-            if ($failureCount -ge $currentThreshold) {
-                Write-Host ("Stopping JPG download after {0} consecutive failures at episode {1}" -f $failureCount, $global:nextJPG) -ForegroundColor Yellow
-                Write-Log ("Stopping JPG download after {0} consecutive failures at episode {1}" -f $failureCount, $global:nextJPG)
+
+            # Before episode 1070, keep going through gaps - all episodes are known to exist in this range
+            # At 1070 and beyond, stop after 2 consecutive failures (new episode territory)
+            if ($global:nextJPG -ge 1070 -and $failureCount -ge $maxConsecutiveFailures) {
+                Write-Host ("Stopping JPG download after {0} consecutive failures at episode {1}" -f $maxConsecutiveFailures, $global:nextJPG) -ForegroundColor Yellow
+                Write-Log ("Stopping JPG download after {0} consecutive failures at episode {1}" -f $maxConsecutiveFailures, $global:nextJPG)
                 break
             }
         }
@@ -335,9 +342,10 @@ EXAMPLE USAGE
 #   * If folder has files, it resumes from JSON tracking file
 # - Starting points (used only when JSON tracking file is missing):
 #   TXT : 001
-#   PDF : 595
-#   JPG : 1
-# - All three file types run indefinitely (weekly podcast) and stop after 2 consecutive failures
+#   PDF : 432
+#   JPG : 980
+# - All three file types run through all episodes below 1070 without stopping on failures (known archive)
+# - At episode 1070 and beyond, each type stops independently after 2 consecutive failures (new episode territory)
 # - Run this script weekly to pick up new episodes as they are released
 # - JSON tracking file (last-downloaded.json) is created/updated automatically
 #>
