@@ -189,9 +189,11 @@ input {
 
 .viewer-page {
   height: 100vh;
+  height: 100dvh;
   padding: 1rem;
   display: flex;
   flex-direction: column;
+  overflow: auto;
 }
 
 .viewer-page .page-header {
@@ -217,11 +219,11 @@ input {
 }
 
 .viewer-card .score-value {
-  font-size: clamp(5rem, 13vw, 10rem);
+  font-size: clamp(2rem, min(13vw, 13vh), 10rem);
 }
 
 .viewer-card .team-name {
-  font-size: clamp(1.2rem, 2vw, 2rem);
+  font-size: clamp(0.9rem, min(2vw, 2vh), 2rem);
 }
 
 .hidden {
@@ -240,6 +242,10 @@ input {
 }
 
 @media (max-width: 720px) {
+  body.viewer-body {
+    overflow: auto;
+  }
+
   .page-shell {
     width: min(100vw - 1rem, 100%);
   }
@@ -264,6 +270,14 @@ input {
   .viewer-grid {
     grid-template-columns: 1fr;
     grid-template-rows: none;
+  }
+
+  .viewer-card .score-value {
+    font-size: clamp(2rem, 15vw, 4rem);
+  }
+
+  .viewer-card .team-name {
+    font-size: clamp(1rem, 5vw, 1.5rem);
   }
 
   .viewer-page {

@@ -1,14 +1,14 @@
 <?php
 /**
- * Filename: scoreboard_lib.php
+ * Filename: youth/scoreboard_lib.php
  * Revision: 1.0
- * Description: Core library for CVC Youth Scoreboard. Defines default team data,
- *              handles JSON file read/write with file locking, and HTTP JSON responses.
+ * Description: Core library for CVC Youth Scoreboard. Defines 8 teams
+ *              (6th-12th Grade + Grads), handles JSON file read/write with file locking.
  * Author: Jason Lamb (with help from Claude)
  * Created Date: 2026-03-19
  * Modified Date: 2026-03-19
  * Changelog
- * 1.0 Initial PHP release, converted from Node.js/Express
+ * 1.0 Initial release for Youth scoreboard instance
  */
 
 declare(strict_types=1);
@@ -22,39 +22,51 @@ function scoreboardDefaultData(): array
         'updatedAt' => null,
         'teams' => [
             [
-                'id' => 'sixth-grade-boys',
-                'name' => '6th Grade Boys',
+                'id' => 'sixth-grade',
+                'name' => '6th Grade',
                 'color' => '#1d4ed8',
                 'score' => 0,
             ],
             [
-                'id' => 'sixth-grade-girls',
-                'name' => '6th Grade Girls',
+                'id' => 'seventh-grade',
+                'name' => '7th Grade',
                 'color' => '#db2777',
                 'score' => 0,
             ],
             [
-                'id' => 'seventh-grade-boys',
-                'name' => '7th Grade Boys',
+                'id' => 'eighth-grade',
+                'name' => '8th Grade',
                 'color' => '#0f766e',
                 'score' => 0,
             ],
             [
-                'id' => 'seventh-grade-girls',
-                'name' => '7th Grade Girls',
+                'id' => 'ninth-grade',
+                'name' => '9th Grade',
                 'color' => '#7c3aed',
                 'score' => 0,
             ],
             [
-                'id' => 'eighth-grade-boys',
-                'name' => '8th Grade Boys',
+                'id' => 'tenth-grade',
+                'name' => '10th Grade',
                 'color' => '#ea580c',
                 'score' => 0,
             ],
             [
-                'id' => 'eighth-grade-girls',
-                'name' => '8th Grade Girls',
+                'id' => 'eleventh-grade',
+                'name' => '11th Grade',
                 'color' => '#15803d',
+                'score' => 0,
+            ],
+            [
+                'id' => 'twelfth-grade',
+                'name' => '12th Grade',
+                'color' => '#dc2626',
+                'score' => 0,
+            ],
+            [
+                'id' => 'grads',
+                'name' => 'Grads',
+                'color' => '#ca8a04',
                 'score' => 0,
             ],
         ],

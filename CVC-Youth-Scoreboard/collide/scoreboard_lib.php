@@ -1,14 +1,14 @@
 <?php
 /**
- * Filename: scoreboard_lib.php
+ * Filename: collide/scoreboard_lib.php
  * Revision: 1.0
- * Description: Core library for CVC Youth Scoreboard. Defines default team data,
- *              handles JSON file read/write with file locking, and HTTP JSON responses.
+ * Description: Core library for CVC Collide Scoreboard. Defines 6 teams
+ *              (6th-8th Boys/Girls), handles JSON file read/write with file locking.
  * Author: Jason Lamb (with help from Claude)
  * Created Date: 2026-03-19
  * Modified Date: 2026-03-19
  * Changelog
- * 1.0 Initial PHP release, converted from Node.js/Express
+ * 1.0 Initial release for Collide scoreboard instance
  */
 
 declare(strict_types=1);
@@ -18,42 +18,42 @@ const SCOREBOARD_DATA_FILE = __DIR__ . '/data/scores.json';
 function scoreboardDefaultData(): array
 {
     return [
-        'title' => 'CVC Youth Scoreboard',
+        'title' => 'CVC Collide Scoreboard',
         'updatedAt' => null,
         'teams' => [
             [
-                'id' => 'sixth-grade-boys',
-                'name' => '6th Grade Boys',
+                'id' => 'sixth-boys',
+                'name' => '6th Boys',
                 'color' => '#1d4ed8',
                 'score' => 0,
             ],
             [
-                'id' => 'sixth-grade-girls',
-                'name' => '6th Grade Girls',
+                'id' => 'sixth-girls',
+                'name' => '6th Girls',
                 'color' => '#db2777',
                 'score' => 0,
             ],
             [
-                'id' => 'seventh-grade-boys',
-                'name' => '7th Grade Boys',
+                'id' => 'seventh-boys',
+                'name' => '7th Boys',
                 'color' => '#0f766e',
                 'score' => 0,
             ],
             [
-                'id' => 'seventh-grade-girls',
-                'name' => '7th Grade Girls',
+                'id' => 'seventh-girls',
+                'name' => '7th Girls',
                 'color' => '#7c3aed',
                 'score' => 0,
             ],
             [
-                'id' => 'eighth-grade-boys',
-                'name' => '8th Grade Boys',
+                'id' => 'eighth-boys',
+                'name' => '8th Boys',
                 'color' => '#ea580c',
                 'score' => 0,
             ],
             [
-                'id' => 'eighth-grade-girls',
-                'name' => '8th Grade Girls',
+                'id' => 'eighth-girls',
+                'name' => '8th Girls',
                 'color' => '#15803d',
                 'score' => 0,
             ],
