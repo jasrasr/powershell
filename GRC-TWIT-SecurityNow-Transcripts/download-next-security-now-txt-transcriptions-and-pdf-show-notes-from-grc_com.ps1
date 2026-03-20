@@ -23,7 +23,7 @@
 
 $global:downloadbase = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads"
 $global:baseUrl = "https://www.grc.com/sn/"
-$global:jpgBaseUrl = "https://www.grc.com/SN/"
+$global:jpgBaseUrl = "https://www.grc.com/sn/"
 
 $startingPointTXT = 1     # 001
 $startingPointPDF = 595
@@ -50,6 +50,26 @@ function Write-Log {
     param ([string]$Message)
     $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
     Add-Content -Path $global:logFile -Value ("[{0}] {1}" -f $timestamp, $Message)
+}
+
+function Get-HighestEpisodeFromFolder {
+    param (
+        [string]$Folder,
+        [string]$Filter,
+        [string]$Pattern
+    )
+
+    $maxEpisode = $null
+    Get-ChildItem -Path $Folder -Filter $Filter -File -ErrorAction SilentlyContinue | ForEach-Object {
+        if ($_.Name -match $Pattern) {
+            $episode = [int]$matches[1]
+            if ($null -eq $maxEpisode -or $episode -gt $maxEpisode) {
+                $maxEpisode = $episode
+            }
+        }
+    }
+
+    return $maxEpisode
 }
 
 # ===== CHECK IF FOLDERS ARE EMPTY =====
@@ -118,6 +138,10 @@ $global:jpgDownloaded = 19
 $global:lastTXT = $null
 $global:lastPDF = $null
 $global:lastJPG = $null
+
+$global:baselineLastTXT = Get-HighestEpisodeFromFolder -Folder $txtFolder -Filter "sn-*.txt" -Pattern '^sn-(\d+)\.txt$'
+$global:baselineLastPDF = Get-HighestEpisodeFromFolder -Folder $pdfFolder -Filter "sn-*-notes.pdf" -Pattern '^sn-(\d+)-notes\.pdf$'
+$global:baselineLastJPG = Get-HighestEpisodeFromFolder -Folder $jpgFolder -Filter "*.jpg" -Pattern '^(\d+)\.jpg$'
 
 # ===== TXT =====
 function Get-GRCTXT {
@@ -262,9 +286,9 @@ function Get-GRCJPG {
 function Save-State {
 
     $data = @{
-        LastTXT = if ($global:lastTXT) { $global:lastTXT } else { $global:nextTXT - 1 }
-        LastPDF = if ($global:lastPDF) { $global:lastPDF } else { $global:nextPDF - 1 }
-        LastJPG = if ($global:lastJPG) { $global:lastJPG } else { $global:nextJPG - 1 }
+        LastTXT = if ($null -ne $global:lastTXT) { $global:lastTXT } elseif ($null -ne $global:baselineLastTXT) { $global:baselineLastTXT } else { $startingPointTXT - 1 }
+        LastPDF = if ($null -ne $global:lastPDF) { $global:lastPDF } elseif ($null -ne $global:baselineLastPDF) { $global:baselineLastPDF } else { $startingPointPDF - 1 }
+        LastJPG = if ($null -ne $global:lastJPG) { $global:lastJPG } elseif ($null -ne $global:baselineLastJPG) { $global:baselineLastJPG } else { $startingPointJPG - 1 }
     }
 
     $data | ConvertTo-Json | Set-Content -Path $trackingFile -Encoding UTF8
