@@ -6,7 +6,7 @@ $jpgDownloadPath = Join-Path $downloadbase 'JPG-Episode-Images'
 $pdfDownloadPath = Join-Path $downloadbase 'PDF-Transcripts'
 $txtDownloadPath = Join-Path $downloadbase 'TXT-Transcripts'    
 
-# Download JPG files from grc.com/sn/1.jpg to 998.jpg
+# Download JPG files from https://www.grc.com/sn/1.jpg to 998.jpg
 $baseUrl = 'https://www.grc.com/sn'
 
 for ($i = 1; $i -le 998; $i++) {
