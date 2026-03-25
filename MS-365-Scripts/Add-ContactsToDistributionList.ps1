@@ -12,12 +12,12 @@
 # Modified Date : 2026-03-25
 # Changelog :
 # 1.0 Initial release
-# 1.1 Set default DistributionList to AltronicDistributorMgmtMailList
+# 1.1 Set default DistributionList to a specific distribution list
 # 2.0 Reworked to match actual CSV format (Name, Email, Company, etc.)
 #     Added empty row skipping, JSON array cleanup, Name splitting
 # 2.1 Removed -DistributionList param; added $DLMap hashtable to map
 #     Email List names to actual distribution list email addresses
-# 2.2 Added full DLMap: Gas Engine Distributor, Packagers, GTI Bi-Fuel
+# 2.2 Added full DLMap with multiple distribution list mappings
 # 2.3 Use email as -Name to avoid duplicate name conflicts in Exchange
 # 2.4 Skip Connect-ExchangeOnline if already connected
 # 2.5 Added per-action result tracking and CSV export to $psexports
@@ -27,14 +27,13 @@
 # 2.8 Removed auto-disconnect from Exchange Online on completion
 # 3.0 Added Update and Remove actions via Action column in CSV
 # 3.1 Fixed alias generation - collapse consecutive periods, strip trailing periods
-# 3.2 Skip contact creation for internal domains (cooperservices.com, altronic-llc.com)
-#     but still add them to DLs as members
+# 3.2 Skip contact creation for internal domains but still add them to DLs as members
 # 3.3 Default Action to "Add" when column is missing or empty in CSV
 # 3.4 Treat "already a member" as Skipped instead of Failed when adding to DL
 # 3.5 Added Delete action with other-group safety check before deletion
-# 3.6 Added per-contact countdown showing current/total/remaining
 #     Filter only requires Email (Name optional for deletes)
 #     Added Skipped Users and Skipped Groups counters to summary
+# 3.6 Added per-contact countdown showing current/total/remaining
 # ============================================================
 
 <#
@@ -47,21 +46,38 @@
     & ".\Add-ContactsToDistributionList.ps1" -CsvPath ".\contacts.csv"
 
 .NOTES
+    This script was originally built to process a CSV exported from a SharePoint contact
+    list, but it can be adapted for any CSV source. The Email List column format (JSON
+    array) matches the SharePoint multi-value column export format. If your CSV uses a
+    simpler format (e.g. a single DL name per row), the $emailLists parsing block can
+    be updated accordingly.
+
     Expected CSV columns:
-      Action     - Add | Update | Remove
+      Action     - Add | Update | Remove | Delete (optional — defaults to Add if missing)
       Name       - Full name
-      Email      - External email address
-      Company    - Company name (may be JSON array format)
-      Email List - JSON array of list names e.g. ["Distributor Management","GTI Bi-Fuel"]
+      Email      - Email address (external contacts will be created; internal domains skipped)
+      Company    - Company name (supports JSON array format e.g. ["Acme Corp"])
+      Email List - JSON array of distribution list names e.g. ["Group A","Group B"]
       Status, Notes, Created By, Modified, Modified By (informational, not used by script)
 
     Action behaviors:
       Add    - Creates the contact if it does not exist; adds to all listed DLs
       Update - Updates Name/Company on existing contact; syncs DL memberships
                (adds to listed DLs, removes from any mapped DLs not in the list)
-      Remove - Removes contact from all listed DLs; deletes the contact
+      Remove - Removes contact from listed DLs only; contact is kept in 365
+      Delete - Removes contact from listed DLs; deletes the contact if not in any
+               other groups outside the mapped DLs
 
-    Update $DLMap in the script to map list names to distribution list email addresses.
+    Sample CSV layout:
+      Action,Name,Email,Company,Email List,Status,Notes,Created By,Modified,Modified By
+      Add,John Smith,john.smith@example.com,"[""Acme Corp""]","[""Group A"",""Group B""]",Active,,Admin,1/1/2025,Admin
+      Add,Jane Doe,jane.doe@example.com,"[""Widget Co""]","[""Group B""]",Active,,Admin,1/1/2025,Admin
+      Update,John Smith,john.smith@example.com,"[""Acme Corp""]","[""Group A""]",Active,,Admin,2/1/2025,Admin
+      Remove,Jane Doe,jane.doe@example.com,"[""Widget Co""]","[""Group B""]",,,,,
+      Delete,john.smith@example.com,john.smith@example.com,,,,,,
+
+    Update $DLMap in the script to map list names to your distribution list email addresses.
+    Update $InternalDomains with any domains that already exist as mailboxes in your tenant.
     Requires Exchange Admin or Recipient Management role.
     Results are exported to $psexports as a CSV and opened on completion.
 #>
@@ -74,8 +90,8 @@ param(
 # Internal domains - skip contact creation, add directly to DLs
 # ------------------------------------------------------------
 $InternalDomains = @(
-    "cooperservices.com"
-    "altronic-llc.com"
+    "yourdomain.com"
+    "yourotherdomain.com"
 )
 
 # ------------------------------------------------------------
@@ -83,10 +99,10 @@ $InternalDomains = @(
 # Add more entries here as needed
 # ------------------------------------------------------------
 $DLMap = @{
-    "Distributor Management" = "AltronicDistributorMgmtMailList@altronic-llc.com"
-    "Gas Engine Distributor" = "AltronicDistributorMailList@altronic-llc.com"
-    "Packagers"              = "AltronicPackagersMailList@altronic-llc.com"
-    "GTI Bi-Fuel"            = "GTIDistributorMailList@altronic-llc.com"
+    "Group A" = "dl-groupa@yourdomain.com"
+    "Group B" = "dl-groupb@yourdomain.com"
+    "Group C" = "dl-groupc@yourdomain.com"
+    "Group D" = "dl-groupd@yourdomain.com"
 }
 
 # ------------------------------------------------------------
