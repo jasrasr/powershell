@@ -1,6 +1,6 @@
 # ============================================================
 # Filename : Add-ContactsToDistributionList.ps1
-# Revision : 3.5
+# Revision : 3.6
 # Description : Manages mail contacts in Microsoft 365 from a
 #               CSV file. Supports Add, Update, and Remove
 #               actions per contact including DL membership sync.
@@ -32,6 +32,7 @@
 # 3.3 Default Action to "Add" when column is missing or empty in CSV
 # 3.4 Treat "already a member" as Skipped instead of Failed when adding to DL
 # 3.5 Added Delete action with other-group safety check before deletion
+# 3.6 Added per-contact countdown showing current/total/remaining
 #     Filter only requires Email (Name optional for deletes)
 #     Added Skipped Users and Skipped Groups counters to summary
 # ============================================================
@@ -123,6 +124,8 @@ $successCount   = 0
 $errorCount     = 0
 $skippedUsers   = 0
 $skippedGroups  = 0
+$totalContacts  = ($contacts | Measure-Object).Count
+$currentIndex   = 0
 
 # Helper to add a result row
 function Add-Result {
@@ -140,6 +143,10 @@ function Add-Result {
 }
 
 foreach ($contact in $contacts) {
+    $currentIndex++
+    $remaining = $totalContacts - $currentIndex
+    Write-Host "`n[$currentIndex of $totalContacts | $remaining remaining] Processing $($contact.Email)" -ForegroundColor White
+
     # Parse common fields
     $action      = if ($contact.Action) { $contact.Action.Trim() } else { "Add" }
     $nameParts   = $contact.Name.Trim().Split(" ", 2)
