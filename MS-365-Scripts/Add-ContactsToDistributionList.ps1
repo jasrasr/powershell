@@ -1,6 +1,6 @@
 # ============================================================
 # Filename : Add-ContactsToDistributionList.ps1
-# Revision : 3.6
+# Revision : 3.7
 # Description : Manages mail contacts in Microsoft 365 from a
 #               CSV file. Supports Add, Update, and Remove
 #               actions per contact including DL membership sync.
@@ -34,6 +34,9 @@
 #     Filter only requires Email (Name optional for deletes)
 #     Added Skipped Users and Skipped Groups counters to summary
 # 3.6 Added per-contact countdown showing current/total/remaining
+# 3.7 Action column moved to far right; now JSON array format e.g. ["Add"]
+#     Status ["not active"] triggers Delete; ["Changed"] triggers Update
+#     Prompt for CSV path if not passed as parameter
 # ============================================================
 
 <#
@@ -52,13 +55,18 @@
     simpler format (e.g. a single DL name per row), the $emailLists parsing block can
     be updated accordingly.
 
-    Expected CSV columns:
-      Action     - Add | Update | Remove | Delete (optional — defaults to Add if missing)
-      Name       - Full name
-      Email      - Email address (external contacts will be created; internal domains skipped)
-      Company    - Company name (supports JSON array format e.g. ["Acme Corp"])
-      Email List - JSON array of distribution list names e.g. ["Group A","Group B"]
-      Status, Notes, Created By, Modified, Modified By (informational, not used by script)
+    Expected CSV columns (Action is the last/rightmost column):
+      Name        - Full name
+      Email       - Email address (external contacts will be created; internal domains skipped)
+      Company     - Company name (supports JSON array format e.g. ["Acme Corp"])
+      Email List  - JSON array of distribution list names e.g. ["Group A","Group B"]
+      Status      - ["Active"] | ["Changed"] | ["not active"] — drives action automatically
+      Notes, Created By, Modified, Modified By (informational, not used by script)
+      Action      - JSON array format e.g. ["Add"] | ["Update"] | ["Remove"] | ["Delete"]
+                    Defaults to Add if column is missing or empty
+                    Note: Status column can override Action automatically:
+                          ["not active"] forces Delete
+                          ["Changed"]    forces Update
 
     Action behaviors:
       Add    - Creates the contact if it does not exist; adds to all listed DLs
@@ -68,13 +76,12 @@
       Delete - Removes contact from listed DLs; deletes the contact if not in any
                other groups outside the mapped DLs
 
-    Sample CSV layout:
-      Action,Name,Email,Company,Email List,Status,Notes,Created By,Modified,Modified By
-      Add,John Smith,john.smith@example.com,"[""Acme Corp""]","[""Group A"",""Group B""]",Active,,Admin,1/1/2025,Admin
-      Add,Jane Doe,jane.doe@example.com,"[""Widget Co""]","[""Group B""]",Active,,Admin,1/1/2025,Admin
-      Update,John Smith,john.smith@example.com,"[""Acme Corp""]","[""Group A""]",Active,,Admin,2/1/2025,Admin
-      Remove,Jane Doe,jane.doe@example.com,"[""Widget Co""]","[""Group B""]",,,,,
-      Delete,john.smith@example.com,john.smith@example.com,,,,,,
+    Sample CSV layout (Action is rightmost column, Status drives action automatically):
+      Name,Email,Company,Email List,Status,Notes,Created By,Modified,Modified By,Action
+      John Smith,john.smith@example.com,"[""Acme Corp""]","[""Group A"",""Group B""]","[""Active""]",,Admin,1/1/2025,Admin,"[""Add""]"
+      Jane Doe,jane.doe@example.com,"[""Widget Co""]","[""Group B""]","[""Active""]",,Admin,1/1/2025,Admin,
+      John Smith,john.smith@example.com,"[""Acme Corp""]","[""Group A""]","[""Changed""]",,Admin,2/1/2025,Admin,
+      Jane Doe,jane.doe@example.com,"[""Widget Co""]","[""Group B""]","[""not active""]",,Admin,3/1/2025,Admin,
 
     Update $DLMap in the script to map list names to your distribution list email addresses.
     Update $InternalDomains with any domains that already exist as mailboxes in your tenant.
@@ -82,9 +89,12 @@
     Results are exported to $psexports as a CSV and opened on completion.
 #>
 param(
-    [Parameter(Mandatory)]
     [string]$CsvPath
 )
+
+if (-not $CsvPath) {
+    $CsvPath = Read-Host "Enter the path to the CSV file"
+}
 
 # ------------------------------------------------------------
 # Internal domains - skip contact creation, add directly to DLs
@@ -164,7 +174,14 @@ foreach ($contact in $contacts) {
     Write-Host "`n[$currentIndex of $totalContacts | $remaining remaining] Processing $($contact.Email)" -ForegroundColor White
 
     # Parse common fields
-    $action      = if ($contact.Action) { $contact.Action.Trim() } else { "Add" }
+    # Action column is JSON array format e.g. ["Add"], ["Delete"] — strip brackets/quotes
+    $action      = if ($contact.Action) { ($contact.Action -replace '[\[\]\""]', '').Trim() } else { "Add" }
+
+    # Override action based on Status column value
+    $status = ($contact.Status -replace '[\[\]\""]', '').Trim()
+    if     ($status -eq "not active") { $action = "Delete" }
+    elseif ($status -eq "Changed")    { $action = "Update" }
+
     $nameParts   = $contact.Name.Trim().Split(" ", 2)
     $firstName   = $nameParts[0]
     $lastName    = if ($nameParts.Count -gt 1) { $nameParts[1] } else { "" }
