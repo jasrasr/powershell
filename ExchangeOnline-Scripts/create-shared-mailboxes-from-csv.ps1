@@ -1,4 +1,4 @@
-# Revision    : 2.2
+# Revision    : 2.3
 # Description : Create shared mailboxes in Exchange Online from a CSV file.
 # Author      : Jason Lamb
 # Created Date: 2026-03-26
@@ -21,6 +21,7 @@
 #         (temp-XXXXXX-alias@domain) then reassign real address as primary and remove temp
 #   2.1 - Check existing permissions before adding; skip with friendly message instead of EXO SID warning
 #   2.2 - Fix temp address workaround: set UPN to real address before stripping aliases so temp is fully removed
+#   2.3 - Member lookup falls back to last-name wildcard search if exact display name finds no UserMailbox
 #
 # CSV Format (comma-delimited, Excel default, headers required):
 #   Name             - Display name of the shared mailbox (required)
@@ -268,9 +269,26 @@ foreach ($row in $rows) {
                          Select-Object -First 1
 
             if (-not $recipient) {
-                Write-Failure "Could not resolve '$memberName' as a UserMailbox — MailUser/MailContact skipped"
-                $result.MembersFailed++
-                continue
+                # Fallback: search by exact last name match in case of nickname mismatch (e.g. "Dave" vs "David")
+                # Uses wildcard to find candidates, then filters to exact last-name match to avoid substring collisions
+                $lastName  = $memberName.Split(' ')[-1]
+                $fallback  = Get-Recipient -Filter "DisplayName -like '*$lastName*'" -ErrorAction Stop |
+                             Where-Object { $_.RecipientType -eq 'UserMailbox' -and $_.DisplayName.Split(' ')[-1] -eq $lastName }
+                if ($fallback.Count -eq 1) {
+                    $recipient = $fallback[0]
+                    Write-Skip "No exact match for '$memberName' — using '$($recipient.DisplayName)' ($($recipient.PrimarySmtpAddress)) by last name"
+                }
+                elseif ($fallback.Count -gt 1) {
+                    Write-Failure "Ambiguous last name match for '$memberName' — multiple UserMailboxes found, skipping. Update CSV with exact display name:"
+                    $fallback | ForEach-Object { Write-Failure "  -> $($_.DisplayName) ($($_.PrimarySmtpAddress))" }
+                    $result.MembersFailed++
+                    continue
+                }
+                else {
+                    Write-Failure "Could not resolve '$memberName' as a UserMailbox — MailUser/MailContact skipped"
+                    $result.MembersFailed++
+                    continue
+                }
             }
 
             $memberIdentity = $recipient.PrimarySmtpAddress
