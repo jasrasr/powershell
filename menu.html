@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<!--
+File Name   : menu.html
+Author      : Jason Lamb (with help from GitHub Copilot)
+Created     : 2026-04-14
+Modified    : auto
+Revision    : auto
+
+Description :
+  Auto-discovers every .html and .php file in the jasrasr/jasrasr.github.io
+  repository via the GitHub Contents API and renders them as a clickable
+  navigation grid.  No build step is required — the page fetches the current
+  file tree at load time so new files appear automatically.
+
+  Works as a fully static page on GitHub Pages (no server-side PHP needed).
+
+Change Log:
+- 1.0 (2026-04-14)
+  - Initial release
+  - GitHub API tree fetch with recursive scan
+  - Color-coded responsive grid (matches links.html palette)
+  - Live search / filter bar
+  - Folder-grouped sections with collapsible headers
+  - Manual refresh button
+  - Auto-updating footer
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Menu — jasrasr.github.io</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    /* ── Reset ─────────────────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #f4f4f4;
+      color: #333;
+    }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    header {
+      background: #222;
+      color: #fff;
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      flex: 1 1 auto;
+    }
+
+    #searchInput {
+      flex: 1 1 200px;
+      max-width: 340px;
+      padding: 0.45rem 0.75rem;
+      border-radius: 6px;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    #refreshBtn {
+      padding: 0.45rem 1rem;
+      border-radius: 6px;
+      border: none;
+      background: #00bcd4;
+      color: #fff;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    #refreshBtn:hover { background: #0097a7; }
+    #refreshBtn:disabled { background: #666; cursor: default; }
+
+    /* ── Status / error banner ──────────────────────────────── */
+    #status {
+      text-align: center;
+      padding: 0.6rem;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    #status.loading { display: block; background: #e8f4fd; color: #1565c0; }
+    #status.error   { display: block; background: #fdecea; color: #b71c1c; }
+
+    /* ── Main content ───────────────────────────────────────── */
+    main {
+      flex: 1;
+      padding: 1rem 1rem 2rem;
+    }
+
+    /* ── Folder group ───────────────────────────────────────── */
+    .folder-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .folder-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      user-select: none;
+      padding: 0.5rem 0.75rem;
+      background: #ddd;
+      border-radius: 6px 6px 0 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #444;
+    }
+
+    .folder-header:hover { background: #ccc; }
+
+    .folder-header .arrow {
+      transition: transform 0.2s;
+      display: inline-block;
+    }
+
+    .folder-header.collapsed .arrow { transform: rotate(-90deg); }
+
+    .folder-body {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      overflow: hidden;
+    }
+
+    .folder-body.collapsed { display: none; }
+
+    /* ── Link tiles ─────────────────────────────────────────── */
+    .link-area {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: center;
+      padding: 16px 10px;
+      min-height: 90px;
+      transition: transform 0.1s ease, opacity 0.15s ease;
+      word-break: break-word;
+      gap: 4px;
+    }
+
+    .link-area:active { transform: scale(0.97); opacity: 0.9; }
+
+    .link-area .badge {
+      font-size: 0.65rem;
+      font-weight: 400;
+      opacity: 0.85;
+      background: rgba(0,0,0,0.2);
+      border-radius: 3px;
+      padding: 1px 5px;
+    }
+
+    /* Color palette — cycles every 6 tiles */
+    .link-area:nth-child(6n+1) { background-color: #007BFF; }
+    .link-area:nth-child(6n+2) { background-color: #28A745; }
+    .link-area:nth-child(6n+3) { background-color: #FFC107; color: #222; }
+    .link-area:nth-child(6n+3) .badge { background: rgba(0,0,0,0.15); }
+    .link-area:nth-child(6n+4) { background-color: #DC3545; }
+    .link-area:nth-child(6n+5) { background-color: #6F42C1; }
+    .link-area:nth-child(6n+6) { background-color: #20C997; }
+
+    /* "Hidden" tile used for search filtering */
+    .link-area.hidden { display: none; }
+
+    /* ── No-results message ─────────────────────────────────── */
+    #noResults {
+      display: none;
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #888;
+      font-size: 1.1rem;
+    }
+
+    /* ── Footer ─────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 8px;
+      font-size: 0.82rem;
+      color: #666;
+      background: #e8e8e8;
+      border-top: 1px solid #ddd;
+    }
+
+    /* ── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .folder-body { grid-template-columns: repeat(2, 1fr); }
+      .link-area { font-size: 0.95rem; }
+    }
+
+    @media (max-width: 600px) {
+      .folder-body { grid-template-columns: 1fr; }
+      .link-area { font-size: 1rem; min-height: 80px; }
+      header h1 { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── Header ─────────────────────────────────────────── -->
+  <header>
+    <h1>📂 Site Menu</h1>
+    <input id="searchInput" type="search" placeholder="Search files…" aria-label="Search files" />
+    <button id="refreshBtn" aria-label="Refresh file list">⟳ Refresh</button>
+  </header>
+
+  <!-- ── Status banner ──────────────────────────────────── -->
+  <div id="status" role="status"></div>
+
+  <!-- ── File grid ──────────────────────────────────────── -->
+  <main id="main">
+    <div id="noResults">No matching files found.</div>
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────── -->
+  <footer id="footer"></footer>
+
+  <script>
+    /* ───────── Configuration ───────────────────────────────── */
+    const REPO_OWNER  = 'jasrasr';
+    const REPO_NAME   = 'jasrasr.github.io';
+    const REPO_BRANCH = 'main';
+    const BASE_URL    = `https://${REPO_OWNER}.github.io`;
+
+    /* GitHub API — public rate-limit is 60 req/hr unauthenticated */
+    const API_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/git/trees/${REPO_BRANCH}?recursive=1`;
+
+    /* ───────── DOM refs ────────────────────────────────────── */
+    const mainEl      = document.getElementById('main');
+    const statusEl    = document.getElementById('status');
+    const searchInput = document.getElementById('searchInput');
+    const refreshBtn  = document.getElementById('refreshBtn');
+    const noResults   = document.getElementById('noResults');
+    const footerEl    = document.getElementById('footer');
+
+    /* ───────── Metadata ────────────────────────────────────── */
+    const fileName = 'menu.html';
+    const revision = '1.0';
+
+    /* ───────── Helpers ─────────────────────────────────────── */
+    function setStatus(msg, type) {
+      statusEl.textContent = msg;
+      statusEl.className = type;   // 'loading' | 'error' | ''
+    }
+
+    function clearStatus() { setStatus('', ''); }
+
+    /**
+     * Returns the "folder" bucket for a file path.
+     * Root-level files are grouped under '(root)'.
+     */
+    function folderOf(path) {
+      const parts = path.split('/');
+      return parts.length > 1 ? parts.slice(0, -1).join('/') : '(root)';
+    }
+
+    /** Convert a raw file path to a display label (filename without extension). */
+    function labelOf(path) {
+      const name = path.split('/').pop();
+      return name.replace(/\.(html|php)$/i, '');
+    }
+
+    /** Build the live URL for a repo file. */
+    function urlOf(path) {
+      return `${BASE_URL}/${path}`;
+    }
+
+    /* ───────── Render ──────────────────────────────────────── */
+    function render(files) {
+      /* Remove everything except the noResults sentinel */
+      [...mainEl.querySelectorAll('.folder-group')].forEach(el => el.remove());
+
+      /* Group by folder */
+      const groups = {};
+      for (const path of files) {
+        const folder = folderOf(path);
+        (groups[folder] = groups[folder] || []).push(path);
+      }
+
+      /* Sort: (root) first, then alphabetical */
+      const folderKeys = Object.keys(groups).sort((a, b) => {
+        if (a === '(root)') return -1;
+        if (b === '(root)') return 1;
+        return a.localeCompare(b);
+      });
+
+      for (const folder of folderKeys) {
+        const group = document.createElement('div');
+        group.className = 'folder-group';
+
+        /* Collapsible header */
+        const header = document.createElement('div');
+        header.className = 'folder-header';
+        header.innerHTML = `<span class="arrow">▾</span> ${folder}`;
+        header.addEventListener('click', () => {
+          header.classList.toggle('collapsed');
+          body.classList.toggle('collapsed');
+        });
+
+        /* Tile grid */
+        const body = document.createElement('div');
+        body.className = 'folder-body';
+
+        for (const path of groups[folder]) {
+          const a = document.createElement('a');
+          a.className = 'link-area';
+          a.href = urlOf(path);
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.dataset.path = path.toLowerCase();
+
+          const ext = path.split('.').pop().toLowerCase();
+          a.innerHTML = `${labelOf(path)}<span class="badge">.${ext}</span>`;
+
+          body.appendChild(a);
+        }
+
+        group.appendChild(header);
+        group.appendChild(body);
+        mainEl.insertBefore(group, noResults);
+      }
+    }
+
+    /* ───────── Filter (search) ─────────────────────────────── */
+    function applyFilter(query) {
+      const q = query.trim().toLowerCase();
+      let anyVisible = false;
+
+      mainEl.querySelectorAll('.folder-group').forEach(group => {
+        const tiles = group.querySelectorAll('.link-area');
+        let groupVisible = false;
+
+        tiles.forEach(tile => {
+          const match = !q || tile.dataset.path.includes(q);
+          tile.classList.toggle('hidden', !match);
+          if (match) groupVisible = true;
+        });
+
+        group.style.display = groupVisible ? '' : 'none';
+        if (groupVisible) anyVisible = true;
+      });
+
+      noResults.style.display = anyVisible ? 'none' : 'block';
+    }
+
+    /* ───────── Fetch from GitHub API ───────────────────────── */
+    async function loadFiles() {
+      setStatus('Loading file list from GitHub…', 'loading');
+      refreshBtn.disabled = true;
+
+      try {
+        const resp = await fetch(API_URL, {
+          headers: { Accept: 'application/vnd.github.v3+json' }
+        });
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          throw new Error(err.message || `HTTP ${resp.status}`);
+        }
+
+        const data = await resp.json();
+
+        /* Filter for .html and .php blobs only */
+        const files = (data.tree || [])
+          .filter(item => item.type === 'blob' && /\.(html|php)$/i.test(item.path))
+          .map(item => item.path)
+          .sort((a, b) => a.localeCompare(b));
+
+        clearStatus();
+        render(files);
+        applyFilter(searchInput.value);
+
+        if (files.length === 0) {
+          noResults.style.display = 'block';
+          noResults.textContent = 'No HTML or PHP files found in this repository.';
+        }
+      } catch (err) {
+        setStatus(`Error loading files: ${err.message}`, 'error');
+      } finally {
+        refreshBtn.disabled = false;
+      }
+    }
+
+    /* ───────── Event wiring ────────────────────────────────── */
+    searchInput.addEventListener('input', () => applyFilter(searchInput.value));
+    refreshBtn.addEventListener('click', loadFiles);
+
+    /* ───────── Footer ──────────────────────────────────────── */
+    (function updateFooter() {
+      const year     = new Date().getFullYear();
+      const modified = new Date().toLocaleDateString();
+      footerEl.textContent =
+        `${fileName} | Rev ${revision} | © ${year} | Modified ${modified} | Repo: ${REPO_OWNER}/${REPO_NAME}`;
+    })();
+
+    /* ───────── Boot ────────────────────────────────────────── */
+    loadFiles();
+  </script>
+
+</body>
+</html>
