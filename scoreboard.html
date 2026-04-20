@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scoreboard</title>
+    <style>
+        :root {
+            --page-bg: #0f0f13;
+            --panel-bg: #1a1a22;
+            --card-bg: #22222e;
+            --border: #2e2e3e;
+            --text: #e8e8f0;
+            --text-muted: #888;
+            --positive: #4ade80;
+            --negative: #f87171;
+            --accent: #6366f1;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--page-bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ---- Header ---- */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-bottom: 1px solid var(--border);
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .title-wrap { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+
+        #titleDisplay {
+            font-size: clamp(1.3rem, 4vw, 2rem);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            cursor: default;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        body.admin-mode #titleDisplay { cursor: pointer; }
+        body.admin-mode #titleDisplay:hover { text-decoration: underline dotted; }
+
+        #titleInput {
+            font-size: clamp(1.1rem, 3vw, 1.6rem);
+            font-weight: 700;
+            background: var(--panel-bg);
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            color: var(--text);
+            padding: 4px 10px;
+            display: none;
+            width: min(320px, 55vw);
+        }
+
+        .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        /* ---- Buttons ---- */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity .15s, transform .1s;
+            line-height: 1;
+        }
+        .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-danger  { background: #dc2626; color: #fff; }
+        .btn-warning { background: #d97706; color: #fff; }
+        .btn-ghost   { background: var(--border); color: var(--text); }
+        .btn-sm { padding: 5px 10px; font-size: 0.78rem; }
+
+        /* ---- Admin-only visibility ---- */
+        .admin-only { display: none; }
+        body.admin-mode .admin-flex  { display: flex; }
+        body.admin-mode .admin-block { display: block; }
+
+        /* ---- Main / Settings ---- */
+        .main { padding: 20px; max-width: 1600px; margin: 0 auto; }
+
+        .settings-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .settings-panel.open { display: block; }
+
+        .settings-panel h2 {
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .8px;
+        }
+
+        .settings-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .settings-row label { font-size: 0.9rem; color: var(--text-muted); }
+
+        .settings-row input[type=number] {
+            width: 70px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            color: var(--text);
+            padding: 6px 10px;
+            font-size: 0.9rem;
+        }
+
+        /* ---- Team Grid ---- */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        /* ---- Team Card ---- */
+        .team-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .team-card-stripe { height: 6px; }
+
+        .team-card-body { padding: 16px; }
+
+        .team-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 8px;
+        }
+
+        .score-display {
+            text-align: center;
+            font-weight: 800;
+            line-height: 1;
+            padding: 10px 0;
+            transition: color .2s;
+        }
+
+        /* ---- Quick Buttons ---- */
+        .quick-btns {
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .quick-btn {
+            flex: 1;
+            min-width: 38px;
+            padding: 7px 3px;
+            border: none;
+            border-radius: 7px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity .15s, transform .1s;
+        }
+        .quick-btn:hover { opacity: 0.8; transform: translateY(-1px); }
+        .quick-btn:active { transform: translateY(0); }
+        .quick-btn.pos { background: #166534; color: #bbf7d0; }
+        .quick-btn.neg { background: #7f1d1d; color: #fecaca; }
+
+        /* ---- Custom score input row ---- */
+        .custom-row {
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .custom-row input {
+            flex: 1;
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            color: var(--text);
+            padding: 6px 10px;
+            font-size: 0.85rem;
+            min-width: 0;
+        }
+
+        /* ---- Rename / Reset row ---- */
+        .team-admin-row {
+            margin-top: 8px;
+            gap: 6px;
+        }
+
+        .team-admin-row input {
+            flex: 1;
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            color: var(--text);
+            padding: 5px 8px;
+            font-size: 0.82rem;
+            min-width: 0;
+        }
+
+        /* ---- Activity Log ---- */
+        .activity-section { margin-top: 24px; }
+
+        .activity-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            user-select: none;
+            padding: 6px 0;
+        }
+
+        .activity-log {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            max-height: 280px;
+            overflow-y: auto;
+            display: none;
+        }
+        .activity-log.open { display: block; }
+
+        .log-entry {
+            display: flex;
+            gap: 12px;
+            padding: 7px 14px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.8rem;
+            align-items: baseline;
+        }
+        .log-entry:last-child { border-bottom: none; }
+        .log-time { color: var(--text-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+        .log-msg  { color: var(--text); }
+
+        /* ---- Viewer mode enlargement ---- */
+        body.viewer-mode .score-display { padding: 16px 0; }
+        body.viewer-mode .team-card-body { padding: 20px; }
+        body.viewer-mode .team-grid { gap: 20px; }
+        body.viewer-mode .team-name { font-size: 1.15rem; }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 600px) {
+            .main { padding: 12px; }
+            .team-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .team-card-body { padding: 12px; }
+            .quick-btn { padding: 6px 2px; font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body class="viewer-mode">
+
+<header class="page-header">
+    <div class="title-wrap">
+        <span id="titleDisplay">Scoreboard</span>
+        <input id="titleInput" type="text" maxlength="60" placeholder="Scoreboard title…">
+    </div>
+    <div class="header-actions">
+        <button class="btn btn-ghost btn-sm admin-only admin-flex" id="settingsToggleBtn" type="button">⚙ Settings</button>
+        <button class="btn btn-danger btn-sm admin-only admin-flex" id="resetAllBtn" type="button">Reset All</button>
+        <button class="btn btn-primary btn-sm" id="modeToggleBtn" type="button">Admin Mode</button>
+    </div>
+</header>
+
+<main class="main">
+
+    <div class="settings-panel" id="settingsPanel">
+        <h2>Settings</h2>
+        <div class="settings-row">
+            <label>Number of teams:
+                <input type="number" id="teamCountInput" min="2" max="12" value="6">
+            </label>
+            <button class="btn btn-primary btn-sm" id="applyTeamsBtn" type="button">Apply</button>
+            <button class="btn btn-warning btn-sm" id="clearDataBtn" type="button">Clear All Data</button>
+        </div>
+    </div>
+
+    <div class="team-grid" id="teamGrid"></div>
+
+    <div class="activity-section admin-only admin-block" id="activitySection">
+        <div class="activity-toggle" id="activityToggle">
+            <span id="activityArrow">▶</span> Recent Activity
+        </div>
+        <div class="activity-log" id="activityLog"></div>
+    </div>
+
+</main>
+
+<script>
+    // ---- Constants ----
+    const STORAGE_KEY = 'scoreboard_v1';
+    const PALETTE = [
+        '#6366f1', '#ec4899', '#f59e0b', '#10b981',
+        '#3b82f6', '#ef4444', '#8b5cf6', '#14b8a6',
+        '#f97316', '#06b6d4', '#a3e635', '#fb7185',
+    ];
+
+    function defaultState() {
+        return {
+            title: 'Scoreboard',
+            teams: [
+                { id: 1, name: '6th Grade Boys',   color: PALETTE[0], score: 0 },
+                { id: 2, name: '6th Grade Girls',  color: PALETTE[1], score: 0 },
+                { id: 3, name: '7th Grade Boys',   color: PALETTE[2], score: 0 },
+                { id: 4, name: '7th Grade Girls',  color: PALETTE[3], score: 0 },
+                { id: 5, name: '8th Grade Boys',   color: PALETTE[4], score: 0 },
+                { id: 6, name: '8th Grade Girls',  color: PALETTE[5], score: 0 },
+            ],
+        };
+    }
+
+    // ---- State ----
+    let state = loadState();
+    let adminMode = false;
+    let auditLog = [];
+    let activityOpen = false;
+
+    function loadState() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) return JSON.parse(raw);
+        } catch (_) { /* ignore */ }
+        return defaultState();
+    }
+
+    function saveState() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function addLog(msg) {
+        const now = new Date();
+        const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        auditLog.unshift({ time, msg });
+        if (auditLog.length > 200) auditLog.length = 200;
+    }
+
+    // ---- Score font sizing (mirrors CVC Scoreboard logic) ----
+    function scoreFontSize(score) {
+        const len = String(Math.abs(score)).length + (score < 0 ? 1 : 0);
+        if (len >= 8) return '1.8rem';
+        if (len >= 7) return '2.2rem';
+        if (len >= 6) return '2.8rem';
+        if (len >= 5) return '3.4rem';
+        if (len >= 4) return '4rem';
+        if (len >= 3) return '5rem';
+        return 'clamp(3rem, 7vw, 5.5rem)';
+    }
+
+    // ---- XSS escape ----
+    function esc(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    // ---- Render ----
+    function render() {
+        renderGrid();
+        renderActivityLog();
+        document.getElementById('titleDisplay').textContent = state.title;
+        document.getElementById('teamCountInput').value = state.teams.length;
+    }
+
+    function renderGrid() {
+        const grid = document.getElementById('teamGrid');
+
+        // Track focused element so we can restore focus after re-render
+        const focused = document.activeElement;
+        const focusId    = focused ? focused.dataset.teamId : null;
+        const focusField = focused ? focused.dataset.field  : null;
+
+        grid.innerHTML = '';
+        state.teams.forEach(team => {
+            const card = document.createElement('div');
+            card.className = 'team-card';
+            card.innerHTML = `
+                <div class="team-card-stripe" style="background:${esc(team.color)}"></div>
+                <div class="team-card-body">
+                    <div class="team-name">${esc(team.name)}</div>
+                    <div class="score-display"
+                         style="color:${esc(team.color)};font-size:${scoreFontSize(team.score)}"
+                    >${team.score}</div>
+
+                    <div class="quick-btns admin-only admin-flex">
+                        <button class="quick-btn pos" data-id="${team.id}" data-delta="1">+1</button>
+                        <button class="quick-btn pos" data-id="${team.id}" data-delta="3">+3</button>
+                        <button class="quick-btn pos" data-id="${team.id}" data-delta="5">+5</button>
+                        <button class="quick-btn pos" data-id="${team.id}" data-delta="10">+10</button>
+                        <button class="quick-btn neg" data-id="${team.id}" data-delta="-1">-1</button>
+                        <button class="quick-btn neg" data-id="${team.id}" data-delta="-3">-3</button>
+                        <button class="quick-btn neg" data-id="${team.id}" data-delta="-5">-5</button>
+                    </div>
+
+                    <div class="custom-row admin-only admin-flex">
+                        <input type="number" placeholder="Custom ±" data-team-id="${team.id}" data-field="custom">
+                        <button class="btn btn-ghost btn-sm" data-id="${team.id}" data-action="apply-custom">Apply</button>
+                    </div>
+
+                    <div class="team-admin-row admin-only admin-flex">
+                        <input type="text" maxlength="40" placeholder="Rename team…"
+                               data-team-id="${team.id}" data-field="rename">
+                        <button class="btn btn-ghost btn-sm" data-id="${team.id}" data-action="rename">Rename</button>
+                        <button class="btn btn-danger btn-sm" data-id="${team.id}" data-action="reset-team">Reset</button>
+                    </div>
+                </div>`;
+            grid.appendChild(card);
+        });
+
+        // Restore focus
+        if (focusId && focusField) {
+            const el = grid.querySelector(`[data-team-id="${focusId}"][data-field="${focusField}"]`);
+            if (el) el.focus();
+        }
+    }
+
+    function renderActivityLog() {
+        const log = document.getElementById('activityLog');
+        if (!auditLog.length) {
+            log.innerHTML = '<div class="log-entry"><span class="log-msg" style="color:var(--text-muted)">No activity yet.</span></div>';
+            return;
+        }
+        log.innerHTML = auditLog.slice(0, 60).map(e =>
+            `<div class="log-entry">
+                <span class="log-time">${esc(e.time)}</span>
+                <span class="log-msg">${esc(e.msg)}</span>
+             </div>`
+        ).join('');
+    }
+
+    // ---- Title editing ----
+    const titleDisplay = document.getElementById('titleDisplay');
+    const titleInput   = document.getElementById('titleInput');
+
+    titleDisplay.addEventListener('click', () => {
+        if (!adminMode) return;
+        titleInput.value = state.title;
+        titleDisplay.style.display = 'none';
+        titleInput.style.display = '';
+        titleInput.focus();
+        titleInput.select();
+    });
+
+    titleInput.addEventListener('blur',    commitTitle);
+    titleInput.addEventListener('keydown', e => { if (e.key === 'Enter') commitTitle(); });
+
+    function commitTitle() {
+        const val = titleInput.value.trim();
+        if (val && val !== state.title) {
+            addLog(`Title renamed: "${state.title}" → "${val}"`);
+            state.title = val;
+            saveState();
+        }
+        titleDisplay.textContent  = state.title;
+        titleDisplay.style.display = '';
+        titleInput.style.display  = 'none';
+    }
+
+    // ---- Mode toggle ----
+    document.getElementById('modeToggleBtn').addEventListener('click', () => {
+        adminMode = !adminMode;
+        document.body.classList.toggle('admin-mode',  adminMode);
+        document.body.classList.toggle('viewer-mode', !adminMode);
+        document.getElementById('modeToggleBtn').textContent = adminMode ? 'Viewer Mode' : 'Admin Mode';
+        if (!adminMode) document.getElementById('settingsPanel').classList.remove('open');
+    });
+
+    // ---- Settings panel ----
+    document.getElementById('settingsToggleBtn').addEventListener('click', () => {
+        document.getElementById('settingsPanel').classList.toggle('open');
+    });
+
+    document.getElementById('applyTeamsBtn').addEventListener('click', () => {
+        const count = parseInt(document.getElementById('teamCountInput').value, 10);
+        if (isNaN(count) || count < 2 || count > 12) {
+            alert('Team count must be between 2 and 12.');
+            return;
+        }
+        const current = state.teams;
+        if (count > current.length) {
+            for (let i = current.length; i < count; i++) {
+                const n = i + 1;
+                current.push({ id: Date.now() + i, name: `Team ${n}`, color: PALETTE[i % PALETTE.length], score: 0 });
+            }
+        } else {
+            state.teams = current.slice(0, count);
+        }
+        saveState();
+        addLog(`Team count changed to ${state.teams.length}`);
+        render();
+    });
+
+    document.getElementById('clearDataBtn').addEventListener('click', () => {
+        if (!confirm('Clear all scoreboard data and reset to defaults?')) return;
+        state = defaultState();
+        saveState();
+        auditLog = [];
+        addLog('All data cleared — reset to defaults');
+        render();
+    });
+
+    // ---- Reset all ----
+    document.getElementById('resetAllBtn').addEventListener('click', () => {
+        if (!confirm('Reset all team scores to 0?')) return;
+        state.teams.forEach(t => { t.score = 0; });
+        saveState();
+        addLog('All scores reset to 0');
+        render();
+    });
+
+    // ---- Activity log toggle ----
+    document.getElementById('activityToggle').addEventListener('click', () => {
+        activityOpen = !activityOpen;
+        document.getElementById('activityLog').classList.toggle('open', activityOpen);
+        document.getElementById('activityArrow').textContent = activityOpen ? '▼' : '▶';
+    });
+
+    // ---- Event delegation for team cards ----
+    document.getElementById('teamGrid').addEventListener('click', e => {
+        const btn = e.target.closest('button[data-id]');
+        if (!btn) return;
+
+        const id   = parseInt(btn.dataset.id, 10);
+        const team = state.teams.find(t => t.id === id);
+        if (!team) return;
+
+        // Quick delta buttons
+        if (btn.dataset.delta !== undefined) {
+            const delta = parseInt(btn.dataset.delta, 10);
+            team.score += delta;
+            saveState();
+            addLog(`${team.name}: ${delta >= 0 ? '+' : ''}${delta} → ${team.score}`);
+            render();
+            return;
+        }
+
+        const action = btn.dataset.action;
+
+        if (action === 'apply-custom') {
+            const input = btn.closest('.team-card-body').querySelector('[data-field="custom"]');
+            const val   = parseInt(input ? input.value : '', 10);
+            if (isNaN(val)) { alert('Enter a valid number.'); return; }
+            team.score += val;
+            saveState();
+            addLog(`${team.name}: custom ${val >= 0 ? '+' : ''}${val} → ${team.score}`);
+            if (input) input.value = '';
+            render();
+
+        } else if (action === 'rename') {
+            const input = btn.closest('.team-card-body').querySelector('[data-field="rename"]');
+            const val   = (input ? input.value : '').trim();
+            if (!val) { alert('Name cannot be empty.'); return; }
+            addLog(`Team renamed: "${team.name}" → "${val}"`);
+            team.name = val;
+            saveState();
+            render();
+
+        } else if (action === 'reset-team') {
+            if (!confirm(`Reset ${team.name} score to 0?`)) return;
+            team.score = 0;
+            saveState();
+            addLog(`${team.name} score reset to 0`);
+            render();
+        }
+    });
+
+    // ---- Init ----
+    render();
+</script>
+</body>
+</html>
