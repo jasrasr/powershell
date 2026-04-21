@@ -1,5 +1,5 @@
 # Filename: HEICconvert2JPG-Monitor.ps1
-# Revision : 1.0.1
+# Revision : 1.0.2
 # Description : Monitors a folder for new HEIC/HEIF files and automatically converts them to JPG
 #               using bundled portable ImageMagick. Originals are archived to an 'Original HEIC'
 #               subfolder per source directory.
@@ -7,6 +7,7 @@
 # Created Date : 2026-04-21
 # Modified Date : 2026-04-21
 # Changelog :
+# 1.0.2 fixed case-insensitive extension matching for .HEIC/.HEIF
 # 1.0.1 added detected/converting screen output messages
 # 1.0.0 initial release
 
@@ -115,7 +116,7 @@ $processedFiles = [System.Collections.Generic.HashSet[string]]::new([System.Stri
 
 $action = {
     $path = $Event.SourceEventArgs.FullPath
-    if ($path -notmatch '\.heic$|\.heif$') { return }
+    if ($path -notmatch '(?i)\.heic$|\.heif$') { return }
     if (-not $processedFiles.Add($path)) { return }
 
     Write-Host "Detected   : $(Split-Path $path -Leaf)" -ForegroundColor White
