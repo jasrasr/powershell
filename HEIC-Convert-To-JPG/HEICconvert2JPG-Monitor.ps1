@@ -1,5 +1,5 @@
 # Filename: HEICconvert2JPG-Monitor.ps1
-# Revision : 1.0.2
+# Revision : 1.1.0
 # Description : Monitors a folder for new HEIC/HEIF files and automatically converts them to JPG
 #               using bundled portable ImageMagick. Originals are archived to an 'Original HEIC'
 #               subfolder per source directory.
@@ -7,6 +7,8 @@
 # Created Date : 2026-04-21
 # Modified Date : 2026-04-21
 # Changelog :
+# 1.1.0 fixed event detection — switched from Register-ObjectEvent -Action (child runspace,
+#         no access to parent scope) to Get-Event polling in main loop
 # 1.0.2 fixed case-insensitive extension matching for .HEIC/.HEIF
 # 1.0.1 added detected/converting screen output messages
 # 1.0.0 initial release
@@ -114,22 +116,7 @@ $watcher.NotifyFilter        = [System.IO.NotifyFilters]::FileName
 # Queue to avoid duplicate events
 $processedFiles = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 
-$action = {
-    $path = $Event.SourceEventArgs.FullPath
-    if ($path -notmatch '(?i)\.heic$|\.heif$') { return }
-    if (-not $processedFiles.Add($path)) { return }
-
-    Write-Host "Detected   : $(Split-Path $path -Leaf)" -ForegroundColor White
-
-    # Brief delay to allow file write to complete
-    Start-Sleep -Milliseconds 500
-
-    Convert-HeicFile -FilePath $path
-    $processedFiles.Remove($path) | Out-Null
-}
-
-$watcher.EnableRaisingEvents = $false
-Register-ObjectEvent -InputObject $watcher -EventName Created -SourceIdentifier 'HEIC_Created' -Action $action | Out-Null
+Register-ObjectEvent -InputObject $watcher -EventName Created -SourceIdentifier 'HEIC_Created' | Out-Null
 
 $watcher.EnableRaisingEvents = $true
 
@@ -145,7 +132,22 @@ Write-Host ""
 
 try {
     while ($true) {
-        Start-Sleep -Seconds 1
+        $events = Get-Event -SourceIdentifier 'HEIC_Created' -ErrorAction SilentlyContinue
+        foreach ($evt in $events) {
+            Remove-Event -EventIdentifier $evt.EventIdentifier
+            $path = $evt.SourceEventArgs.FullPath
+            if ($path -notmatch '(?i)\.heic$|\.heif$') { continue }
+            if (-not $processedFiles.Add($path)) { continue }
+
+            Write-Host "Detected   : $(Split-Path $path -Leaf)" -ForegroundColor White
+
+            # Brief delay to allow file write to complete
+            Start-Sleep -Milliseconds 500
+
+            Convert-HeicFile -FilePath $path
+            $processedFiles.Remove($path) | Out-Null
+        }
+        Start-Sleep -Milliseconds 500
     }
 }
 finally {
