@@ -1,5 +1,5 @@
 # Filename: HEICconvert2JPG-Monitor.ps1
-# Revision : 1.1.0
+# Revision : 1.2.0
 # Description : Monitors a folder for new HEIC/HEIF files and automatically converts them to JPG
 #               using bundled portable ImageMagick. Originals are archived to an 'Original HEIC'
 #               subfolder per source directory.
@@ -7,6 +7,8 @@
 # Created Date : 2026-04-21
 # Modified Date : 2026-04-21
 # Changelog :
+# 1.2.0 added Renamed event + larger buffer to support OneDrive synced folders (files arrive
+#         via rename, not Created event); increased InternalBufferSize to 65536
 # 1.1.0 fixed event detection — switched from Register-ObjectEvent -Action (child runspace,
 #         no access to parent scope) to Get-Event polling in main loop
 # 1.0.2 fixed case-insensitive extension matching for .HEIC/.HEIF
@@ -107,16 +109,19 @@ function Convert-HeicFile {
 # -----------------------------
 # FileSystemWatcher Setup
 # -----------------------------
-$watcher                     = New-Object System.IO.FileSystemWatcher
-$watcher.Path                = $WatchFolder
-$watcher.Filter              = '*.*'
+$watcher                       = New-Object System.IO.FileSystemWatcher
+$watcher.Path                  = $WatchFolder
+$watcher.Filter                = '*.*'
 $watcher.IncludeSubdirectories = $Recurse.IsPresent
-$watcher.NotifyFilter        = [System.IO.NotifyFilters]::FileName
+$watcher.NotifyFilter          = [System.IO.NotifyFilters]::FileName
+$watcher.InternalBufferSize    = 65536
 
 # Queue to avoid duplicate events
 $processedFiles = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 
+# Watch both Created and Renamed — OneDrive delivers files via rename, not Created
 Register-ObjectEvent -InputObject $watcher -EventName Created -SourceIdentifier 'HEIC_Created' | Out-Null
+Register-ObjectEvent -InputObject $watcher -EventName Renamed -SourceIdentifier 'HEIC_Renamed' | Out-Null
 
 $watcher.EnableRaisingEvents = $true
 
@@ -132,7 +137,10 @@ Write-Host ""
 
 try {
     while ($true) {
-        $events = Get-Event -SourceIdentifier 'HEIC_Created' -ErrorAction SilentlyContinue
+        $events = @()
+        $events += Get-Event -SourceIdentifier 'HEIC_Created' -ErrorAction SilentlyContinue
+        $events += Get-Event -SourceIdentifier 'HEIC_Renamed' -ErrorAction SilentlyContinue
+
         foreach ($evt in $events) {
             Remove-Event -EventIdentifier $evt.EventIdentifier
             $path = $evt.SourceEventArgs.FullPath
@@ -153,6 +161,7 @@ try {
 finally {
     $watcher.EnableRaisingEvents = $false
     Unregister-Event -SourceIdentifier 'HEIC_Created' -ErrorAction SilentlyContinue
+    Unregister-Event -SourceIdentifier 'HEIC_Renamed' -ErrorAction SilentlyContinue
     $watcher.Dispose()
     Write-Host ""
     Write-Host "Monitor stopped. Log saved to: $logPath" -ForegroundColor Cyan
