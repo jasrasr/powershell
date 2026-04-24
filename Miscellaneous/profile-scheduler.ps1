@@ -34,7 +34,7 @@ if (($now - $lastDaily).TotalHours -ge 24) {
 ####################
 if (($now - $lastWeekly).TotalHours -ge 168) {
 
-    # Add weekly scripts here
+    . 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell\Miscellaneous\check-powershell-update.ps1'
 
     $lastWeekly = $now
     $stateChanged = $true
