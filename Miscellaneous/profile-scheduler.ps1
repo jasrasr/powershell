@@ -1,18 +1,30 @@
-# profile-scheduler.ps1
-# Runs scripts on daily/weekly/monthly intervals based on elapsed time since last run
-# Intervals: 24 hours (daily), 168 hours (weekly), 30 days (monthly)
-# Revision 1.0 | Author: Jason Lamb with help from Claude
+# Filename: profile-scheduler.ps1
+# Revision : 1.1.0
+# Description : Runs scripts on daily/weekly/monthly intervals based on elapsed time since last run
+# Author : Jason Lamb (with help from Claude Code)
+# Created Date : 2026-04-01
+# Modified Date : 2026-04-24
+# Changelog :
+# 1.0.0 initial release
+# 1.1.0 added per-script last run tracking to state JSON
 
 $schedulerStatePath = "$psexports\profile-scheduler-state.json"
 
 # Load or initialize state
 if (Test-Path $schedulerStatePath) {
-    $state = Get-Content $schedulerStatePath | ConvertFrom-Json
-    $lastDaily   = [DateTime]$state.LastDaily
-    $lastWeekly  = [DateTime]$state.LastWeekly
-    $lastMonthly = [DateTime]$state.LastMonthly
+    $stateRaw    = Get-Content $schedulerStatePath | ConvertFrom-Json
+    $lastDaily   = [DateTime]$stateRaw.LastDaily
+    $lastWeekly  = [DateTime]$stateRaw.LastWeekly
+    $lastMonthly = [DateTime]$stateRaw.LastMonthly
+    $scriptState = @{}
+    if ($stateRaw.Scripts) {
+        $stateRaw.Scripts.PSObject.Properties | ForEach-Object {
+            $scriptState[$_.Name] = $_.Value
+        }
+    }
 } else {
     $lastDaily = $lastWeekly = $lastMonthly = [DateTime]::MinValue
+    $scriptState = @{}
 }
 
 $now = Get-Date
@@ -24,6 +36,7 @@ $stateChanged = $false
 if (($now - $lastDaily).TotalHours -ge 24) {
 
     . 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell\Miscellaneous\check-choco-updates.ps1'
+    $scriptState['check-choco-updates'] = [PSCustomObject]@{ LastRun = $now.ToString('o'); Interval = 'Daily' }
 
     $lastDaily = $now
     $stateChanged = $true
@@ -35,6 +48,7 @@ if (($now - $lastDaily).TotalHours -ge 24) {
 if (($now - $lastWeekly).TotalHours -ge 168) {
 
     . 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell\Miscellaneous\check-powershell-update.ps1'
+    $scriptState['check-powershell-update'] = [PSCustomObject]@{ LastRun = $now.ToString('o'); Interval = 'Weekly' }
 
     $lastWeekly = $now
     $stateChanged = $true
@@ -56,5 +70,6 @@ if ($stateChanged) {
         LastDaily   = $lastDaily.ToString('o')
         LastWeekly  = $lastWeekly.ToString('o')
         LastMonthly = $lastMonthly.ToString('o')
-    } | ConvertTo-Json | Set-Content $schedulerStatePath
+        Scripts     = $scriptState
+    } | ConvertTo-Json -Depth 3 | Set-Content $schedulerStatePath
 }
