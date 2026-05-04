@@ -29,3 +29,6 @@ function genrandpw {
 # Example Usage:
 #   . .\random-password-generator-12-chars.ps1
 #   genrandpw
+#
+# or oneliner
+#   . .\random-password-generator-12-chars.ps1; genrandpw
