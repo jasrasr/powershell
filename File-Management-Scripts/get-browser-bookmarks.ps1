@@ -1,5 +1,5 @@
 # Filename     : get-browser-bookmarks.ps1
-# Revision     : 1.0.2
+# Revision     : 1.0.3
 # Description  : Extracts bookmarks from Chrome and Edge, exports to OneDrive Documents in CSV, JSON, and HTML formats
 # Author       : Jason Lamb (with help from Claude Code CLI)
 # Created Date : 2026-04-30
@@ -8,6 +8,7 @@
 # 1.0.0 Initial release; Chrome/Edge extraction, OneDrive detection, multi-format export
 # 1.0.1 Changed default export path to $env:OneDriveCommercial\Documents; added export summary
 # 1.0.2 Open export folder in Explorer on complete
+# 1.0.3 Changed export path to Documents\! Bookmark Export; auto-create folder if missing
 
 param(
     [string]$ExportPath,
@@ -262,7 +263,7 @@ Write-Host "========================================" -ForegroundColor Cyan
 # Determine export path
 if (-not $ExportPath) {
     if ($env:OneDriveCommercial) {
-        $ExportPath = Join-Path $env:OneDriveCommercial "Documents"
+        $ExportPath = Join-Path $env:OneDriveCommercial "Documents\! Bookmark Export"
         Write-Host "OneDrive (Commercial) detected: $ExportPath" -ForegroundColor Green
     } else {
         $ExportPath = if ($PSExports) { $PSExports } else { $PSScriptRoot }
@@ -271,8 +272,8 @@ if (-not $ExportPath) {
 }
 
 if (-not (Test-Path $ExportPath)) {
-    Write-Error "Export path does not exist: $ExportPath"
-    exit 1
+    New-Item -ItemType Directory -Path $ExportPath -Force | Out-Null
+    Write-Host "Created export folder: $ExportPath" -ForegroundColor Yellow
 }
 
 Write-Host "Export path: $ExportPath" -ForegroundColor Cyan
