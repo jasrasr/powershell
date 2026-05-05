@@ -35,6 +35,7 @@
     Changelog:
         1.0.0 - Initial release; Chrome/Edge extraction, OneDrive detection, multi-format export
         1.0.1 - Changed default export path to $env:OneDriveCommercial\Documents; added export summary
+        1.0.2 - Open export folder in Explorer on complete
 
 #>
 
@@ -399,6 +400,8 @@ if ($errors.Count -gt 0) {
     Write-Host "`nWarnings/Errors:" -ForegroundColor Yellow
     $errors | ForEach-Object { Write-Host "  - $_" }
 }
+
+Start-Process explorer.exe $ExportPath
 
 # Example Usage:
 # .\get-browser-bookmarks.ps1
