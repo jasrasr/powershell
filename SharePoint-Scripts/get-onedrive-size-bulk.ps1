@@ -1,5 +1,5 @@
 # Filename: get-onedrive-size-bulk.ps1
-# Revision : 1.0.4
+# Revision : 1.1.1
 # Description : Get OneDrive storage usage for a list of users from a CSV via Microsoft Graph REST API
 # Author : Jason Lamb (with help from Claude Code CLI)
 # Created Date : 2026-05-04
@@ -10,10 +10,13 @@
 # 1.0.2 fix admin URL derivation; switch to SharePoint Online PowerShell; fix PnP auth and assembly conflicts
 # 1.0.3 fix OutFile requirement for report cmdlet; fix CSV column names
 # 1.0.4 rewrite auth to pure REST device code flow - eliminates all module assembly conflicts
+# 1.1.0 fix invalid_scope error - use tenant-specific auth endpoint instead of common; add -TenantDomain param
+# 1.1.1 fix column name mismatch - auto-detect UPN, storage, and activity column names from report
 
 param(
     [string]$CsvPath,
     [string]$ExportPath,
+    [string]$TenantDomain,
     [string]$EmailColumn = 'EmailAddress'
 )
 
@@ -43,24 +46,50 @@ if (-not ($users | Get-Member -Name $EmailColumn -MemberType NoteProperty -Error
     exit 1
 }
 
+# Prompt for tenant domain if not provided — needed for admin scopes
+if (-not $TenantDomain) {
+    $inputTenant = Read-Host "Primary tenant domain (e.g. contoso.com)"
+    $TenantDomain = $inputTenant.Trim()
+    if (-not $TenantDomain) {
+        Write-Host "Tenant domain is required." -ForegroundColor Red
+        exit 1
+    }
+}
+
+# Resolve tenant ID from domain
+Write-Host "Resolving tenant ID for $TenantDomain..." -ForegroundColor DarkGray
+try {
+    $oidc = Invoke-RestMethod -Uri "https://login.microsoftonline.com/$TenantDomain/.well-known/openid-configuration" -ErrorAction Stop
+    $tenantId = $oidc.issuer -replace 'https://sts.windows.net/', '' -replace '/', ''
+    Write-Host "Tenant ID : $tenantId" -ForegroundColor DarkGray
+} catch {
+    Write-Host "Could not resolve tenant ID for '$TenantDomain': $_" -ForegroundColor Red
+    exit 1
+}
+
 # Authenticate via device code (no modules required)
 # Uses the well-known Microsoft Graph PowerShell public client ID
 $clientId = '14d82eec-204b-4c2f-b7e8-296a70dab67e'
-$scope    = 'https://graph.microsoft.com/Reports.Read.All offline_access'
 
 Write-Host "Requesting device code from Microsoft..." -ForegroundColor Cyan
 $deviceCodeRequest = Invoke-RestMethod -Method POST `
-    -Uri "https://login.microsoftonline.com/common/oauth2/v2.0/devicecode" `
-    -ContentType 'application/x-www-form-urlencoded' `
-    -Body "client_id=$clientId&scope=$([Uri]::EscapeDataString($scope))"
+    -Uri "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/devicecode" `
+    -Body @{
+        client_id = $clientId
+        scope     = 'https://graph.microsoft.com/Reports.Read.All'
+    }
 
 Write-Host ""
 Write-Host $deviceCodeRequest.message -ForegroundColor Yellow
 Write-Host ""
 
 # Poll for token
-$tokenUri  = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
-$pollBody  = "grant_type=urn:ietf:params:oauth:grant-type:device_code&client_id=$clientId&device_code=$($deviceCodeRequest.device_code)"
+$tokenUri = "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token"
+$pollBody = @{
+    grant_type  = 'urn:ietf:params:oauth:grant-type:device_code'
+    client_id   = $clientId
+    device_code = $deviceCodeRequest.device_code
+}
 $interval  = [int]$deviceCodeRequest.interval
 $expiresIn = [int]$deviceCodeRequest.expires_in
 $elapsed   = 0
@@ -70,7 +99,7 @@ while ($elapsed -lt $expiresIn) {
     Start-Sleep -Seconds $interval
     $elapsed += $interval
     try {
-        $token = Invoke-RestMethod -Method POST -Uri $tokenUri -ContentType 'application/x-www-form-urlencoded' -Body $pollBody -ErrorAction Stop
+        $token = Invoke-RestMethod -Method POST -Uri $tokenUri -Body $pollBody -ErrorAction Stop
         break
     } catch {
         $errBody = $_.ErrorDetails.Message | ConvertFrom-Json -ErrorAction SilentlyContinue
@@ -104,10 +133,23 @@ try {
 $reportData = Import-Csv -Path $tempFile
 Remove-Item $tempFile -Force -ErrorAction SilentlyContinue
 
+if (-not $reportData -or $reportData.Count -eq 0) {
+    Write-Host "Report returned no data." -ForegroundColor Red
+    exit 1
+}
+
+# Detect UPN column name — differs by Graph API version
+$upnColumn = $reportData[0].PSObject.Properties.Name | Where-Object { $_ -match 'Principal Name|UPN|userPrincipalName' } | Select-Object -First 1
+if (-not $upnColumn) {
+    Write-Host "Could not find UPN column. Available columns: $($reportData[0].PSObject.Properties.Name -join ', ')" -ForegroundColor Red
+    exit 1
+}
+Write-Host "Using UPN column: '$upnColumn'" -ForegroundColor DarkGray
+
 # Build lookup by UPN
 $reportLookup = @{}
 foreach ($entry in $reportData) {
-    $upn = $entry.'User Principal Name'
+    $upn = $entry.$upnColumn
     if ($upn) { $reportLookup[$upn.ToLower()] = $entry }
 }
 
@@ -130,14 +172,17 @@ foreach ($user in $users) {
 
     $entry = $reportLookup[$email.ToLower()]
     if ($entry) {
-        $usedBytes  = [int64]$entry.'Storage Used (Byte)'
-        $quotaBytes = [int64]$entry.'Storage Allocated (Byte)'
+        $usedCol   = $entry.PSObject.Properties.Name | Where-Object { $_ -match 'Storage Used' }   | Select-Object -First 1
+        $quotaCol  = $entry.PSObject.Properties.Name | Where-Object { $_ -match 'Storage Allocated|Quota' } | Select-Object -First 1
+        $usedBytes  = [int64]$entry.$usedCol
+        $quotaBytes = [int64]$entry.$quotaCol
 
         $row.Used_MB      = [math]::Round($usedBytes / 1MB, 2)
         $row.Used_GB      = [math]::Round($usedBytes / 1GB, 2)
         $row.Quota_GB     = [math]::Round($quotaBytes / 1GB, 2)
         $row.Remaining_GB = [math]::Round(($quotaBytes - $usedBytes) / 1GB, 2)
-        $row.LastActivity = $entry.'Last Activity Date'
+        $activityCol      = $entry.PSObject.Properties.Name | Where-Object { $_ -match 'Last Activity' } | Select-Object -First 1
+        $row.LastActivity = $entry.$activityCol
 
         if ($quotaBytes -gt 0) {
             $row.PercentUsed = [math]::Round(($usedBytes / $quotaBytes) * 100, 1)
@@ -167,6 +212,6 @@ if ($ExportPath) {
 
 # Example Usage:
 #   .\get-onedrive-size-bulk.ps1
-#   .\get-onedrive-size-bulk.ps1 -CsvPath "C:\temp\users.csv"
-#   .\get-onedrive-size-bulk.ps1 -CsvPath "C:\temp\users.csv" -ExportPath "C:\temp\onedrive-report.csv"
-#   .\get-onedrive-size-bulk.ps1 -CsvPath "C:\temp\users.csv" -ExportPath "C:\temp\onedrive-report.csv" -EmailColumn "Email"
+#   .\get-onedrive-size-bulk.ps1 -CsvPath "C:\temp\users.csv" -TenantDomain "contoso.com"
+#   .\get-onedrive-size-bulk.ps1 -CsvPath "C:\temp\users.csv" -ExportPath "C:\temp\onedrive-report.csv" -TenantDomain "contoso.com"
+#   .\get-onedrive-size-bulk.ps1 -CsvPath "C:\temp\users.csv" -ExportPath "C:\temp\onedrive-report.csv" -TenantDomain "contoso.com" -EmailColumn "Email"

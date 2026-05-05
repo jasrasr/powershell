@@ -31,9 +31,10 @@
 .NOTES
     Author: Jason Lamb with help from Claude Code
     Created: 2026-04-30
-    Modified: 2026-04-30
+    Modified: 2026-05-05
     Changelog:
         1.0.0 - Initial release; Chrome/Edge extraction, OneDrive detection, multi-format export
+        1.0.1 - Changed default export path to $env:OneDriveCommercial\Documents; added export summary
 
 #>
 
@@ -48,6 +49,7 @@ param(
 # Initialize variables
 $bookmarks = @()
 $errors = @()
+$exportedFiles = @()
 
 # ============================================================================
 # FUNCTION: Detect OneDrive Root
@@ -288,13 +290,12 @@ Write-Host "========================================" -ForegroundColor Cyan
 
 # Determine export path
 if (-not $ExportPath) {
-    $oneDrive = Get-OneDriveRoot
-    if ($oneDrive) {
-        $ExportPath = $oneDrive
-        Write-Host "OneDrive detected: $ExportPath" -ForegroundColor Green
+    if ($env:OneDriveCommercial) {
+        $ExportPath = Join-Path $env:OneDriveCommercial "Documents"
+        Write-Host "OneDrive (Commercial) detected: $ExportPath" -ForegroundColor Green
     } else {
         $ExportPath = if ($PSExports) { $PSExports } else { $PSScriptRoot }
-        Write-Host "OneDrive not found, using: $ExportPath" -ForegroundColor Yellow
+        Write-Host "OneDriveCommercial not found, using: $ExportPath" -ForegroundColor Yellow
     }
 }
 
@@ -362,17 +363,23 @@ $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 
 if ($Formats -contains 'CSV') {
     $csvPath = Join-Path $ExportPath "bookmarks_$timestamp.csv"
-    Export-BookmarksCSV -Bookmarks $bookmarks -OutputPath $csvPath
+    if (Export-BookmarksCSV -Bookmarks $bookmarks -OutputPath $csvPath) {
+        $exportedFiles += "bookmarks_$timestamp.csv"
+    }
 }
 
 if ($Formats -contains 'JSON') {
     $jsonPath = Join-Path $ExportPath "bookmarks_$timestamp.json"
-    Export-BookmarksJSON -Bookmarks $bookmarks -OutputPath $jsonPath
+    if (Export-BookmarksJSON -Bookmarks $bookmarks -OutputPath $jsonPath) {
+        $exportedFiles += "bookmarks_$timestamp.json"
+    }
 }
 
 if ($Formats -contains 'HTML') {
     $htmlPath = Join-Path $ExportPath "bookmarks_$timestamp.html"
-    Export-BookmarksHTML -Bookmarks $bookmarks -OutputPath $htmlPath
+    if (Export-BookmarksHTML -Bookmarks $bookmarks -OutputPath $htmlPath) {
+        $exportedFiles += "bookmarks_$timestamp.html"
+    }
 }
 
 # ============================================================================
@@ -381,6 +388,12 @@ if ($Formats -contains 'HTML') {
 Write-Host "`n========================================" -ForegroundColor Cyan
 Write-Host "Export Complete" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Cyan
+
+Write-Host "`nSave Location : $ExportPath" -ForegroundColor Cyan
+if ($exportedFiles.Count -gt 0) {
+    Write-Host "Files Exported:" -ForegroundColor Cyan
+    $exportedFiles | ForEach-Object { Write-Host "  - $_" -ForegroundColor White }
+}
 
 if ($errors.Count -gt 0) {
     Write-Host "`nWarnings/Errors:" -ForegroundColor Yellow
