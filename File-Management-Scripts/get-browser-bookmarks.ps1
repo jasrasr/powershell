@@ -1,43 +1,13 @@
-#Requires -Version 5.1
-<#
-.SYNOPSIS
-    Extracts browser bookmarks from Chrome and Edge, exports to OneDrive root in multiple formats.
-
-.DESCRIPTION
-    Retrieves bookmarks from Google Chrome and Microsoft Edge, merges them, and exports to
-    OneDrive root directory in CSV, JSON, and HTML (Netscape) formats. Handles browser file locks
-    by copying bookmarks to temp location if needed. Recursively processes folder structures.
-
-.PARAMETER ExportPath
-    Path to export bookmarks. Defaults to OneDrive root if detected, otherwise $PSExports.
-
-.PARAMETER Formats
-    Array of export formats: 'CSV', 'JSON', 'HTML'. Defaults to all three.
-
-.PARAMETER IncludeChrome
-    Include Chrome bookmarks. Defaults to $true.
-
-.PARAMETER IncludeEdge
-    Include Edge bookmarks. Defaults to $true.
-
-.EXAMPLE
-    .\get-browser-bookmarks.ps1
-    Exports all bookmarks to OneDrive root in CSV, JSON, and HTML formats.
-
-.EXAMPLE
-    .\get-browser-bookmarks.ps1 -ExportPath "C:\temp" -Formats 'CSV', 'JSON'
-    Exports bookmarks to C:\temp in CSV and JSON formats only.
-
-.NOTES
-    Author: Jason Lamb with help from Claude Code
-    Created: 2026-04-30
-    Modified: 2026-05-05
-    Changelog:
-        1.0.0 - Initial release; Chrome/Edge extraction, OneDrive detection, multi-format export
-        1.0.1 - Changed default export path to $env:OneDriveCommercial\Documents; added export summary
-        1.0.2 - Open export folder in Explorer on complete
-
-#>
+# Filename     : get-browser-bookmarks.ps1
+# Revision     : 1.0.2
+# Description  : Extracts bookmarks from Chrome and Edge, exports to OneDrive Documents in CSV, JSON, and HTML formats
+# Author       : Jason Lamb (with help from Claude Code CLI)
+# Created Date : 2026-04-30
+# Modified Date: 2026-05-05
+# Changelog    :
+# 1.0.0 Initial release; Chrome/Edge extraction, OneDrive detection, multi-format export
+# 1.0.1 Changed default export path to $env:OneDriveCommercial\Documents; added export summary
+# 1.0.2 Open export folder in Explorer on complete
 
 param(
     [string]$ExportPath,
