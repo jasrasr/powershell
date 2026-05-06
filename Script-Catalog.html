@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PowerShell Script Catalog</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #21253a;
+      --border: #2e3350;
+      --accent: #5b6cf9;
+      --accent-light: #7b8cf5;
+      --text: #e2e8f0;
+      --text-muted: #8892b0;
+      --text-dim: #64748b;
+      --link: #79c0ff;
+      --link-hover: #a5d6ff;
+      --sidebar-width: 260px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    #sidebar {
+      width: var(--sidebar-width);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      overflow-y: auto;
+      padding-bottom: 2rem;
+      z-index: 100;
+    }
+    .sidebar-header {
+      padding: 1.2rem 1rem 0.8rem;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      z-index: 10;
+    }
+    .sidebar-brand {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+    }
+    .sidebar-sub {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 0.42rem 1rem;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 0.83rem;
+      transition: all 0.15s;
+      gap: 0.5rem;
+      border-left: 3px solid transparent;
+    }
+    .nav-item:hover {
+      color: var(--text);
+      background: var(--surface2);
+      border-left-color: var(--accent);
+    }
+    .nav-icon { font-size: 1em; flex-shrink: 0; width: 1.4em; text-align: center; }
+    .nav-label { flex: 1; }
+    .nav-count {
+      background: var(--surface2);
+      color: var(--text-dim);
+      font-size: 0.68rem;
+      padding: 0.1rem 0.38rem;
+      border-radius: 10px;
+      font-weight: 700;
+      min-width: 1.6em;
+      text-align: center;
+    }
+
+    /* Main content */
+    #main {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      min-width: 0;
+    }
+    #topbar {
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      z-index: 50;
+      flex-wrap: wrap;
+    }
+    #topbar h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    #topbar h1 span { color: var(--accent-light); }
+    .total-badge {
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.18rem 0.55rem;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+    #search-wrap {
+      flex: 1;
+      max-width: 420px;
+      margin-left: auto;
+    }
+    #search {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.45rem 1rem;
+      color: var(--text);
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    #search:focus { border-color: var(--accent); }
+    #search::placeholder { color: var(--text-dim); }
+
+    /* Sections */
+    #content { padding: 1.5rem; }
+    .category {
+      margin-bottom: 2.5rem;
+      scroll-margin-top: 66px;
+    }
+    .cat-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent-light);
+      padding-bottom: 0.55rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0.6rem;
+    }
+    .cat-icon { font-size: 1.1em; }
+    .cat-count {
+      margin-left: auto;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      background: var(--surface2);
+      padding: 0.12rem 0.45rem;
+      border-radius: 8px;
+    }
+
+    /* Table */
+    .script-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.855rem;
+    }
+    .script-table thead th {
+      text-align: left;
+      padding: 0.35rem 0.7rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .script-table thead th:first-child { width: 40%; }
+    .script-table tbody tr {
+      border-bottom: 1px solid rgba(46,51,80,0.6);
+      transition: background 0.1s;
+    }
+    .script-table tbody tr:hover { background: var(--surface); }
+    .script-table tbody tr.hidden { display: none; }
+    .script-table td {
+      padding: 0.45rem 0.7rem;
+      vertical-align: top;
+    }
+    .script-name a {
+      color: var(--link);
+      text-decoration: none;
+      font-family: "SF Mono", "Consolas", "Fira Code", monospace;
+      font-size: 0.8rem;
+      word-break: break-all;
+    }
+    .script-name a:hover { color: var(--link-hover); text-decoration: underline; }
+    .subdir { color: var(--text-dim); }
+    .script-desc { color: var(--text-muted); line-height: 1.5; }
+    .no-desc { color: var(--text-dim); font-style: italic; font-size: 0.8rem; }
+
+    #no-results {
+      display: none;
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+    }
+    .category.all-hidden { display: none; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    @media (max-width: 768px) {
+      :root { --sidebar-width: 0px; }
+      #sidebar { display: none; }
+      #main { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<nav id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-brand">⚡ PS Script Catalog</div>
+    <div class="sidebar-sub">279 scripts &middot; 23 categories</div>
+  </div>
+<a href="#cat-AD-Scripts" class="nav-item"><span class="nav-icon">🏢</span><span class="nav-label">Active Directory Scripts</span><span class="nav-count">22</span></a>
+<a href="#cat-AutoCAD" class="nav-item"><span class="nav-icon">📐</span><span class="nav-label">AutoCAD Scripts</span><span class="nav-count">1</span></a>
+<a href="#cat-ChatGPT-CLI" class="nav-item"><span class="nav-icon">🤖</span><span class="nav-label">ChatGPT CLI</span><span class="nav-count">2</span></a>
+<a href="#cat-Computer-Management-Scripts" class="nav-item"><span class="nav-icon">💻</span><span class="nav-label">Computer Management Scripts</span><span class="nav-count">15</span></a>
+<a href="#cat-ExchangeOnline-Scripts" class="nav-item"><span class="nav-icon">📧</span><span class="nav-label">Exchange Online Scripts</span><span class="nav-count">5</span></a>
+<a href="#cat-File-Management-Scripts" class="nav-item"><span class="nav-icon">📁</span><span class="nav-label">File Management Scripts</span><span class="nav-count">88</span></a>
+<a href="#cat-GRC-TWIT-SecurityNow-Transcripts" class="nav-item"><span class="nav-icon">🎙️</span><span class="nav-label">GRC / Security Now Transcripts</span><span class="nav-count">16</span></a>
+<a href="#cat-HEIC-Convert-To-JPG" class="nav-item"><span class="nav-icon">🖼️</span><span class="nav-label">HEIC to JPG Converter</span><span class="nav-count">6</span></a>
+<a href="#cat-matrix" class="nav-item"><span class="nav-icon">🌃</span><span class="nav-label">Matrix Animation</span><span class="nav-count">1</span></a>
+<a href="#cat-MS-365-Scripts" class="nav-item"><span class="nav-icon">☁️</span><span class="nav-label">Microsoft 365 Scripts</span><span class="nav-count">9</span></a>
+<a href="#cat-Miscellaneous" class="nav-item"><span class="nav-icon">🔧</span><span class="nav-label">Miscellaneous</span><span class="nav-count">53</span></a>
+<a href="#cat-Networking-Scripts" class="nav-item"><span class="nav-icon">🌐</span><span class="nav-label">Networking Scripts</span><span class="nav-count">5</span></a>
+<a href="#cat-Notifications" class="nav-item"><span class="nav-icon">🔔</span><span class="nav-label">Notification System</span><span class="nav-count">4</span></a>
+<a href="#cat-Track-Package" class="nav-item"><span class="nav-icon">📬</span><span class="nav-label">Package Tracking Scripts</span><span class="nav-count">4</span></a>
+<a href="#cat-PowerShell-Quiz" class="nav-item"><span class="nav-icon">❓</span><span class="nav-label">PowerShell Quiz</span><span class="nav-count">6</span></a>
+<a href="#cat-Regedit-Scripts" class="nav-item"><span class="nav-icon">🗝️</span><span class="nav-label">Registry Scripts</span><span class="nav-count">7</span></a>
+<a href="#cat-SCCM-Scripts" class="nav-item"><span class="nav-icon">📦</span><span class="nav-label">SCCM / ConfigMgr Scripts</span><span class="nav-count">7</span></a>
+<a href="#cat-Server-Management-Scripts" class="nav-item"><span class="nav-icon">🖥️</span><span class="nav-label">Server Management Scripts</span><span class="nav-count">2</span></a>
+<a href="#cat-SharePoint-Scripts" class="nav-item"><span class="nav-icon">🔗</span><span class="nav-label">SharePoint / OneDrive Scripts</span><span class="nav-count">2</span></a>
+<a href="#cat-Software-Managagement-Scripts" class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-label">Software Management Scripts</span><span class="nav-count">2</span></a>
+<a href="#cat-Space-Speed-Compare-Demo" class="nav-item"><span class="nav-icon">🚀</span><span class="nav-label">Space / Speed Compare Demo</span><span class="nav-count">5</span></a>
+<a href="#cat-Tic-Tac-Toe" class="nav-item"><span class="nav-icon">🎮</span><span class="nav-label">Tic-Tac-Toe Game</span><span class="nav-count">10</span></a>
+<a href="#cat-_root" class="nav-item"><span class="nav-icon">📄</span><span class="nav-label">Root / General Scripts</span><span class="nav-count">7</span></a>
+</nav>
+
+<div id="main">
+  <div id="topbar">
+    <h1>⚡ <span>PowerShell</span> Script Catalog</h1>
+    <span class="total-badge">279 scripts</span>
+    <div id="search-wrap">
+      <input type="search" id="search" placeholder="Search scripts by name or description…" autocomplete="off">
+    </div>
+  </div>
+
+  <div id="content">
+  <section class="category" id="cat-AD-Scripts">
+    <h2 class="cat-header">
+      <span class="cat-icon">🏢</span>
+      Active Directory Scripts
+      <span class="cat-count">22 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="ad-audit.ps1" data-desc="audit ad &quot;reactivations&quot; (event id 4722) on a single dc (configurable)." data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/ad-audit.ps1" target="_blank" rel="noopener">ad-audit.ps1</a></td>
+          <td class="script-desc">Audit AD &quot;reactivations&quot; (Event ID 4722) on a single DC (configurable).</td>
+        </tr>
+        <tr data-name="adjust-ad-groups-for-365-license-syncing.ps1" data-desc="" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/adjust-ad-groups-for-365-license-syncing.ps1" target="_blank" rel="noopener">adjust-ad-groups-for-365-license-syncing.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="azure-user-audit-logs.ps1" data-desc="az monitor activity-log list --caller user@example.com --offset 7d" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/azure-user-audit-logs.ps1" target="_blank" rel="noopener">azure-user-audit-logs.ps1</a></td>
+          <td class="script-desc">az monitor activity-log list --caller user@example.com --offset 7d</td>
+        </tr>
+        <tr data-name="change-active-directory-computer-description.ps1" data-desc="import the active directory module" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/change-active-directory-computer-description.ps1" target="_blank" rel="noopener">change-active-directory-computer-description.ps1</a></td>
+          <td class="script-desc">Import the Active Directory module</td>
+        </tr>
+        <tr data-name="check-ad-members-in-all-groups-in-an-ou.ps1" data-desc="check users in all groups" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/check-ad-members-in-all-groups-in-an-OU.ps1" target="_blank" rel="noopener">check-ad-members-in-all-groups-in-an-OU.ps1</a></td>
+          <td class="script-desc">check users in all groups</td>
+        </tr>
+        <tr data-name="check-azure-for-mfa-issues.ps1" data-desc="" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/check-azure-for-mfa-issues.ps1" target="_blank" rel="noopener">check-azure-for-mfa-issues.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="check-computer-in-ad.ps1" data-desc="check if a list of computer names exists in active directory" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/check-computer-in-AD.ps1" target="_blank" rel="noopener">check-computer-in-AD.ps1</a></td>
+          <td class="script-desc">Check if a list of computer names exists in Active Directory</td>
+        </tr>
+        <tr data-name="check-password-expire-date.ps1" data-desc="import active directory module" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/check-password-expire-date.ps1" target="_blank" rel="noopener">check-password-expire-date.ps1</a></td>
+          <td class="script-desc">Import Active Directory module</td>
+        </tr>
+        <tr data-name="detect-weak-passwords.ps1" data-desc="foreach ($account in $manualuserlist){" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/detect-weak-passwords.ps1" target="_blank" rel="noopener">detect-weak-passwords.ps1</a></td>
+          <td class="script-desc">foreach ($account in $manualuserlist){</td>
+        </tr>
+        <tr data-name="get-active-directory-audit-of-enable-disable-accounts-by-domain-admin.ps1" data-desc="define the event ids for account disabled and enabled" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/get-active-directory-audit-of-enable-disable-accounts-by-domain-admin.ps1" target="_blank" rel="noopener">get-active-directory-audit-of-enable-disable-accounts-by-domain-admin.ps1</a></td>
+          <td class="script-desc">Define the Event IDs for account disabled and enabled</td>
+        </tr>
+        <tr data-name="get-manager-email-from-user-email.ps1" data-desc="do something with $item" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/get-manager-email-from-user-email.ps1" target="_blank" rel="noopener">get-manager-email-from-user-email.ps1</a></td>
+          <td class="script-desc">Do something with $item</td>
+        </tr>
+        <tr data-name="get-user-department-location-from-email.ps1" data-desc="get department and companyname from azure ad via microsoft graph by email address" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/get-user-department-location-from-email.ps1" target="_blank" rel="noopener">get-user-department-location-from-email.ps1</a></td>
+          <td class="script-desc">Get Department and CompanyName from Azure AD via Microsoft Graph by email address</td>
+        </tr>
+        <tr data-name="get-users-cannotchangepassword.ps1" data-desc="" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/get-users-cannotchangepassword.ps1" target="_blank" rel="noopener">get-users-cannotchangepassword.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="get-users-change-password-on-next-logon.ps1" data-desc="" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/get-users-change-password-on-next-logon.ps1" target="_blank" rel="noopener">get-users-change-password-on-next-logon.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="get-users-passwordlastset.ps1" data-desc="" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/get-users-passwordlastset.ps1" target="_blank" rel="noopener">get-users-passwordlastset.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="install-msgraph.ps1" data-desc="" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/install-msgraph.ps1" target="_blank" rel="noopener">install-msgraph.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="m365useroffboarding-hardened.ps1" data-desc="automate microsoft 365 user offboarding (hardened)" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/M365UserOffBoarding-Hardened.ps1" target="_blank" rel="noopener">M365UserOffBoarding-Hardened.ps1</a></td>
+          <td class="script-desc">Automate Microsoft 365 User Offboarding (Hardened)</td>
+        </tr>
+        <tr data-name="remove-ad-group-members-via-ou.ps1" data-desc="enumerate all groups in an ou and remove members with mandatory ou prompt, yes/y whatif confirmation, strict live-mode confirmation, and log path validation (rev 1.6)" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/remove-ad-group-members-via-ou.ps1" target="_blank" rel="noopener">remove-ad-group-members-via-ou.ps1</a></td>
+          <td class="script-desc">Enumerate all groups in an OU and remove members with mandatory OU prompt, YES/Y WhatIf confirmation, strict live-mode confirmation, and log path validation (Rev 1.6)</td>
+        </tr>
+        <tr data-name="rename-ad-group-with-hashtable.ps1" data-desc="" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/rename-ad-group-with-hashtable.ps1" target="_blank" rel="noopener">rename-ad-group-with-hashtable.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="reset-user-password-enable-and-force.ps1" data-desc="new-aduser -name “doug thornberry&quot; -givenname &quot;doug&quot; -surname &quot;thornberry&quot; -displayname &quot;doug thornberry&quot; -samaccountname &quot;doug.thornberry&quot; -path &quot;ou=125,ou=nwi,ou=midd,dc=$domain,dc=local&quot; -userprincipalname &quot;doug.thorn" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/reset-user-password-enable-and-force.ps1" target="_blank" rel="noopener">reset-user-password-enable-and-force.ps1</a></td>
+          <td class="script-desc">New-ADUser -Name “Doug Thornberry&quot; -GivenName &quot;Doug&quot; -Surname &quot;Thornberry&quot; -displayname &quot;Doug Thornberry&quot; -SamAccountName &quot;doug.thornberry&quot; -path &quot;OU=125,OU=NWI,OU=MIDD,DC=$domain,DC=LOCAL&quot; -UserPrincipalName &quot;doug.thorn</td>
+        </tr>
+        <tr data-name="sync-ad-to-azure.ps1" data-desc="" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/sync-ad-to-azure.ps1" target="_blank" rel="noopener">sync-ad-to-azure.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="verify-and-update-extensionattribute15.ps1" data-desc="get all users with office attribute equal to &quot;cleveland&quot;" data-cat="active directory scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AD-Scripts/verify-and-update-extensionattribute15.ps1" target="_blank" rel="noopener">verify-and-update-extensionattribute15.ps1</a></td>
+          <td class="script-desc">Get all users with Office attribute equal to &quot;Cleveland&quot;</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-AutoCAD">
+    <h2 class="cat-header">
+      <span class="cat-icon">📐</span>
+      AutoCAD Scripts
+      <span class="cat-count">1 script</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="autopurge.ps1" data-desc="construct the argument list with quoted paths for spaces" data-cat="autocad scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/AutoCAD/autopurge.ps1" target="_blank" rel="noopener">autopurge.ps1</a></td>
+          <td class="script-desc">Construct the argument list with quoted paths for spaces</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-ChatGPT-CLI">
+    <h2 class="cat-header">
+      <span class="cat-icon">🤖</span>
+      ChatGPT CLI
+      <span class="cat-count">2 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="append-to-profile.ps1" data-desc="add to `$profile" data-cat="chatgpt cli">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/ChatGPT-CLI/append-to-profile.ps1" target="_blank" rel="noopener">append-to-profile.ps1</a></td>
+          <td class="script-desc">ADD TO `$PROFILE</td>
+        </tr>
+        <tr data-name="invoke-chatgpt.ps1" data-desc="smart chatgpt cli for powershell (rev 3.1)" data-cat="chatgpt cli">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/ChatGPT-CLI/invoke-chatgpt.ps1" target="_blank" rel="noopener">invoke-chatgpt.ps1</a></td>
+          <td class="script-desc">Smart ChatGPT CLI for PowerShell (Rev 3.1)</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-Computer-Management-Scripts">
+    <h2 class="cat-header">
+      <span class="cat-icon">💻</span>
+      Computer Management Scripts
+      <span class="cat-count">15 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="change-computer-name-remotely.ps1" data-desc="remotely rename one or more computers on the domain using a hashtable of oldname=newname pairs," data-cat="computer management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Computer-Management-Scripts/change-computer-name-remotely.ps1" target="_blank" rel="noopener">change-computer-name-remotely.ps1</a></td>
+          <td class="script-desc">Remotely rename one or more computers on the domain using a hashtable of OldName=NewName pairs,</td>
+        </tr>
+        <tr data-name="check-enable-winrm.ps1" data-desc="check if winrm is enabled using invoke-command" data-cat="computer management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Computer-Management-Scripts/check-enable-winrm.ps1" target="_blank" rel="noopener">check-enable-winrm.ps1</a></td>
+          <td class="script-desc">check if winrm is enabled using Invoke-Command</td>
+        </tr>
+        <tr data-name="chrome-clean.ps1" data-desc="dry run (see what would happen)" data-cat="computer management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Computer-Management-Scripts/chrome-clean.ps1" target="_blank" rel="noopener">chrome-clean.ps1</a></td>
+          <td class="script-desc">Dry run (see what would happen)</td>
+        </tr>
+        <tr data-name="datetime.ps1" data-desc="" data-cat="computer management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Computer-Management-Scripts/datetime.ps1" target="_blank" rel="noopener">datetime.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="disable-fastboot.ps1" data-desc="disables windows fast boot (fast startup) via registry with validation, state check, and logging" data-cat="computer management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Computer-Management-Scripts/disable-fastboot.ps1" target="_blank" rel="noopener">disable-fastboot.ps1</a></td>
+          <td class="script-desc">Disables Windows Fast Boot (Fast Startup) via registry with validation, state check, and logging</td>
+        </tr>
+        <tr data-name="get-computerinfo-local.ps1" data-desc="fallback wrapper that runs get-computerinfo.ps1 without uploading to the api." data-cat="computer management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Computer-Management-Scripts/Get-ComputerInfo-Local.ps1" target="_blank" rel="noopener">Get-ComputerInfo-Local.ps1</a></td>
+          <td class="script-desc">Fallback wrapper that runs Get-ComputerInfo.ps1 without uploading to the API.</td>
+        </tr>
+        <tr data-name="get-computerinfo.ps1" data-desc="collects computer name, serial, manufacturer, model, windows version, current user" data-cat="computer management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Computer-Management-Scripts/Get-ComputerInfo.ps1" target="_blank" rel="noopener">Get-ComputerInfo.ps1</a></td>
+          <td class="script-desc">Collects computer name, serial, manufacturer, model, Windows version, current user</td>
+        </tr>
+        <tr data-name="get-installedsoftware,ps1.ps1" data-desc="$_&quot;" data-cat="computer management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Computer-Management-Scripts/Get-InstalledSoftware,ps1.ps1" target="_blank" rel="noopener">Get-InstalledSoftware,ps1.ps1</a></td>
+          <td class="script-desc">$_&quot;</td>
+        </tr>
+        <tr data-name="get-task-and-runas-user.ps1" data-desc="retrieves all scheduled tasks on the local system and extracts the task name, task folder, and the user the task runs as. if the runasuser field is empty, it is resolved based on the logontype. results are sorted and dis" data-cat="computer management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Computer-Management-Scripts/get-task-and-runas-user.ps1" target="_blank" rel="noopener">get-task-and-runas-user.ps1</a></td>
+          <td class="script-desc">Retrieves all scheduled tasks on the local system and extracts the Task Name, Task Folder, and the user the task runs as. If the RunAsUser field is empty, it is resolved based on the LogonType. Results are sorted and dis</td>
+        </tr>
+        <tr data-name="ping-and-reg-autodesk-access-revit-version.ps1" data-desc="query autodesk access and all revit 2026 components (incl. formit converter), return full table: computer, registrypath, publisher, displayversion, displayname, installdate; run local when host matches; log to c:\temp\po" data-cat="computer management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Computer-Management-Scripts/ping-and-reg-autodesk-access-revit-version.ps1" target="_blank" rel="noopener">ping-and-reg-autodesk-access-revit-version.ps1</a></td>
+          <td class="script-desc">Query Autodesk Access and all Revit 2026 components (incl. FormIt Converter), return full table: Computer, RegistryPath, Publisher, DisplayVersion, DisplayName, InstallDate; run local when host matches; log to C:\temp\po</td>
+        </tr>
+        <tr data-name="rename-computer-remotely-multiple.ps1" data-desc="remotely rename one or more computers using oldname=newname hashtable." data-cat="computer management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Computer-Management-Scripts/rename-computer-remotely-multiple.ps1" target="_blank" rel="noopener">rename-computer-remotely-multiple.ps1</a></td>
+          <td class="script-desc">Remotely rename one or more computers using OldName=NewName hashtable.</td>
+        </tr>
+        <tr data-name="rename-computer-remotely.ps1" data-desc="prompts for old and new computer names, domain admin username, and password to rename a remote computer (no reboot)" data-cat="computer management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Computer-Management-Scripts/rename-computer-remotely.ps1" target="_blank" rel="noopener">rename-computer-remotely.ps1</a></td>
+          <td class="script-desc">Prompts for old and new computer names, domain admin username, and password to rename a remote computer (no reboot)</td>
+        </tr>
+        <tr data-name="restart-egnyte.ps1" data-desc="restart only egnyteclient/egnytedrive with rolling log; do not stop webedit/syncservice/update  (rev 1.6)" data-cat="computer management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Computer-Management-Scripts/restart-egnyte.ps1" target="_blank" rel="noopener">restart-egnyte.ps1</a></td>
+          <td class="script-desc">Restart only EgnyteClient/EgnyteDrive with rolling log; do NOT stop WebEdit/SyncService/Update  (Rev 1.6)</td>
+        </tr>
+        <tr data-name="set-ad-group-local-admin.ps1" data-desc="get the current computer&#x27;s hostname" data-cat="computer management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Computer-Management-Scripts/set-ad-group-local-admin.ps1" target="_blank" rel="noopener">set-ad-group-local-admin.ps1</a></td>
+          <td class="script-desc">Get the current computer&#x27;s hostname</td>
+        </tr>
+        <tr data-name="setup-clone-git-via-powershell.ps1" data-desc="git setup and github repo clone with onedrive fallback, prompts for user config, updated git v2.50.0 url" data-cat="computer management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Computer-Management-Scripts/setup-clone-git-via-powershell.ps1" target="_blank" rel="noopener">setup-clone-git-via-powershell.ps1</a></td>
+          <td class="script-desc">Git setup and GitHub repo clone with OneDrive fallback, prompts for user config, updated Git v2.50.0 URL</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-ExchangeOnline-Scripts">
+    <h2 class="cat-header">
+      <span class="cat-icon">📧</span>
+      Exchange Online Scripts
+      <span class="cat-count">5 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="adjust-shared-calendar-timezone.ps1" data-desc="1. import the exchange online powershell module and connect" data-cat="exchange online scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/ExchangeOnline-Scripts/adjust-shared-calendar-timezone.ps1" target="_blank" rel="noopener">adjust-shared-calendar-timezone.ps1</a></td>
+          <td class="script-desc">1. Import the Exchange Online PowerShell module and connect</td>
+        </tr>
+        <tr data-name="create-shared-mailboxes-from-csv.ps1" data-desc="create shared mailboxes in exchange online from a csv file." data-cat="exchange online scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/ExchangeOnline-Scripts/create-shared-mailboxes-from-csv.ps1" target="_blank" rel="noopener">create-shared-mailboxes-from-csv.ps1</a></td>
+          <td class="script-desc">Create shared mailboxes in Exchange Online from a CSV file.</td>
+        </tr>
+        <tr data-name="get-mailbox-size-bulk.ps1" data-desc="get primary and archive mailbox sizes for a list of users from a csv" data-cat="exchange online scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/ExchangeOnline-Scripts/get-mailbox-size-bulk.ps1" target="_blank" rel="noopener">get-mailbox-size-bulk.ps1</a></td>
+          <td class="script-desc">Get primary and archive mailbox sizes for a list of users from a CSV</td>
+        </tr>
+        <tr data-name="get-mailbox-size.ps1" data-desc="get deleted items size for a mailbox (primary + archive), robust against exo deserialization. rev 1.4" data-cat="exchange online scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/ExchangeOnline-Scripts/get-mailbox-size.ps1" target="_blank" rel="noopener">get-mailbox-size.ps1</a></td>
+          <td class="script-desc">Get Deleted Items size for a mailbox (Primary + Archive), robust against EXO deserialization. Rev 1.4</td>
+        </tr>
+        <tr data-name="search-filecontent.ps1" data-desc="" data-cat="exchange online scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/ExchangeOnline-Scripts/Search-FileContent.ps1" target="_blank" rel="noopener">Search-FileContent.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-File-Management-Scripts">
+    <h2 class="cat-header">
+      <span class="cat-icon">📁</span>
+      File Management Scripts
+      <span class="cat-count">88 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="automox-reorder-csvtoxlsx.ps1" data-desc="reorder automox csv columns, export to xlsx, and convert to excel table. rev 1.0" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/Automox-Reorder-CsvToXlsx.ps1" target="_blank" rel="noopener">Automox-Reorder-CsvToXlsx.ps1</a></td>
+          <td class="script-desc">Reorder Automox CSV columns, export to XLSX, and convert to Excel table. Rev 1.0</td>
+        </tr>
+        <tr data-name="change-active-directory-computer-description.ps1" data-desc="define variables" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/change-active-directory-computer-description.ps1" target="_blank" rel="noopener">change-active-directory-computer-description.ps1</a></td>
+          <td class="script-desc">Define variables</td>
+        </tr>
+        <tr data-name="change-modify-date.ps1" data-desc="modify file lastwritetime (modification date) using powershell. rev 1.0" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/change-modify-date.ps1" target="_blank" rel="noopener">change-modify-date.ps1</a></td>
+          <td class="script-desc">Modify file LastWriteTime (modification date) using PowerShell. Rev 1.0</td>
+        </tr>
+        <tr data-name="check-files-and-permissions.ps1" data-desc="" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/check-files-and-permissions.ps1" target="_blank" rel="noopener">check-files-and-permissions.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="check-log-file-daily.ps1" data-desc="expected: modified today" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/check-log-file-daily.ps1" target="_blank" rel="noopener">check-log-file-daily.ps1</a></td>
+          <td class="script-desc">Expected: modified today</td>
+        </tr>
+        <tr data-name="check-xlsx-xlsm-legacy-shared-stage1-scan-only.ps1" data-desc="scan current folder &amp; subfolders for .xlsx &amp; .xlsm," data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/check-xlsx-xlsm-legacy-shared-stage1-scan-only.ps1" target="_blank" rel="noopener">check-xlsx-xlsm-legacy-shared-stage1-scan-only.ps1</a></td>
+          <td class="script-desc">Scan current folder &amp; subfolders for .xlsx &amp; .xlsm,</td>
+        </tr>
+        <tr data-name="check-xlsx-xlsm-legacy-shared-stage2-update.ps1" data-desc="read a csv log and remove legacy shared workbook mode" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/check-xlsx-xlsm-legacy-shared-stage2-update.ps1" target="_blank" rel="noopener">check-xlsx-xlsm-legacy-shared-stage2-update.ps1</a></td>
+          <td class="script-desc">Read a CSV log and remove legacy shared workbook mode</td>
+        </tr>
+        <tr data-name="clean-duplicate-files.ps1" data-desc="delete duplicate desktop files on the desktop from onedrive with the same &quot;${domain} inc-*.lnk&quot;" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/clean-duplicate-files.ps1" target="_blank" rel="noopener">clean-duplicate-files.ps1</a></td>
+          <td class="script-desc">delete duplicate desktop files on the desktop from OneDrive with the same &quot;${domain} inc-*.lnk&quot;</td>
+        </tr>
+        <tr data-name="combine-all-txt-files-in-a-folder.ps1" data-desc="merge all txt files in a folder into one csv by appending lines vertically (one after another). rev 2.0" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/combine-all-txt-files-in-a-folder.ps1" target="_blank" rel="noopener">combine-all-txt-files-in-a-folder.ps1</a></td>
+          <td class="script-desc">Merge all TXT files in a folder into one CSV by appending lines vertically (one after another). Rev 2.0</td>
+        </tr>
+        <tr data-name="compare-folders.ps1" data-desc="compare two directories and export results to csv # rev 1.0" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/compare-folders.ps1" target="_blank" rel="noopener">compare-folders.ps1</a></td>
+          <td class="script-desc">Compare two directories and export results to CSV # Rev 1.0</td>
+        </tr>
+        <tr data-name="compare-source-destination-files.ps1" data-desc="check if the source excel differs from the most-recent destination copy. if different, copy to destination with today&#x27;s date suffix (e.g., &#x27;project list download 090425.xlsx&#x27;). rev 1.0" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/compare-source-destination-files.ps1" target="_blank" rel="noopener">compare-source-destination-files.ps1</a></td>
+          <td class="script-desc">Check if the source Excel differs from the most-recent destination copy. If different, copy to destination with today&#x27;s date suffix (e.g., &#x27;Project List Download 090425.xlsx&#x27;). Rev 1.0</td>
+        </tr>
+        <tr data-name="compare-two-xlsx-files.ps1" data-desc="auto-picks the latest two excel files in a folder (newest = $newfile, second-newest = $oldfile) and compares by project# (a) vs stat (b)." data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/compare-two-xlsx-files.ps1" target="_blank" rel="noopener">compare-two-xlsx-files.ps1</a></td>
+          <td class="script-desc">Auto-picks the latest two Excel files in a folder (newest = $NewFile, second-newest = $OldFile) and compares by Project# (A) vs Stat (B).</td>
+        </tr>
+        <tr data-name="convert-csv-to-xlsx.ps1" data-desc="convertcsvtoxlsx.ps1" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/Convert-Csv-To-Xlsx.ps1" target="_blank" rel="noopener">Convert-Csv-To-Xlsx.ps1</a></td>
+          <td class="script-desc">ConvertCsvToXlsx.ps1</td>
+        </tr>
+        <tr data-name="convert-dng.ps1" data-desc="fix dcraw_emu invocation (no “--”), set working dir for output, convert dng → 16-bit tiff → jpg via imagemagick. adds single-file smoke test + bulk conversion. rev 1.3" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/convert-dng.ps1" target="_blank" rel="noopener">convert-dng.ps1</a></td>
+          <td class="script-desc">Fix dcraw_emu invocation (no “--”), set working dir for output, convert DNG → 16-bit TIFF → JPG via ImageMagick. Adds single-file smoke test + bulk conversion. Rev 1.3</td>
+        </tr>
+        <tr data-name="delete-bulk-files-from-array.ps1" data-desc="" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/delete-bulk-files-from-array.ps1" target="_blank" rel="noopener">delete-bulk-files-from-array.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="delete-sub-empty-folders-and-log.ps1" data-desc="remove empty folders inside target directory (test with -whatif first), log results to same folder" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/delete-sub-empty-folders-and-log.ps1" target="_blank" rel="noopener">delete-sub-empty-folders-and-log.ps1</a></td>
+          <td class="script-desc">Remove empty folders inside target directory (test with -WhatIf first), log results to same folder</td>
+        </tr>
+        <tr data-name="expand-drive-c-to-max-avilable.ps1" data-desc="import the storage module (optional, depending on your system)" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/expand-drive-c-to-max-avilable.ps1" target="_blank" rel="noopener">expand-drive-c-to-max-avilable.ps1</a></td>
+          <td class="script-desc">Import the Storage module (optional, depending on your system)</td>
+        </tr>
+        <tr data-name="extract-zip-file.ps1" data-desc="extract zip file" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/extract-zip-file.ps1" target="_blank" rel="noopener">extract-zip-file.ps1</a></td>
+          <td class="script-desc">extract zip file</td>
+        </tr>
+        <tr data-name="fast-robocopy-one-file.ps1" data-desc="copy-onefile.ps1" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/fast-robocopy-one-file.ps1" target="_blank" rel="noopener">fast-robocopy-one-file.ps1</a></td>
+          <td class="script-desc">Copy-OneFile.ps1</td>
+        </tr>
+        <tr data-name="file-hash-compare-speeds.ps1" data-desc="benchmark hash speeds (md5 vs sha1 vs sha256) with progress, per-iteration stats, and csv export. rev 1.0" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/file-hash-compare-speeds.ps1" target="_blank" rel="noopener">file-hash-compare-speeds.ps1</a></td>
+          <td class="script-desc">Benchmark hash speeds (MD5 vs SHA1 vs SHA256) with progress, per-iteration stats, and CSV export. Rev 1.0</td>
+        </tr>
+        <tr data-name="file-hash-compare.ps1" data-desc="benchmark hash speeds (md5 vs sha1 vs sha256) with progress, per-iteration stats, and csv export. rev 1.0" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/file-hash-compare.ps1" target="_blank" rel="noopener">file-hash-compare.ps1</a></td>
+          <td class="script-desc">Benchmark hash speeds (MD5 vs SHA1 vs SHA256) with progress, per-iteration stats, and CSV export. Rev 1.0</td>
+        </tr>
+        <tr data-name="filter-csv.ps1" data-desc="stream-filter a very large csv and remove rows containing the cell &quot;list folder contents&quot;. saves output in the same folder with &quot;-filtered&quot; suffix, reports how many lines were removed, and shows a responsive progress bar" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/filter-csv.ps1" target="_blank" rel="noopener">filter-csv.ps1</a></td>
+          <td class="script-desc">Stream-filter a very large CSV and remove rows containing the cell &quot;List Folder Contents&quot;. Saves output in the SAME folder with &quot;-filtered&quot; suffix, reports how many lines were removed, and shows a responsive progress bar</td>
+        </tr>
+        <tr data-name="find-longpaths.ps1" data-desc="find-longpaths.ps1" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/Find-LongPaths.ps1" target="_blank" rel="noopener">Find-LongPaths.ps1</a></td>
+          <td class="script-desc">Find-LongPaths.ps1</td>
+        </tr>
+        <tr data-name="fix-onedrive-file-conflicts.ps1" data-desc="rename onedrive host-conflict files by removing the computer name token and appending &quot;-onedriveconflict&lt;3-char nonce&gt;&quot;. logs original -&gt; new with timestamp to a single rolling csv log. adds exclusion of specific folders" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/fix-onedrive-file-conflicts.ps1" target="_blank" rel="noopener">fix-onedrive-file-conflicts.ps1</a></td>
+          <td class="script-desc">Rename OneDrive host-conflict files by removing the computer name token and appending &quot;-onedriveconflict&lt;3-char nonce&gt;&quot;. Logs original -&gt; new with timestamp to a single rolling CSV log. Adds exclusion of specific folders</td>
+        </tr>
+        <tr data-name="folder-depth4-stream-batches-summary.ps1" data-desc="stream folders exactly at depth 4 with live progress, timestamped incremental batch output every 1000 items," data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/folder-depth4-stream-batches-summary.ps1" target="_blank" rel="noopener">folder-depth4-stream-batches-summary.ps1</a></td>
+          <td class="script-desc">Stream folders exactly at depth 4 with live progress, timestamped incremental batch output every 1000 items,</td>
+        </tr>
+        <tr data-name="get-browser-bookmarks.ps1" data-desc="detects microsoft onedrive installation and returns root path." data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/get-browser-bookmarks.ps1" target="_blank" rel="noopener">get-browser-bookmarks.ps1</a></td>
+          <td class="script-desc">Detects Microsoft OneDrive installation and returns root path.</td>
+        </tr>
+        <tr data-name="get-content-from-text-file.ps1" data-desc="define the path to the text files" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/get-content-from-text-file.ps1" target="_blank" rel="noopener">get-content-from-text-file.ps1</a></td>
+          <td class="script-desc">Define the path to the text files</td>
+        </tr>
+        <tr data-name="get-dir-aka-childitem-recurse-dup.ps1" data-desc="get-childitem -path &quot;n:\!newprojecttemplate-bim&quot; -recurse" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/get-dir-aka-childitem-recurse-dup.ps1" target="_blank" rel="noopener">get-dir-aka-childitem-recurse-dup.ps1</a></td>
+          <td class="script-desc">Get-ChildItem -Path &quot;N:\!newprojecttemplate-BIM&quot; -Recurse</td>
+        </tr>
+        <tr data-name="get-dir-aka-childitem-recurse.ps1" data-desc="get-childitem -path &quot;n:\!newprojecttemplate-bim&quot; -recurse" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/get-dir-aka-childitem-recurse.ps1" target="_blank" rel="noopener">get-dir-aka-childitem-recurse.ps1</a></td>
+          <td class="script-desc">Get-ChildItem -Path &quot;N:\!newprojecttemplate-BIM&quot; -Recurse</td>
+        </tr>
+        <tr data-name="get-dir-export-dup.ps1" data-desc="install-module -name powershellget -force -allowclobber" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/get-dir-export-dup.ps1" target="_blank" rel="noopener">get-dir-export-dup.ps1</a></td>
+          <td class="script-desc">Install-Module -Name PowerShellGet -Force -AllowClobber</td>
+        </tr>
+        <tr data-name="get-dir-export.ps1" data-desc="" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/get-dir-export.ps1" target="_blank" rel="noopener">get-dir-export.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="get-file-hash-sha256.ps1" data-desc="quick sha256 file hash calculator (no console spam). rev 1.1" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/get-file-hash-sha256.ps1" target="_blank" rel="noopener">get-file-hash-sha256.ps1</a></td>
+          <td class="script-desc">Quick SHA256 file hash calculator (no console spam). Rev 1.1</td>
+        </tr>
+        <tr data-name="get-folder-icacls-dup.ps1" data-desc="get folder permissions using icacls" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/get-folder-icacls-dup.ps1" target="_blank" rel="noopener">get-folder-icacls-dup.ps1</a></td>
+          <td class="script-desc">Get folder permissions using icacls</td>
+        </tr>
+        <tr data-name="get-folder-icacls.ps1" data-desc="get folder permissions using icacls" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/get-folder-icacls.ps1" target="_blank" rel="noopener">get-folder-icacls.ps1</a></td>
+          <td class="script-desc">Get folder permissions using icacls</td>
+        </tr>
+        <tr data-name="get-folderlist.ps1" data-desc="get-folderlist.ps1" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/Get-FolderList.ps1" target="_blank" rel="noopener">Get-FolderList.ps1</a></td>
+          <td class="script-desc">Get-FolderList.ps1</td>
+        </tr>
+        <tr data-name="get-folders-that-match-this-naming-structure.ps1" data-desc="define the root folder to search" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/get-folders-that-match-this-naming-structure.ps1" target="_blank" rel="noopener">get-folders-that-match-this-naming-structure.ps1</a></td>
+          <td class="script-desc">Define the root folder to search</td>
+        </tr>
+        <tr data-name="get-mdstatistics.ps1" data-desc="sentences (rough)" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/Get-MdStatistics.ps1" target="_blank" rel="noopener">Get-MdStatistics.ps1</a></td>
+          <td class="script-desc">Sentences (rough)</td>
+        </tr>
+        <tr data-name="get-number-of-sub-files-and-folders.ps1" data-desc="process each folder, does it exist, how many sub files/folders" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/get-number-of-sub-files-and-folders.ps1" target="_blank" rel="noopener">get-number-of-sub-files-and-folders.ps1</a></td>
+          <td class="script-desc">Process each folder, does it exist, how many sub files/folders</td>
+        </tr>
+        <tr data-name="get-only-depth-4-with-heartbeat-incremental-output-batch.ps1" data-desc="stream folders exactly at depth 4 with live progress bar, timestamped incremental file output every 1000 items," data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/get-only-depth-4-with-heartbeat-incremental-output-batch.ps1" target="_blank" rel="noopener">get-only-depth-4-with-heartbeat-incremental-output-batch.ps1</a></td>
+          <td class="script-desc">Stream folders exactly at depth 4 with live progress bar, timestamped incremental file output every 1000 items,</td>
+        </tr>
+        <tr data-name="get-overall-folder-size-with-child-items-in-mb.ps1" data-desc="define an array of project folders" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/get-overall-folder-size-with-child-items-in-mb.ps1" target="_blank" rel="noopener">get-overall-folder-size-with-child-items-in-mb.ps1</a></td>
+          <td class="script-desc">Define an array of project folders</td>
+        </tr>
+        <tr data-name="get-unique-value-from-csv.ps1" data-desc="extract a unique list of &quot;display name&quot; values from a very large csv with a progress bar. supports exact line-based progress when -totallines is provided. saves results to a new csv in the same folder with header &quot;displa" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/get-unique-value-from-csv.ps1" target="_blank" rel="noopener">get-unique-value-from-csv.ps1</a></td>
+          <td class="script-desc">Extract a unique list of &quot;Display Name&quot; values from a very large CSV with a progress bar. Supports exact line-based progress when -TotalLines is provided. Saves results to a new CSV in the same folder with header &quot;Displa</td>
+        </tr>
+        <tr data-name="if-file-exist-then-output-file.ps1" data-desc="this script is used to check if the autodesk programs are installed on the machine." data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/if-file-exist-then-output-file.ps1" target="_blank" rel="noopener">if-file-exist-then-output-file.ps1</a></td>
+          <td class="script-desc">This script is used to check if the Autodesk programs are installed on the machine.</td>
+        </tr>
+        <tr data-name="invoke-robocopy.ps1" data-desc="prompts for source and destination, then runs robocopy with standard flags and logging. runs in list-only (/l) mode for testing." data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/Invoke-Robocopy.ps1" target="_blank" rel="noopener">Invoke-Robocopy.ps1</a></td>
+          <td class="script-desc">Prompts for source and destination, then runs robocopy with standard flags and logging. Runs in list-only (/l) mode for testing.</td>
+        </tr>
+        <tr data-name="m365-version-update-download.ps1" data-desc="check microsoft 365 apps &quot;current channel&quot; build on ms learn." data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/m365-version-update-download.ps1" target="_blank" rel="noopener">m365-version-update-download.ps1</a></td>
+          <td class="script-desc">Check Microsoft 365 Apps &quot;Current Channel&quot; build on MS Learn.</td>
+        </tr>
+        <tr data-name="map-user-profile-folders-to-onedrive.ps1" data-desc="define user-specific paths using $env:username" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/map-user-profile-folders-to-onedrive.ps1" target="_blank" rel="noopener">map-user-profile-folders-to-onedrive.ps1</a></td>
+          <td class="script-desc">Define user-specific paths using $env:USERNAME</td>
+        </tr>
+        <tr data-name="map-user-profile-folders-to-onedrive1.ps1" data-desc="define onedrive path specific to ${domainup}" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/map-user-profile-folders-to-onedrive1.ps1" target="_blank" rel="noopener">map-user-profile-folders-to-onedrive1.ps1</a></td>
+          <td class="script-desc">Define OneDrive path specific to ${domainup}</td>
+        </tr>
+        <tr data-name="merge-all-txt-files-into-one.ps1" data-desc="combine all merged txt files into a single file and report total line count" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/merge-all-txt-files-into-one.ps1" target="_blank" rel="noopener">merge-all-txt-files-into-one.ps1</a></td>
+          <td class="script-desc">Combine all merged TXT files into a single file and report total line count</td>
+        </tr>
+        <tr data-name="merge-pdf-files.ps1" data-desc="download pdfsharp from https://sourceforge.net/projects/pdfsharp/files/pdfsharp/pdfsharp%201.50.5147/pdfsharp-migradocfoundation-assemblies-1_50_5147.zip/download" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/merge-pdf-files.ps1" target="_blank" rel="noopener">merge-pdf-files.ps1</a></td>
+          <td class="script-desc">download pdfsharp from https://sourceforge.net/projects/pdfsharp/files/pdfsharp/PDFsharp%201.50.5147/PDFsharp-MigraDocFoundation-Assemblies-1_50_5147.zip/download</td>
+        </tr>
+        <tr data-name="merge-pst-files-percent.ps1" data-desc="define source folder containing pst files and the destination pst file path" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/merge-pst-files-percent.ps1" target="_blank" rel="noopener">merge-pst-files-percent.ps1</a></td>
+          <td class="script-desc">Define source folder containing PST files and the destination PST file path</td>
+        </tr>
+        <tr data-name="merge-pst-files.ps1" data-desc="define source folder containing pst files and the destination pst file path" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/merge-pst-files.ps1" target="_blank" rel="noopener">merge-pst-files.ps1</a></td>
+          <td class="script-desc">Define source folder containing PST files and the destination PST file path</td>
+        </tr>
+        <tr data-name="merge-two-txt-files-into-one-csv.ps1" data-desc="merge two txt files side-by-side into a csv file without quotes." data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/merge-two-txt-files-into-one-csv.ps1" target="_blank" rel="noopener">merge-two-txt-files-into-one-csv.ps1</a></td>
+          <td class="script-desc">Merge two TXT files side-by-side into a CSV file without quotes.</td>
+        </tr>
+        <tr data-name="merge-txt-files-max-count-lines-per-file.ps1" data-desc="merge all txt files in a folder into new merged files with a maximum of 1000 rows each." data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/merge-txt-files-max-count-lines-per-file.ps1" target="_blank" rel="noopener">merge-txt-files-max-count-lines-per-file.ps1</a></td>
+          <td class="script-desc">Merge all TXT files in a folder into new merged files with a maximum of 1000 rows each.</td>
+        </tr>
+        <tr data-name="monitor-folders.ps1" data-desc="monitor provided folders for total file count, folder count, and size every 60 seconds; stop when 5 sequential snapshots are identical. includes -depth, per-iteration runtime, and a visible countdown to the next run. rev" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/monitor-folders.ps1" target="_blank" rel="noopener">monitor-folders.ps1</a></td>
+          <td class="script-desc">Monitor provided folders for total file count, folder count, and size every 60 seconds; stop when 5 sequential snapshots are identical. Includes -Depth, per-iteration runtime, and a visible countdown to the next run. Rev</td>
+        </tr>
+        <tr data-name="move-file-attempt-60-seconds-if-failure.ps1" data-desc="keep retrying every 1 minute until twinmotion 2022.2.3 revit installer.zip is successfully moved, with logging" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/move-file-attempt-60-seconds-if-failure.ps1" target="_blank" rel="noopener">move-file-attempt-60-seconds-if-failure.ps1</a></td>
+          <td class="script-desc">Keep retrying every 1 minute until Twinmotion 2022.2.3 Revit Installer.zip is successfully moved, with logging</td>
+        </tr>
+        <tr data-name="move-files.ps1" data-desc="define source and destination directories" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/move-files.ps1" target="_blank" rel="noopener">move-files.ps1</a></td>
+          <td class="script-desc">Define source and destination directories</td>
+        </tr>
+        <tr data-name="move-withprogress.ps1" data-desc="" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/move-withprogress.ps1" target="_blank" rel="noopener">move-withprogress.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="nerdio-management.ps1" data-desc="dir  &#x27;\\egnytemigrate-3\c$\users\jason.lamb\downloads&#x27;" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/nerdio-management.ps1" target="_blank" rel="noopener">nerdio-management.ps1</a></td>
+          <td class="script-desc">dir  &#x27;\\egnytemigrate-3\c$\users\jason.lamb\downloads&#x27;</td>
+        </tr>
+        <tr data-name="new-client-project-from-template.ps1" data-desc="$logpath = &quot;\\${domain}.local\corp\data\proj\!template\logs\robocopylog-$datetime.txt&quot;" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/new-client-project-from-template.ps1" target="_blank" rel="noopener">new-client-project-from-template.ps1</a></td>
+          <td class="script-desc">$logpath = &quot;\\${domain}.local\corp\data\proj\!TEMPLATE\logs\robocopylog-$datetime.txt&quot;</td>
+        </tr>
+        <tr data-name="panzura-disk-space.ps1" data-desc="get current date and time" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/panzura-disk-space.ps1" target="_blank" rel="noopener">panzura-disk-space.ps1</a></td>
+          <td class="script-desc">Get current date and time</td>
+        </tr>
+        <tr data-name="parse-filter-csv-txt-file.ps1" data-desc="read all lines, filter, and overwrite" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/parse-filter-csv-txt-file.ps1" target="_blank" rel="noopener">parse-filter-csv-txt-file.ps1</a></td>
+          <td class="script-desc">Read all lines, filter, and overwrite</td>
+        </tr>
+        <tr data-name="parse-txt-file-other.ps1" data-desc="remove row a row that matches &quot;x&quot; to $txtoutput" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/parse-txt-file-other.ps1" target="_blank" rel="noopener">parse-txt-file-other.ps1</a></td>
+          <td class="script-desc">remove row a row that matches &quot;x&quot; to $txtoutput</td>
+        </tr>
+        <tr data-name="parse-txt-remove-lines.ps1" data-desc="cleans text files with a given prefix by removing standard subfolder patterns and child paths." data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/parse-txt-remove-lines.ps1" target="_blank" rel="noopener">parse-txt-remove-lines.ps1</a></td>
+          <td class="script-desc">Cleans text files with a given prefix by removing standard subfolder patterns and child paths.</td>
+        </tr>
+        <tr data-name="parse-txt-remove-matching-lines-from-another-txt-file-skip-completed.ps1" data-desc="cleans text files with a given prefix by removing standard subfolder patterns and child paths." data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/parse-txt-remove-matching-lines-from-another-txt-file-skip-completed.ps1" target="_blank" rel="noopener">parse-txt-remove-matching-lines-from-another-txt-file-skip-completed.ps1</a></td>
+          <td class="script-desc">Cleans text files with a given prefix by removing standard subfolder patterns and child paths.</td>
+        </tr>
+        <tr data-name="parse-txt-remove-matching-lines-from-another-txt-file.ps1" data-desc="remove lines from *-cleaned.txt files that appear in a reference file (egnyte-permission-report.txt)" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/parse-txt-remove-matching-lines-from-another-txt-file.ps1" target="_blank" rel="noopener">parse-txt-remove-matching-lines-from-another-txt-file.ps1</a></td>
+          <td class="script-desc">Remove lines from *-cleaned.txt files that appear in a reference file (egnyte-permission-report.txt)</td>
+        </tr>
+        <tr data-name="parse-txt.ps1" data-desc="parse icacls text into csv, bump middough\* with leading comma" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/parse-txt.ps1" target="_blank" rel="noopener">parse-txt.ps1</a></td>
+          <td class="script-desc">Parse icacls text into CSV, bump MIDDOUGH\* with leading comma</td>
+        </tr>
+        <tr data-name="ping-computer-and-move-file.ps1" data-desc="" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/ping-computer-and-move-file.ps1" target="_blank" rel="noopener">ping-computer-and-move-file.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="ping-get-folder-and-expand-c-drive-max.ps1" data-desc="define the list of computers" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/ping-get-folder-and-expand-c-drive-max.ps1" target="_blank" rel="noopener">ping-get-folder-and-expand-c-drive-max.ps1</a></td>
+          <td class="script-desc">Define the list of computers</td>
+        </tr>
+        <tr data-name="random-folder-creation.ps1" data-desc="count the number of child items in each directory" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/random-folder-creation.ps1" target="_blank" rel="noopener">random-folder-creation.ps1</a></td>
+          <td class="script-desc">Count the number of child items in each directory</td>
+        </tr>
+        <tr data-name="remove-duplicate-lines-in-txt-file.ps1" data-desc="remove duplicate lines (preserving first occurrence) from a specified text file and overwrite the original file atomically." data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/remove-duplicate-lines-in-txt-file.ps1" target="_blank" rel="noopener">remove-duplicate-lines-in-txt-file.ps1</a></td>
+          <td class="script-desc">Remove duplicate lines (preserving first occurrence) from a specified text file and overwrite the original file atomically.</td>
+        </tr>
+        <tr data-name="remove-empty-folders.ps1" data-desc="fast removal of empty subfolders using .net enumeration (deepest-first) with progress bar and runtime timestamps. default whatif; use -delete to actually remove. logs to parent.  rev 1.8" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/remove-empty-folders.ps1" target="_blank" rel="noopener">remove-empty-folders.ps1</a></td>
+          <td class="script-desc">Fast removal of empty subfolders using .NET enumeration (deepest-first) with progress bar and runtime timestamps. Default WhatIf; use -Delete to actually remove. Logs to parent.  Rev 1.8</td>
+        </tr>
+        <tr data-name="remove-empty-lines-from-txt-file.ps1" data-desc="remove empty lines from a specified text file and overwrite the original file. added parameter input. rev 1.1" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/remove-empty-lines-from-txt-file.ps1" target="_blank" rel="noopener">remove-empty-lines-from-txt-file.ps1</a></td>
+          <td class="script-desc">Remove empty lines from a specified text file and overwrite the original file. Added parameter input. Rev 1.1</td>
+        </tr>
+        <tr data-name="remove-users-from-csv.ps1" data-desc="robust header handling + exclude filtering. extract/keep unique &quot;display name&quot; values excluding a provided csv list, optionally filter source rows. fixes &quot;display name not found&quot; by normalizing header quotes/whitespace/b" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/remove-users-from-csv.ps1" target="_blank" rel="noopener">remove-users-from-csv.ps1</a></td>
+          <td class="script-desc">Robust header handling + exclude filtering. Extract/keep unique &quot;Display Name&quot; values excluding a provided CSV list, optionally filter source rows. Fixes &quot;Display Name not found&quot; by normalizing header quotes/whitespace/B</td>
+        </tr>
+        <tr data-name="rename-clean-file-names.ps1" data-desc="clean file names only (no folder renames)." data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/rename-clean-file-names.ps1" target="_blank" rel="noopener">rename-clean-file-names.ps1</a></td>
+          <td class="script-desc">Clean file names only (no folder renames).</td>
+        </tr>
+        <tr data-name="rename-filenames-with-leading-or-trailing-space.ps1" data-desc="rename files within one or more target folders by trimming names, collapsing multiple spaces, and appending -1/-2 for duplicates; per-folder and global logs; optional recursion; dry run supported; exclusion folder array " data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/rename-filenames-with-leading-or-trailing-space.ps1" target="_blank" rel="noopener">rename-filenames-with-leading-or-trailing-space.ps1</a></td>
+          <td class="script-desc">Rename files within one or more target folders by trimming names, collapsing multiple spaces, and appending -1/-2 for duplicates; per-folder and global logs; optional recursion; dry run supported; exclusion folder array </td>
+        </tr>
+        <tr data-name="rename-filenames-with-space-with-dash.ps1" data-desc="define the root folder to search" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/rename-filenames-with-space-with-dash.ps1" target="_blank" rel="noopener">rename-filenames-with-space-with-dash.ps1</a></td>
+          <td class="script-desc">Define the root folder to search</td>
+        </tr>
+        <tr data-name="rename-files-in-bulk.ps1" data-desc="define the directory where the files are located" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/rename-files-in-bulk.ps1" target="_blank" rel="noopener">rename-files-in-bulk.ps1</a></td>
+          <td class="script-desc">Define the directory where the files are located</td>
+        </tr>
+        <tr data-name="rename-files-with-spaces-to-dashes.ps1" data-desc="if it&#x27;s a file, split name and extension" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/rename-files-with-spaces-to-dashes.ps1" target="_blank" rel="noopener">rename-files-with-spaces-to-dashes.ps1</a></td>
+          <td class="script-desc">If it&#x27;s a file, split name and extension</td>
+        </tr>
+        <tr data-name="replace-file-name-space-with-dash.ps1" data-desc="define the path to the file you want to rename" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/replace-file-name-space-with-dash.ps1" target="_blank" rel="noopener">replace-file-name-space-with-dash.ps1</a></td>
+          <td class="script-desc">Define the path to the file you want to rename</td>
+        </tr>
+        <tr data-name="replace-files-with-source-dir-array.ps1" data-desc="define an array of source directories" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/replace-files-with-source-dir-array.ps1" target="_blank" rel="noopener">replace-files-with-source-dir-array.ps1</a></td>
+          <td class="script-desc">Define an array of source directories</td>
+        </tr>
+        <tr data-name="review-txt-file-and-remove-lines-with-file-extensions.ps1" data-desc="path to the input file (updated to clean5.txt)" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/review-txt-file-and-remove-lines-with-file-extensions.ps1" target="_blank" rel="noopener">review-txt-file-and-remove-lines-with-file-extensions.ps1</a></td>
+          <td class="script-desc">Path to the input file (updated to clean5.txt)</td>
+        </tr>
+        <tr data-name="sort-csv-by-row-a-z.ps1" data-desc="source csv by row a-z" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/sort-csv-by-row-a-z.ps1" target="_blank" rel="noopener">sort-csv-by-row-a-z.ps1</a></td>
+          <td class="script-desc">source csv by row a-z</td>
+        </tr>
+        <tr data-name="split-large-csv-by-line-count-streaming.ps1" data-desc="stream-split a large csv by line count with robust local staging for network paths (egnyte/panzura), retries, and heartbeats. rev 1.4" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/split-large-csv-by-line-count-streaming.ps1" target="_blank" rel="noopener">split-large-csv-by-line-count-streaming.ps1</a></td>
+          <td class="script-desc">Stream-split a large CSV by line count with robust LOCAL STAGING for network paths (Egnyte/Panzura), retries, and heartbeats. Rev 1.4</td>
+        </tr>
+        <tr data-name="split-large-csv-by-line-count.ps1" data-desc="split a large csv into smaller chunk files while preserving the header. rev 1.0" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/split-large-csv-by-line-count.ps1" target="_blank" rel="noopener">split-large-csv-by-line-count.ps1</a></td>
+          <td class="script-desc">Split a large CSV into smaller chunk files while preserving the header. Rev 1.0</td>
+        </tr>
+        <tr data-name="split-large-txt-by-line-count-streaming.ps1" data-desc="stream-split a large txt by line count with robust local staging for network paths (egnyte/panzura), retries, and heartbeats. rev 1.5" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/split-large-txt-by-line-count-streaming.ps1" target="_blank" rel="noopener">split-large-txt-by-line-count-streaming.ps1</a></td>
+          <td class="script-desc">Stream-split a large TXT by line count with robust LOCAL STAGING for network paths (Egnyte/Panzura), retries, and heartbeats. Rev 1.5</td>
+        </tr>
+        <tr data-name="sync-bb-stamps-from-sharepoint-onedrive.ps1" data-desc="$sourcefolder = &quot;c:\temp\test\bbstamps&quot;" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/sync-bb-stamps-from-sharepoint-onedrive.ps1" target="_blank" rel="noopener">sync-bb-stamps-from-sharepoint-onedrive.ps1</a></td>
+          <td class="script-desc">$SourceFolder = &quot;C:\Temp\test\bbstamps&quot;</td>
+        </tr>
+        <tr data-name="test.ps1" data-desc="" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/test.ps1" target="_blank" rel="noopener">test.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="transfer-a-large-file.ps1" data-desc="define variables" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/transfer-a-large-file.ps1" target="_blank" rel="noopener">transfer-a-large-file.ps1</a></td>
+          <td class="script-desc">Define variables</td>
+        </tr>
+        <tr data-name="verify-files-in-a-folder.ps1" data-desc="verify files in a folder" data-cat="file management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/File-Management-Scripts/verify-files-in-a-folder.ps1" target="_blank" rel="noopener">verify-files-in-a-folder.ps1</a></td>
+          <td class="script-desc">Verify Files in a Folder</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-GRC-TWIT-SecurityNow-Transcripts">
+    <h2 class="cat-header">
+      <span class="cat-icon">🎙️</span>
+      GRC / Security Now Transcripts
+      <span class="cat-count">16 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="check-and-download-missing-pdf-files.ps1" data-desc="combine local gap check for sn-###-notes.pdf and remote grc download for any missing pdfs. rev 2.0" data-cat="grc / security now transcripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/GRC-TWIT-SecurityNow-Transcripts/check-and-download-missing-pdf-files.ps1" target="_blank" rel="noopener">check-and-download-missing-pdf-files.ps1</a></td>
+          <td class="script-desc">Combine local gap check for sn-###-notes.pdf and remote GRC download for any missing PDFs. Rev 2.0</td>
+        </tr>
+        <tr data-name="check-download-pdf-txt-jpg.ps1" data-desc="downloads grc security now txt transcripts, pdf show notes, and jpg episode images (all weekly podcast) with smart empty folder detection and resume, logging, and persistent tracking" data-cat="grc / security now transcripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/GRC-TWIT-SecurityNow-Transcripts/check-download-pdf-txt-jpg.ps1" target="_blank" rel="noopener">check-download-pdf-txt-jpg.ps1</a></td>
+          <td class="script-desc">Downloads GRC Security Now TXT transcripts, PDF show notes, and JPG episode images (all weekly podcast) with smart empty folder detection and resume, logging, and persistent tracking</td>
+        </tr>
+        <tr data-name="check-for-missing-pdf-files.ps1" data-desc="check for missing sequential pdf files (sn-###-notes.pdf) in a folder. rev 1.0" data-cat="grc / security now transcripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/GRC-TWIT-SecurityNow-Transcripts/check-for-missing-pdf-files.ps1" target="_blank" rel="noopener">check-for-missing-pdf-files.ps1</a></td>
+          <td class="script-desc">Check for missing sequential PDF files (sn-###-notes.pdf) in a folder. Rev 1.0</td>
+        </tr>
+        <tr data-name="check-for-missing-txt-files.ps1" data-desc="check for missing sequential txt transcript files (sn-###.txt) in a folder. rev 1.1" data-cat="grc / security now transcripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/GRC-TWIT-SecurityNow-Transcripts/check-for-missing-txt-files.ps1" target="_blank" rel="noopener">check-for-missing-txt-files.ps1</a></td>
+          <td class="script-desc">Check for missing sequential TXT transcript files (sn-###.txt) in a folder. Rev 1.1</td>
+        </tr>
+        <tr data-name="download-missing-pdf-files.ps1" data-desc="check for missing pdf show notes (sn-###-notes.pdf) on grc site and download any that exist. rev 1.0" data-cat="grc / security now transcripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/GRC-TWIT-SecurityNow-Transcripts/download-missing-pdf-files.ps1" target="_blank" rel="noopener">download-missing-pdf-files.ps1</a></td>
+          <td class="script-desc">Check for missing PDF show notes (sn-###-notes.pdf) on GRC site and download any that exist. Rev 1.0</td>
+        </tr>
+        <tr data-name="download-missing-txt-files.ps1" data-desc="download the file" data-cat="grc / security now transcripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/GRC-TWIT-SecurityNow-Transcripts/download-missing-txt-files.ps1" target="_blank" rel="noopener">download-missing-txt-files.ps1</a></td>
+          <td class="script-desc">download the file</td>
+        </tr>
+        <tr data-name="download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com-1.ps1" data-desc="powershell script to download security now transcripts" data-cat="grc / security now transcripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/GRC-TWIT-SecurityNow-Transcripts/download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com-1.ps1" target="_blank" rel="noopener">download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com-1.ps1</a></td>
+          <td class="script-desc">PowerShell Script to Download Security Now Transcripts</td>
+        </tr>
+        <tr data-name="download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com.ps1" data-desc="downloads grc security now txt transcripts, pdf show notes, and jpg episode images (all weekly podcast) with smart empty folder detection and resume, logging, and persistent tracking" data-cat="grc / security now transcripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/GRC-TWIT-SecurityNow-Transcripts/download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com.ps1" target="_blank" rel="noopener">download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com.ps1</a></td>
+          <td class="script-desc">Downloads GRC Security Now TXT transcripts, PDF show notes, and JPG episode images (all weekly podcast) with smart empty folder detection and resume, logging, and persistent tracking</td>
+        </tr>
+        <tr data-name="pdf-txt-jpg start at zero.ps1" data-desc="start with https://www.grc.com/sn/1.jpg and go to https://www.grc.com/sn/998.jpg to see if file exist and then download to $githubpath\powershell\grc-twit-securitynow-transcripts\downloads\jpg-episode-images\" data-cat="grc / security now transcripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/GRC-TWIT-SecurityNow-Transcripts/pdf-txt-jpg start at zero.ps1" target="_blank" rel="noopener">pdf-txt-jpg start at zero.ps1</a></td>
+          <td class="script-desc">start with https://www.grc.com/sn/1.jpg and go to https://www.grc.com/sn/998.jpg to see if file exist and then download to $githubpath\powershell\GRC-TWIT-SecurityNow-Transcripts\Downloads\JPG-Episode-Images\</td>
+        </tr>
+        <tr data-name="convert-transcriptstojson.ps1" data-desc="requires: powershell 7+, optional: pdftotext.exe or similar to extract pdf text" data-cat="grc / security now transcripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/GRC-TWIT-SecurityNow-Transcripts/testing/Convert-TranscriptsToJson.ps1" target="_blank" rel="noopener"><span class="subdir">testing/</span>Convert-TranscriptsToJson.ps1</a></td>
+          <td class="script-desc">Requires: PowerShell 7+, optional: pdftotext.exe or similar to extract PDF text</td>
+        </tr>
+        <tr data-name="generate-episodesearchsite-old.ps1" data-desc="load the ai tagging helper" data-cat="grc / security now transcripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/GRC-TWIT-SecurityNow-Transcripts/testing/Generate-EpisodeSearchSite-old.ps1" target="_blank" rel="noopener"><span class="subdir">testing/</span>Generate-EpisodeSearchSite-old.ps1</a></td>
+          <td class="script-desc">Load the AI tagging helper</td>
+        </tr>
+        <tr data-name="generate-episodesearchsite.ps1" data-desc="generate-episodesearchsite.ps1" data-cat="grc / security now transcripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/GRC-TWIT-SecurityNow-Transcripts/testing/Generate-EpisodeSearchSite.ps1" target="_blank" rel="noopener"><span class="subdir">testing/</span>Generate-EpisodeSearchSite.ps1</a></td>
+          <td class="script-desc">generate-episodesearchsite.ps1</td>
+        </tr>
+        <tr data-name="generate-html-with-links.ps1" data-desc="split export-markdownindex from html export. markdown index now only creates readme.md, separate export-htmlindex will handle html table layout" data-cat="grc / security now transcripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/GRC-TWIT-SecurityNow-Transcripts/testing/generate-html-with-links.ps1" target="_blank" rel="noopener"><span class="subdir">testing/</span>generate-html-with-links.ps1</a></td>
+          <td class="script-desc">Split Export-MarkdownIndex from HTML export. Markdown index now only creates README.md, separate Export-HtmlIndex will handle HTML table layout</td>
+        </tr>
+        <tr data-name="get-grcpdfshownotes-works.ps1" data-desc="define the base url and file pattern" data-cat="grc / security now transcripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/GRC-TWIT-SecurityNow-Transcripts/testing/get-grcpdfshownotes-works.ps1" target="_blank" rel="noopener"><span class="subdir">testing/</span>get-grcpdfshownotes-works.ps1</a></td>
+          <td class="script-desc">Define the base URL and file pattern</td>
+        </tr>
+        <tr data-name="get-tagsfromtext.ps1" data-desc="&#x27;$onedrivepath\downloads\grc_sn_files\transcriptions&#x27;" data-cat="grc / security now transcripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/GRC-TWIT-SecurityNow-Transcripts/testing/Get-TagsFromText.ps1" target="_blank" rel="noopener"><span class="subdir">testing/</span>Get-TagsFromText.ps1</a></td>
+          <td class="script-desc">&#x27;$onedrivepath\Downloads\GRC_SN_Files\Transcriptions&#x27;</td>
+        </tr>
+        <tr data-name="index-grctranscripts.ps1" data-desc="create empty array for index" data-cat="grc / security now transcripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/GRC-TWIT-SecurityNow-Transcripts/testing/Index-GRCTranscripts.ps1" target="_blank" rel="noopener"><span class="subdir">testing/</span>Index-GRCTranscripts.ps1</a></td>
+          <td class="script-desc">Create empty array for index</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-HEIC-Convert-To-JPG">
+    <h2 class="cat-header">
+      <span class="cat-icon">🖼️</span>
+      HEIC to JPG Converter
+      <span class="cat-count">6 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="compile-to-exe.ps1" data-desc="compile script to exe with custom icon" data-cat="heic to jpg converter">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/HEIC-Convert-To-JPG/compile-to-exe.ps1" target="_blank" rel="noopener">compile-to-exe.ps1</a></td>
+          <td class="script-desc">Compile script to EXE with custom icon</td>
+        </tr>
+        <tr data-name="convert-png-to-ico.ps1" data-desc="ps v7+ compatible" data-cat="heic to jpg converter">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/HEIC-Convert-To-JPG/convert-png-to-ico.ps1" target="_blank" rel="noopener">convert-png-to-ico.ps1</a></td>
+          <td class="script-desc">ps v7+ compatible</td>
+        </tr>
+        <tr data-name="convertto-jpeg.ps1" data-desc="only works with powershell 5.1" data-cat="heic to jpg converter">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/HEIC-Convert-To-JPG/ConvertTo-Jpeg.ps1" target="_blank" rel="noopener">ConvertTo-Jpeg.ps1</a></td>
+          <td class="script-desc">ONLY WORKS WITH POWERSHELL 5.1</td>
+        </tr>
+        <tr data-name="heicconvert2jpg-gui.ps1" data-desc="gui heic/heif to jpg converter using bundled portable imagemagick" data-cat="heic to jpg converter">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/HEIC-Convert-To-JPG/HEICconvert2JPG-GUI.ps1" target="_blank" rel="noopener">HEICconvert2JPG-GUI.ps1</a></td>
+          <td class="script-desc">GUI HEIC/HEIF to JPG Converter using bundled portable ImageMagick</td>
+        </tr>
+        <tr data-name="heicconvert2jpg-gui0-rev5-1.ps1" data-desc="converts heic/heif files to jpg using imagemagick via powershell gui." data-cat="heic to jpg converter">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/HEIC-Convert-To-JPG/HEICconvert2JPG-GUI0-rev5-1.ps1" target="_blank" rel="noopener">HEICconvert2JPG-GUI0-rev5-1.ps1</a></td>
+          <td class="script-desc">Converts HEIC/HEIF files to JPG using ImageMagick via PowerShell GUI.</td>
+        </tr>
+        <tr data-name="heicconvert2jpg-monitor.ps1" data-desc="monitors a folder for new heic/heif files and automatically converts them to jpg" data-cat="heic to jpg converter">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/HEIC-Convert-To-JPG/HEICconvert2JPG-Monitor.ps1" target="_blank" rel="noopener">HEICconvert2JPG-Monitor.ps1</a></td>
+          <td class="script-desc">Monitors a folder for new HEIC/HEIF files and automatically converts them to JPG</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-matrix">
+    <h2 class="cat-header">
+      <span class="cat-icon">🌃</span>
+      Matrix Animation
+      <span class="cat-count">1 script</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="start-matrix.ps1" data-desc="posh-matrix v2.03 by mathieures" data-cat="matrix animation">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/matrix/start-matrix.ps1" target="_blank" rel="noopener">start-matrix.ps1</a></td>
+          <td class="script-desc">Posh-Matrix v2.03 by mathieures</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-MS-365-Scripts">
+    <h2 class="cat-header">
+      <span class="cat-icon">☁️</span>
+      Microsoft 365 Scripts
+      <span class="cat-count">9 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="add-contactstodistributionlist.ps1" data-desc="manages mail contacts in microsoft 365 from a csv — supports add, update, and remove." data-cat="microsoft 365 scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/MS-365-Scripts/Add-ContactsToDistributionList.ps1" target="_blank" rel="noopener">Add-ContactsToDistributionList.ps1</a></td>
+          <td class="script-desc">Manages mail contacts in Microsoft 365 from a CSV — supports Add, Update, and Remove.</td>
+        </tr>
+        <tr data-name="block-msteams-external-domain.ps1" data-desc="prompt for one or more comma-separated domains" data-cat="microsoft 365 scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/MS-365-Scripts/block-msteams-external-domain.ps1" target="_blank" rel="noopener">block-msteams-external-domain.ps1</a></td>
+          <td class="script-desc">Prompt for one or more comma-separated domains</td>
+        </tr>
+        <tr data-name="export-distributionlistmembers.ps1" data-desc="exports members of specified distribution lists to a csv." data-cat="microsoft 365 scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/MS-365-Scripts/Export-DistributionListMembers.ps1" target="_blank" rel="noopener">Export-DistributionListMembers.ps1</a></td>
+          <td class="script-desc">Exports members of specified distribution lists to a CSV.</td>
+        </tr>
+        <tr data-name="get-entra-user-details-for-org-chart.ps1" data-desc="gets all entra/azure ad user details including first, last, display, email," data-cat="microsoft 365 scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/MS-365-Scripts/get-entra-user-details-for-org-chart.ps1" target="_blank" rel="noopener">get-entra-user-details-for-org-chart.ps1</a></td>
+          <td class="script-desc">Gets all Entra/Azure AD user details including first, last, display, email,</td>
+        </tr>
+        <tr data-name="get-entracustomattributes.ps1" data-desc="retrieve all custom attributes (1-15) for users matching a specified upn domain from entra and export to csv" data-cat="microsoft 365 scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/MS-365-Scripts/Get-EntraCustomAttributes.ps1" target="_blank" rel="noopener">Get-EntraCustomAttributes.ps1</a></td>
+          <td class="script-desc">Retrieve all custom attributes (1-15) for users matching a specified UPN domain from Entra and export to CSV</td>
+        </tr>
+        <tr data-name="get-entraforwardingemails.ps1" data-desc="retrieve all forwarding email addresses for users matching a specified upn domain from entra and export to csv" data-cat="microsoft 365 scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/MS-365-Scripts/Get-EntraForwardingEmails.ps1" target="_blank" rel="noopener">Get-EntraForwardingEmails.ps1</a></td>
+          <td class="script-desc">Retrieve all forwarding email addresses for users matching a specified UPN domain from Entra and export to CSV</td>
+        </tr>
+        <tr data-name="get-entrauserprincipalnames.ps1" data-desc="retrieve user principal names (upn) for users matching a specified upn domain from entra and export to csv" data-cat="microsoft 365 scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/MS-365-Scripts/Get-EntraUserPrincipalNames.ps1" target="_blank" rel="noopener">Get-EntraUserPrincipalNames.ps1</a></td>
+          <td class="script-desc">Retrieve User Principal Names (UPN) for users matching a specified UPN domain from Entra and export to CSV</td>
+        </tr>
+        <tr data-name="get-members-owners-from-team.ps1" data-desc="get owners and members from a microsoft teams team and export to console and csv" data-cat="microsoft 365 scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/MS-365-Scripts/get-members-owners-from-team.ps1" target="_blank" rel="noopener">get-members-owners-from-team.ps1</a></td>
+          <td class="script-desc">Get owners and members from a Microsoft Teams team and export to console and CSV</td>
+        </tr>
+        <tr data-name="get-teams-from-user-email.ps1" data-desc="prompt for a user upn and export all microsoft teams where the" data-cat="microsoft 365 scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/MS-365-Scripts/get-teams-from-user-email.ps1" target="_blank" rel="noopener">get-teams-from-user-email.ps1</a></td>
+          <td class="script-desc">Prompt for a user UPN and export all Microsoft Teams where the</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-Miscellaneous">
+    <h2 class="cat-header">
+      <span class="cat-icon">🔧</span>
+      Miscellaneous
+      <span class="cat-count">53 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="add-to-array.ps1" data-desc="" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/add-to-array.ps1" target="_blank" rel="noopener">add-to-array.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="all-passwords-7-lower-alpha.ps1" data-desc="generate a dynamic file name with the current time in hhmmss format" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/all-passwords-7-lower-alpha.ps1" target="_blank" rel="noopener">all-passwords-7-lower-alpha.ps1</a></td>
+          <td class="script-desc">Generate a dynamic file name with the current time in HHmmss format</td>
+        </tr>
+        <tr data-name="analyze-acript.ps1" data-desc="static analyzer for powershell scripts to flag suspicious patterns (non-executing). rev 1.0" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/analyze-acript.ps1" target="_blank" rel="noopener">analyze-acript.ps1</a></td>
+          <td class="script-desc">Static analyzer for PowerShell scripts to flag suspicious patterns (non-executing). Rev 1.0</td>
+        </tr>
+        <tr data-name="calculate-days.ps1" data-desc="compute days until or since a provided date (via parameter or prompt), then allow y/n or direct-date input to continue." data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/calculate-days.ps1" target="_blank" rel="noopener">calculate-days.ps1</a></td>
+          <td class="script-desc">Compute days until or since a provided date (via parameter or prompt), then allow Y/N or direct-date input to continue.</td>
+        </tr>
+        <tr data-name="character-count-of-string.ps1" data-desc="string statistics script — counts chars, words, vowels, etc. with random color output. rev 1.0" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/character-count-of-string.ps1" target="_blank" rel="noopener">character-count-of-string.ps1</a></td>
+          <td class="script-desc">String statistics script — counts chars, words, vowels, etc. with random color output. Rev 1.0</td>
+        </tr>
+        <tr data-name="check-choco-updates.ps1" data-desc="check-choco-updates.ps1" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/check-choco-updates.ps1" target="_blank" rel="noopener">check-choco-updates.ps1</a></td>
+          <td class="script-desc">check-choco-updates.ps1</td>
+        </tr>
+        <tr data-name="check-onedrive-service-and-folder-location.ps1" data-desc="define the onedrive path specific to ${domain}" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/check-onedrive-service-and-folder-location.ps1" target="_blank" rel="noopener">check-onedrive-service-and-folder-location.ps1</a></td>
+          <td class="script-desc">Define the OneDrive path specific to ${domain}</td>
+        </tr>
+        <tr data-name="check-powershell-update.ps1" data-desc="checks the chocolatey rss feed for powershell-core and alerts if a newer version is available than what is currently installed" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/check-powershell-update.ps1" target="_blank" rel="noopener">check-powershell-update.ps1</a></td>
+          <td class="script-desc">Checks the Chocolatey RSS feed for powershell-core and alerts if a newer version is available than what is currently installed</td>
+        </tr>
+        <tr data-name="christmas-tree.ps1" data-desc="animated christmas tree with blinking star, alternating green/ornament lights," data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/christmas-tree.ps1" target="_blank" rel="noopener">christmas-tree.ps1</a></td>
+          <td class="script-desc">Animated Christmas tree with blinking star, alternating green/ornament lights,</td>
+        </tr>
+        <tr data-name="create-csv-to-xlsx-task.ps1" data-desc="createcsvtoxlsxtask.ps1" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/Create-Csv-To-Xlsx-Task.ps1" target="_blank" rel="noopener">Create-Csv-To-Xlsx-Task.ps1</a></td>
+          <td class="script-desc">CreateCsvToXlsxTask.ps1</td>
+        </tr>
+        <tr data-name="dell-command-update.ps1" data-desc="update 10/24/24 moved logs to &#x27;c:\temp\automox-exports\dcu&#x27;" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/Dell-Command-Update.ps1" target="_blank" rel="noopener">Dell-Command-Update.ps1</a></td>
+          <td class="script-desc">update 10/24/24 moved logs to &#x27;C:\Temp\Automox-Exports\DCU&#x27;</td>
+        </tr>
+        <tr data-name="dell-empswarranty-jledit.ps1" data-desc="create working dir if it doesn&#x27;t exist" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/Dell-EMPSWarranty-jledit.ps1" target="_blank" rel="noopener">Dell-EMPSWarranty-jledit.ps1</a></td>
+          <td class="script-desc">Create working dir if it doesn&#x27;t exist</td>
+        </tr>
+        <tr data-name="dell-empswarranty.ps1" data-desc="this will download and install dell command integration suite if it is not already installed, then get the warranty information for the system" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/Dell-EMPSWarranty.ps1" target="_blank" rel="noopener">Dell-EMPSWarranty.ps1</a></td>
+          <td class="script-desc">This will download and install Dell Command Integration Suite if it is not already installed, then get the warranty information for the system</td>
+        </tr>
+        <tr data-name="dell-service-tag-to-model.ps1" data-desc="all your tags as one big string" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/dell-service-tag-to-model.ps1" target="_blank" rel="noopener">dell-service-tag-to-model.ps1</a></td>
+          <td class="script-desc">all your tags as one big string</td>
+        </tr>
+        <tr data-name="dell-service-tag-to-support-url.ps1" data-desc="launches dell support page for a given service tag in a new chrome window and returns the url" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/dell-service-tag-to-support-url.ps1" target="_blank" rel="noopener">dell-service-tag-to-support-url.ps1</a></td>
+          <td class="script-desc">Launches Dell support page for a given service tag in a new Chrome window and returns the URL</td>
+        </tr>
+        <tr data-name="fake-chatbot.ps1" data-desc="winforms chat bot with external prompt-answer text file support. rev 1.1" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/fake-chatbot.ps1" target="_blank" rel="noopener">fake-chatbot.ps1</a></td>
+          <td class="script-desc">WinForms Chat Bot with external prompt-answer text file support. Rev 1.1</td>
+        </tr>
+        <tr data-name="generate-ppt.ps1" data-desc="creates a powerpoint slideshow from a folder of images, one image per slide, centered and scaled to fit 16:9" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/generate-ppt.ps1" target="_blank" rel="noopener">generate-ppt.ps1</a></td>
+          <td class="script-desc">Creates a PowerPoint slideshow from a folder of images, one image per slide, centered and scaled to fit 16:9</td>
+        </tr>
+        <tr data-name="generate-qr-code-to-html.ps1" data-desc="generate a qr code as svg or png for a website url using a web qr service, with $psexports as the default export folder" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/generate-qr-code-to-html.ps1" target="_blank" rel="noopener">generate-qr-code-to-html.ps1</a></td>
+          <td class="script-desc">Generate a QR code as SVG or PNG for a website URL using a web QR service, with $psexports as the default export folder</td>
+        </tr>
+        <tr data-name="get-dellwarranty.ps1" data-desc="" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/Get-DellWarranty.ps1" target="_blank" rel="noopener">Get-DellWarranty.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="get-local-users-and-groups.ps1" data-desc="query and optionally add a domain user to a local group on a remote computer" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/get-local-users-and-groups.ps1" target="_blank" rel="noopener">get-local-users-and-groups.ps1</a></td>
+          <td class="script-desc">Query and optionally add a domain user to a local group on a remote computer</td>
+        </tr>
+        <tr data-name="get-ms-teams-owners-and-members.ps1" data-desc="get date/time yymmdd_hhmmss" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/get-ms-teams-owners-and-members.ps1" target="_blank" rel="noopener">get-ms-teams-owners-and-members.ps1</a></td>
+          <td class="script-desc">get date/time YYMMDD_HHMMSS</td>
+        </tr>
+        <tr data-name="get-office-365-user-licenses-and-apps.ps1" data-desc="specify the users&#x27; emails or user principal names (upns)" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/get-office-365-user-licenses-and-apps.ps1" target="_blank" rel="noopener">get-office-365-user-licenses-and-apps.ps1</a></td>
+          <td class="script-desc">Specify the users&#x27; emails or User Principal Names (UPNs)</td>
+        </tr>
+        <tr data-name="git-update.ps1" data-desc="smart git pull/add/commit/push. generates ai commit message from diff via openai." data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/git-update.ps1" target="_blank" rel="noopener">git-update.ps1</a></td>
+          <td class="script-desc">Smart git pull/add/commit/push. Generates AI commit message from diff via OpenAI.</td>
+        </tr>
+        <tr data-name="hash-tables.ps1" data-desc="{0} | model: {1} | location: {2}&quot; -f $_.computername, $_.model, $_.location) -foregroundcolor $color" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/hash-tables.ps1" target="_blank" rel="noopener">hash-tables.ps1</a></td>
+          <td class="script-desc">{0} | Model: {1} | Location: {2}&quot; -f $_.ComputerName, $_.Model, $_.Location) -ForegroundColor $Color</td>
+        </tr>
+        <tr data-name="import-claudememoriestocodex.ps1" data-desc="import claude code cli memory files into codex memories, filtering global instructions down to durable user preferences" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/Import-ClaudeMemoriesToCodex.ps1" target="_blank" rel="noopener">Import-ClaudeMemoriesToCodex.ps1</a></td>
+          <td class="script-desc">Import Claude Code CLI memory files into Codex memories, filtering global instructions down to durable user preferences</td>
+        </tr>
+        <tr data-name="internal-speedtest.ps1" data-desc="internal speed test by copying a random-sized file from c:\temp to \\&lt;computer&gt;\c$\temp and reporting speed" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/internal-speedtest.ps1" target="_blank" rel="noopener">internal-speedtest.ps1</a></td>
+          <td class="script-desc">Internal speed test by copying a random-sized file from C:\Temp to \\&lt;computer&gt;\C$\Temp and reporting speed</td>
+        </tr>
+        <tr data-name="invoke-caffeine.ps1" data-desc="starts or stops caffeine.exe (-active/-stop) and logs each action into a single .log file." data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/invoke-caffeine.ps1" target="_blank" rel="noopener">invoke-caffeine.ps1</a></td>
+          <td class="script-desc">Starts or stops caffeine.exe (-active/-stop) and logs each action into a single .log file.</td>
+        </tr>
+        <tr data-name="list-to-array.ps1" data-desc="save a string list into an array-formatted powershell file, removing trailing comma on the last item, and append multiple foreach loop examples" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/list-to-array.ps1" target="_blank" rel="noopener">list-to-array.ps1</a></td>
+          <td class="script-desc">Save a string list into an array-formatted PowerShell file, removing trailing comma on the last item, and append multiple foreach loop examples</td>
+        </tr>
+        <tr data-name="change-lock-screen.ps1" data-desc="1. define image directory" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/Lock-Screen/Change-Lock-Screen.ps1" target="_blank" rel="noopener"><span class="subdir">Lock-Screen/</span>Change-Lock-Screen.ps1</a></td>
+          <td class="script-desc">1. Define image directory</td>
+        </tr>
+        <tr data-name="message-box.ps1" data-desc="powershell messagebox reference guide - demonstrates all button and icon combinations" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/Message-Box.ps1" target="_blank" rel="noopener">Message-Box.ps1</a></td>
+          <td class="script-desc">PowerShell MessageBox reference guide - demonstrates all button and icon combinations</td>
+        </tr>
+        <tr data-name="ping-test-and-log.ps1" data-desc="periodic internet speed test with live countdown timer, real-time log writing after every test. rev 1.2" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/ping-test-and-log.ps1" target="_blank" rel="noopener">ping-test-and-log.ps1</a></td>
+          <td class="script-desc">Periodic internet speed test with live countdown timer, real-time log writing after every test. Rev 1.2</td>
+        </tr>
+        <tr data-name="powertoys-browsersearch-install-helper.ps1" data-desc="installs the browsersearch plugin for powertoys run from a downloaded zip file, copies required dll dependencies, and restarts powertoys if installation succeeds." data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/powertoys-browsersearch-install-helper.ps1" target="_blank" rel="noopener">powertoys-browsersearch-install-helper.ps1</a></td>
+          <td class="script-desc">Installs the BrowserSearch plugin for PowerToys Run from a downloaded ZIP file, copies required DLL dependencies, and restarts PowerToys if installation succeeds.</td>
+        </tr>
+        <tr data-name="profile-scheduler.ps1" data-desc="runs scripts on per-script intervals based on each script&#x27;s own last run time" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/profile-scheduler.ps1" target="_blank" rel="noopener">profile-scheduler.ps1</a></td>
+          <td class="script-desc">Runs scripts on per-script intervals based on each script&#x27;s own last run time</td>
+        </tr>
+        <tr data-name="progress-bar.ps1" data-desc="gui version of variable-time progress bar using winforms (param fix)" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/progress-bar.ps1" target="_blank" rel="noopener">progress-bar.ps1</a></td>
+          <td class="script-desc">GUI version of variable-time progress bar using WinForms (param fix)</td>
+        </tr>
+        <tr data-name="ps-common-profile-copy.ps1" data-desc="backup @ &quot;$githubpath\powershell\miscellaneous\ps-common-profile-copy.ps1&quot;" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/ps-common-profile-COPY.ps1" target="_blank" rel="noopener">ps-common-profile-COPY.ps1</a></td>
+          <td class="script-desc">backup @ &quot;$GitHubpath\PowerShell\Miscellaneous\ps-common-profile-COPY.ps1&quot;</td>
+        </tr>
+        <tr data-name="ps-custom-faq-help-copy.ps1" data-desc="jason&#x27;s custom powershell quick reference with colored banner details (labels magenta, values white)" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/ps-custom-faq-help-COPY.ps1" target="_blank" rel="noopener">ps-custom-faq-help-COPY.ps1</a></td>
+          <td class="script-desc">Jason&#x27;s custom PowerShell quick reference with colored banner details (labels magenta, values white)</td>
+        </tr>
+        <tr data-name="random-password-generator-12-chars.ps1" data-desc="generates a random 12-character password and copies it to clipboard" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/random-password-generator-12-chars.ps1" target="_blank" rel="noopener">random-password-generator-12-chars.ps1</a></td>
+          <td class="script-desc">Generates a random 12-character password and copies it to clipboard</td>
+        </tr>
+        <tr data-name="random-password-generator.ps1" data-desc="generate 10 random passwords with complexity (uppercase, lowercase, digits, special chars). rev 1.0" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/random-password-generator.ps1" target="_blank" rel="noopener">random-password-generator.ps1</a></td>
+          <td class="script-desc">Generate 10 random passwords with complexity (uppercase, lowercase, digits, special chars). Rev 1.0</td>
+        </tr>
+        <tr data-name="remove-duplicates-from-array.ps1" data-desc="remove duplicates" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/remove-duplicates-from-array.ps1" target="_blank" rel="noopener">remove-duplicates-from-array.ps1</a></td>
+          <td class="script-desc">remove duplicates</td>
+        </tr>
+        <tr data-name="remove-space-replace-underscore.ps1" data-desc="prompt for input if no parameter given" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/remove-space-replace-underscore.ps1" target="_blank" rel="noopener">remove-space-replace-underscore.ps1</a></td>
+          <td class="script-desc">Prompt for input if no parameter given</td>
+        </tr>
+        <tr data-name="replace-text.ps1" data-desc="replace space with _" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/replace-text.ps1" target="_blank" rel="noopener">replace-text.ps1</a></td>
+          <td class="script-desc">replace space with _</td>
+        </tr>
+        <tr data-name="run-function-every-x-minutes.ps1" data-desc="repeatedly runs a function on a fixed interval until stopped." data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/run-function-every-x-minutes.ps1" target="_blank" rel="noopener">run-function-every-x-minutes.ps1</a></td>
+          <td class="script-desc">Repeatedly runs a function on a fixed interval until stopped.</td>
+        </tr>
+        <tr data-name="run-once-daily.ps1" data-desc="runs once-per-day scheduled tasks including security now! transcript fetch, file compare, and git sync; maintains daily run stamp file" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/run-once-daily.ps1" target="_blank" rel="noopener">run-once-daily.ps1</a></td>
+          <td class="script-desc">Runs once-per-day scheduled tasks including Security Now! transcript fetch, file compare, and git sync; maintains daily run stamp file</td>
+        </tr>
+        <tr data-name="schedule-a-task-with-powershell-file.ps1" data-desc="create two daily triggers, one for am and one for pm" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/schedule-a-task-with-powershell-file.ps1" target="_blank" rel="noopener">schedule-a-task-with-powershell-file.ps1</a></td>
+          <td class="script-desc">Create two daily triggers, one for AM and one for PM</td>
+        </tr>
+        <tr data-name="send-toastnotification.ps1" data-desc="sends a windows toast notification to the logged-on user&#x27;s desktop." data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/Send-ToastNotification.ps1" target="_blank" rel="noopener">Send-ToastNotification.ps1</a></td>
+          <td class="script-desc">Sends a Windows toast notification to the logged-on user&#x27;s desktop.</td>
+        </tr>
+        <tr data-name="speedtest.ps1" data-desc="this script performs a speed test and outputs the results." data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/speedtest.ps1" target="_blank" rel="noopener">speedtest.ps1</a></td>
+          <td class="script-desc">This script performs a speed test and outputs the results.</td>
+        </tr>
+        <tr data-name="test-debouncevisualization.ps1" data-desc="demonstrates the debounce timing behavior with simulated file change events." data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/Test-DebounceVisualization.ps1" target="_blank" rel="noopener">Test-DebounceVisualization.ps1</a></td>
+          <td class="script-desc">Demonstrates the debounce timing behavior with simulated file change events.</td>
+        </tr>
+        <tr data-name="test.ps1" data-desc="" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/test.ps1" target="_blank" rel="noopener">test.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="watch-gitrepofolder.ps1" data-desc="monitors a local git repository folder for file/folder changes and automatically commits and pushes to github." data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/Watch-GitRepoFolder.ps1" target="_blank" rel="noopener">Watch-GitRepoFolder.ps1</a></td>
+          <td class="script-desc">Monitors a local Git repository folder for file/folder changes and automatically commits and pushes to GitHub.</td>
+        </tr>
+        <tr data-name="watch-multigitrepos.ps1" data-desc="monitors multiple git repositories in a parent folder and automatically commits/pushes with ai-generated commit messages." data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/Watch-MultiGitRepos.ps1" target="_blank" rel="noopener">Watch-MultiGitRepos.ps1</a></td>
+          <td class="script-desc">Monitors multiple Git repositories in a parent folder and automatically commits/pushes with AI-generated commit messages.</td>
+        </tr>
+        <tr data-name="winget-check-upgrade-install.ps1" data-desc="to install updates" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/winget-check-upgrade-install.ps1" target="_blank" rel="noopener">winget-check-upgrade-install.ps1</a></td>
+          <td class="script-desc">TO INSTALL UPDATES</td>
+        </tr>
+        <tr data-name="wordpress-xml-export-parse-to-csv.ps1" data-desc="path to your xml export file" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/wordpress-xml-export-parse-to-csv.ps1" target="_blank" rel="noopener">wordpress-xml-export-parse-to-csv.ps1</a></td>
+          <td class="script-desc">Path to your XML export file</td>
+        </tr>
+        <tr data-name="write-host-foregroundcolors.ps1" data-desc="demonstrate write-host with various foregroundcolor options" data-cat="miscellaneous">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Miscellaneous/write-host-foregroundcolors.ps1" target="_blank" rel="noopener">write-host-foregroundcolors.ps1</a></td>
+          <td class="script-desc">Demonstrate Write-Host with various ForegroundColor options</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-Networking-Scripts">
+    <h2 class="cat-header">
+      <span class="cat-icon">🌐</span>
+      Networking Scripts
+      <span class="cat-count">5 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="remote-computer-ping-and-ipconfig-(2).ps1" data-desc="invoke ipconfig on the remote computer and display the output" data-cat="networking scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Networking-Scripts/remote-computer-ping-and-ipconfig-(2).ps1" target="_blank" rel="noopener">remote-computer-ping-and-ipconfig-(2).ps1</a></td>
+          <td class="script-desc">Invoke ipconfig on the remote computer and display the output</td>
+        </tr>
+        <tr data-name="remote-computer-ping-and-ipconfig.ps1" data-desc="invoke ipconfig on the remote computer and display the output" data-cat="networking scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Networking-Scripts/remote-computer-ping-and-ipconfig.ps1" target="_blank" rel="noopener">remote-computer-ping-and-ipconfig.ps1</a></td>
+          <td class="script-desc">Invoke ipconfig on the remote computer and display the output</td>
+        </tr>
+        <tr data-name="test-(2).ps1" data-desc="" data-cat="networking scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Networking-Scripts/test-(2).ps1" target="_blank" rel="noopener">test-(2).ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="test-(3).ps1" data-desc="" data-cat="networking scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Networking-Scripts/test-(3).ps1" target="_blank" rel="noopener">test-(3).ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="test.ps1" data-desc="" data-cat="networking scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Networking-Scripts/test.ps1" target="_blank" rel="noopener">test.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-Notifications">
+    <h2 class="cat-header">
+      <span class="cat-icon">🔔</span>
+      Notification System
+      <span class="cat-count">4 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="demo.ps1" data-desc="demonstrates the notification system with read/unread status" data-cat="notification system">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Notifications/Demo.ps1" target="_blank" rel="noopener">Demo.ps1</a></td>
+          <td class="script-desc">Demonstrates the notification system with read/unread status</td>
+        </tr>
+        <tr data-name="example-usage.ps1" data-desc="shows common usage patterns for the notification system" data-cat="notification system">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Notifications/Example-Usage.ps1" target="_blank" rel="noopener">Example-Usage.ps1</a></td>
+          <td class="script-desc">Shows common usage patterns for the notification system</td>
+        </tr>
+        <tr data-name="notificationmanager.ps1" data-desc="powershell module for managing notifications with read/unread status" data-cat="notification system">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Notifications/NotificationManager.ps1" target="_blank" rel="noopener">NotificationManager.ps1</a></td>
+          <td class="script-desc">PowerShell module for managing notifications with read/unread status</td>
+        </tr>
+        <tr data-name="test-notifications.ps1" data-desc="basic tests to verify notification system functionality" data-cat="notification system">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Notifications/Test-Notifications.ps1" target="_blank" rel="noopener">Test-Notifications.ps1</a></td>
+          <td class="script-desc">Basic tests to verify notification system functionality</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-Track-Package">
+    <h2 class="cat-header">
+      <span class="cat-icon">📬</span>
+      Package Tracking Scripts
+      <span class="cat-count">4 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="combined.ps1" data-desc="unified fedex, ups, usps tracking function with updated regex detection. rev 1.1" data-cat="package tracking scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Track-Package/combined.ps1" target="_blank" rel="noopener">combined.ps1</a></td>
+          <td class="script-desc">Unified FedEx, UPS, USPS tracking function with updated regex detection. Rev 1.1</td>
+        </tr>
+        <tr data-name="fedex.ps1" data-desc="launches a fedex tracking url in a new chrome window and returns the url for logging or further use" data-cat="package tracking scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Track-Package/fedex.ps1" target="_blank" rel="noopener">fedex.ps1</a></td>
+          <td class="script-desc">Launches a FedEx tracking URL in a new Chrome window and returns the URL for logging or further use</td>
+        </tr>
+        <tr data-name="ups.ps1" data-desc="launches a ups tracking url in a new chrome window and returns the url for logging or further use" data-cat="package tracking scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Track-Package/ups.ps1" target="_blank" rel="noopener">ups.ps1</a></td>
+          <td class="script-desc">Launches a UPS tracking URL in a new Chrome window and returns the URL for logging or further use</td>
+        </tr>
+        <tr data-name="usps.ps1" data-desc="launches a usps tracking url in a new chrome window and returns the url for logging or further use" data-cat="package tracking scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Track-Package/usps.ps1" target="_blank" rel="noopener">usps.ps1</a></td>
+          <td class="script-desc">Launches a USPS tracking URL in a new Chrome window and returns the URL for logging or further use</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-PowerShell-Quiz">
+    <h2 class="cat-header">
+      <span class="cat-icon">❓</span>
+      PowerShell Quiz
+      <span class="cat-count">6 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="make-questionset.ps1" data-desc="single-quoted powershell strings: escape &#x27; as &#x27;&#x27;" data-cat="powershell quiz">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/PowerShell-Quiz/Make-QuestionSet.ps1" target="_blank" rel="noopener">Make-QuestionSet.ps1</a></td>
+          <td class="script-desc">single-quoted PowerShell strings: escape &#x27; as &#x27;&#x27;</td>
+        </tr>
+        <tr data-name="questions-easy.ps1" data-desc="xor key and obfuscated correct answers (no plaintext comments)" data-cat="powershell quiz">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/PowerShell-Quiz/questions-easy.ps1" target="_blank" rel="noopener">questions-easy.ps1</a></td>
+          <td class="script-desc">XOR key and obfuscated correct answers (no plaintext comments)</td>
+        </tr>
+        <tr data-name="questions-hard.ps1" data-desc="" data-cat="powershell quiz">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/PowerShell-Quiz/questions-hard.ps1" target="_blank" rel="noopener">questions-hard.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="questions-medium.ps1" data-desc="xor key and obfuscated correct answers (no plaintext comments)" data-cat="powershell quiz">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/PowerShell-Quiz/questions-medium.ps1" target="_blank" rel="noopener">questions-medium.ps1</a></td>
+          <td class="script-desc">XOR key and obfuscated correct answers (no plaintext comments)</td>
+        </tr>
+        <tr data-name="questions-remoting.ps1" data-desc="" data-cat="powershell quiz">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/PowerShell-Quiz/questions-remoting.ps1" target="_blank" rel="noopener">questions-remoting.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="quiz-engine.ps1" data-desc="quiz-engine.ps1 — ps7+ compatibility hotfix, shuffle-by-default, cooldown + logging (rev 1.8)" data-cat="powershell quiz">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/PowerShell-Quiz/Quiz-Engine.ps1" target="_blank" rel="noopener">Quiz-Engine.ps1</a></td>
+          <td class="script-desc">Quiz-Engine.ps1 — PS7+ compatibility hotfix, shuffle-by-default, cooldown + logging (Rev 1.8)</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-Regedit-Scripts">
+    <h2 class="cat-header">
+      <span class="cat-icon">🗝️</span>
+      Registry Scripts
+      <span class="cat-count">7 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="autodesk-programs-unofficial-from-support.ps1" data-desc="define the base registry path" data-cat="registry scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Regedit-Scripts/autodesk-programs-unofficial-from-support.ps1" target="_blank" rel="noopener">autodesk-programs-unofficial-from-support.ps1</a></td>
+          <td class="script-desc">Define the base registry path</td>
+        </tr>
+        <tr data-name="clear-win-upgrade-block.ps1" data-desc="remove upgrade block by clearing targetreleaseversion and disableosupgrade. adds ping check, unreachable hosts in red, successes in green, before/after reports in yellow. creates per-target log folder if missing to preve" data-cat="registry scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Regedit-Scripts/clear-win-upgrade-block.ps1" target="_blank" rel="noopener">clear-win-upgrade-block.ps1</a></td>
+          <td class="script-desc">Remove upgrade block by clearing TargetReleaseVersion and DisableOSUpgrade. Adds ping check, unreachable hosts in red, successes in green, before/after reports in yellow. Creates per-target log folder if missing to preve</td>
+        </tr>
+        <tr data-name="detect-reg-for-autodesk-v2.ps1" data-desc="get date and time" data-cat="registry scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Regedit-Scripts/detect-reg-for-autodesk-v2.ps1" target="_blank" rel="noopener">detect-reg-for-autodesk-v2.ps1</a></td>
+          <td class="script-desc">Get Date and Time</td>
+        </tr>
+        <tr data-name="detect-reg-for-autodesk.ps1" data-desc="" data-cat="registry scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Regedit-Scripts/detect-reg-for-autodesk.ps1" target="_blank" rel="noopener">detect-reg-for-autodesk.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="enable-remote-registry-for-remote-computer.ps1" data-desc="remotely enables remoteregistry service and key firewall rules, with interactive computer name prompt" data-cat="registry scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Regedit-Scripts/enable-remote-registry-for-remote-computer.ps1" target="_blank" rel="noopener">enable-remote-registry-for-remote-computer.ps1</a></td>
+          <td class="script-desc">Remotely enables RemoteRegistry service and key firewall rules, with interactive computer name prompt</td>
+        </tr>
+        <tr data-name="get-os-version-and-log-to-txt-file-with-date-time-stamp.ps1" data-desc="$value&quot;" data-cat="registry scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Regedit-Scripts/get-os-version-and-log-to-txt-file-with-date-time-stamp.ps1" target="_blank" rel="noopener">get-os-version-and-log-to-txt-file-with-date-time-stamp.ps1</a></td>
+          <td class="script-desc">$value&quot;</td>
+        </tr>
+        <tr data-name="get-os-version-update-to-screen.ps1" data-desc="check specific registry values (local or remote) and output results to screen only. rev 1.1" data-cat="registry scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Regedit-Scripts/get-os-version-update-to-screen.ps1" target="_blank" rel="noopener">get-os-version-update-to-screen.ps1</a></td>
+          <td class="script-desc">Check specific registry values (local or remote) and output results to screen only. Rev 1.1</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-SCCM-Scripts">
+    <h2 class="cat-header">
+      <span class="cat-icon">📦</span>
+      SCCM / ConfigMgr Scripts
+      <span class="cat-count">7 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="deploy-apps-to-distribution-and-collectionps1.ps1" data-desc="deploy multiple applications as &quot;available&quot; to a user collection in software center and distribute content to specified distribution points." data-cat="sccm / configmgr scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/SCCM-Scripts/deploy-apps-to-distribution-and-collectionps1.ps1" target="_blank" rel="noopener">deploy-apps-to-distribution-and-collectionps1.ps1</a></td>
+          <td class="script-desc">Deploy multiple applications as &quot;Available&quot; to a user collection in Software Center and distribute content to specified Distribution Points.</td>
+        </tr>
+        <tr data-name="deploy-apps-to-distribution-points.ps1" data-desc="distribute multiple applications to a list of distribution points only (no deployment). fix set-location to cmsite drive and trim sitecode. rev 1.3" data-cat="sccm / configmgr scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/SCCM-Scripts/deploy-apps-to-distribution-points.ps1" target="_blank" rel="noopener">deploy-apps-to-distribution-points.ps1</a></td>
+          <td class="script-desc">Distribute multiple applications to a list of Distribution Points only (no deployment). Fix Set-Location to CMSite drive and trim SiteCode. Rev 1.3</td>
+        </tr>
+        <tr data-name="deploy-appstousercollection.ps1" data-desc="deploy multiple applications as &quot;available&quot; to a user collection in software center." data-cat="sccm / configmgr scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/SCCM-Scripts/deploy-appstousercollection.ps1" target="_blank" rel="noopener">deploy-appstousercollection.ps1</a></td>
+          <td class="script-desc">Deploy multiple applications as &quot;Available&quot; to a user collection in Software Center.</td>
+        </tr>
+        <tr data-name="new-app-via-csv.ps1" data-desc="import the psd1 file (returns a hashtable)" data-cat="sccm / configmgr scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/SCCM-Scripts/new-app-via-csv.ps1" target="_blank" rel="noopener">new-app-via-csv.ps1</a></td>
+          <td class="script-desc">Import the PSD1 file (returns a hashtable)</td>
+        </tr>
+        <tr data-name="new-cmapp.ps1" data-desc="create a configmgr application with msi or script deployment type + detection, then optionally distribute content." data-cat="sccm / configmgr scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/SCCM-Scripts/new-cmapp.ps1" target="_blank" rel="noopener">new-cmapp.ps1</a></td>
+          <td class="script-desc">Create a ConfigMgr Application with MSI or Script deployment type + detection, then optionally distribute content.</td>
+        </tr>
+        <tr data-name="retrieve-all-applications-from-sccm.ps1" data-desc="connection to sccm server required before running this script" data-cat="sccm / configmgr scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/SCCM-Scripts/Retrieve-all-Applications-from-sccm.ps1" target="_blank" rel="noopener">Retrieve-all-Applications-from-sccm.ps1</a></td>
+          <td class="script-desc">Connection to SCCM server required before running this script</td>
+        </tr>
+        <tr data-name="test-update.ps1" data-desc="" data-cat="sccm / configmgr scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/SCCM-Scripts/test-update.ps1" target="_blank" rel="noopener">test-update.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-Server-Management-Scripts">
+    <h2 class="cat-header">
+      <span class="cat-icon">🖥️</span>
+      Server Management Scripts
+      <span class="cat-count">2 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="get-logged-on-users.ps1" data-desc="retrieves a list of interactive user sessions (quser output) from the specified remote server." data-cat="server management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Server-Management-Scripts/get-logged-on-users.ps1" target="_blank" rel="noopener">get-logged-on-users.ps1</a></td>
+          <td class="script-desc">Retrieves a list of interactive user sessions (quser output) from the specified remote server.</td>
+        </tr>
+        <tr data-name="get-task-and-runas-user.ps1" data-desc="retrieves scheduled tasks from multiple remote servers, normalizes missing runasuser values, removes runspaceid noise, displays results in the console, and exports to csv." data-cat="server management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Server-Management-Scripts/get-task-and-runas-user.ps1" target="_blank" rel="noopener">get-task-and-runas-user.ps1</a></td>
+          <td class="script-desc">Retrieves scheduled tasks from multiple remote servers, normalizes missing RunAsUser values, removes RunspaceId noise, displays results in the console, and exports to CSV.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-SharePoint-Scripts">
+    <h2 class="cat-header">
+      <span class="cat-icon">🔗</span>
+      SharePoint / OneDrive Scripts
+      <span class="cat-count">2 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="get-onedrive-size-bulk.ps1" data-desc="get onedrive storage usage for a list of users from a csv via microsoft graph rest api" data-cat="sharepoint / onedrive scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/SharePoint-Scripts/get-onedrive-size-bulk.ps1" target="_blank" rel="noopener">get-onedrive-size-bulk.ps1</a></td>
+          <td class="script-desc">Get OneDrive storage usage for a list of users from a CSV via Microsoft Graph REST API</td>
+        </tr>
+        <tr data-name="move-sharepoint-list-from-one-site-to-another.ps1" data-desc="export the list schema" data-cat="sharepoint / onedrive scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/SharePoint-Scripts/move-sharepoint-list-from-one-site-to-another.ps1" target="_blank" rel="noopener">move-sharepoint-list-from-one-site-to-another.ps1</a></td>
+          <td class="script-desc">Export the list schema</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-Software-Managagement-Scripts">
+    <h2 class="cat-header">
+      <span class="cat-icon">⚙️</span>
+      Software Management Scripts
+      <span class="cat-count">2 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="revit-2022-and-2024-force-update-only.ps1" data-desc="array of target computers" data-cat="software management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Software-Managagement-Scripts/revit-2022-and-2024-force-update-only.ps1" target="_blank" rel="noopener">revit-2022-and-2024-force-update-only.ps1</a></td>
+          <td class="script-desc">Array of target computers</td>
+        </tr>
+        <tr data-name="revit-2022-and-2024-force-update.ps1" data-desc="configuration section" data-cat="software management scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Software-Managagement-Scripts/revit-2022-and-2024-force-update.ps1" target="_blank" rel="noopener">revit-2022-and-2024-force-update.ps1</a></td>
+          <td class="script-desc">CONFIGURATION SECTION</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-Space-Speed-Compare-Demo">
+    <h2 class="cat-header">
+      <span class="cat-icon">🚀</span>
+      Space / Speed Compare Demo
+      <span class="cat-count">5 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="bitbyteconverter-rev1.ps1" data-desc="byte ↔ bit converter gui" data-cat="space / speed compare demo">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Space-Speed-Compare-Demo/bitbyteconverter-rev1.ps1" target="_blank" rel="noopener">bitbyteconverter-rev1.ps1</a></td>
+          <td class="script-desc">Byte ↔ Bit Converter GUI</td>
+        </tr>
+        <tr data-name="bitbyteconverter-rev2.ps1" data-desc="byte ↔ bit + network speed converter (stable + reverse support)" data-cat="space / speed compare demo">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Space-Speed-Compare-Demo/bitbyteconverter-rev2.ps1" target="_blank" rel="noopener">bitbyteconverter-rev2.ps1</a></td>
+          <td class="script-desc">Byte ↔ Bit + Network Speed Converter (stable + reverse support)</td>
+        </tr>
+        <tr data-name="bitbyteconverter-rev3.ps1" data-desc="byte ↔ bit converter gui with network speed simulation" data-cat="space / speed compare demo">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Space-Speed-Compare-Demo/bitbyteconverter-rev3.ps1" target="_blank" rel="noopener">bitbyteconverter-rev3.ps1</a></td>
+          <td class="script-desc">Byte ↔ Bit Converter GUI with Network Speed Simulation</td>
+        </tr>
+        <tr data-name="bitbyteconverter-rev4.ps1" data-desc="byte ↔ bit converter gui with download/upload simulation" data-cat="space / speed compare demo">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Space-Speed-Compare-Demo/bitbyteconverter-rev4.ps1" target="_blank" rel="noopener">bitbyteconverter-rev4.ps1</a></td>
+          <td class="script-desc">Byte ↔ Bit Converter GUI with Download/Upload Simulation</td>
+        </tr>
+        <tr data-name="space-speed-compare-demo-gui.ps1" data-desc="byte ↔ bit converter gui with download/upload simulation" data-cat="space / speed compare demo">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Space-Speed-Compare-Demo/Space-Speed-Compare-Demo-gui.ps1" target="_blank" rel="noopener">Space-Speed-Compare-Demo-gui.ps1</a></td>
+          <td class="script-desc">Byte ↔ Bit Converter GUI with Download/Upload Simulation</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-Tic-Tac-Toe">
+    <h2 class="cat-header">
+      <span class="cat-icon">🎮</span>
+      Tic-Tac-Toe Game
+      <span class="cat-count">10 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="supertictactoe-beta-legal-play-logic.ps1" data-desc="undo functionality fixed using arraylist. board redraws correctly. cleaned logic." data-cat="tic-tac-toe game">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Tic-Tac-Toe/SuperTicTacToe-beta-legal-play-logic.ps1" target="_blank" rel="noopener">SuperTicTacToe-beta-legal-play-logic.ps1</a></td>
+          <td class="script-desc">Undo functionality fixed using ArrayList. Board redraws correctly. Cleaned logic.</td>
+        </tr>
+        <tr data-name="supertictactoe-beta-winner-animation.ps1" data-desc="undo functionality fixed using arraylist. board redraws correctly. cleaned logic." data-cat="tic-tac-toe game">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Tic-Tac-Toe/SuperTicTacToe-beta-winner-animation.ps1" target="_blank" rel="noopener">SuperTicTacToe-beta-winner-animation.ps1</a></td>
+          <td class="script-desc">Undo functionality fixed using ArrayList. Board redraws correctly. Cleaned logic.</td>
+        </tr>
+        <tr data-name="supertictactoe-beta.ps1" data-desc="undo functionality fixed using arraylist. board redraws correctly. cleaned logic." data-cat="tic-tac-toe game">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Tic-Tac-Toe/SuperTicTacToe-beta.ps1" target="_blank" rel="noopener">SuperTicTacToe-beta.ps1</a></td>
+          <td class="script-desc">Undo functionality fixed using ArrayList. Board redraws correctly. Cleaned logic.</td>
+        </tr>
+        <tr data-name="supertictactoe-rev1.8.ps1" data-desc="undo functionality fixed using arraylist. board redraws correctly. cleaned logic." data-cat="tic-tac-toe game">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Tic-Tac-Toe/SuperTicTacToe-Rev1.8.ps1" target="_blank" rel="noopener">SuperTicTacToe-Rev1.8.ps1</a></td>
+          <td class="script-desc">Undo functionality fixed using ArrayList. Board redraws correctly. Cleaned logic.</td>
+        </tr>
+        <tr data-name="supertictactoe-rev1.ps1" data-desc="" data-cat="tic-tac-toe game">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Tic-Tac-Toe/SuperTicTacToe-Rev1.ps1" target="_blank" rel="noopener">SuperTicTacToe-Rev1.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="supertictactoe-rev4.ps1" data-desc="" data-cat="tic-tac-toe game">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Tic-Tac-Toe/SuperTicTacToe-Rev4.ps1" target="_blank" rel="noopener">SuperTicTacToe-Rev4.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="supertictactoe-rev5.ps1" data-desc="" data-cat="tic-tac-toe game">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Tic-Tac-Toe/SuperTicTacToe-Rev5.ps1" target="_blank" rel="noopener">SuperTicTacToe-Rev5.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="supertictactoe-rev6.ps1" data-desc="" data-cat="tic-tac-toe game">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Tic-Tac-Toe/SuperTicTacToe-Rev6.ps1" target="_blank" rel="noopener">SuperTicTacToe-Rev6.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="supertictactoe-rev7.ps1" data-desc="" data-cat="tic-tac-toe game">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Tic-Tac-Toe/SuperTicTacToe-Rev7.ps1" target="_blank" rel="noopener">SuperTicTacToe-Rev7.ps1</a></td>
+          <td class="script-desc"><em class="no-desc">No description available</em></td>
+        </tr>
+        <tr data-name="supertictactoe.ps1" data-desc="undo functionality fixed using arraylist. board redraws correctly. cleaned logic." data-cat="tic-tac-toe game">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Tic-Tac-Toe/SuperTicTacToe.ps1" target="_blank" rel="noopener">SuperTicTacToe.ps1</a></td>
+          <td class="script-desc">Undo functionality fixed using ArrayList. Board redraws correctly. Cleaned logic.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="category" id="cat-_root">
+    <h2 class="cat-header">
+      <span class="cat-icon">📄</span>
+      Root / General Scripts
+      <span class="cat-count">7 scripts</span>
+    </h2>
+    <table class="script-table">
+      <thead><tr><th>Script</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr data-name="commonvariables.ps1" data-desc="use this script to get all $variable tags from a folder of *.ps1 files" data-cat="root / general scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/CommonVariables.ps1" target="_blank" rel="noopener">CommonVariables.ps1</a></td>
+          <td class="script-desc">Use this script to get all $variable tags from a folder of *.ps1 files</td>
+        </tr>
+        <tr data-name="commonvariablesgenerator.ps1" data-desc="this script also generates a list of $variables from other files, different output than the other script - commonvariables.ps1" data-cat="root / general scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/CommonVariablesGenerator.ps1" target="_blank" rel="noopener">CommonVariablesGenerator.ps1</a></td>
+          <td class="script-desc">This script also generates a list of $variables from other files, different output than the other script - CommonVariables.ps1</td>
+        </tr>
+        <tr data-name="different-write-commands.ps1" data-desc="this version demonstrates different types of output in powershell." data-cat="root / general scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/different-write-commands.ps1" target="_blank" rel="noopener">different-write-commands.ps1</a></td>
+          <td class="script-desc">This version demonstrates different types of output in PowerShell.</td>
+        </tr>
+        <tr data-name="helpful-git-commands.ps1" data-desc="git: initialize a new git repository" data-cat="root / general scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/helpful-git-commands.ps1" target="_blank" rel="noopener">helpful-git-commands.ps1</a></td>
+          <td class="script-desc">Git: Initialize a new Git repository</td>
+        </tr>
+        <tr data-name="initial-computer-setup-with-powershell.ps1" data-desc="transfer file to hyper-v vm" data-cat="root / general scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/initial-computer-setup-with-powershell.ps1" target="_blank" rel="noopener">initial-computer-setup-with-powershell.ps1</a></td>
+          <td class="script-desc">TRANSFER FILE TO HYPER-V VM</td>
+        </tr>
+        <tr data-name="install-update-powershell-commandlets.ps1" data-desc="check if the script is running with administrator privileges" data-cat="root / general scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/install-update-powershell-commandlets.ps1" target="_blank" rel="noopener">install-update-powershell-commandlets.ps1</a></td>
+          <td class="script-desc">Check if the script is running with administrator privileges</td>
+        </tr>
+        <tr data-name="uninstall-stop-reinstall-egnyte.ps1" data-desc="self-elevate, stop egnyte desktop app processes, uninstall all versions with reboot suppression, copy msi local, install egnyte 3.29.1.175, and wait for keypress. rev 1.8" data-cat="root / general scripts">
+          <td class="script-name"><a href="https://github.com/jasrasr/powershell/blob/main/Uninstall-Stop-Reinstall-Egnyte.ps1" target="_blank" rel="noopener">Uninstall-Stop-Reinstall-Egnyte.ps1</a></td>
+          <td class="script-desc">Self-elevate, stop Egnyte Desktop App processes, uninstall all versions with reboot suppression, copy MSI local, install Egnyte 3.29.1.175, and wait for keypress. Rev 1.8</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+    <div id="no-results">No scripts match your search.</div>
+  </div>
+</div>
+
+<script>
+  const searchInput = document.getElementById('search');
+  const noResults = document.getElementById('no-results');
+
+  searchInput.addEventListener('input', function() {
+    const q = this.value.toLowerCase().trim();
+    let anyVisible = false;
+
+    document.querySelectorAll('.category').forEach(function(section) {
+      let sectionVisible = false;
+      section.querySelectorAll('tbody tr').forEach(function(row) {
+        const name = row.dataset.name || '';
+        const desc = row.dataset.desc || '';
+        const cat  = row.dataset.cat  || '';
+        const match = !q || name.includes(q) || desc.includes(q) || cat.includes(q);
+        row.classList.toggle('hidden', !match);
+        if (match) sectionVisible = true;
+      });
+      section.classList.toggle('all-hidden', !sectionVisible);
+      if (sectionVisible) anyVisible = true;
+    });
+
+    noResults.style.display = anyVisible ? 'none' : 'block';
+  });
+</script>
+</body>
+</html>
