@@ -1,5 +1,0 @@
-test ai generation for git-update
-asdf
-asdf
-
-asdfasdfadd this to the file
