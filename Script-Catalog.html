@@ -233,7 +233,7 @@
 <nav id="sidebar">
   <div class="sidebar-header">
     <div class="sidebar-brand">⚡ PS Script Catalog</div>
-    <div class="sidebar-sub">279 scripts &middot; 23 categories</div>
+    <div class="sidebar-sub" id="sidebar-stats"></div>
   </div>
 <a href="#cat-AD-Scripts" class="nav-item"><span class="nav-icon">🏢</span><span class="nav-label">Active Directory Scripts</span><span class="nav-count">22</span></a>
 <a href="#cat-AutoCAD" class="nav-item"><span class="nav-icon">📐</span><span class="nav-label">AutoCAD Scripts</span><span class="nav-count">1</span></a>
@@ -263,7 +263,7 @@
 <div id="main">
   <div id="topbar">
     <h1>⚡ <span>PowerShell</span> Script Catalog</h1>
-    <span class="total-badge">279 scripts</span>
+    <span class="total-badge" id="total-badge"></span>
     <div id="search-wrap">
       <input type="search" id="search" placeholder="Search scripts by name or description…" autocomplete="off">
     </div>
@@ -1667,6 +1667,12 @@
 </div>
 
 <script>
+  // Compute totals dynamically from the DOM
+  const totalScripts = document.querySelectorAll('.script-table tbody tr').length;
+  const totalCats = document.querySelectorAll('.category').length;
+  document.getElementById('total-badge').textContent = totalScripts + ' scripts';
+  document.getElementById('sidebar-stats').textContent = totalScripts + ' scripts \u00b7 ' + totalCats + ' categories';
+
   const searchInput = document.getElementById('search');
   const noResults = document.getElementById('no-results');
 
