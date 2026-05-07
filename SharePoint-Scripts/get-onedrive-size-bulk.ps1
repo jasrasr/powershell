@@ -1,9 +1,9 @@
 # Filename: get-onedrive-size-bulk.ps1
-# Revision : 1.1.1
+# Revision : 1.1.2
 # Description : Get OneDrive storage usage for a list of users from a CSV via Microsoft Graph REST API
 # Author : Jason Lamb (with help from Claude Code CLI)
 # Created Date : 2026-05-04
-# Modified Date : 2026-05-04
+# Modified Date : 2026-05-07
 # Changelog :
 # 1.0.0 initial release (Microsoft Graph SDK Get-MgUserDrive)
 # 1.0.1 fix 403 error - switch to Sites.Read.All scope, check existing scopes before skipping connect
@@ -12,6 +12,7 @@
 # 1.0.4 rewrite auth to pure REST device code flow - eliminates all module assembly conflicts
 # 1.1.0 fix invalid_scope error - use tenant-specific auth endpoint instead of common; add -TenantDomain param
 # 1.1.1 fix column name mismatch - auto-detect UPN, storage, and activity column names from report
+# 1.1.2 cache access token in $global:GraphToken for reuse within the same PowerShell session
 
 param(
     [string]$CsvPath,
@@ -48,7 +49,7 @@ if (-not ($users | Get-Member -Name $EmailColumn -MemberType NoteProperty -Error
 
 # Prompt for tenant domain if not provided — needed for admin scopes
 if (-not $TenantDomain) {
-    $inputTenant = Read-Host "Primary tenant domain (e.g. contoso.com)"
+    $inputTenant = Read-Host "Primary tenant domain (e.g. tenantdomain.onmicrosoft.com)"
     $TenantDomain = $inputTenant.Trim()
     if (-not $TenantDomain) {
         Write-Host "Tenant domain is required." -ForegroundColor Red
@@ -71,52 +72,60 @@ try {
 # Uses the well-known Microsoft Graph PowerShell public client ID
 $clientId = '14d82eec-204b-4c2f-b7e8-296a70dab67e'
 
-Write-Host "Requesting device code from Microsoft..." -ForegroundColor Cyan
-$deviceCodeRequest = Invoke-RestMethod -Method POST `
-    -Uri "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/devicecode" `
-    -Body @{
-        client_id = $clientId
-        scope     = 'https://graph.microsoft.com/Reports.Read.All'
+# Reuse cached token if still valid (within the same PowerShell session)
+$now = Get-Date
+if ($global:GraphToken -and $global:GraphTokenExpiry -and ($now -lt $global:GraphTokenExpiry)) {
+    Write-Host "Reusing cached Graph token (expires $($global:GraphTokenExpiry.ToString('HH:mm:ss')))." -ForegroundColor Green
+} else {
+    Write-Host "Requesting device code from Microsoft..." -ForegroundColor Cyan
+    $deviceCodeRequest = Invoke-RestMethod -Method POST `
+        -Uri "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/devicecode" `
+        -Body @{
+            client_id = $clientId
+            scope     = 'https://graph.microsoft.com/Reports.Read.All'
+        }
+
+    Write-Host ""
+    Write-Host $deviceCodeRequest.message -ForegroundColor Yellow
+    Write-Host ""
+
+    # Poll for token
+    $tokenUri = "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token"
+    $pollBody = @{
+        grant_type  = 'urn:ietf:params:oauth:grant-type:device_code'
+        client_id   = $clientId
+        device_code = $deviceCodeRequest.device_code
+    }
+    $interval  = [int]$deviceCodeRequest.interval
+    $expiresIn = [int]$deviceCodeRequest.expires_in
+    $elapsed   = 0
+    $token     = $null
+
+    while ($elapsed -lt $expiresIn) {
+        Start-Sleep -Seconds $interval
+        $elapsed += $interval
+        try {
+            $token = Invoke-RestMethod -Method POST -Uri $tokenUri -Body $pollBody -ErrorAction Stop
+            break
+        } catch {
+            $errBody = $_.ErrorDetails.Message | ConvertFrom-Json -ErrorAction SilentlyContinue
+            if ($errBody.error -eq 'authorization_pending') { continue }
+            Write-Host "Authentication error: $($errBody.error_description)" -ForegroundColor Red
+            exit 1
+        }
     }
 
-Write-Host ""
-Write-Host $deviceCodeRequest.message -ForegroundColor Yellow
-Write-Host ""
-
-# Poll for token
-$tokenUri = "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token"
-$pollBody = @{
-    grant_type  = 'urn:ietf:params:oauth:grant-type:device_code'
-    client_id   = $clientId
-    device_code = $deviceCodeRequest.device_code
-}
-$interval  = [int]$deviceCodeRequest.interval
-$expiresIn = [int]$deviceCodeRequest.expires_in
-$elapsed   = 0
-$token     = $null
-
-while ($elapsed -lt $expiresIn) {
-    Start-Sleep -Seconds $interval
-    $elapsed += $interval
-    try {
-        $token = Invoke-RestMethod -Method POST -Uri $tokenUri -Body $pollBody -ErrorAction Stop
-        break
-    } catch {
-        $errBody = $_.ErrorDetails.Message | ConvertFrom-Json -ErrorAction SilentlyContinue
-        if ($errBody.error -eq 'authorization_pending') { continue }
-        Write-Host "Authentication error: $($errBody.error_description)" -ForegroundColor Red
+    if (-not $token) {
+        Write-Host "Authentication timed out." -ForegroundColor Red
         exit 1
     }
+
+    $global:GraphToken      = $token.access_token
+    $global:GraphTokenExpiry = $now.AddSeconds([int]$token.expires_in - 30)
+    Write-Host "Authenticated successfully." -ForegroundColor Green
 }
 
-if (-not $token) {
-    Write-Host "Authentication timed out." -ForegroundColor Red
-    exit 1
-}
-
-Write-Host "Authenticated successfully." -ForegroundColor Green
-
-$headers = @{ Authorization = "Bearer $($token.access_token)" }
+$headers = @{ Authorization = "Bearer $global:GraphToken" }
 
 # Fetch OneDrive usage report — returns CSV content
 Write-Host "Fetching OneDrive usage report..." -ForegroundColor Cyan
@@ -208,6 +217,7 @@ if ($ExportPath) {
     if (-not (Test-Path $exportDir)) { New-Item -ItemType Directory -Path $exportDir -Force | Out-Null }
     $results | Export-Csv -Path $ExportPath -NoTypeInformation
     Write-Host "Exported to: $ExportPath" -ForegroundColor Green
+    Start-Process notepad.exe $ExportPath
 }
 
 # Example Usage:

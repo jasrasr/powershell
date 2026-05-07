@@ -1,11 +1,12 @@
 # Filename: get-mailbox-size-bulk.ps1
-# Revision : 1.0.0
+# Revision : 1.0.1
 # Description : Get primary and archive mailbox sizes for a list of users from a CSV
 # Author : Jason Lamb (with help from Claude Code CLI)
 # Created Date : 2026-05-04
-# Modified Date : 2026-05-04
+# Modified Date : 2026-05-07
 # Changelog :
 # 1.0.0 initial release
+# 1.0.1 open exported CSV in Notepad when complete
 
 param(
     [string]$CsvPath,
@@ -141,6 +142,7 @@ if ($ExportPath) {
     if (-not (Test-Path $exportDir)) { New-Item -ItemType Directory -Path $exportDir -Force | Out-Null }
     $results | Export-Csv -Path $ExportPath -NoTypeInformation
     Write-Host "Exported to: $ExportPath" -ForegroundColor Green
+    Start-Process notepad.exe $ExportPath
 }
 
 # Example Usage:
