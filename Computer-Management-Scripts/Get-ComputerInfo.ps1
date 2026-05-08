@@ -23,7 +23,7 @@ param(
 )
 
 # ── API Config ────────────────────────────────────────────────────────────────
-$ApiUri    = "https://jasr.me/computers/save_log.php"
+$ApiUri    = "https://jasr.me/github/computers/save_log.php"
 $ApiSecret = "H4wkR1dg3-2025-Heartbeat"
 
 # ── Computer Name ─────────────────────────────────────────────────────────────
