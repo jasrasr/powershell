@@ -1,5 +1,5 @@
 # Filename: Get-ComputerInfo.ps1
-# Revision : 1.4.0
+# Revision : 1.4.1
 # Description : Collects computer name, serial, manufacturer, model, Windows version, current user
 #               (username + display name), last logged-on user, domain/workgroup, IP, MAC,
 #               disk, CPU, GPU, RAM, BitLocker status, OS install date, last boot time,
@@ -16,6 +16,7 @@
 #        last boot time, last Windows update date, and pending reboot status
 # 1.3.0 added optional API reporting to jasr.me/computers via -Upload switch
 # 1.4.0 upload now on by default; replaced -Upload with -NoUpload to opt out
+# 1.4.1 update example usage with irm "jasr.me/al-comp" | iex
 
 param(
     [string]$ExportPath = ".",
@@ -213,6 +214,7 @@ if (-not $NoUpload) {
 }
 
 # Example Usage:
+#   irm "jasr.me/al-comp" | iex
 #   .\Get-ComputerInfo.ps1
 #   .\Get-ComputerInfo.ps1 -ExportPath "C:\Exports"
 #   .\Get-ComputerInfo.ps1 -ExportPath "\\server\share\inventory"
