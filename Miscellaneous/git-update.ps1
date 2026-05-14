@@ -61,7 +61,7 @@ function git-update {
                 messages = @(
                     @{
                         role    = "system"
-                        content = "You are a git commit message generator. Given a git diff, write a concise, meaningful commit message in present tense, under 72 characters. Return only the commit message, no explanation."
+                        content = "You are a git commit message generator. Given a git diff, write a concise, meaningful commit message in present tense, under 72 characters. Return only the commit message, no explanation. Do not mention AI, artificial intelligence, or automation in the message."
                     },
                     @{
                         role    = "user"
