@@ -1,4 +1,4 @@
-# Filename: split-large-binary-file.ps1
+# Filename: zip-split.ps1
 # Revision : 1.0.0
 # Description : Split a large binary file (zip, exe, etc.) into numbered parts using FileStream for memory-efficient handling
 # Author : Jason Lamb (with help from Claude Code CLI)
@@ -111,6 +111,6 @@ Write-Host "Elapsed  : $([math]::Round($elapsed.TotalMinutes, 1)) minutes" -Fore
 Write-Host ""
 
 # Example Usage:
-#   .\split-large-binary-file.ps1 -SourceFile "C:\path\to\archive.zip" -OutputDirectory "C:\path\to\output"
-#   .\split-large-binary-file.ps1 -SourceFile "C:\path\to\archive.zip" -OutputDirectory "C:\path\to\output" -PartSizeGB 50
-#   .\split-large-binary-file.ps1 -SourceFile "D:\backups\large-backup.zip" -OutputDirectory "D:\backups\parts" -PartSizeGB 100
+#   .\zip-split.ps1 -SourceFile "C:\path\to\archive.zip" -OutputDirectory "C:\path\to\output"
+#   .\zip-split.ps1 -SourceFile "C:\path\to\archive.zip" -OutputDirectory "C:\path\to\output" -PartSizeGB 50
+#   .\zip-split.ps1 -SourceFile "D:\backups\large-backup.zip" -OutputDirectory "D:\backups\parts" -PartSizeGB 100

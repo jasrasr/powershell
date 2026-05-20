@@ -1,6 +1,6 @@
-# Filename: combine-binary-parts.ps1
+# Filename: zip-combine.ps1
 # Revision : 1.0.0
-# Description : Reassemble a large binary file from numbered .part files created by split-large-binary-file.ps1
+# Description : Reassemble a large binary file from numbered .part files created by zip-split.ps1
 # Author : Jason Lamb (with help from Claude Code CLI)
 # Created Date : 2026-05-20
 # Modified Date : 2026-05-20
@@ -108,5 +108,5 @@ Write-Host "Elapsed     : $([math]::Round($elapsed.TotalMinutes, 1)) minutes" -F
 Write-Host ""
 
 # Example Usage:
-#   .\combine-binary-parts.ps1 -PartsDirectory "C:\path\to\parts" -OutputFile "C:\output\archive.zip"
-#   .\combine-binary-parts.ps1 -PartsDirectory "D:\downloads\parts" -OutputFile "D:\downloads\restored.zip"
+#   .\zip-combine.ps1 -PartsDirectory "C:\path\to\parts" -OutputFile "C:\output\archive.zip"
+#   .\zip-combine.ps1 -PartsDirectory "D:\downloads\parts" -OutputFile "D:\downloads\restored.zip"
