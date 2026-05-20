@@ -1,4 +1,4 @@
-# Filename: zip-folder.ps1
+# Filename: zip-whole-folder.ps1
 # Revision : 1.0.0
 # Description : Compress a folder into a ZIP file using .NET ZipFile for memory-efficient handling
 # Author : Jason Lamb (with help from Claude Code CLI)
@@ -81,7 +81,7 @@ Write-Host "Elapsed     : $([math]::Round($elapsed.TotalMinutes, 1)) minutes" -F
 Write-Host ""
 
 # Example Usage:
-#   .\zip-folder.ps1 -SourceFolder "C:\path\to\folder"
-#   .\zip-folder.ps1 -SourceFolder "C:\path\to\folder" -OutputZip "C:\output\archive.zip"
-#   .\zip-folder.ps1 -SourceFolder "C:\path\to\folder" -OutputZip "C:\output\archive.zip" -CompressionLevel Fastest
-#   .\zip-folder.ps1 -SourceFolder "C:\path\to\folder" -CompressionLevel NoCompression
+#   .\zip-whole-folder.ps1 -SourceFolder "C:\path\to\folder"
+#   .\zip-whole-folder.ps1 -SourceFolder "C:\path\to\folder" -OutputZip "C:\output\archive.zip"
+#   .\zip-whole-folder.ps1 -SourceFolder "C:\path\to\folder" -OutputZip "C:\output\archive.zip" -CompressionLevel Fastest
+#   .\zip-whole-folder.ps1 -SourceFolder "C:\path\to\folder" -CompressionLevel NoCompression
