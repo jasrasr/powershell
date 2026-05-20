@@ -1,5 +1,5 @@
 # Filename: export-dynamic-group-members.ps1
-# Revision : 1.0.1
+# Revision : 1.0.2
 # Description : Export all members of a dynamic distribution group to CSV (Name + Email), then open the file
 # Author : Jason Lamb (with help from Claude Code CLI)
 # Created Date : 2026-04-06
@@ -7,6 +7,7 @@
 # Changelog :
 # 1.0.0 initial release
 # 1.0.1 verify EXO connection is live after Connect-ExchangeOnline; add -ResultSize Unlimited
+# 1.0.2 warn to authenticate as Exchange admin; improve connection failure message
 
 param (
     [Parameter(Mandatory)]
@@ -30,11 +31,11 @@ foreach ($module in @("ExchangeOnlineManagement")) {
 # Connect only if not already connected
 $exoConnection = Get-ConnectionInformation -ErrorAction SilentlyContinue | Select-Object -First 1
 if (-not $exoConnection) {
+    Write-Host "NOTE: Authenticate with your Exchange Online admin account." -ForegroundColor Yellow
     Connect-ExchangeOnline -Device -ShowBanner:$false
-    # Verify session was established — Device auth can return before cmdlets are ready
     $exoConnection = Get-ConnectionInformation -ErrorAction SilentlyContinue | Select-Object -First 1
     if (-not $exoConnection) {
-        Write-Host "ERROR: Exchange Online connection could not be established." -ForegroundColor Red
+        Write-Host "ERROR: Failed to connect. Ensure you authenticated with an Exchange Online admin account." -ForegroundColor Red
         exit 1
     }
 } else {

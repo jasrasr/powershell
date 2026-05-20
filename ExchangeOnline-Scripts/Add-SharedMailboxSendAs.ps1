@@ -1,11 +1,12 @@
 # Filename: Add-SharedMailboxSendAs.ps1
-# Revision : 1.0.0
+# Revision : 1.0.1
 # Description : Grants Send As permission on a shared mailbox to multiple users listed in a CSV
 # Author : Jason Lamb (with help from Claude Code CLI)
 # Created Date : 2026-05-20
 # Modified Date : 2026-05-20
 # Changelog :
 # 1.0.0 initial release
+# 1.0.1 warn to authenticate as Exchange admin; add post-connection verification
 
 param (
     [Parameter(Mandatory)]
@@ -30,7 +31,13 @@ foreach ($module in @("ExchangeOnlineManagement")) {
 # Connect to Exchange Online only if not already connected
 $exoConnection = Get-ConnectionInformation -ErrorAction SilentlyContinue | Select-Object -First 1
 if (-not $exoConnection) {
+    Write-Host "NOTE: Authenticate with your Exchange Online admin account." -ForegroundColor Yellow
     Connect-ExchangeOnline -Device -ShowBanner:$false
+    $exoConnection = Get-ConnectionInformation -ErrorAction SilentlyContinue | Select-Object -First 1
+    if (-not $exoConnection) {
+        Write-Host "ERROR: Failed to connect. Ensure you authenticated with an Exchange Online admin account." -ForegroundColor Red
+        exit 1
+    }
 } else {
     Write-Host "Already connected to Exchange Online as $($exoConnection.UserPrincipalName)" -ForegroundColor Green
 }
