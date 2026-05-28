@@ -1,10 +1,14 @@
 # Filename: Remove-GitHistory.ps1
-# Revision : 1.0.0
+# Revision : 1.1.3
 # Description : Permanently removes specified files or folders from all git commit history using git-filter-repo
 # Author : Jason Lamb (with help from Claude Code CLI)
 # Created Date : 2026-05-22
 # Modified Date : 2026-05-22
 # Changelog :
+# 1.1.3 fix pip error suppression; add Python Scripts to PATH after install so git finds git-filter-repo
+# 1.1.2 re-launch as admin automatically if Python install requires elevation
+# 1.1.1 fix Windows Store Python stub detection by verifying commands actually run
+# 1.1.0 auto-install Python and git-filter-repo if missing
 # 1.0.0 initial release
 
 [CmdletBinding(SupportsShouldProcess)]
@@ -32,13 +36,78 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
-$filterRepoAvailable = & git filter-repo --version 2>$null
+& git filter-repo --version 2>$null | Out-Null
 if ($LASTEXITCODE -ne 0) {
-    Write-Host ""
-    Write-Host "git-filter-repo is not installed." -ForegroundColor Red
-    Write-Host "Install it with:  pip install git-filter-repo" -ForegroundColor Yellow
-    Write-Host "Then re-run this script." -ForegroundColor Yellow
-    exit 1
+    Write-Host "git-filter-repo is not installed. Attempting to install..." -ForegroundColor Yellow
+
+    # Resolve pip — use try/catch so missing commands fail silently (Store stubs throw terminating errors)
+    $pipCmd = $null; $pipExe = $null
+    try   { $null = & pip --version 2>$null;          if ($LASTEXITCODE -eq 0) { $pipCmd = { pip install git-filter-repo };          $pipExe = "pip"    } } catch {}
+    if (-not $pipCmd) {
+        try { $null = & python -m pip --version 2>$null; if ($LASTEXITCODE -eq 0) { $pipCmd = { python -m pip install git-filter-repo }; $pipExe = "python" } } catch {}
+    }
+    if (-not $pipCmd) {
+        try { $null = & py -m pip --version 2>$null;     if ($LASTEXITCODE -eq 0) { $pipCmd = { py -m pip install git-filter-repo };     $pipExe = "py"     } } catch {}
+    }
+
+    if (-not $pipCmd) {
+        Write-Host "Python is not installed. Installing via winget..." -ForegroundColor Cyan
+        if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+            Write-Error "winget is not available. Install Python manually from https://python.org, then run: pip install git-filter-repo"
+            exit 1
+        }
+
+        $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+        if (-not $isAdmin) {
+            Write-Host "Installation requires administrator privileges. Re-launching as admin..." -ForegroundColor Yellow
+            $argList = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`""
+            foreach ($key in $PSBoundParameters.Keys) {
+                $val = $PSBoundParameters[$key]
+                if ($val -is [switch]) {
+                    if ($val) { $argList += " -$key" }
+                } elseif ($val -is [string[]]) {
+                    $argList += " -$key " + (($val | ForEach-Object { "`"$_`"" }) -join ",")
+                } else {
+                    $argList += " -$key `"$val`""
+                }
+            }
+            Start-Process powershell -ArgumentList $argList -Verb RunAs
+            exit 0
+        }
+
+        winget install --id Python.Python.3 --silent --accept-package-agreements --accept-source-agreements
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "Python installation failed. Install manually from https://python.org"
+            exit 1
+        }
+        # Refresh PATH so pip is available in this session
+        $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" +
+                    [System.Environment]::GetEnvironmentVariable("PATH", "User")
+        $pipCmd = { pip install git-filter-repo }
+    }
+
+    Write-Host "Installing git-filter-repo..." -ForegroundColor Cyan
+    & $pipCmd
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to install git-filter-repo. Try manually: pip install git-filter-repo"
+        exit 1
+    }
+
+    # Add Python user Scripts dir to PATH for this session (pip installs there but doesn't update PATH)
+    $userScripts = $null
+    try { $userScripts = (& $pipExe -m site --user-scripts 2>$null) } catch {}
+    if ($userScripts -and (Test-Path $userScripts) -and ($env:PATH -notlike "*$userScripts*")) {
+        $env:PATH += ";$userScripts"
+        Write-Host "Added $userScripts to PATH for this session." -ForegroundColor Cyan
+    }
+
+    # Verify install succeeded
+    & git filter-repo --version 2>$null | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "git-filter-repo installed but not found by git. You may need to restart your terminal and re-run."
+        exit 1
+    }
+    Write-Host "git-filter-repo installed successfully." -ForegroundColor Green
 }
 
 # ── Validate repo ────────────────────────────────────────────────────────────

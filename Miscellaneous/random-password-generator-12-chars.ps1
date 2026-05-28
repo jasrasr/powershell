@@ -32,3 +32,5 @@ function genrandpw {
 #
 # or oneliner
 #   . .\random-password-generator-12-chars.ps1; genrandpw
+
+Keith Sponseller
