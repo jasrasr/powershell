@@ -1,10 +1,11 @@
 # Filename: Search-FileContent.ps1
-# Revision : 1.1.0
-# Description : Recursively searches file contents for matching text across plain-text files and Office .xlsx/.docx documents, with optional regex, case-sensitive, and multi-threaded execution. Emits a Snippet column with match context and auto-logs results to a timestamped CSV under $psexports.
+# Revision : 1.2.0
+# Description : Recursively searches file contents for matching text across plain-text files and Office .xlsx/.docx documents, with optional regex, case-sensitive, and multi-threaded execution. Emits a Snippet column with match context, returns paths relative to -RootPath by default, and auto-logs results to a timestamped CSV under $psexports.
 # Author : Jason Lamb (with help from Claude Code CLI)
 # Created Date : 2026-05-28
 # Modified Date : 2026-05-28
 # Changelog :
+# 1.2.0 emit Path relative to -RootPath by default; add -AbsolutePath switch to opt back into full paths
 # 1.1.0 add Snippet column showing matched-text context; auto-log results to $env:psexports (or default powershell-exports folder) with timestamped CSV; add -SnippetContext, -LogFile, -NoLog parameters
 # 1.0.0 initial release
 
@@ -39,7 +40,9 @@ param(
 
     [string]$LogFile,
 
-    [switch]$NoLog
+    [switch]$NoLog,
+
+    [switch]$AbsolutePath
 )
 
 Set-StrictMode -Version Latest
@@ -287,6 +290,9 @@ if (-not $NoLog -and -not $LogFile) {
 }
 
 $resolvedRoot = (Resolve-Path -LiteralPath $RootPath).Path
+$dirSep = [System.IO.Path]::DirectorySeparatorChar
+$altSep = [System.IO.Path]::AltDirectorySeparatorChar
+$relativeBasePrefix = $resolvedRoot.TrimEnd($dirSep, $altSep) + $dirSep
 $searchOption = if ($NoRecurse) { 'TopDirectoryOnly' } else { 'AllDirectories' }
 $plainTextExtensionsLower = $TextExtensions.ForEach({ $_.ToLowerInvariant() })
 
@@ -519,8 +525,21 @@ if ($PSVersionTable.PSVersion.Major -ge 7 -and $Threads -gt 1) {
 
         $snippet = Get-FileContentSnippet -Path $_ -Needle $using:SearchText -UseRegex:$using:Regex -MatchCase:$using:CaseSensitive -PlainTextExtensions $using:plainTextExtensionsLower -Context $using:SnippetContext
         if ($snippet) {
+            $displayPath = if ($using:AbsolutePath) {
+                $_
+            }
+            else {
+                $basePrefix = $using:relativeBasePrefix
+                if ($_.StartsWith($basePrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+                    $_.Substring($basePrefix.Length)
+                }
+                else {
+                    $_
+                }
+            }
+
             [pscustomobject]@{
-                Path      = $_
+                Path      = $displayPath
                 Extension = [System.IO.Path]::GetExtension($_).ToLowerInvariant()
                 SizeKB    = [math]::Round(((Get-Item -LiteralPath $_).Length / 1KB), 2)
                 Snippet   = $snippet
@@ -532,8 +551,18 @@ else {
     $results = foreach ($file in $files) {
         $snippet = Get-FileContentSnippet -Path $file -Needle $SearchText -UseRegex:$Regex -MatchCase:$CaseSensitive -PlainTextExtensions $plainTextExtensionsLower -Context $SnippetContext
         if ($snippet) {
+            $displayPath = if ($AbsolutePath) {
+                $file
+            }
+            elseif ($file.StartsWith($relativeBasePrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+                $file.Substring($relativeBasePrefix.Length)
+            }
+            else {
+                $file
+            }
+
             [pscustomobject]@{
-                Path      = $file
+                Path      = $displayPath
                 Extension = [System.IO.Path]::GetExtension($file).ToLowerInvariant()
                 SizeKB    = [math]::Round(((Get-Item -LiteralPath $file).Length / 1KB), 2)
                 Snippet   = $snippet
@@ -574,3 +603,4 @@ $sorted
 #   .\Search-FileContent.ps1 -SearchText "needle" -SnippetContext 150
 #   .\Search-FileContent.ps1 -SearchText "needle" -LogFile "C:\temp\hits.csv"
 #   .\Search-FileContent.ps1 -SearchText "needle" -NoLog
+#   .\Search-FileContent.ps1 -SearchText "needle" -AbsolutePath
