@@ -1,3 +1,13 @@
+# Filename: Search-FileContent.ps1
+# Revision : 1.1.0
+# Description : Recursively searches file contents for matching text across plain-text files and Office .xlsx/.docx documents, with optional regex, case-sensitive, and multi-threaded execution. Emits a Snippet column with match context and auto-logs results to a timestamped CSV under $psexports.
+# Author : Jason Lamb (with help from Claude Code CLI)
+# Created Date : 2026-05-28
+# Modified Date : 2026-05-28
+# Changelog :
+# 1.1.0 add Snippet column showing matched-text context; auto-log results to $env:psexports (or default powershell-exports folder) with timestamped CSV; add -SnippetContext, -LogFile, -NoLog parameters
+# 1.0.0 initial release
+
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)]
@@ -23,13 +33,19 @@ param(
 
     [switch]$NoRecurse,
 
-    [int]$Threads = 8
+    [int]$Threads = 8,
+
+    [int]$SnippetContext = 80,
+
+    [string]$LogFile,
+
+    [switch]$NoLog
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-function Test-StringMatch {
+function Get-MatchSnippet {
     param(
         [Parameter(Mandatory)]
         [AllowEmptyString()]
@@ -40,8 +56,17 @@ function Test-StringMatch {
 
         [switch]$UseRegex,
 
-        [switch]$MatchCase
+        [switch]$MatchCase,
+
+        [int]$Context = 80
     )
+
+    if ([string]::IsNullOrEmpty($InputText)) {
+        return $null
+    }
+
+    $matchStart = -1
+    $matchLength = 0
 
     if ($UseRegex) {
         $options = [System.Text.RegularExpressions.RegexOptions]::CultureInvariant
@@ -49,20 +74,47 @@ function Test-StringMatch {
             $options = $options -bor [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
         }
 
-        return [System.Text.RegularExpressions.Regex]::IsMatch($InputText, $Needle, $options)
-    }
-
-    $comparison = if ($MatchCase) {
-        [System.StringComparison]::Ordinal
+        $m = [System.Text.RegularExpressions.Regex]::Match($InputText, $Needle, $options)
+        if ($m.Success) {
+            $matchStart = $m.Index
+            $matchLength = $m.Length
+        }
     }
     else {
-        [System.StringComparison]::OrdinalIgnoreCase
+        $comparison = if ($MatchCase) {
+            [System.StringComparison]::Ordinal
+        }
+        else {
+            [System.StringComparison]::OrdinalIgnoreCase
+        }
+
+        $matchStart = $InputText.IndexOf($Needle, $comparison)
+        if ($matchStart -ge 0) {
+            $matchLength = $Needle.Length
+        }
     }
 
-    return $InputText.IndexOf($Needle, $comparison) -ge 0
+    if ($matchStart -lt 0) {
+        return $null
+    }
+
+    $snippetStart = [Math]::Max(0, $matchStart - $Context)
+    $snippetEnd = [Math]::Min($InputText.Length, $matchStart + $matchLength + $Context)
+    $snippet = $InputText.Substring($snippetStart, $snippetEnd - $snippetStart)
+
+    $snippet = [regex]::Replace($snippet, '\s+', ' ').Trim()
+
+    if ($snippetStart -gt 0) {
+        $snippet = "...$snippet"
+    }
+    if ($snippetEnd -lt $InputText.Length) {
+        $snippet = "$snippet..."
+    }
+
+    return $snippet
 }
 
-function Find-ZipEntryText {
+function Get-ZipEntrySnippet {
     param(
         [Parameter(Mandatory)]
         [System.IO.Compression.ZipArchive]$Archive,
@@ -75,7 +127,9 @@ function Find-ZipEntryText {
 
         [switch]$UseRegex,
 
-        [switch]$MatchCase
+        [switch]$MatchCase,
+
+        [int]$Context = 80
     )
 
     foreach ($entry in $Archive.Entries) {
@@ -117,8 +171,9 @@ function Find-ZipEntryText {
             $doc.LoadXml($xmlText)
             $searchableText = if ($doc.DocumentElement) { $doc.DocumentElement.InnerText } else { '' }
 
-            if (Test-StringMatch -InputText $searchableText -Needle $Needle -UseRegex:$UseRegex -MatchCase:$MatchCase) {
-                return $true
+            $snippet = Get-MatchSnippet -InputText $searchableText -Needle $Needle -UseRegex:$UseRegex -MatchCase:$MatchCase -Context $Context
+            if ($snippet) {
+                return $snippet
             }
         }
         catch {
@@ -126,10 +181,10 @@ function Find-ZipEntryText {
         }
     }
 
-    return $false
+    return $null
 }
 
-function Test-FileContentMatch {
+function Get-FileContentSnippet {
     param(
         [Parameter(Mandatory)]
         [string]$Path,
@@ -141,7 +196,9 @@ function Test-FileContentMatch {
 
         [switch]$MatchCase,
 
-        [string[]]$PlainTextExtensions
+        [string[]]$PlainTextExtensions,
+
+        [int]$Context = 80
     )
 
     $extension = [System.IO.Path]::GetExtension($Path).ToLowerInvariant()
@@ -152,11 +209,11 @@ function Test-FileContentMatch {
                 $archive = [System.IO.Compression.ZipFile]::OpenRead($Path)
             }
             catch {
-                return $false
+                return $null
             }
 
             try {
-                return Find-ZipEntryText -Archive $archive -EntryPatterns @('xl/sharedStrings.xml', 'xl/worksheets/*.xml') -Needle $Needle -UseRegex:$UseRegex -MatchCase:$MatchCase
+                return Get-ZipEntrySnippet -Archive $archive -EntryPatterns @('xl/sharedStrings.xml', 'xl/worksheets/*.xml') -Needle $Needle -UseRegex:$UseRegex -MatchCase:$MatchCase -Context $Context
             }
             finally {
                 $archive.Dispose()
@@ -168,18 +225,18 @@ function Test-FileContentMatch {
                 $archive = [System.IO.Compression.ZipFile]::OpenRead($Path)
             }
             catch {
-                return $false
+                return $null
             }
 
             try {
-                return Find-ZipEntryText -Archive $archive -EntryPatterns @(
+                return Get-ZipEntrySnippet -Archive $archive -EntryPatterns @(
                     'word/document.xml',
                     'word/header*.xml',
                     'word/footer*.xml',
                     'word/footnotes.xml',
                     'word/endnotes.xml',
                     'word/comments.xml'
-                ) -Needle $Needle -UseRegex:$UseRegex -MatchCase:$MatchCase
+                ) -Needle $Needle -UseRegex:$UseRegex -MatchCase:$MatchCase -Context $Context
             }
             finally {
                 $archive.Dispose()
@@ -188,17 +245,17 @@ function Test-FileContentMatch {
 
         default {
             if ($PlainTextExtensions -notcontains $extension) {
-                return $false
+                return $null
             }
 
             try {
                 $content = [System.IO.File]::ReadAllText($Path)
             }
             catch {
-                return $false
+                return $null
             }
 
-            return Test-StringMatch -InputText $content -Needle $Needle -UseRegex:$UseRegex -MatchCase:$MatchCase
+            return Get-MatchSnippet -InputText $content -Needle $Needle -UseRegex:$UseRegex -MatchCase:$MatchCase -Context $Context
         }
     }
 }
@@ -208,6 +265,26 @@ if (-not (Test-Path -LiteralPath $RootPath -PathType Container)) {
 }
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+if (-not $NoLog -and -not $LogFile) {
+    $exportRoot = if ($env:psexports) {
+        $env:psexports
+    }
+    elseif (Test-Path -LiteralPath 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\powershell-exports' -PathType Container) {
+        'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\powershell-exports'
+    }
+    else {
+        Join-Path $env:USERPROFILE 'powershell-exports'
+    }
+
+    if (-not (Test-Path -LiteralPath $exportRoot -PathType Container)) {
+        Write-Warning "Export directory not found: $exportRoot - log skipped. Use -LogFile <path> or -NoLog to suppress."
+        $NoLog = $true
+    }
+    else {
+        $LogFile = Join-Path $exportRoot ("Search-FileContent_{0}.csv" -f (Get-Date -Format 'yyyyMMdd-HHmmss'))
+    }
+}
 
 $resolvedRoot = (Resolve-Path -LiteralPath $RootPath).Path
 $searchOption = if ($NoRecurse) { 'TopDirectoryOnly' } else { 'AllDirectories' }
@@ -241,7 +318,7 @@ $files = [System.IO.Directory]::EnumerateFiles($resolvedRoot, '*', $searchOption
 
 if ($PSVersionTable.PSVersion.Major -ge 7 -and $Threads -gt 1) {
     $results = $files | ForEach-Object -Parallel {
-        function Test-StringMatch {
+        function Get-MatchSnippet {
             param(
                 [Parameter(Mandatory)]
                 [AllowEmptyString()]
@@ -249,8 +326,16 @@ if ($PSVersionTable.PSVersion.Major -ge 7 -and $Threads -gt 1) {
                 [Parameter(Mandatory)]
                 [string]$Needle,
                 [switch]$UseRegex,
-                [switch]$MatchCase
+                [switch]$MatchCase,
+                [int]$Context = 80
             )
+
+            if ([string]::IsNullOrEmpty($InputText)) {
+                return $null
+            }
+
+            $matchStart = -1
+            $matchLength = 0
 
             if ($UseRegex) {
                 $options = [System.Text.RegularExpressions.RegexOptions]::CultureInvariant
@@ -258,20 +343,47 @@ if ($PSVersionTable.PSVersion.Major -ge 7 -and $Threads -gt 1) {
                     $options = $options -bor [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
                 }
 
-                return [System.Text.RegularExpressions.Regex]::IsMatch($InputText, $Needle, $options)
-            }
-
-            $comparison = if ($MatchCase) {
-                [System.StringComparison]::Ordinal
+                $m = [System.Text.RegularExpressions.Regex]::Match($InputText, $Needle, $options)
+                if ($m.Success) {
+                    $matchStart = $m.Index
+                    $matchLength = $m.Length
+                }
             }
             else {
-                [System.StringComparison]::OrdinalIgnoreCase
+                $comparison = if ($MatchCase) {
+                    [System.StringComparison]::Ordinal
+                }
+                else {
+                    [System.StringComparison]::OrdinalIgnoreCase
+                }
+
+                $matchStart = $InputText.IndexOf($Needle, $comparison)
+                if ($matchStart -ge 0) {
+                    $matchLength = $Needle.Length
+                }
             }
 
-            return $InputText.IndexOf($Needle, $comparison) -ge 0
+            if ($matchStart -lt 0) {
+                return $null
+            }
+
+            $snippetStart = [Math]::Max(0, $matchStart - $Context)
+            $snippetEnd = [Math]::Min($InputText.Length, $matchStart + $matchLength + $Context)
+            $snippet = $InputText.Substring($snippetStart, $snippetEnd - $snippetStart)
+
+            $snippet = [regex]::Replace($snippet, '\s+', ' ').Trim()
+
+            if ($snippetStart -gt 0) {
+                $snippet = "...$snippet"
+            }
+            if ($snippetEnd -lt $InputText.Length) {
+                $snippet = "$snippet..."
+            }
+
+            return $snippet
         }
 
-        function Find-ZipEntryText {
+        function Get-ZipEntrySnippet {
             param(
                 [Parameter(Mandatory)]
                 [System.IO.Compression.ZipArchive]$Archive,
@@ -280,7 +392,8 @@ if ($PSVersionTable.PSVersion.Major -ge 7 -and $Threads -gt 1) {
                 [Parameter(Mandatory)]
                 [string]$Needle,
                 [switch]$UseRegex,
-                [switch]$MatchCase
+                [switch]$MatchCase,
+                [int]$Context = 80
             )
 
             foreach ($entry in $Archive.Entries) {
@@ -322,8 +435,9 @@ if ($PSVersionTable.PSVersion.Major -ge 7 -and $Threads -gt 1) {
                     $doc.LoadXml($xmlText)
                     $searchableText = if ($doc.DocumentElement) { $doc.DocumentElement.InnerText } else { '' }
 
-                    if (Test-StringMatch -InputText $searchableText -Needle $Needle -UseRegex:$UseRegex -MatchCase:$MatchCase) {
-                        return $true
+                    $snippet = Get-MatchSnippet -InputText $searchableText -Needle $Needle -UseRegex:$UseRegex -MatchCase:$MatchCase -Context $Context
+                    if ($snippet) {
+                        return $snippet
                     }
                 }
                 catch {
@@ -331,10 +445,10 @@ if ($PSVersionTable.PSVersion.Major -ge 7 -and $Threads -gt 1) {
                 }
             }
 
-            return $false
+            return $null
         }
 
-        function Test-FileContentMatch {
+        function Get-FileContentSnippet {
             param(
                 [Parameter(Mandatory)]
                 [string]$Path,
@@ -342,7 +456,8 @@ if ($PSVersionTable.PSVersion.Major -ge 7 -and $Threads -gt 1) {
                 [string]$Needle,
                 [switch]$UseRegex,
                 [switch]$MatchCase,
-                [string[]]$PlainTextExtensions
+                [string[]]$PlainTextExtensions,
+                [int]$Context = 80
             )
 
             $extension = [System.IO.Path]::GetExtension($Path).ToLowerInvariant()
@@ -353,11 +468,11 @@ if ($PSVersionTable.PSVersion.Major -ge 7 -and $Threads -gt 1) {
                         $archive = [System.IO.Compression.ZipFile]::OpenRead($Path)
                     }
                     catch {
-                        return $false
+                        return $null
                     }
 
                     try {
-                        return Find-ZipEntryText -Archive $archive -EntryPatterns @('xl/sharedStrings.xml', 'xl/worksheets/*.xml') -Needle $Needle -UseRegex:$UseRegex -MatchCase:$MatchCase
+                        return Get-ZipEntrySnippet -Archive $archive -EntryPatterns @('xl/sharedStrings.xml', 'xl/worksheets/*.xml') -Needle $Needle -UseRegex:$UseRegex -MatchCase:$MatchCase -Context $Context
                     }
                     finally {
                         $archive.Dispose()
@@ -369,18 +484,18 @@ if ($PSVersionTable.PSVersion.Major -ge 7 -and $Threads -gt 1) {
                         $archive = [System.IO.Compression.ZipFile]::OpenRead($Path)
                     }
                     catch {
-                        return $false
+                        return $null
                     }
 
                     try {
-                        return Find-ZipEntryText -Archive $archive -EntryPatterns @(
+                        return Get-ZipEntrySnippet -Archive $archive -EntryPatterns @(
                             'word/document.xml',
                             'word/header*.xml',
                             'word/footer*.xml',
                             'word/footnotes.xml',
                             'word/endnotes.xml',
                             'word/comments.xml'
-                        ) -Needle $Needle -UseRegex:$UseRegex -MatchCase:$MatchCase
+                        ) -Needle $Needle -UseRegex:$UseRegex -MatchCase:$MatchCase -Context $Context
                     }
                     finally {
                         $archive.Dispose()
@@ -392,35 +507,70 @@ if ($PSVersionTable.PSVersion.Major -ge 7 -and $Threads -gt 1) {
                         $content = [System.IO.File]::ReadAllText($Path)
                     }
                     catch {
-                        return $false
+                        return $null
                     }
 
-                    return Test-StringMatch -InputText $content -Needle $Needle -UseRegex:$UseRegex -MatchCase:$MatchCase
+                    return Get-MatchSnippet -InputText $content -Needle $Needle -UseRegex:$UseRegex -MatchCase:$MatchCase -Context $Context
                 }
             }
         }
 
         Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-        if (Test-FileContentMatch -Path $_ -Needle $using:SearchText -UseRegex:$using:Regex -MatchCase:$using:CaseSensitive -PlainTextExtensions $using:plainTextExtensionsLower) {
+        $snippet = Get-FileContentSnippet -Path $_ -Needle $using:SearchText -UseRegex:$using:Regex -MatchCase:$using:CaseSensitive -PlainTextExtensions $using:plainTextExtensionsLower -Context $using:SnippetContext
+        if ($snippet) {
             [pscustomobject]@{
                 Path      = $_
                 Extension = [System.IO.Path]::GetExtension($_).ToLowerInvariant()
                 SizeKB    = [math]::Round(((Get-Item -LiteralPath $_).Length / 1KB), 2)
+                Snippet   = $snippet
             }
         }
     } -ThrottleLimit $Threads
 }
 else {
     $results = foreach ($file in $files) {
-        if (Test-FileContentMatch -Path $file -Needle $SearchText -UseRegex:$Regex -MatchCase:$CaseSensitive -PlainTextExtensions $plainTextExtensionsLower) {
+        $snippet = Get-FileContentSnippet -Path $file -Needle $SearchText -UseRegex:$Regex -MatchCase:$CaseSensitive -PlainTextExtensions $plainTextExtensionsLower -Context $SnippetContext
+        if ($snippet) {
             [pscustomobject]@{
                 Path      = $file
                 Extension = [System.IO.Path]::GetExtension($file).ToLowerInvariant()
                 SizeKB    = [math]::Round(((Get-Item -LiteralPath $file).Length / 1KB), 2)
+                Snippet   = $snippet
             }
         }
     }
 }
 
-$results | Sort-Object Path
+$sorted = @($results | Sort-Object Path)
+
+if (-not $NoLog -and $LogFile) {
+    if ($sorted.Count -gt 0) {
+        try {
+            $sorted | Export-Csv -LiteralPath $LogFile -NoTypeInformation -Encoding UTF8
+            Write-Host "Results logged to: $LogFile" -ForegroundColor Cyan
+        }
+        catch {
+            Write-Warning "Failed to write log file '$LogFile': $($_.Exception.Message)"
+        }
+    }
+    else {
+        Write-Host "No matches found - log file not written." -ForegroundColor Yellow
+    }
+}
+
+$sorted
+
+# Example Usage:
+#   .\Search-FileContent.ps1 -SearchText "API_KEY"
+#   .\Search-FileContent.ps1 -SearchText "password" -RootPath "C:\Logs"
+#   .\Search-FileContent.ps1 -SearchText "error\s+\d+" -Regex
+#   .\Search-FileContent.ps1 -SearchText "TODO" -CaseSensitive
+#   .\Search-FileContent.ps1 -SearchText "invoice" -Include *.xlsx,*.docx
+#   .\Search-FileContent.ps1 -SearchText "secret" -Exclude *.log,*.tmp
+#   .\Search-FileContent.ps1 -SearchText "config" -TextExtensions .ps1,.psm1
+#   .\Search-FileContent.ps1 -SearchText "Smith" -NoRecurse
+#   .\Search-FileContent.ps1 -SearchText "internal" -Threads 16
+#   .\Search-FileContent.ps1 -SearchText "needle" -SnippetContext 150
+#   .\Search-FileContent.ps1 -SearchText "needle" -LogFile "C:\temp\hits.csv"
+#   .\Search-FileContent.ps1 -SearchText "needle" -NoLog
