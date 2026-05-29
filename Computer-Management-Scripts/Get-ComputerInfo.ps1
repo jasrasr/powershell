@@ -1,5 +1,5 @@
 # Filename: Get-ComputerInfo.ps1
-# Revision : 1.4.1
+# Revision : 1.4.2
 # Description : Collects computer name, serial, manufacturer, model, Windows version, current user
 #               (username + display name), last logged-on user, domain/workgroup, IP, MAC,
 #               disk, CPU, GPU, RAM, BitLocker status, OS install date, last boot time,
@@ -17,6 +17,8 @@
 # 1.3.0 added optional API reporting to jasr.me/computers via -Upload switch
 # 1.4.0 upload now on by default; replaced -Upload with -NoUpload to opt out
 # 1.4.1 update example usage with irm "jasr.me/al-comp" | iex
+# 1.4.2 fix OSInstallDate/LastBootTime being blank when run via irm | iex
+#        (deserialized WMI objects lack ConvertToDateTime method — use static converter instead)
 
 param(
     [string]$ExportPath = ".",
@@ -80,8 +82,18 @@ $isW11         = $osInfo.Caption -match "Windows 11"
 $winVersion    = if ($displayVersion) {
                      if ($isW11) { "W11 $displayVersion" } else { "W10 $displayVersion" }
                  } else { $osInfo.Caption }
-$osInstallDate = $osInfo.ConvertToDateTime($osInfo.InstallDate).ToString("yyyy-MM-dd")
-$lastBootTime  = $osInfo.ConvertToDateTime($osInfo.LastBootUpTime).ToString("yyyy-MM-dd HH:mm:ss")
+# Use static converter so this works even when WMI objects come back deserialized
+# (e.g. when the script is run via `irm | iex`, which strips instance methods).
+try {
+    $osInstallDate = [Management.ManagementDateTimeConverter]::ToDateTime($osInfo.InstallDate).ToString("yyyy-MM-dd")
+} catch {
+    $osInstallDate = "N/A"
+}
+try {
+    $lastBootTime  = [Management.ManagementDateTimeConverter]::ToDateTime($osInfo.LastBootUpTime).ToString("yyyy-MM-dd HH:mm:ss")
+} catch {
+    $lastBootTime  = "N/A"
+}
 
 # ── Network (primary NIC with default gateway) ────────────────────────────────
 try {
