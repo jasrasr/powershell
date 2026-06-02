@@ -1,14 +1,15 @@
 # Filename     : get-browser-bookmarks.ps1
-# Revision     : 1.0.3
+# Revision     : 1.0.4
 # Description  : Extracts bookmarks from Chrome and Edge, exports to OneDrive Documents in CSV, JSON, and HTML formats
 # Author       : Jason Lamb (with help from Claude Code CLI)
 # Created Date : 2026-04-30
-# Modified Date: 2026-05-05
+# Modified Date: 2026-06-02
 # Changelog    :
 # 1.0.0 Initial release; Chrome/Edge extraction, OneDrive detection, multi-format export
 # 1.0.1 Changed default export path to $env:OneDriveCommercial\Documents; added export summary
 # 1.0.2 Open export folder in Explorer on complete
 # 1.0.3 Changed export path to Documents\! Bookmark Export; auto-create folder if missing
+# 1.0.4 Include all bookmark roots (Bookmarks bar, Other bookmarks, Mobile bookmarks) — prior versions only extracted the bookmarks bar
 
 param(
     [string]$ExportPath,
@@ -283,13 +284,19 @@ Write-Host "Export path: $ExportPath" -ForegroundColor Cyan
 # ============================================================================
 if ($IncludeChrome) {
     Write-Host "`n[CHROME] Extracting bookmarks..." -ForegroundColor Cyan
-    $chromeBookmarks = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default\Bookmarks"
-    $chromeContent = Get-BookmarksFile -FilePath $chromeBookmarks -BrowserName "Chrome"
-    
+    $chromeBookmarksPath = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default\Bookmarks"
+    $chromeContent = Get-BookmarksFile -FilePath $chromeBookmarksPath -BrowserName "Chrome"
+
     if ($chromeContent) {
         try {
             $chromeJson = $chromeContent | ConvertFrom-Json
-            $chromeBookmarks = Get-BookmarkChildren -Node $chromeJson.roots.bookmark_bar -BrowserName "Chrome"
+            $chromeBookmarks = @()
+            foreach ($rootName in @('bookmark_bar', 'other', 'synced')) {
+                $rootNode = $chromeJson.roots.$rootName
+                if ($rootNode) {
+                    $chromeBookmarks += Get-BookmarkChildren -Node $rootNode -ParentFolder $rootNode.name -BrowserName "Chrome"
+                }
+            }
             $bookmarks += $chromeBookmarks
             Write-Host "Chrome: $($chromeBookmarks.Count) bookmarks found" -ForegroundColor Green
         } catch {
@@ -304,13 +311,19 @@ if ($IncludeChrome) {
 # ============================================================================
 if ($IncludeEdge) {
     Write-Host "`n[EDGE] Extracting bookmarks..." -ForegroundColor Cyan
-    $edgeBookmarks = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Bookmarks"
-    $edgeContent = Get-BookmarksFile -FilePath $edgeBookmarks -BrowserName "Edge"
-    
+    $edgeBookmarksPath = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Bookmarks"
+    $edgeContent = Get-BookmarksFile -FilePath $edgeBookmarksPath -BrowserName "Edge"
+
     if ($edgeContent) {
         try {
             $edgeJson = $edgeContent | ConvertFrom-Json
-            $edgeBookmarks = Get-BookmarkChildren -Node $edgeJson.roots.bookmark_bar -BrowserName "Edge"
+            $edgeBookmarks = @()
+            foreach ($rootName in @('bookmark_bar', 'other', 'synced')) {
+                $rootNode = $edgeJson.roots.$rootName
+                if ($rootNode) {
+                    $edgeBookmarks += Get-BookmarkChildren -Node $rootNode -ParentFolder $rootNode.name -BrowserName "Edge"
+                }
+            }
             $bookmarks += $edgeBookmarks
             Write-Host "Edge: $($edgeBookmarks.Count) bookmarks found" -ForegroundColor Green
         } catch {
