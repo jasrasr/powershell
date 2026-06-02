@@ -1,12 +1,14 @@
 # Filename: HEICconvert2JPG-Monitor.ps1
-# Revision : 1.2.0
+# Revision : 1.3.0
 # Description : Monitors a folder for new HEIC/HEIF files and automatically converts them to JPG
 #               using bundled portable ImageMagick. Originals are archived to an 'Original HEIC'
 #               subfolder per source directory.
 # Author : Jason Lamb (with help from Claude Code)
 # Created Date : 2026-04-21
-# Modified Date : 2026-04-21
+# Modified Date : 2026-05-29
 # Changelog :
+# 1.3.0 added pre-scan of existing HEIC/HEIF files in WatchFolder at startup so the script
+#         processes the current backlog before entering the watch loop
 # 1.2.0 added Renamed event + larger buffer to support OneDrive synced folders (files arrive
 #         via rename, not Created event); increased InternalBufferSize to 65536
 # 1.1.0 fixed event detection — switched from Register-ObjectEvent -Action (child runspace,
@@ -132,6 +134,22 @@ Write-Host "Output     : $(if ($OutputFolder) { $OutputFolder } else { '(same as
 Write-Host "Log        : $logPath" -ForegroundColor Cyan
 Write-Host "ImageMagick: $magickExe" -ForegroundColor Cyan
 Write-Host ""
+# -----------------------------
+# Pre-scan existing files
+# -----------------------------
+$existing = Get-ChildItem -Path $WatchFolder -Recurse:$Recurse.IsPresent -File -ErrorAction SilentlyContinue |
+    Where-Object { $_.Extension -imatch '\.heic$|\.heif$' -and $_.DirectoryName -notmatch '\\Original HEIC$' }
+
+if ($existing) {
+    Write-Host "Pre-scan : found $($existing.Count) existing HEIC/HEIF file(s) — processing before watch starts." -ForegroundColor Cyan
+    Write-Host ""
+    foreach ($f in $existing) {
+        Write-Host "Existing   : $($f.Name)" -ForegroundColor White
+        Convert-HeicFile -FilePath $f.FullName
+    }
+    Write-Host ""
+}
+
 Write-Host "Waiting for HEIC/HEIF files... Press Ctrl+C to stop." -ForegroundColor Gray
 Write-Host ""
 

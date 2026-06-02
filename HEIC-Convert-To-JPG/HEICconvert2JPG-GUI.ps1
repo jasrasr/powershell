@@ -1,12 +1,15 @@
-# Revision : 5.5
+# Revision : 5.6
 # Description : GUI HEIC/HEIF to JPG Converter using bundled portable ImageMagick
 # Author : Jason Lamb (with help from ChatGPT & Claude Code)
 # Created Date : 2025-04-01
-# Modified Date : 2026-03-23
+# Modified Date : 2026-05-29
 
 # -----------------------------
 # Changelog
 # -----------------------------
+# v5.6 : Fixed final "Conversion Complete" MessageBox being hidden behind the
+#         Topmost form. Pass the form as the MessageBox owner so it stacks on
+#         top of the parent. Same fix applied to validation MessageBoxes.
 # v5.5 : Switched conversion engine from Windows WIC (PresentationCore) to
 #         ImageMagick (bundled portable or system PATH). WIC failed with
 #         0xC00D5212 because the HEIF AppX codec does not register with the
@@ -64,7 +67,8 @@ function Start-Convert {
         [string[]]$Files,
         [string]$OutputFolder,
         [System.Windows.Forms.RichTextBox]$LogBox,
-        [System.Windows.Forms.ProgressBar]$ProgressBar
+        [System.Windows.Forms.ProgressBar]$ProgressBar,
+        [System.Windows.Forms.Form]$OwnerForm
     )
 
     if (-not (Test-Path $logRoot)) {
@@ -143,10 +147,18 @@ function Start-Convert {
         }
     }
 
-    [System.Windows.Forms.MessageBox]::Show(
-        "Converted : $converted`nSkipped : $skipped`nFailed : $failed",
-        "Conversion Complete"
-    )
+    if ($OwnerForm) {
+        [System.Windows.Forms.MessageBox]::Show(
+            $OwnerForm,
+            "Converted : $converted`nSkipped : $skipped`nFailed : $failed",
+            "Conversion Complete"
+        )
+    } else {
+        [System.Windows.Forms.MessageBox]::Show(
+            "Converted : $converted`nSkipped : $skipped`nFailed : $failed",
+            "Conversion Complete"
+        )
+    }
 
     $global:collectedFiles = @()
 }
@@ -283,16 +295,16 @@ $convertButton.Text = 'Convert'
 $convertButton.Location = New-Object System.Drawing.Point(270,470)
 $convertButton.Add_Click({
     if (-not $global:collectedFiles.Count) {
-        [System.Windows.Forms.MessageBox]::Show("Select at least one HEIC or HEIF file.")
+        [System.Windows.Forms.MessageBox]::Show($form, "Select at least one HEIC or HEIF file.")
         return
     }
     if (-not (Test-Path $outputBox.Text)) {
-        [System.Windows.Forms.MessageBox]::Show("Select a valid output folder.")
+        [System.Windows.Forms.MessageBox]::Show($form, "Select a valid output folder.")
         return
     }
 
     $logBox.Clear()
-    Start-Convert -Files $global:collectedFiles -OutputFolder $outputBox.Text -LogBox $logBox -ProgressBar $progress
+    Start-Convert -Files $global:collectedFiles -OutputFolder $outputBox.Text -LogBox $logBox -ProgressBar $progress -OwnerForm $form
 })
 $form.Controls.Add($convertButton)
 
