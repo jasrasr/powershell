@@ -1,5 +1,5 @@
 # Filename: get-github-repo-issues.ps1
-# Revision : 1.1.0
+# Revision : 1.2.0
 # Description : Export open GitHub issues and create a Codex-ready task prompt
 # Author : Jason Lamb (with help from Codex CLI)
 # Created Date : 2026-06-03
@@ -7,6 +7,7 @@
 # Changelog :
 # 1.0.0 initial release
 # 1.1.0 made repository input and output paths generic for public sharing
+# 1.2.0 added support for common GitHub repository URL formats
 
 <#
 .SYNOPSIS
@@ -18,7 +19,7 @@ that can be passed to Codex CLI. Codex can then generate a markdown task report
 from the exported issues.
 
 .PARAMETER Repo
-GitHub repository in owner/name format.
+GitHub repository as owner/name or a GitHub URL.
 
 .PARAMETER OutputFolder
 Folder where the JSON, prompt, task report path, and log files will be created.
@@ -32,7 +33,6 @@ Runs Codex CLI immediately with the generated prompt text.
 
 param (
     [Parameter(Mandatory = $true)]
-    [ValidatePattern("^[^/]+/[^/]+$")]
     [string]$Repo,
 
     [string]$OutputFolder = (Join-Path $env:USERPROFILE "powershell-exports"),
@@ -44,6 +44,27 @@ param (
 )
 
 $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+
+function ConvertTo-GitHubRepoSlug {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Repo
+    )
+
+    $repoValue = $Repo.Trim()
+
+    if ($repoValue -match "^(?:https://)?github\.com/([^/\s]+)/([^/\s]+?)(?:\.git)?/?$") {
+        return "$($Matches[1])/$($Matches[2])"
+    }
+
+    if ($repoValue -match "^([^/\s]+)/([^/\s]+?)(?:\.git)?$") {
+        return "$($Matches[1])/$($Matches[2])"
+    }
+
+    throw "Repository must be in one of these formats: owner/repository, github.com/owner/repository, github.com/owner/repository.git, or https://github.com/owner/repository.git"
+}
+
+$repoSlug = ConvertTo-GitHubRepoSlug -Repo $Repo
 
 if (-not (Test-Path -Path $OutputFolder)) {
     New-Item -Path $OutputFolder -ItemType Directory -Force | Out-Null
@@ -66,7 +87,7 @@ function Write-Log {
 }
 
 Write-Log "Starting GitHub issue export."
-Write-Log "Repository : $Repo"
+Write-Log "Repository : $repoSlug"
 Write-Log "Output folder : $OutputFolder"
 
 $ghCheck = Get-Command gh -ErrorAction SilentlyContinue
@@ -87,7 +108,7 @@ $ghArgs = @(
     "issue",
     "list",
     "--repo",
-    $Repo,
+    $repoSlug,
     "--state",
     "open",
     "--limit",
@@ -152,6 +173,9 @@ Write-Host "Log    : $logPath"
 
 # Example Usage:
 #   .\get-github-repo-issues.ps1 -Repo "owner/repository"
+#   .\get-github-repo-issues.ps1 -Repo "github.com/owner/repository"
+#   .\get-github-repo-issues.ps1 -Repo "github.com/owner/repository.git"
+#   .\get-github-repo-issues.ps1 -Repo "https://github.com/owner/repository.git"
 #   .\get-github-repo-issues.ps1 -Repo "owner/repository" -OutputFolder "$env:USERPROFILE\powershell-exports"
 #   .\get-github-repo-issues.ps1 -Repo "owner/repository" -IssueLimit 50
 #   .\get-github-repo-issues.ps1 -Repo "owner/repository" -RunCodex
