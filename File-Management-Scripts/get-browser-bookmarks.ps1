@@ -1,5 +1,5 @@
 # Filename     : get-browser-bookmarks.ps1
-# Revision     : 1.1.3
+# Revision     : 1.1.4
 # Description  : Extracts bookmarks from Chrome, Edge, and Firefox; exports to OneDrive Documents in CSV, JSON, and HTML formats
 # Author       : Jason Lamb (with help from Claude Code CLI)
 # Created Date : 2026-04-30
@@ -14,6 +14,7 @@
 # 1.1.1 Fix SQLite reader: use .NET File.Copy/Delete (avoids 8.3 short-path errors in $env:TEMP); replace O(N^2) array += with List<T>; read moz_bookmarks first and filter moz_places to only referenced URLs; O(1) parent lookup via hashtable instead of Where-Object
 # 1.1.2 SQLite reader: add visited-page guard in walkTable (prevents infinite loops on corrupt/cyclic b-tree links); add timing + progress output at every major stage to make hangs diagnosable; bound page numbers to actual file extent
 # 1.1.3 SQLite reader: bound headerSize varint defensively + safety cap on serial-type loop (prevents runaway decode on malformed records); per-record progress in sqlite_master decode
+# 1.1.4 SQLite reader: switch decodeRecord $values to List<object> (PowerShell's `$arr += $null` is a no-op that silently drops NULL columns and shifts positional indices); diagnostic dump of first 3 sqlite_master records
 
 param(
     [string]$ExportPath,
@@ -624,13 +625,15 @@ function Get-FirefoxBookmarksFromSqlite {
     }
 
     # --- Helper: decode a SQLite record payload into column values ---
+    # IMPORTANT: $values uses List<object> instead of @() because PowerShell's
+    # `$arr += $null` is a no-op (silently drops the null), which would shift
+    # subsequent column indices and break positional schema reads.
     $decodeRecord = {
         param([byte[]]$Payload)
-        $values = @()
+        $values = [System.Collections.Generic.List[object]]::new()
         $vr = & $readVarint $Payload 0
         $headerSize = [int]$vr[0]
         $hdrPos = [int]$vr[1]
-        # Bound headerSize defensively — a corrupt varint can claim millions of bytes
         if ($headerSize -le 0 -or $headerSize -gt $Payload.Length -or $headerSize -gt 4096) {
             throw "Invalid record header size: $headerSize (payload=$($Payload.Length))"
         }
@@ -640,53 +643,51 @@ function Get-FirefoxBookmarksFromSqlite {
             $vr = & $readVarint $Payload $hdrPos
             [void]$serialTypes.Add([int64]$vr[0])
             $advance = [int]$vr[1]
-            if ($advance -le 0) { break }   # belt-and-suspenders: never make negative progress
+            if ($advance -le 0) { break }
             $hdrPos += $advance
         }
         foreach ($st in $serialTypes) {
             switch ([int64]$st) {
-                0 { $values += $null }
-                1 { $values += [int64][sbyte]$Payload[$bodyPos]; $bodyPos += 1 }
-                2 { $v = ([int]$Payload[$bodyPos] -shl 8) -bor [int]$Payload[$bodyPos+1]; if ($v -band 0x8000) { $v = $v - 0x10000 }; $values += [int64]$v; $bodyPos += 2 }
-                3 { $v = ([int]$Payload[$bodyPos] -shl 16) -bor ([int]$Payload[$bodyPos+1] -shl 8) -bor [int]$Payload[$bodyPos+2]; if ($v -band 0x800000) { $v = $v - 0x1000000 }; $values += [int64]$v; $bodyPos += 3 }
-                4 { $v = ([int64]$Payload[$bodyPos] -shl 24) -bor ([int64]$Payload[$bodyPos+1] -shl 16) -bor ([int64]$Payload[$bodyPos+2] -shl 8) -bor [int64]$Payload[$bodyPos+3]; if ($v -band 0x80000000) { $v = $v - 0x100000000 }; $values += $v; $bodyPos += 4 }
+                0 { [void]$values.Add($null) }
+                1 { [void]$values.Add([int64][sbyte]$Payload[$bodyPos]); $bodyPos += 1 }
+                2 { $v = ([int]$Payload[$bodyPos] -shl 8) -bor [int]$Payload[$bodyPos+1]; if ($v -band 0x8000) { $v = $v - 0x10000 }; [void]$values.Add([int64]$v); $bodyPos += 2 }
+                3 { $v = ([int]$Payload[$bodyPos] -shl 16) -bor ([int]$Payload[$bodyPos+1] -shl 8) -bor [int]$Payload[$bodyPos+2]; if ($v -band 0x800000) { $v = $v - 0x1000000 }; [void]$values.Add([int64]$v); $bodyPos += 3 }
+                4 { $v = ([int64]$Payload[$bodyPos] -shl 24) -bor ([int64]$Payload[$bodyPos+1] -shl 16) -bor ([int64]$Payload[$bodyPos+2] -shl 8) -bor [int64]$Payload[$bodyPos+3]; if ($v -band 0x80000000) { $v = $v - 0x100000000 }; [void]$values.Add($v); $bodyPos += 4 }
                 5 {
                     $v = [int64]0
                     for ($i = 0; $i -lt 6; $i++) { $v = ($v -shl 8) -bor [int64]$Payload[$bodyPos + $i] }
                     if ($v -band 0x800000000000) { $v = $v - 0x1000000000000 }
-                    $values += $v; $bodyPos += 6
+                    [void]$values.Add($v); $bodyPos += 6
                 }
                 6 {
                     $v = [int64]0
                     for ($i = 0; $i -lt 8; $i++) { $v = ($v -shl 8) -bor [int64]$Payload[$bodyPos + $i] }
-                    $values += $v; $bodyPos += 8
+                    [void]$values.Add($v); $bodyPos += 8
                 }
                 7 {
                     $tmp = New-Object byte[] 8
                     for ($i = 0; $i -lt 8; $i++) { $tmp[7 - $i] = $Payload[$bodyPos + $i] }
-                    $values += [BitConverter]::ToDouble($tmp, 0)
+                    [void]$values.Add([BitConverter]::ToDouble($tmp, 0))
                     $bodyPos += 8
                 }
-                8 { $values += [int64]0 }
-                9 { $values += [int64]1 }
+                8 { [void]$values.Add([int64]0) }
+                9 { [void]$values.Add([int64]1) }
                 default {
                     if ($st -ge 12) {
                         if (($st -band 1) -eq 0) {
-                            # BLOB
                             $len = [int](($st - 12) / 2)
                             $blob = New-Object byte[] $len
                             if ($len -gt 0) { [Array]::Copy($Payload, $bodyPos, $blob, 0, $len) }
-                            $values += ,$blob
+                            [void]$values.Add($blob)
                             $bodyPos += $len
                         } else {
-                            # TEXT (UTF-8 assumed; Firefox uses UTF-8 by default)
                             $len = [int](($st - 13) / 2)
                             $text = if ($len -gt 0) { [System.Text.Encoding]::UTF8.GetString($Payload, $bodyPos, $len) } else { "" }
-                            $values += $text
+                            [void]$values.Add($text)
                             $bodyPos += $len
                         }
                     } else {
-                        $values += $null
+                        [void]$values.Add($null)
                     }
                 }
             }
@@ -705,18 +706,40 @@ function Get-FirefoxBookmarksFromSqlite {
     $decodeStart = [DateTime]::Now
     foreach ($rec in $masterRecords) {
         $decodeIdx++
-        Write-Host "[FIREFOX]   decoding sqlite_master record $decodeIdx/$($masterRecords.Count) (payload=$($rec.Payload.Length))" -ForegroundColor DarkGray
         try {
+            # Diagnostic: hex dump first 24 bytes of payload for record 1 to verify alignment
+            if ($decodeIdx -eq 1) {
+                $hexBytes = for ($i = 0; $i -lt [Math]::Min(24, $rec.Payload.Length); $i++) { "{0:X2}" -f $rec.Payload[$i] }
+                $asciiBytes = for ($i = 0; $i -lt [Math]::Min(24, $rec.Payload.Length); $i++) {
+                    $b = $rec.Payload[$i]
+                    if ($b -ge 0x20 -and $b -lt 0x7F) { [char]$b } else { '.' }
+                }
+                Write-Host "[FIREFOX]   rec 1 first 24 hex: $($hexBytes -join ' ')" -ForegroundColor DarkGray
+                Write-Host "[FIREFOX]   rec 1 ascii:        $($asciiBytes -join '  ')" -ForegroundColor DarkGray
+                Write-Host "[FIREFOX]   rec 1 rowid: $($rec.RowId)" -ForegroundColor DarkGray
+            }
             $cols = & $decodeRecord $rec.Payload
+            if ($decodeIdx -le 3) {
+                $colSummary = for ($i = 0; $i -lt [Math]::Min($cols.Count, 5); $i++) {
+                    $v = $cols[$i]
+                    if ($null -eq $v) { '<null>' }
+                    elseif ($v -is [byte[]]) { "<blob:$($v.Length)>" }
+                    elseif ($v -is [string]) { "`"$(if ($v.Length -gt 40) { $v.Substring(0,40) + '...' } else { $v })`"" }
+                    else { "$v" }
+                }
+                Write-Host "[FIREFOX]   rec $decodeIdx/$($masterRecords.Count) (payload=$($rec.Payload.Length), cols=$($cols.Count)): $($colSummary -join ' | ')" -ForegroundColor DarkGray
+            }
             # sqlite_master columns: type, name, tbl_name, rootpage, sql
             if ($cols.Count -ge 4 -and $cols[0] -eq 'table') {
                 $tableRoots[$cols[1]] = [int]$cols[3]
             }
         } catch {
-            Write-Host "[FIREFOX]   record $decodeIdx skipped: $_" -ForegroundColor DarkYellow
+            if ($decodeIdx -le 12) {
+                Write-Host "[FIREFOX]   rec $decodeIdx skipped: $_" -ForegroundColor DarkYellow
+            }
         }
     }
-    Write-Host "[FIREFOX] sqlite_master decode: $([Math]::Round(([DateTime]::Now - $decodeStart).TotalSeconds, 2))s" -ForegroundColor Gray
+    Write-Host "[FIREFOX] sqlite_master decode: $([Math]::Round(([DateTime]::Now - $decodeStart).TotalSeconds, 2))s, $($masterRecords.Count) records processed" -ForegroundColor Gray
     Write-Host "[FIREFOX] Found $($tableRoots.Count) tables: $(($tableRoots.Keys | Sort-Object) -join ', ')" -ForegroundColor Gray
 
     if (-not $tableRoots.ContainsKey('moz_bookmarks') -or -not $tableRoots.ContainsKey('moz_places')) {

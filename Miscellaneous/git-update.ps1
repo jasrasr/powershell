@@ -1,12 +1,14 @@
 # Filename: git-update.ps1
-# Revision : 1.0.0
+# Revision : 1.0.1
 # Description : Smart git pull/add/commit/push. Generates AI commit message from diff via OpenAI.
 #               Use -Quick to skip AI and use a timestamped message instead.
 # Author : Jason Lamb (with help from Claude Code CLI)
 # Created Date : 2026-05-05
-# Modified Date : 2026-05-05
+# Modified Date : 2026-06-05
 # Changelog :
 # 1.0.0 initial release
+# 1.0.1 bail out on pull failure instead of committing/pushing into a diverged state;
+#       switched pull to --rebase --autostash; added push-failure handling
 
 function git-update {
     param(
@@ -22,9 +24,18 @@ function git-update {
 
     $datetime = Get-Date -Format 'yyyy-MM-dd HH:mm'
 
-    # Pull latest
+    # Pull latest (rebase + autostash so uncommitted local changes don't block the pull)
     Write-Host "Pulling latest changes..." -ForegroundColor Cyan
-    git pull
+    git pull --rebase --autostash
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Pull failed. Refusing to commit/push into a diverged state." -ForegroundColor Red
+        if (Test-Path (Join-Path $gitDir.FullName 'rebase-merge')) {
+            Write-Host "Aborting in-progress rebase..." -ForegroundColor Yellow
+            git rebase --abort
+        }
+        Write-Host "Resolve manually (git status), then run git-update again." -ForegroundColor Yellow
+        return
+    }
 
     # Stage all changes
     Write-Host "Staging all changes..." -ForegroundColor Cyan
@@ -90,10 +101,19 @@ function git-update {
     # Commit
     Write-Host "Committing..." -ForegroundColor Cyan
     git commit -m $commitMessage
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Commit failed. Aborting before push." -ForegroundColor Red
+        return
+    }
 
     # Push
     Write-Host "Pushing..." -ForegroundColor Cyan
     git push
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Push failed. Local commit is preserved." -ForegroundColor Red
+        Write-Host "Run git-update again, or resolve manually with git pull --rebase / git push." -ForegroundColor Yellow
+        return
+    }
 
     Write-Host "Done." -ForegroundColor Green
 }
