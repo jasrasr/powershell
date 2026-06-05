@@ -7,8 +7,4 @@ Demonstrations that compare drive space usage or I/O throughput for learning and
 | Name | Type | Description |
 | --- | --- | --- |
 | `README.md` | File | Markdown documentation |
-| `Space-Speed-Compare-Demo-gui.ps1` | File | PowerShell script |
-| `bitbyteconverter-rev1.ps1` | File | PowerShell script |
-| `bitbyteconverter-rev2.ps1` | File | PowerShell script |
-| `bitbyteconverter-rev3.ps1` | File | PowerShell script |
-| `bitbyteconverter-rev4.ps1` | File | PowerShell script |
+| `Space-Speed-Compare-Demo-gui.ps1` | File | Byte ↔ Bit converter GUI with download/upload network speed simulation (colored progress bar) |

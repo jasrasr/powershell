@@ -7,16 +7,25 @@
 .AUTHOR
     Jason Lamb (jasr.me)
 .REVISION
-    4.0
+    4.0.1
 .CREATED
     2025-10-29
+.CHANGES
+    4.0.1 - Fixed Add-Type compile errors on PowerShell 7 by passing
+            -ReferencedAssemblies for WinForms/Drawing. Guarded type definition
+            so the script is safely re-runnable in the same session.
+    4.0   - Initial release of dual-mode (download/upload) simulator with
+            colored progress bar.
 #>
 
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
 # --- Custom colored ProgressBar class ---
-Add-Type -TypeDefinition @"
+# Guard so re-running in the same PS session doesn't error on "type already exists".
+# -ReferencedAssemblies is required on PowerShell 7+ — WinForms/Drawing are not auto-referenced.
+if (-not ('ColorProgressBar' -as [type])) {
+    Add-Type -ReferencedAssemblies System.Windows.Forms, System.Drawing -TypeDefinition @"
 using System;
 using System.Windows.Forms;
 using System.Drawing;
@@ -38,6 +47,7 @@ public class ColorProgressBar : ProgressBar
     }
 }
 "@
+}
 
 # --- Create Form ---
 $form               = New-Object System.Windows.Forms.Form
