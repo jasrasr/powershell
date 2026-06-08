@@ -1,5 +1,5 @@
 # Filename     : get-browser-bookmarks.ps1
-# Revision     : 1.1.4
+# Revision     : 1.2.0
 # Description  : Extracts bookmarks from Chrome, Edge, and Firefox; exports to OneDrive Documents in CSV, JSON, and HTML formats
 # Author       : Jason Lamb (with help from Claude Code CLI)
 # Created Date : 2026-04-30
@@ -11,10 +11,7 @@
 # 1.0.3 Changed export path to Documents\! Bookmark Export; auto-create folder if missing
 # 1.0.4 Include all bookmark roots (Bookmarks bar, Other bookmarks, Mobile bookmarks) — prior versions only extracted the bookmarks bar
 # 1.1.0 Add Firefox support: layered extraction (jsonlz4 backup -> pure-PS SQLite reader) with no module/install requirement; also copies raw backup files to export folder for portable migration
-# 1.1.1 Fix SQLite reader: use .NET File.Copy/Delete (avoids 8.3 short-path errors in $env:TEMP); replace O(N^2) array += with List<T>; read moz_bookmarks first and filter moz_places to only referenced URLs; O(1) parent lookup via hashtable instead of Where-Object
-# 1.1.2 SQLite reader: add visited-page guard in walkTable (prevents infinite loops on corrupt/cyclic b-tree links); add timing + progress output at every major stage to make hangs diagnosable; bound page numbers to actual file extent
-# 1.1.3 SQLite reader: bound headerSize varint defensively + safety cap on serial-type loop (prevents runaway decode on malformed records); per-record progress in sqlite_master decode
-# 1.1.4 SQLite reader: switch decodeRecord $values to List<object> (PowerShell's `$arr += $null` is a no-op that silently drops NULL columns and shifts positional indices); diagnostic dump of first 3 sqlite_master records
+# 1.2.0 Firefox SQLite reader stabilized and verified working end-to-end. Key fixes: (1) hashtable return from readVarint to bypass PowerShell pipeline array-unrolling that was dropping the byte-count element; (2) List<T> for hot accumulators instead of @() += (prevents O(N^2) walks and the $arr += $null no-op gotcha that drops NULL columns); (3) .NET File.Copy/Delete to avoid 8.3 short-path failures in $env:TEMP; (4) visited-page guard in b-tree walk; (5) defensive bounds on headerSize varint and serial-type loop; (6) moz_bookmarks read before moz_places so we only decode the URL rows we actually need
 
 param(
     [string]$ExportPath,
@@ -435,37 +432,27 @@ function Get-FirefoxBookmarksFromSqlite {
         Write-Warning "[Firefox] places.sqlite-wal contains pending changes. Close Firefox for the freshest data."
     }
 
-    $srcSize = (Get-Item $placesPath).Length
-    Write-Host "[FIREFOX] places.sqlite size: $([Math]::Round($srcSize / 1MB, 2)) MB" -ForegroundColor Gray
-
     # Copy to temp (file is locked while Firefox is open). Use .NET APIs to avoid
     # PowerShell path-provider issues with 8.3 short paths like C:\Users\JASON~1.LAM
     $tempCopy = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(), "places_$([guid]::NewGuid().Guid).sqlite")
-    Write-Host "[FIREFOX] Copying places.sqlite to temp..." -ForegroundColor Gray
-    $copyStart = [DateTime]::Now
     try {
         [System.IO.File]::Copy($placesPath, $tempCopy, $true)
     } catch {
         $script:errors += "[Firefox] Could not copy places.sqlite: $_"
         return $null
     }
-    Write-Host "[FIREFOX] Copy complete in $([Math]::Round(([DateTime]::Now - $copyStart).TotalSeconds, 2))s" -ForegroundColor Gray
 
-    Write-Host "[FIREFOX] Loading bytes into memory..." -ForegroundColor Gray
-    $loadStart = [DateTime]::Now
     try {
         $bytes = [System.IO.File]::ReadAllBytes($tempCopy)
     } finally {
         try { [System.IO.File]::Delete($tempCopy) } catch { }
     }
-    Write-Host "[FIREFOX] Loaded $($bytes.Length) bytes in $([Math]::Round(([DateTime]::Now - $loadStart).TotalSeconds, 2))s" -ForegroundColor Gray
 
     if ($bytes.Length -lt 100) {
         $script:errors += "[Firefox] places.sqlite is too small to be valid"
         return $null
     }
 
-    # --- SQLite header parsing ---
     $headerMagic = [System.Text.Encoding]::ASCII.GetString($bytes, 0, 15)
     if ($headerMagic -ne "SQLite format 3") {
         $script:errors += "[Firefox] places.sqlite is not a SQLite 3 file"
@@ -477,9 +464,11 @@ function Get-FirefoxBookmarksFromSqlite {
     $pageSize = if ($pageSizeRaw -eq 1) { 65536 } else { $pageSizeRaw }
     $reservedSpace = [int]$bytes[20]
     $usableSize = $pageSize - $reservedSpace
-    Write-Host "[FIREFOX] Page size: $pageSize, total pages: $([Math]::Floor($bytes.Length / $pageSize))" -ForegroundColor Gray
 
     # --- Helper: read varint (1-9 bytes, big-endian) ---
+    # Returns a hashtable to avoid PowerShell array-unrolling: when a scriptblock
+    # returns @(value, count), the pipeline can enumerate the array and downstream
+    # capture sometimes loses the second element (making $vr[1] $null → cast to 0).
     $readVarint = {
         param([byte[]]$Buf, [int]$Offset)
         $value = [int64]0
@@ -487,12 +476,11 @@ function Get-FirefoxBookmarksFromSqlite {
             $b = $Buf[$Offset + $i]
             $value = ($value -shl 7) -bor ($b -band 0x7F)
             if (($b -band 0x80) -eq 0) {
-                return @($value, $i + 1)
+                return @{ Value = $value; Bytes = $i + 1 }
             }
         }
-        # 9th byte: full 8 bits
         $value = ($value -shl 8) -bor $Buf[$Offset + 8]
-        return @($value, 9)
+        return @{ Value = $value; Bytes = 9 }
     }
 
     # --- Helper: extract page bytes (pages are 1-indexed) ---
@@ -538,10 +526,10 @@ function Get-FirefoxBookmarksFromSqlite {
             try {
                 # Read payload size varint
                 $vr = & $readVarint $Page $cellOffset
-                $payloadSize = [int64]$vr[0]; $cellOffset += [int]$vr[1]
+                $payloadSize = [int64]$vr.Value; $cellOffset += [int]$vr.Bytes
                 # Read rowid varint
                 $vr = & $readVarint $Page $cellOffset
-                $rowid = [int64]$vr[0]; $cellOffset += [int]$vr[1]
+                $rowid = [int64]$vr.Value; $cellOffset += [int]$vr.Bytes
 
                 # Determine how many bytes are stored on this page vs overflow
                 $maxLocal = $usableSize - 35
@@ -616,10 +604,6 @@ function Get-FirefoxBookmarksFromSqlite {
                     $stack.Push($leftChild)
                 }
             }
-            # Periodic progress for very large b-trees
-            if (($pagesProcessed % 500) -eq 0) {
-                Write-Host "[FIREFOX]   ...walked $pagesProcessed pages, $($allRecords.Count) records so far" -ForegroundColor DarkGray
-            }
         }
         return ,$allRecords
     }
@@ -632,8 +616,8 @@ function Get-FirefoxBookmarksFromSqlite {
         param([byte[]]$Payload)
         $values = [System.Collections.Generic.List[object]]::new()
         $vr = & $readVarint $Payload 0
-        $headerSize = [int]$vr[0]
-        $hdrPos = [int]$vr[1]
+        $headerSize = [int]$vr.Value
+        $hdrPos = [int]$vr.Bytes
         if ($headerSize -le 0 -or $headerSize -gt $Payload.Length -or $headerSize -gt 4096) {
             throw "Invalid record header size: $headerSize (payload=$($Payload.Length))"
         }
@@ -641,8 +625,8 @@ function Get-FirefoxBookmarksFromSqlite {
         $serialTypes = [System.Collections.Generic.List[int64]]::new()
         while ($hdrPos -lt $headerSize -and $serialTypes.Count -lt 200) {
             $vr = & $readVarint $Payload $hdrPos
-            [void]$serialTypes.Add([int64]$vr[0])
-            $advance = [int]$vr[1]
+            [void]$serialTypes.Add([int64]$vr.Value)
+            $advance = [int]$vr.Bytes
             if ($advance -le 0) { break }
             $hdrPos += $advance
         }
@@ -696,51 +680,17 @@ function Get-FirefoxBookmarksFromSqlite {
     }
 
     # --- Read sqlite_master (root page 1) to find target tables ---
-    Write-Host "[FIREFOX] Walking sqlite_master (page 1)..." -ForegroundColor Gray
-    $masterStart = [DateTime]::Now
     $masterRecords = & $walkTable 1
-    Write-Host "[FIREFOX] sqlite_master walk: $($masterRecords.Count) records in $([Math]::Round(([DateTime]::Now - $masterStart).TotalSeconds, 2))s" -ForegroundColor Gray
-
     $tableRoots = @{}
-    $decodeIdx = 0
-    $decodeStart = [DateTime]::Now
     foreach ($rec in $masterRecords) {
-        $decodeIdx++
         try {
-            # Diagnostic: hex dump first 24 bytes of payload for record 1 to verify alignment
-            if ($decodeIdx -eq 1) {
-                $hexBytes = for ($i = 0; $i -lt [Math]::Min(24, $rec.Payload.Length); $i++) { "{0:X2}" -f $rec.Payload[$i] }
-                $asciiBytes = for ($i = 0; $i -lt [Math]::Min(24, $rec.Payload.Length); $i++) {
-                    $b = $rec.Payload[$i]
-                    if ($b -ge 0x20 -and $b -lt 0x7F) { [char]$b } else { '.' }
-                }
-                Write-Host "[FIREFOX]   rec 1 first 24 hex: $($hexBytes -join ' ')" -ForegroundColor DarkGray
-                Write-Host "[FIREFOX]   rec 1 ascii:        $($asciiBytes -join '  ')" -ForegroundColor DarkGray
-                Write-Host "[FIREFOX]   rec 1 rowid: $($rec.RowId)" -ForegroundColor DarkGray
-            }
             $cols = & $decodeRecord $rec.Payload
-            if ($decodeIdx -le 3) {
-                $colSummary = for ($i = 0; $i -lt [Math]::Min($cols.Count, 5); $i++) {
-                    $v = $cols[$i]
-                    if ($null -eq $v) { '<null>' }
-                    elseif ($v -is [byte[]]) { "<blob:$($v.Length)>" }
-                    elseif ($v -is [string]) { "`"$(if ($v.Length -gt 40) { $v.Substring(0,40) + '...' } else { $v })`"" }
-                    else { "$v" }
-                }
-                Write-Host "[FIREFOX]   rec $decodeIdx/$($masterRecords.Count) (payload=$($rec.Payload.Length), cols=$($cols.Count)): $($colSummary -join ' | ')" -ForegroundColor DarkGray
-            }
             # sqlite_master columns: type, name, tbl_name, rootpage, sql
             if ($cols.Count -ge 4 -and $cols[0] -eq 'table') {
                 $tableRoots[$cols[1]] = [int]$cols[3]
             }
-        } catch {
-            if ($decodeIdx -le 12) {
-                Write-Host "[FIREFOX]   rec $decodeIdx skipped: $_" -ForegroundColor DarkYellow
-            }
-        }
+        } catch { }
     }
-    Write-Host "[FIREFOX] sqlite_master decode: $([Math]::Round(([DateTime]::Now - $decodeStart).TotalSeconds, 2))s, $($masterRecords.Count) records processed" -ForegroundColor Gray
-    Write-Host "[FIREFOX] Found $($tableRoots.Count) tables: $(($tableRoots.Keys | Sort-Object) -join ', ')" -ForegroundColor Gray
 
     if (-not $tableRoots.ContainsKey('moz_bookmarks') -or -not $tableRoots.ContainsKey('moz_places')) {
         $script:errors += "[Firefox] places.sqlite is missing expected tables (moz_bookmarks / moz_places)"
@@ -748,10 +698,7 @@ function Get-FirefoxBookmarksFromSqlite {
     }
 
     # --- Read moz_bookmarks FIRST so we know which moz_places rows we need ---
-    Write-Host "[FIREFOX] Reading moz_bookmarks (root page $($tableRoots['moz_bookmarks']))..." -ForegroundColor Cyan
-    $bmStart = [DateTime]::Now
     $bookmarkRecords = & $walkTable $tableRoots['moz_bookmarks']
-    Write-Host "[FIREFOX] moz_bookmarks walk: $($bookmarkRecords.Count) records in $([Math]::Round(([DateTime]::Now - $bmStart).TotalSeconds, 2))s" -ForegroundColor Gray
     $bmRows = [System.Collections.Generic.List[object]]::new()
     $bmById = @{}
     $wantedFks = [System.Collections.Generic.HashSet[int64]]::new()
@@ -773,13 +720,8 @@ function Get-FirefoxBookmarksFromSqlite {
             if ($row.Type -eq 1 -and $row.Fk) { [void]$wantedFks.Add([int64]$row.Fk) }
         } catch { }
     }
-    Write-Host "[FIREFOX] Found $($bmRows.Count) bookmark rows ($($wantedFks.Count) URL refs)" -ForegroundColor Gray
-
     # --- Read moz_places, but only keep URLs referenced by bookmarks ---
-    Write-Host "[FIREFOX] Reading moz_places (root page $($tableRoots['moz_places']))..." -ForegroundColor Cyan
-    $placesStart = [DateTime]::Now
     $placesRecords = & $walkTable $tableRoots['moz_places']
-    Write-Host "[FIREFOX] moz_places walk: $($placesRecords.Count) records in $([Math]::Round(([DateTime]::Now - $placesStart).TotalSeconds, 2))s" -ForegroundColor Gray
     $urlById = @{}
     foreach ($rec in $placesRecords) {
         $rowId = [int64]$rec.RowId
