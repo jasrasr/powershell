@@ -3,7 +3,7 @@
 # Description : Export open GitHub issues and create a Markdown task report plus a Codex-ready prompt
 # Author : Jason Lamb (with help from Codex CLI)
 # Created Date : 2026-06-03
-# Modified Date : 2026-06-04
+# Modified Date : 2026-06-08
 # Changelog :
 # 1.0.0 initial release
 # 1.1.0 made repository input and output paths generic for public sharing
