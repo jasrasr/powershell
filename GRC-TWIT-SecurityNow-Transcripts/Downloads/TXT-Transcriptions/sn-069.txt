@@ -10,255 +10,255 @@ FILE ARCHIVE:	http://www.GRC.com/securitynow.htm
 
 DESCRIPTION:  To create some background for next week's discussion about the significant technical challenges involved in creating true anonymity on the Internet, this week Steve and Leo discuss the consequences of use and abuse of the extreme power afforded by many different forms of Internet anonymity, privacy, and freedom of speech.
 
-INTRO:  Netcasts you love, from people you trust.  This is TWiT.
+INTRO:  Netcasts you love, from people you trust.  This isï¿½TWiT.
 
 LEO LAPORTE:  Bandwidth for Security Now! is provided by AOL Radio at AOL.com/podcasting.
 
 This is Security Now! with Steve Gibson, Episode 69 for December 7, 2006:  Internet Anonymity, Part 1.
 
-Security Now! is brought to you by Astaro, makers of the Astaro Security Gateway, on the web at www.astaro.com.  And by Dell.  For this week’s specials, visit TWiT.tv/dell.
+Security Now! is brought to you by Astaro, makers of the Astaro Security Gateway, on the web at www.astaro.com.  And by Dell.  For this weekï¿½s specials, visit TWiT.tv/dell.
 
 Well, after that marathon edition last week of Security Now!, a whole, what was it, almost an hour and a half...
 
-STEVE GIBSON:  Actually it was more than that, it was 97 minutes.
+STEVE GIBSON:  Actually it was more than that, it was 97ï¿½minutes.
 
-LEO:  I’m exhausted.  But, you know, I should say Steve Gibson is here, and he’s our security guru.  And people loved it.
+LEO:  Iï¿½m exhausted.  But, you know, I should say Steve Gibson is here, and heï¿½s our security guru.  And people loved it.
 
-STEVE:  They really did.  I got some positive feedback in our Security Now! newsgroup at GRC from people saying, I mean, I had one comment, someone said they thought it might have been the best Security Now! ever.  And they liked the fact that we took our time, we thoroughly covered the topics.  I think more by coincidence than anything else we had a really good selection of questions, you know, they were complimenting me on the questions.  But it’s like, well, I didn’t really do anything different this time than I have before.  I just read through a bunch of questions and found good ones.  But I guess we just hit the sweet spot somehow.
+STEVE:  They really did.  I got some positive feedback in our Security Now! newsgroup at GRC from people saying, I mean, I had one comment, someone said they thought it might have been the best Security Now! ever.  And they liked the fact that we took our time, we thoroughly covered the topics.  I think more by coincidence than anything else we had a really good selection of questions, you know, they were complimenting me on the questions.  But itï¿½s like, well, I didnï¿½t really do anything different this time than Iï¿½have before.  I just read through a bunch of questions andï¿½found good ones.  But I guess we just hit the sweet spotï¿½somehow.
 
-LEO:  I like the Q&As because of the variety.  It’s not just one topic.  And often the questions – and I think this was the case last time – are ones that I myself go, hmm, I wonder.  And so it’s good.  That’s why I do call-in talk shows and call-in TV shows, because I think people ask the questions.  Sometimes we as experts don’t always ask the right questions.  We know too much, maybe.
+LEO:  I like the Q&As because of the variety.  Itï¿½s not just one topic.  And often the questions ï¿½ and I think this was the case last time ï¿½ are ones that I myself go, hmm, I wonder.  And so itï¿½s good.  Thatï¿½s why I do call-in talk shows and call-in TV shows, because I think people ask the questions.  Sometimes we as experts donï¿½t always ask the right questions.  We know too much, maybe.
 
-STEVE:  And of course doing that really keeps you on your toes, too’, because as I listen to you on KFI I’m thinking, my God, this guy knows so much.  No, really.
+STEVE:  And of course doing that really keeps you on your toes, tooï¿½, because as I listen to you on KFI Iï¿½m thinking, my God, this guy knows so much.  No, really.
 
 LEO:  I fake it well.
 
 STEVE:  The breadth of your knowledge is phenomenal.
 
-LEO:  It is, it’s good training for that.  I’m probably leaving that KFI show at the end of the month because I’ve been working seven days a week for three years, and it’s finally taken its toll.  My hair is falling out.
+LEO:  It is, itï¿½s good training for that.  Iï¿½m probably leaving that KFI show at the end of the month because Iï¿½ve been working seven days a week for three years, and itï¿½s finally taken its toll.  My hair is falling out.
 
-STEVE:  Your family’s forgot – well, I think that...
+STEVE:  Your familyï¿½s forgot ï¿½ well, I think that...
 
 LEO:  Family?  What family?
 
 STEVE:  The birthday you may have recently had might be responsible for some of that hair loss, too, Leo.
 
-LEO:  And it’s hard to choose any one of the many projects I have to let go.  But because the radio show consumes both Saturday and Sunday, it really eats my weekends.  I think that’s probably the one that’s going to go.  And that’s the thing, you know what, that’s the thing that will suffer is that forced training every week on 20 or 30 topics is great.  It keeps my mind going.  If I seem dumber next year, you’ll know why.
+LEO:  And itï¿½s hard to choose any one of the many projects I have to let go.  But because the radio show consumes both Saturday and Sunday, it really eats my weekends.  I think thatï¿½s probably the one thatï¿½s going to go.  And thatï¿½s the thing, you know what, thatï¿½s the thing that will suffer is that forced training every week on 20 or 30 topics is great.  It keeps my mind going.  If I seem dumber next year, youï¿½ll know why.
 
-So this week we’re going to talk about something I think is very important:  Internet anonymity.
+So this week weï¿½re going to talk about something I think is very important:  Internet anonymity.
 
-STEVE:  There’s been a lot of interest from people posting their own questions on the Security Now! page at GRC.  For example, people want to have a presentation about this network called TOR, which stands for The Onion Router, which is an anonymity-enhancing network.  And so I’ve begun to do a lot of research onto the specifics of that so we could talk about it.
+STEVE:  Thereï¿½s been a lot of interest from people posting their own questions on the Security Now! page at GRC.  For example, people want to have a presentation about this network called TOR, which stands for The Onion Router, which is an anonymity-enhancing network.  And so Iï¿½ve begun to do a lot of research onto the specifics of that so we could talk about it.
 
-But in getting involved in this, I realized that there’s a social issue, like a moral and ethical issue that sort of comes up when you talk about, well, when you talk about any powerful technology.  And the Internet and the anonymity that it provides is a powerful technology.  Famously, Einstein was very concerned about the uses to which his contribution to the development of the atom bomb would be put.  And I think, as I remember, later in life he became really sort of a peace nut, really worried that this armament he had created was so powerful and so potentially susceptible to misuse and abuse that he partially regretted his role in that.
+But in getting involved in this, I realized that thereï¿½s a social issue, like a moral and ethical issue that sort of comes up when you talk about, well, when you talk about any powerful technology.  And the Internet and the anonymity that it provides is a powerful technology.  Famously, Einstein was very concerned about the uses to which his contribution to the development of the atom bomb would be put.  And I think, as I remember, later in life he became really sort of a peace nut, really worried that this armament he had created was so powerful and so potentially susceptible to misuse and abuse that he partially regretted his role in that.
 
-LEO:  It’s always a mixed bag.  I think if you accept the notion that there are times when anonymity is important, if you’re a whistle-blower, if you are in a repressive regime and you need to fight against it, there are lots of reasons that anonymity would be important.  I’ve had this conversation with Phil Zimmerman, the guy who created PGP, and that’s what he says.  He says, unfortunately you don’t get to choose.  You either allow anonymity or not.  And there are pluses and minuses to both, I guess.
+LEO:  Itï¿½s always a mixed bag.  I think if you accept the notion that there are times when anonymity is important, if youï¿½re a whistle-blower, if you are in a repressive regime and you need to fight against it, there are lots of reasons that anonymity would be important.  Iï¿½ve had this conversation with Phil Zimmerman, the guy who created PGP, and thatï¿½s what he says.  He says, unfortunately you donï¿½t get to choose.  You either allow anonymity or not.  And there are pluses and minuses to both, I guess.
 
-STEVE:  Well, for example, it’s certainly arguable that you cannot have free speech without anonymity.  Because people will simply be...
+STEVE:  Well, for example, itï¿½s certainly arguable that you cannot have free speech without anonymity.  Because people will simply be...
 
 LEO:  Intimidated.
 
-STEVE:  They will be less – yes, intimated, exactly, and less willing to speak freely if they know that there are consequences to what they could say.  I have to say, Leo, I have been self-conscious sending some political email, like post 9/11, knowing that the United States government has become much more aggressive about scanning email.  When I use hot terms and keywords and things, I find myself thinking, literally, my behavior is modified because I don’t want a false-positive.  I’m no terrorist.  I’m a patriot and all that.  But still it’s just like you just get a little twitchy when you think that what you’re saying could be triggering some automated system somewhere.
+STEVE:  They will be less ï¿½ yes, intimated, exactly, and less willing to speak freely if they know that there are consequences to what they could say.  I have to say, Leo, I have been self-conscious sending some political email, like post 9/11, knowing that the United States government has become much more aggressive about scanning email.  When I use hot terms and keywords and things, I find myself thinking, literally, my behavior is modified because I donï¿½t want a false-positive.  Iï¿½m no terrorist.  Iï¿½m a patriot and all that.  But still itï¿½s just like you just get a little twitchy when you think that what youï¿½re saying could be triggering some automated system somewhere.
 
-LEO:  That’s why I use PGP.  One of these days we’re going to get you using it because that’s the point.  But it also raises the specter of terrorists themselves using encryption.
+LEO:  Thatï¿½s why I use PGP.  One of these days weï¿½re goingï¿½to get you using it because thatï¿½s the point.  But itï¿½also raises the specter of terrorists themselves usingï¿½encryption.
 
-STEVE:  Well, yes.  And in fact, you know, sort of on the issue of the benefit of it, GRC maintains newsgroups.  And we don’t require anyone to authenticate themselves in any way.  So most of the people there use handles, typical Internet handles, some random combination of words and letters and things that identify them.  And that’s the only way they’re identified.
+STEVE:  Well, yes.  And in fact, you know, sort of on the issue of the benefit of it, GRC maintains newsgroups.  And we donï¿½t require anyone to authenticate themselves in any way.  So most of the people there use handles, typical Internet handles, some random combination of words and letters and things that identify them.  And thatï¿½s the only way theyï¿½re identified.
 
-Now, we implemented the technology to essentially create a hash of their log-in, which is not in any way associated to their name or any other information, but it’s a unique token which cannot be spoofed.  And so the idea is that posters at GRC have a handle which is anonymous, but they also have a tag which every posting they make is stamped with that tag, which is just – it’s literally – it’s the result of a cryptographic hash.  And what it means is that nobody is able to impersonate somebody else, even though everyone is able to remain anonymous.
+Now, we implemented the technology to essentially create a hash of their log-in, which is not in any way associated to their name or any other information, but itï¿½s a unique token which cannot be spoofed.  And so the idea is that posters at GRC have a handle which is anonymous, but they also have a tag which every posting they make is stamped with that tag, which is just ï¿½ itï¿½s literally ï¿½ itï¿½s the result of a cryptographic hash.  And what it means is that nobody is able to impersonate somebody else, even though everyone is able to remain anonymous.
 
-And actually the other cool thing is that this allows people to securely delete their own postings if something happens and they regret what they posted, they were upset at the time.  It’s been a traditional problem with newsgroups is that you either could not delete, or anyone could delete, in which case you have specious deleters who are deleting other people’s postings.  So we didn’t want that.  But we also wanted people to be able to amend their own postings.  And so this allows them to do that.  But the point is that I’m really an advocate of allowing people to be anonymous if that’s what they want because I think it gets the truth.  I really think people feel much more free to say what they really think if they’re anonymous.
+And actually the other cool thing is that this allows people to securely delete their own postings if something happens and they regret what they posted, they were upset at the time.  Itï¿½s been a traditional problem with newsgroups is that you either could not delete, or anyone could delete, in which case you have specious deleters who are deleting other peopleï¿½s postings.  So we didnï¿½t want that.  But we also wanted people to be able to amend their own postings.  And so this allows them to do that.  But the point is that Iï¿½m really an advocate of allowing people to be anonymous if thatï¿½s what they want because I think it gets the truth.  I really think people feel much more free to say what they really think if theyï¿½re anonymous.
 
 Now, even in my own little microcosm, speaking about this just for a minute, there has been a downside to that.  Back when I was being very vocal about raw sockets on Windows XP and created a huge furor in the industry, the newsgroups drew a lot of attention from what you could only call trolls, I mean, people who were trolling the group...
 
 LEO:  Awful, yeah.
 
-STEVE:  It was really awful.  Now, I refused to delete those postings.  I have, you know, it’s my server, my bandwidth, and my storage.  And people there were saying, Steve, why are you allowing these people to badmouth you like this and just leave this content on the server?  And my feeling was, well, that’s their opinion.  And who am I to say that they don’t have as much right to post something negative about Steve Gibson and GRC as somebody else has to post something positive.  I ended up being vindicated in that issue with Microsoft and raw sockets, which are now removed from XP after Service Pack 2.  But it was a rough time.  And it was about me sticking to the principle that people could post whatever they wanted to and do so anonymously.  Arguably, if these people had to be identified, then they would probably not have posted that way.  One of the things that we see on the Internet is much more outrageous behavior than you normally see in the physical world, where people are inherently more accountable for their actions.
+STEVE:  It was really awful.  Now, I refused to delete those postings.  I have, you know, itï¿½s my server, my bandwidth, and my storage.  And people there were saying, Steve, why are you allowing these people to badmouth you like this and just leave this content on the server?  And my feeling was, well, thatï¿½s their opinion.  And who am I to say that they donï¿½t have as much right to post something negative about Steve Gibson and GRC as somebody else has to post something positive.  I ended up being vindicated in that issue with Microsoft and raw sockets, which are now removed from XP after Service Pack 2.  But it was a rough time.  And it was about me sticking to the principle that people could post whatever they wanted to and do so anonymously.  Arguably, if these people had to be identified, then they would probably not have posted that way.  One of the things that we see on the Internet is much more outrageous behavior than you normally see in the physical world, where people are inherently more accountable for their actions.
 
-LEO:  Oh, yeah, BuggyBear2937 is very easily annoyed.  And lets us all know it.  I’m making that up, of course.
+LEO:  Oh, yeah, BuggyBear2937 is very easily annoyed.  And lets us all know it.  Iï¿½m making that up, of course.
 
 STEVE:  Oh, of course.
 
-LEO:  But that’s the real problem is that it doesn’t feel like a face-to-face.  You are somewhat anonymous.  And on sites where people use real names, you don’t see that kind of problem.  It’s just tough because there are pros and cons to both sides.
+LEO:  But thatï¿½s the real problem is that it doesnï¿½t feel like a face-to-face.  You are somewhat anonymous.  And on sites where people use real names, you donï¿½t see that kind of problem.  Itï¿½s just tough because there are pros and cons to both sides.
 
 STEVE:  I have to say, too, that if somebody uses an anonymous handle over time, and we have the ability to prevent that from being spoofed, as we do, what ends up developing over time is a trust in that person.
 
-LEO:  That’s true, that’s true.
+LEO:  Thatï¿½s true, thatï¿½s true.
 
-STEVE:  I mean, that is, in that anonymous handle.  That is, I’ll never know who many of the valued contributors on our newsgroups are.
+STEVE:  I mean, that is, in that anonymous handle.  That is, Iï¿½ll never know who many of the valued contributors on our newsgroups are.
 
-LEO:  But they have identity.  They’ve built an identity, even though it doesn’t match their real name.
-
-STEVE:  Exactly.
-
-LEO:  Now, and that’s why – and maybe this is the answer.  That’s why a lot of message boards have an Ignore feature.  So if, conversely, somebody proves their identity to be a complete butthead, you just press the Ignore button, and you don’t see their stuff anymore.  Maybe that’s the kind of solution we need.  Instead of saying, no, you’ve got to use your real name, we need maybe to do it some other way, more innovatively.
-
-STEVE:  And of course in the press there’s this whole notion – and even in law enforcement there is this notion of an anonymous informant.  The famous Deep Throat, who was participating in the whole Watergate issue and informing Bob Woodward of what was going on.  This was a person who over time built up a relationship with this person in the press and so – and the same thing, of course, happens in law enforcement where somebody will have a confidential informant that over time has proven their integrity, may always need for whatever reason to remain anonymous, but feels that by providing certain information, more better is being done than harm.  And that’s sort of the way that decision gets made.
-
-So the other thing that’s interesting is, for example, there’s a network called Freenet which is really a perfect example of very powerful technology where you’re taking the good with the bad.  Freenet allows the creation of private encrypted networks for storage of content.  Now, that’s something very different, for example, than other anonymizing services like the famous Anonymizer.com that’s been around for a decade.  They will allow you to anonymously acquire information, that is, for example, anonymously surfing the Internet so that you go to sites that have no idea who you are.
-
-Now, as we’re going to discuss next week, it turns out that unless this is done with much greater care than most people assume, that level of anonymity can be penetrated.  So it turns out that really true anonymity on the ‘Net is much harder to get than is normally believed.  But Freenet is a different approach.  They’re very pro anonymity, pro privacy, pro free speech.  So their system basically allocates a chunk of hard drive space from everyone participating in the network.  And the content of Freenet is encrypted and stored in this big distributed database made up of all these different computers.  Well, it’s valuable certainly for people to be able to post and share their own content.  Whereas, for example, as I said, with Anonymizer you’re only browsing websites, and they specifically don’t allow you to create content.  In Freenet you can.
-
-But it does mean that, as a participant in this network, you have no idea how your hard drive is being used.  It could literally be, sure, it could be uplifting free speech articles about what’s really going on with a government or actions somewhere in the world.  But at the same time it could be really distasteful child pornography or something.  And the point is, you are enabling that to be stored on your computer by availing yourself of this system.  So it’s a real mixed bag.
-
-And the other issue is one of copyright.  And it’s interesting how copyright comes into this because the enforcement of copyright, that is, the actual enforcement of it, requires monitoring communications.  That’s how copyright is enforced is you’re monitoring communication.  But free speech, as we have said, cannot be guaranteed in an environment where there is monitored communications.  So just logically that demonstrates that you cannot simultaneously have both freedom of speech and the enforcement of copyright.
-
-LEO:  You’re right.  QED, QED.
-
-STEVE:  Exactly.  And so many people have said, well, what if Freenet is used for sharing of copyrighted movies and files and music and content?  And it’s like, well, yes, that’s a violation of copyright law.  And so it’s against the law for the system to be used in that way.  But a system which robustly enforces freedom of speech – and we’ve already seen that freedom of speech requires anonymity, otherwise speech is really not unencumbered and not free, so you’re going to have anonymity.  And inherently that means that the anonymity creates free speech, and free speech means that copyright cannot be enforced.
-
-So I guess the real point I wanted to make was that we’re talking about potentially very powerful technologies which can be abused.  As you were saying earlier, Leo, there is, for example, an issue with terrorists using networks like this to securely communicate among themselves.  It’s absolutely possible.
-
-LEO:  Of course when you’re just encrypting the email, you can still tell who’s sending a message to whom; right?
-
-STEVE:  So, for example, with PGP there is the knowledge that we’ve got endpoints that are communicating.  And one of the differences with a system like Freenet, which is a rich network of interconnected systems which are encrypted, is that there isn’t any way to demonstrate a point-to-point connection.  Data can be deposited in this distributed, shared database, and it can be retrieved.
-
-LEO:  So if I use PGP to encrypt email to you, everybody knows, who’s snooping on us, anyway, that you and I are having a conversation.
+LEO:  But they have identity.  Theyï¿½ve built an identity, even though it doesnï¿½t match their real name.
 
 STEVE:  Exactly.
 
-LEO:  If I were to do it over Freenet, nobody’d know who I was talking to.
+LEO:  Now, and thatï¿½s why ï¿½ and maybe this is the answer.  Thatï¿½s why a lot of message boards have an Ignore feature.  So if, conversely, somebody proves their identity to be a complete butthead, you just press the Ignore button, and you donï¿½t see their stuff anymore.  Maybe thatï¿½s the kind of solution we need.  Instead of saying, no, youï¿½ve got to use your real name, we need maybe to do it some other way, moreï¿½innovatively.
 
-STEVE:  Exactly.  And in fact, Freenet, I think it’s currently at 0.7 is the current release.  They have just added some technology to allow standard Internet-style bulletin board communications where people are able to have threaded discussions with complete assured anonymity and an inherent database, which is what any kind of a discussion board requires, and absolute encryption, and no ability to trace who sees what.
+STEVE:  And of course in the press thereï¿½s this whole notionï¿½ï¿½ and even in law enforcement there is this notion of an anonymous informant.  The famous Deep Throat, who was participating in the whole Watergate issue and informing Bob Woodward of what was going on.  This was a person who over time built up a relationship with this person in the press and so ï¿½ and the same thing, of course, happens in law enforcement where somebody will have a confidential informant that over time has proven their integrity, may always need for whatever reason to remain anonymous, but feels that by providing certain information, more better is being done than harm.  And thatï¿½s sort of the way that decision gets made.
 
-LEO:  Do you want to talk a little bit about how Freenet works?
+So the other thing thatï¿½s interesting is, for example, thereï¿½s a network called Freenet which is really a perfect example of very powerful technology where youï¿½re taking the good with the bad.  Freenet allows the creation of private encrypted networks for storage of content.  Now, thatï¿½s something very different, for example, than other anonymizing services like the famous Anonymizer.com thatï¿½s been around for a decade.  They will allow you to anonymously acquire information, that is, for example, anonymously surfing the Internet so that you go to sites that have no idea who you are.
 
-STEVE:  I’m going to get into the technology of this stuff  next week because it is complicated.  It turns out that, for example, Anonymizer, that is basically essentially just a proxy, Anonymizer is – well, any simple anonymizing proxy has the problem that, if communications is monitored upstream and downstream of it, that is, on either side of it, it’s possible to associate the traffic pattern coming and going and determine the IP of someone visiting a given website.  And that’s something that people don’t typically appreciate, the idea being that packet sizes vary, packet timing varies.  And so if somebody – for example, the government – had the ability of monitoring the network traffic to and from Anonymizer, they would be able to see packets coming into Anonymizer and leaving, and basically penetrate that anonymizing proxy effect because the traffic would allow them to associate connections through the proxy and basically punch a hole in the entire thing.
+Now, as weï¿½re going to discuss next week, it turns out that unless this is done with much greater care than most people assume, that level of anonymity can be penetrated.  So it turns out that really true anonymity on the ï¿½Net is much harder to get than is normally believed.  But Freenet is a different approach.  Theyï¿½re very pro anonymity, pro privacy, pro free speech.  So their system basically allocates a chunk of hard drive space from everyone participating in the network.  And the content of Freenet is encrypted and stored in this big distributed database made up of all these different computers.  Well, itï¿½s valuable certainly for people to be able to post and share their own content.  Whereas, for example, as I said, with Anonymizer youï¿½re only browsing websites, and they specifically donï¿½t allow you to create content.  In Freenet you can.
 
-So it turns out that obtaining this level of real anonymity is substantially more difficult than most people assume.  It’s just not a matter of running through a proxy which is going to reissue your HTTP communications from its IP rather than from yours.  In fact, the TOR project says TOR only minimally hides such correlations between incoming and outgoing traffic.  It says even TOR, which is a multi-hop, multilayered system, it says an attacker watching patterns of traffic at the initiator and at the responder will be able to confirm the correspondence with high probability.
+But it does mean that, as a participant in this network, you have no idea how your hard drive is being used.  It could literally be, sure, it could be uplifting free speech articles about whatï¿½s really going on with a government or actions somewhere in the world.  But at the same time it could be really distasteful child pornography or something.  And the point is, you are enabling that to be stored on your computer by availing yourself of this system.  So itï¿½s a real mixed bag.
 
-LEO:  The correspondence between you and me, let’s say.
+And the other issue is one of copyright.  And itï¿½s interesting how copyright comes into this because the enforcement of copyright, that is, the actual enforcement of it, requires monitoring communications.  Thatï¿½s how copyright is enforced is youï¿½re monitoring communication.  But free speech, as we have said, cannot be guaranteed in an environment where there is monitored communications.  So just logically that demonstrates that you cannot simultaneously have both freedom of speech and the enforcement of copyright.
+
+LEO:  Youï¿½re right.  QED, QED.
+
+STEVE:  Exactly.  And so many people have said, well, what if Freenet is used for sharing of copyrighted movies and files and music and content?  And itï¿½s like, well, yes, thatï¿½s a violation of copyright law.  And so itï¿½s against the law for the system to be used in that way.  But a system which robustly enforces freedom of speech ï¿½ and weï¿½ve already seen that freedom of speech requires anonymity, otherwise speech is really not unencumbered and not free, so youï¿½re going to have anonymity.  And inherently that means that the anonymity creates free speech, and free speech means that copyright cannot be enforced.
+
+So I guess the real point I wanted to make was that weï¿½re talking about potentially very powerful technologies which can be abused.  As you were saying earlier, Leo, there is, for example, an issue with terrorists using networks like this to securely communicate among themselves.  Itï¿½s absolutely possible.
+
+LEO:  Of course when youï¿½re just encrypting the email, you can still tell whoï¿½s sending a message to whom; right?
+
+STEVE:  So, for example, with PGP there is the knowledge that weï¿½ve got endpoints that are communicating.  And one of the differences with a system like Freenet, which is a rich network of interconnected systems which are encrypted, is that there isnï¿½t any way to demonstrate a point-to-point connection.  Data can be deposited in this distributed, shared database, and it can be retrieved.
+
+LEO:  So if I use PGP to encrypt email to you, everybody knows, whoï¿½s snooping on us, anyway, that you and I are having a conversation.
+
+STEVE:  Exactly.
+
+LEO:  If I were to do it over Freenet, nobodyï¿½d know who I was talking to.
+
+STEVE:  Exactly.  And in fact, Freenet, I think itï¿½s currently at 0.7 is the current release.  They have just added some technology to allow standard Internet-style bulletin board communications where people are able to have threaded discussions with complete assured anonymity and an inherent database, which is what any kind of a discussion board requires, and absolute encryption, and no ability to trace who sees what.
+
+LEO:  Do you want to talk a little bit about how Freenetï¿½works?
+
+STEVE:  Iï¿½m going to get into the technology of this stuff  next week because it is complicated.  It turns out that, for example, Anonymizer, that is basically essentially just a proxy, Anonymizer is ï¿½ well, any simple anonymizing proxy has the problem that, if communications is monitored upstream and downstream of it, that is, on either side of it, itï¿½s possible to associate the traffic pattern coming and going and determine the IP of someone visiting a given website.  And thatï¿½s something that people donï¿½t typically appreciate, the idea being that packet sizes vary, packet timing varies.  And so if somebody ï¿½ for example, the government ï¿½ had the ability of monitoring the network traffic to and from Anonymizer, they would be able to see packets coming into Anonymizer and leaving, and basically penetrate that anonymizing proxy effect because the traffic would allow them to associate connections through the proxy and basically punch a hole in the entire thing.
+
+So it turns out that obtaining this level of real anonymity is substantially more difficult than most people assume.  Itï¿½s just not a matter of running through a proxy which is going to reissue your HTTP communications from its IP rather than from yours.  In fact, the TOR project says TOR only minimally hides such correlations between incoming and outgoing traffic.  It says even TOR, which is a multi-hop, multilayered system, it says an attacker watching patterns of traffic at the initiator and at the responder will be able to confirm the correspondence with high probability.
+
+LEO:  The correspondence between you and me, letï¿½s say.
 
 STEVE:  Well, yes, for example, if we were connecting through there.  But normally TOR is used for robust anonymous surfing.  It turns out, though, that it is not that robust.
 
-LEO:  Ain’t so anonymous either, apparently.
+LEO:  Ainï¿½t so anonymous either, apparently.
 
-STEVE:  Exactly.  And that’s the problem is they had to – and they deliberately, I mean, they understand the problem.  The only way to really enhance this is to introduce much greater latency, that is, for the routers in the TOR network to hold the packets for a long period of time and then release them.  Well, now, this is the kind of thing that you could do, for example, if you wanted to anonymously download files, where you’re not trying to do real-time activities.  But things like VoIP obviously require real-time responses.  And to practically surf the web, to go from website to website clicking on links and downloading content, there’s a tremendous amount of real-time interaction between your browser and the remote server as all of the various components of a web page are assembled.
+STEVE:  Exactly.  And thatï¿½s the problem is they had to ï¿½ and they deliberately, I mean, they understand the problem.  The only way to really enhance this is to introduce much greater latency, that is, for the routers in the TOR network to hold the packets for a long period of time and then release them.  Well, now, this is the kind of thing that you could do, for example, if you wanted to anonymously download files, where youï¿½re not trying to do real-time activities.  But things like VoIP obviously require real-time responses.  And to practically surf the web, to go from website to website clicking on links and downloading content, thereï¿½s a tremendous amount of real-time interaction between your browser and the remote server as all of the various components of a web page are assembled.
 
-So this notion of real-time anonymity turns out to be specious.  It is almost impossible to get that.  One way you can is if the anonymizer also is a big cache.  Because if it’s caching, then many of the things you need, the assets and resources and even the pages you go to, may already be in the cache.  For example, people who use Google are probably aware that sometimes you’ll click on a link in Google that is a link that Google has returned as a result of a search.  And the site’ll be down or offline or really slow, and you go okay, so you hit Stop on your browser, and instead you use Google’s cached copy.  So in that scenario you’re never making your request outside of Google.  It’s going to Google, and you’re taking advantage of Google’s massive cache of the entire Internet in order to prevent actually going out to that server and getting the content.  So there’s an example where no one could detect, if they weren’t looking inside Google, no one could detect from the outside, over for example an HTTPS, an SSL-secured connection to Google’s cache, what it was you were looking at because Google would be the central repository of all these external sites.  But that’s exactly analogous to what Freenet does because Freenet creates this encrypted, secured database of discussion groups and massive amounts of content which is completely opaque from the outside.  And due to the way it’s set up, no one is able to determine what it is you’re putting into this database and what it is you’re pulling out.
+So this notion of real-time anonymity turns out to be specious.  It is almost impossible to get that.  One way you can is if the anonymizer also is a big cache.  Because if itï¿½s caching, then many of the things you need, the assets and resources and even the pages you go to, may already be in the cache.  For example, people who use Google are probably aware that sometimes youï¿½ll click on a link in Google that is a link that Google has returned as a result of a search.  And the siteï¿½ll be down or offline or really slow, and you go okay, so you hit Stop on your browser, and instead you use Googleï¿½s cached copy.  So in that scenario youï¿½re never making your request outside of Google.  Itï¿½s going to Google, and youï¿½re taking advantage of Googleï¿½s massive cache of the entire Internet in order to prevent actually going out to that server and getting the content.  So thereï¿½s an example where no one could detect, if they werenï¿½t looking inside Google, no one could detect from the outside, over for example an HTTPS, an SSL-secured connection to Googleï¿½s cache, what it was you were looking at because Google would be the central repository of all these external sites.  But thatï¿½s exactly analogous to what Freenet does because Freenet creates this encrypted, secured database of discussion groups and massive amounts of content which is completely opaque from the outside.  And due to the way itï¿½s set up, no one is able to determine what it is youï¿½re putting into this database and what it is youï¿½re pulling out.
 
-LEO:  So we don’t want to get into details on how this works.
+LEO:  So we donï¿½t want to get into details on how thisï¿½works.
 
-STEVE:  I want to do that next week because it’s really interesting what the TOR guys did in order to create really robust security with their network.
+STEVE:  I want to do that next week because itï¿½s really interesting what the TOR guys did in order to create really robust security with their network.
 
-LEO:  So there’s Freenet, there’s TOR, and then of course there’s local encryption, which doesn’t eliminate the locale of where it’s coming from or where it’s going, but at least encrypts the content, like PGP or the new privacy guard, GPG, which I use.
+LEO:  So thereï¿½s Freenet, thereï¿½s TOR, and then of course thereï¿½s local encryption, which doesnï¿½t eliminate the locale of where itï¿½s coming from or where itï¿½s going, but at least encrypts the content, like PGP or the new privacy guard, GPG, which I use.
 
-STEVE:  Right.  And I’m glad you brought that up because the point is, what’s significant about that is that it’s not anonymous.
+STEVE:  Right.  And Iï¿½m glad you brought that up because theï¿½point is, whatï¿½s significant about that is that itï¿½s notï¿½anonymous.
 
-LEO:  Right.  In the sense that you know who it is, yes, right.
+LEO:  Right.  In the sense that you know who it is, yes,ï¿½right.
 
-STEVE:  Exactly.  The content may be opaque and securely encrypted, but there’s no anonymity provided by the people who are communicating at the endpoints.  And very often that’s something that people really need or want for various purposes.  And again, the problem is there are many, many good reasons and beneficial reasons for having and enforcing and allowing anonymity on the ‘Net.  The flipside is, as with any really powerful technology, it can be used for nefarious purposes, as well.
+STEVE:  Exactly.  The content may be opaque and securely encrypted, but thereï¿½s no anonymity provided by the people who are communicating at the endpoints.  And very often thatï¿½s something that people really need or want for various purposes.  And again, the problem is there are many, many good reasons and beneficial reasons for having and enforcing and allowing anonymity on the ï¿½Net.  The flipside is, as with any really powerful technology, it can be used for nefarious purposes, as well.
 
-LEO:  There were for many years, and I don’t know if they’re still around, anonymous remailers, where you would use kind of – similar to a TOR or Anonymizer.  You’d use multiproxies, and it would eventually hide who sent the email and where it was going.  Unfortunately, I have to say, at least some of these have been subpoenaed by governmental agencies, and I guess it wasn’t hidden enough.
+LEO:  There were for many years, and I donï¿½t know if theyï¿½re still around, anonymous remailers, where you would use kind of ï¿½ similar to a TOR or Anonymizer.  Youï¿½d use multiproxies, and it would eventually hide who sent the email and where it was going.  Unfortunately, I have to say, at least some of these have been subpoenaed by governmental agencies, and I guess it wasnï¿½t hidden enough.
 
-STEVE:  Yes, in fact there was a case there, something called the Java Anonymous Proxy Project, which spreads anonymous proxies around the globe.  It turns out that the state of Germany did not want these anonymous proxies functioning within their domain, literally, I mean their dominion, and generated legal action against these anonymizers.  They legally required that a backdoor be installed in order for them to have access to what was going on.  I mean, this kind of anonymity makes governments very uncomfortable.
+STEVE:  Yes, in fact there was a case there, something called the Java Anonymous Proxy Project, which spreads anonymous proxies around the globe.  It turns out that the state of Germany did not want these anonymous proxies functioning within their domain, literally, I mean their dominion, and generated legal action against these anonymizers.  They legally required that a backdoor be installed in order for them to have access to what was goingï¿½on.  I mean, this kind of anonymity makes governments very uncomfortable.
 
-LEO:  And others, like the Church of Scientology, who compromised the Penet mailer.  It’s a fascinating subject.  And we’ve just started, basically, as you have in the past, with kind of a roundup of the high-level issues.  We’ll talk about the technologies in the next episodes.
+LEO:  And others, like the Church of Scientology, who compromised the Penet mailer.  Itï¿½s a fascinating subject.  And weï¿½ve just started, basically, as you have in the past, with kind of a roundup of the high-level issues.  Weï¿½ll talk about the technologies in the next episodes.
 
-STEVE:  You know, we could have ignored the whole question of the value and benefit and importance and responsibility that comes with anonymity on the Internet because it’s very significant because the Internet is such a powerful opportunity for giving people the freedom of speech and freedom of anonymity.  But with that comes some responsibility.  And there’s a dark side, which I didn’t want to not talk about that.
+STEVE:  You know, we could have ignored the whole question of the value and benefit and importance and responsibility that comes with anonymity on the Internet because itï¿½s very significant because the Internet is such a powerful opportunity for giving people the freedom of speech and freedom of anonymity.  But with that comes some responsibility.  And thereï¿½s a dark side, which I didnï¿½t want to not talk about that.
 
-LEO:  You can’t ignore it.  Although I am certainly a believer ultimately in free speech, and I think you’ve got to do it, despite the negatives, the downside.  The alternative of completely no anonymity at all is just far worse.
+LEO:  You canï¿½t ignore it.  Although I am certainly a believer ultimately in free speech, and I think youï¿½ve gotï¿½to do it, despite the negatives, the downside.  The alternative of completely no anonymity at all is just farï¿½worse.
 
-STEVE:  And it seems to be – I don’t mean to impose democratic politics on the world.  Certainly the...
+STEVE:  And it seems to be ï¿½ I donï¿½t mean to impose democratic politics on the world.  Certainly the...
 
-LEO:  Lowercase “d,” by the way, not uppercase “D” when you say “democratic.”
+LEO:  Lowercase ï¿½d,ï¿½ by the way, not uppercase ï¿½Dï¿½ when you say ï¿½democratic.ï¿½
 
-STEVE:  Right, exactly, lowercase “d.”  Certainly the rulers of China have a different philosophy about the way they think a state should operate.  But to the degree that a democracy is a valuable thing for people to have, we understand that that requires that the citizens of the democracy be informed of what the government is doing and that there be good communications in order for this state to be managed.  And governments have historically fought that kind of really good communication.  Governments would like to have more control.  And it’s the lack of control that makes the system work in the long term.
+STEVE:  Right, exactly, lowercase ï¿½d.ï¿½  Certainly the rulers of China have a different philosophy about the way they think a state should operate.  But to the degree that a democracy is a valuable thing for people to have, we understand that that requires that the citizens of the democracy be informed of what the government is doing and that there be good communications in order for this state to be managed.  And governments have historically fought that kind of really good communication.  Governments would like to have more control.  And itï¿½s the lack of control that makes the system work in the long term.
 
-LEO:  Steve, as usual, sometimes technology verges on politics.  And this is a case where it does, and I think you’ve done a great job of synopsizing both sides.  Next week the ins and outs, the technology behind Freenet and...
+LEO:  Steve, as usual, sometimes technology verges on politics.  And this is a case where it does, and I think youï¿½ve done a great job of synopsizing both sides.  Next week the ins and outs, the technology behind Freenet and...
 
-STEVE:  And why anonymity, why and exactly how technically obtaining real anonymity is a much more difficult thing to do on the ‘Net than most people are aware.
+STEVE:  And why anonymity, why and exactly how technically obtaining real anonymity is a much more difficult thing to do on the ï¿½Net than most people are aware.
 
-LEO:  It’s hard to do.  Thank you, Steve Gibson.  Of course we want to remind everybody that Steve’s site is the home, not only to this podcast, GRC.com, and the 16KB versions and the transcripts, but also to SpinRite, which is his daily bread.  And if you ever have trouble with your hard drive, there’s no question at all, SpinRite is a must.  It’s in my kit.  When I go around and work on people’s computers, it’s one of the first programs I’ll run.  It’s the ultimate disk recovery and maintenance utility, and it’s highly recommended.
+LEO:  Itï¿½s hard to do.  Thank you, Steve Gibson.  Of course we want to remind everybody that Steveï¿½s site is the home, not only to this podcast, GRC.com, and the 16KB versions andï¿½the transcripts, but also to SpinRite, which is his daily bread.  And if you ever have trouble with your hard drive, thereï¿½s no question at all, SpinRite is a must.  Itï¿½sï¿½in my kit.  When I go around and work on peopleï¿½s computers, itï¿½s one of the first programs Iï¿½ll run.  Itï¿½s the ultimate disk recovery and maintenance utility, and itï¿½s highly recommended.
 
 STEVE:  I got a neat piece of mail from someone who recently purchased a Dell Latitude notebook.  He said:  I purchased a brand new Dell Latitude notebook a couple of weeks ago and was very happy with the core duo, gig of RAM machine.  He said:  It started to boot really slowly, and programs would crash every so often.  So I ran SpinRite, and what do you know, it started finding problems about halfway through the scan.  So I emailed Dell and told them that SpinRite was used on the drive, and that I would require a new one.  With no questions asked, they sent out a brand new hard drive the next day with prepaid return shipping.
 
-LEO:  That’s great.  That’s great.
+LEO:  Thatï¿½s great.  Thatï¿½s great.
 
-STEVE:  He said:  The respect from Dell to the SpinRite product was phenomenal.  They didn’t even want me to run any other software to confirm the diagnosis.
+STEVE:  He said:  The respect from Dell to the SpinRite product was phenomenal.  They didnï¿½t even want me to run any other software to confirm the diagnosis.
 
 LEO:  They do.
 
 STEVE:  He said:  Thanks, Steve, you saved a brand new Dell from an untimely death.
 
-LEO:  Isn’t that great.
+LEO:  Isnï¿½t that great.
 
-STEVE:  That was really neat.  And of course, you know, Dell can’t control how the UPS driver may have been drop-kicking this guy’s poor laptop...
+STEVE:  That was really neat.  And of course, you know, Dell canï¿½t control how the UPS driver may have been drop-kicking this guyï¿½s poor laptop...
 
-LEO:  Well, don’t even blame UPS.  Sometimes the hard drives just come out of the factory bad.
+LEO:  Well, donï¿½t even blame UPS.  Sometimes the hard drives just come out of the factory bad.
 
-STEVE:  Exactly.  It could pass initial tests and just have an infant mortality problem.  But this guy ran SpinRite, it confirmed a problem, and Dell said, okay, that’s all we need to know.
+STEVE:  Exactly.  It could pass initial tests and just have an infant mortality problem.  But this guy ran SpinRite, it confirmed a problem, and Dell said, okay, thatï¿½s all we need to know.
 
-LEO:  I love it.  That’s kind of a joint plug, really, for  SpinRite and our sponsor.  I like it.  Very nicely done.
+LEO:  I love it.  Thatï¿½s kind of a joint plug, really, for  SpinRite and our sponsor.  I like it.  Very nicely done.
 
 STEVE:  True story.
 
-LEO:  I actually just bought a Dell laptop, an M1210, which is a dual core 2 with two gigs of RAM.  I loaded this sucker up.  Actually I was amazed because the price for really absolute top-of-the-line laptop was about $2,000.  And that’s so much less than it used to be.  In fact, we used to say the computer you want is always at least $2,500, and the dream computer’s like 3 or $4,000.
+LEO:  I actually just bought a Dell laptop, an M1210, which is a dual core 2 with two gigs of RAM.  I loaded this sucker up.  Actually I was amazed because the price for really absolute top-of-the-line laptop was about $2,000.  And thatï¿½s so much less than it used to be.  In fact, we used to say the computer you want is always at least $2,500, and the dream computerï¿½s like 3 or $4,000.
 
 STEVE:  It was always a moving target.
 
-LEO:  Yeah.  Core 2 duo, 2GHz processors, two gigs of RAM.  I got a 7200 RPM hard drive because I wanted to – this is going to be my Vista machine, so I really wanted to trick it out, knowing that Vista is going to be demanding.  They don’t have hybrid hard drives yet, unfortunately.  But everything else, I just loaded that sucker up.  I was very pleased.  If you want a link to that or to other Leo’s Picks, including the XPS that we bought for Call For Help, that you’ll find at TWiT.tv/dell.  That’s the Leo’s Picks page.  Dell does provide us with financial support for this podcast and a number of the other TWiT podcasts.  They’ve been a really great sponsor.  In fact, I think our contract runs out in the next couple of weeks, and I’m hoping that we can get them to come back.  But I do appreciate their support, and your support, too.  When you buy any Dell product by going through one of the links on the TWiT.tv/dell page, we get credit for it.  And so thanks to Dell for their support.
+LEO:  Yeah.  Core 2 duo, 2GHz processors, two gigs of RAM.  I got a 7200 RPM hard drive because I wanted to ï¿½ this is going to be my Vista machine, so I really wanted to trick it out, knowing that Vista is going to be demanding.  They donï¿½t have hybrid hard drives yet, unfortunately.  But everything else, I just loaded that sucker up.  I was very pleased.  If you want a link to that or to other Leoï¿½s Picks, including the XPS that we bought for Call For Help, that youï¿½ll find at TWiT.tv/dell.  Thatï¿½s the Leoï¿½s Picks page.  Dell does provide us with financial support for this podcast and a number of the other TWiT podcasts.  Theyï¿½ve been a really great sponsor.  In fact, I think our contract runs out in the next couple of weeks, and Iï¿½m hoping that we can get them to come back.  But I do appreciate their support, and your support, too.  When you buy any Dell product by going through one of the links on the TWiT.tv/dell page, we get credit for it.  And so thanks to Dell for their support.
 
-Oh, also want to mention Astaro because they have been here since practically day one.  I can’t remember exactly what episode they joined us on, but early on.  They’ve been big supporters of the show.
+Oh, also want to mention Astaro because they have been here since practically day one.  I canï¿½t remember exactly what episode they joined us on, but early on.  Theyï¿½ve been big supporters of the show.
 
 STEVE:  And they were our first sponsor.
 
-LEO:  They were our first sponsor.  They were the first sponsor on the TWiT network.  And they’ve decided to come back for another year.  And that’s – we love them.  And there’s good reason.  It’s an open-source, high-quality security gateway.  If you have a small or medium business, and you need superior protection from spam, from viruses, from hackers, you get a complete VPN, intrusion protection, content filtering, and of course an industry-strength firewall, all in a very easy to use, high-performance appliance.  I’ve got one, and I just love it.  It’s the Astaro Security Gateway.  Contact them, they’ll give you a free trial – www.astaro.com, or call 877-4AS-TARO.  You can schedule a free trial.  And home users, non-business users, can download the software version of ASG free for home use also.  Astaro.com.  Thanks to them.
+LEO:  They were our first sponsor.  They were the first sponsor on the TWiT network.  And theyï¿½ve decided to come back for another year.  And thatï¿½s ï¿½ we love them.  And thereï¿½s good reason.  Itï¿½s an open-source, high-quality security gateway.  If you have a small or medium business, and you need superior protection from spam, from viruses, from hackers, you get a complete VPN, intrusion protection, content filtering, and of course an industry-strength firewall, all in a very easy to use, high-performance appliance.  Iï¿½ve got one, and I just love it.  Itï¿½s the Astaro Security Gateway.  Contact them, theyï¿½ll give you a free trial ï¿½ www.astaro.com, or call 877-4AS-TARO.  You can schedule a free trial.  And home users, non-business users, can download the software version of ASG free for home use also.  Astaro.com.  Thanks to them.
 
-STEVE:  So next week is talking about the technical challenges of Internet anonymity.  I did mention last week that I would have a new piece of security-oriented freeware to announce.  Unfortunately, we’re recording this and next episode early.
+STEVE:  So next week is talking about the technical challenges of Internet anonymity.  I did mention last week that I would have a new piece of security-oriented freeware to announce.  Unfortunately, weï¿½re recording this and next episode early.
 
 LEO:  Ahead of time, yeah.
 
-STEVE:  Yes.  And I’ve got myself tangled up in some tricky details with it.  It’s going to end up being, I think, even cooler and more valuable than I originally expected; but it’s also turning out to be a lot more challenging.  So I’m going to delay the announcement until I actually have the thing running and bulletproof and tested.  So it’ll be a couple weeks, and then we’ll talk about what that is.
+STEVE:  Yes.  And Iï¿½ve got myself tangled up in some tricky details with it.  Itï¿½s going to end up being, I think, even cooler and more valuable than I originally expected; but itï¿½s also turning out to be a lot more challenging.  So Iï¿½m going to delay the announcement until I actually have the thing running and bulletproof and tested.  So itï¿½ll be a couple weeks, and then weï¿½ll talk about what that is.
 
-LEO:  No problem at all.  You’re in heaven, though, aren’t you, when you get to code on a new project.
+LEO:  No problem at all.  Youï¿½re in heaven, though, arenï¿½t you, when you get to code on a new project.
 
-STEVE:  Oh, finally, Leo, I’m back to writing some code.
+STEVE:  Oh, finally, Leo, Iï¿½m back to writing some code.
 
-LEO:  Does that make you feel good?  That’s neat, I can tell.  Are you running this in Assembly?
+LEO:  Does that make you feel good?  Thatï¿½s neat, I can tell.  Are you running this in Assembly?
 
 STEVE:  Of course.
 
-LEO:  Oh, Steve.  You’re so old-fashioned.
+LEO:  Oh, Steve.  Youï¿½re so old-fashioned.
 
-STEVE:  That’s my language.
+STEVE:  Thatï¿½s my language.
 
 LEO:  I love it.
 
-STEVE:  Well, it turns out that it’s exactly the right language for this application because I’m dealing with, down in the registers of Intel processors, dealing with literally setting bits on and off and protected mode and privileged instructions and that kind of stuff.  So it’s a...
+STEVE:  Well, it turns out that itï¿½s exactly the right language for this application because Iï¿½m dealing with, down in the registers of Intel processors, dealing with literally setting bits on and off and protected mode and privileged instructions and that kind of stuff.  So itï¿½s a...
 
 LEO:  Will this work on Vista as well as XP?
 
 STEVE:  Yes.
 
-LEO:  Really.  How do you know that?  Did you test it in Vista?
+LEO:  Really.  How do you know that?  Did you test it inï¿½Vista?
 
-STEVE:  Yeah.  I’ve got it running on Vista.  In fact, I have a new MacBook with the Intel core 2 duo because I needed some more recent chips in order to see it running there.  And Leo, I’ve got to tell you, I’m going to disabuse you of this notion that Vista requires a lot of power.  I am really happily running it on my little HP TC1100 notebook, I mean, my little...
+STEVE:  Yeah.  Iï¿½ve got it running on Vista.  In fact, I have a new MacBook with the Intel core 2 duo because I needed some more recent chips in order to see it running there.  And Leo, Iï¿½ve got to tell you, Iï¿½m going to disabuse you of this notion that Vista requires a lot of power.  I am really happily running it on my little HP TC1100 notebook, I mean, my little...
 
-LEO:  That thing is low power.  That’s the old tablet, yeah, that’s not very fancy.  I mean, that’s Pentium M, right?
+LEO:  That thing is low power.  Thatï¿½s the old tablet, yeah, thatï¿½s not very fancy.  I mean, thatï¿½s Pentium M, right?
 
-STEVE:  Yes.  The 1000 was a Transmeta, and they realized, whoops, that was a mistake.  And so they went to the 1100, which is a Pentium M, I think it’s 1.2GHz or something.  But it is completely usable.
+STEVE:  Yes.  The 1000 was a Transmeta, and they realized, whoops, that was a mistake.  And so they went to the 1100, which is a Pentium M, I think itï¿½s 1.2GHz or something.  But it is completely usable.
 
-LEO:  That’s good news.
+LEO:  Thatï¿½s good news.
 
-STEVE:  And I’ll tell you, I don’t have the – my God, I’m never going to remember the name of this UI.  The Glass?  Is it Glass?
+STEVE:  And Iï¿½ll tell you, I donï¿½t have the ï¿½ my God, Iï¿½m never going to remember the name of this UI.  The Glass?  Is it Glass?
 
 LEO:  Aero Glass.
 
-STEVE:  Aero Glass.  I don’t have that, but...
+STEVE:  Aero Glass.  I donï¿½t have that, but...
 
-LEO:  You don’t need that.
+LEO:  You donï¿½t need that.
 
-STEVE:  I really don’t need it.  And Leo, there are so many little touches.  There’s now stroke recognition on the tablet.  So you’re able to scroll a browser page just by stroking up or down.  You’re able to copy, paste, cut, and delete using stylus strokes.  Anyway, I’m seriously considering maybe just skipping over XP and going to Vista because I really think this is...
+STEVE:  I really donï¿½t need it.  And Leo, there are so many little touches.  Thereï¿½s now stroke recognition on the tablet.  So youï¿½re able to scroll a browser page just by stroking up or down.  Youï¿½re able to copy, paste, cut, and delete using stylus strokes.  Anyway, Iï¿½m seriously considering maybe just skipping over XP and going to Vista because I really think this is...
 
 LEO:  I think you should.
 
-STEVE:  You and Paul were talking on Windows Weekly on Friday, saying that in his opinion, because he’s of course been really exposed to it, he thinks it’s like Microsoft really got it right.
+STEVE:  You and Paul were talking on Windows Weekly on Friday, saying that in his opinion, because heï¿½s of course been really exposed to it, he thinks itï¿½s like Microsoft really got it right.
 
-LEO:  I’m excited about it.  I’m totally excited about it.
+LEO:  Iï¿½m excited about it.  Iï¿½m totally excited about it.
 
-STEVE:  And here I am saying – Mr. Skeptic, Mr. Oh Don’t Touch It for a Couple Years, blah blah blah.  It’s like, well, there’s a lot to like about it.
+STEVE:  And here I am saying ï¿½ Mr. Skeptic, Mr. Oh Donï¿½t Touch It for a Couple Years, blah blah blah.  Itï¿½s like, well, thereï¿½s a lot to like about it.
 
-LEO:  In fact, I have to say, on this M1210, it’s running XP because I haven’t yet got my MSDN subscription.  And I don’t – it’s like I don’t even want to try it.  I know XP.  I’m not interested.  I want Vista.  I want Vista.  And I’m sure everybody else is saying the same thing.
+LEO:  In fact, I have to say, on this M1210, itï¿½s running XPï¿½because I havenï¿½t yet got my MSDN subscription.  And I donï¿½tï¿½ï¿½ itï¿½s like I donï¿½t even want to try it.  I know XP.  Iï¿½m not interested.  I want Vista.  I want Vista.  And Iï¿½m sure everybody else is saying the same thing.
 
-All right, well, we’re just going to say good bye, and see you next week.  And thank you, Steve.  All right.  And we’ll see you all back here, same time, same place, for Security Now!.
+All right, well, weï¿½re just going to say good bye, and see you next week.  And thank you, Steve.  All right.  And weï¿½llï¿½see you all back here, same time, same place, for Security Now!.
 
 
 Copyright (c) 2006 by Steve Gibson and Leo Laporte. SOME RIGHTS RESERVED.  This work is licensed for the good of the Internet Community under the Creative Commons License v2.5. See the following Web page for details: http://creativecommons.org/licenses/by-nc-sa/2.5/

@@ -681,3 +681,4 @@ STEVE:  So, yeah, lots of stuff.
 LEO:  Yeah.  I run a network analysis program in the background almost all the time to keep an eye on, you know, our bandwidth and so forth, Fing.  And I think this will be equally useful running in the background.  I definitely look forward to it.
 
 Copyright (c) 2024 by Steve Gibson and Leo Laporte.  SOME RIGHTS RESERVED.  This work is licensed for the good of the Internet Community under the Creative Commons License v2.5.  See the following Web page for details:  https://creativecommons.org/licenses/by-nc-sa/2.5/.
+

@@ -1,0 +1,1 @@
+I've this former as na exmaole for how to build scripts worh these functions using my preferences. 

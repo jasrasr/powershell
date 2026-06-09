@@ -1,26 +1,32 @@
-# Revision : 1.0
-# Description : Launches Dell support page for a given service tag in a new Chrome window and returns the URL
-# Author : Jason Lamb (with help from ChatGPT)
+# Filename: dell-service-tag-to-support-url.ps1
+# Revision : 1.1.1
+# Description : Launches Dell support pages for one or more service tags in new Chrome tabs and returns the URLs
+# Author : Jason Lamb (with help from Claude Code)
 # Created Date : 2025-08-20
-# Modified Date : 2025-08-20
+# Modified Date : 2026-05-18
+# Changelog :
+# 1.0 initial release
+# 1.1.0 changed to open in new tab of existing Chrome window instead of new window
+# 1.1.1 added support for multiple service tags
 
 function dell {
     param(
-        [Parameter(Mandatory)][string]$ServiceTag
+        [Parameter(Mandatory)][string[]]$ServiceTag
     )
 
-    # Construct the Dell support URL
-    $url = "https://www.dell.com/support/home/en-us/product-support/servicetag/$ServiceTag"
+    foreach ($tag in $ServiceTag) {
+        # Construct the Dell support URL
+        $url = "https://www.dell.com/support/home/en-us/product-support/servicetag/$tag"
 
-    # Launch Chrome in a new window with the support page
-    Start-Process chrome.exe "--new-window $url"
+        # Launch Chrome in a new tab with the support page
+        Start-Process chrome.exe $url
 
-    # Return the URL for logging or further use
-    return $url
+        # Return the URL for logging or further use
+        $url
+    }
 }
 
-# call with 'dell 7QBMYK3'
-# returns
-# C:\> dell 7QBMYK3
-# https://www.dell.com/support/home/en-us/product-support/servicetag/7QBMYK3
-# launches chrome in new window
+# Example Usage:
+#   dell 7QBMYK3
+#   dell 7QBMYK3 ABCD123
+#   Opens the Dell support page in a new tab of an existing Chrome window and returns the URL

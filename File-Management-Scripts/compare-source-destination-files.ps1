@@ -1,3 +1,4 @@
+
 # Revision : 1.0
 # Description : Check if the source Excel differs from the most-recent destination copy. If different, copy to destination with today's date suffix (e.g., 'Project List Download 090425.xlsx'). Rev 1.0
 # Author : Jason Lamb (with help from ChatGPT)
@@ -5,10 +6,10 @@
 # Modified Date : 2025-09-04
 
 param(
-    [string] $SourceFile = 'S:\Corporate\MIS\Project List Download.xlsx',
-    [string] $DestFolder = 'C:\Users\jason.lamb\OneDrive - middough\General - IT\U & N Drive clean up',
-    [string] $BaseName   = 'Project List Download',      # filename prefix before the date
-    [string] $SearchMask = 'Project List Download*.xlsx' # existing destination pattern
+    [string] $SourceFile = "\\servername\foldername\filename.xlsx",
+    [string] $DestFolder = "c:\...\comparefolder",
+    [string] $BaseName   = 'filename',      # filename prefix before the date
+    [string] $SearchMask = 'filename*.xlsx' # existing destination pattern
 )
 
 # --- Prep & validation ---
@@ -46,7 +47,7 @@ try {
         Write-Host "Result : No differences detected. No copy performed."
         exit 0
     } else {
-        # Build dated filename like 'Project List Download 090425.xlsx'
+        # Build dated filename like 'filename $date.xlsx'
         $dateSuffix = Get-Date -Format 'MMddyy'
         $newName = "$BaseName $dateSuffix.xlsx"
         $destPath = Join-Path $DestFolder $newName

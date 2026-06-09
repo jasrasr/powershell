@@ -1,8 +1,8 @@
-# Revision : 1.4
-# Description : Monitor provided folders for total file count, folder count, and size every 60 seconds; stop when 5 sequential snapshots are identical. Includes -Depth, per-iteration runtime, and a visible countdown to the next run. Rev 1.4
+# Revision : 1.5
+# Description : Monitor provided folders for total file count, folder count, and size every 60 seconds; stop when 5 sequential snapshots are identical. Includes -Depth, per-iteration runtime, and a visible countdown to the next run. Rev 1.5
 # Author : Jason Lamb (with help from ChatGPT)
 # Created Date : 2025-09-25
-# Modified Date : 2025-09-25
+# Modified Date : 2026-03-20
 
 param(
     [Parameter(Mandatory = $true)]
@@ -16,6 +16,8 @@ param(
 
     [int] $Depth = -1   # -1 means full recursion (no depth limit)
 )
+
+. "C:\Users\jason.lamb\OneDrive - Cooper Machinery Services\Documents\Github\PowerShell Transcript\Send-NtfyNotification.ps1"
 
 function Convert-Size {
     param([long] $Bytes)
@@ -164,11 +166,13 @@ Write-Host ""
 Write-Host "Final combined counts :" -ForegroundColor Magenta
 Write-Host ("Files {0} | Folders {1} | Size {2} | Duration {3}s" -f $final.TotalFiles, $final.TotalFolders, $final.HumanSize, $final.DurationSec) -ForegroundColor Magenta
 
+Send-NtfyNotification -Topic 'jason-job-finished-83hd72' -Title 'Folder Monitor - Stable' -Message "Monitoring complete. Files: $($final.TotalFiles) | Folders: $($final.TotalFolders) | Size: $($final.HumanSize)" -Tags 'white_check_mark' -IncludeTimestamp
+
 <# -----------------------------
 USAGE
 ------------------------------
 # Monitor two paths with full recursion (default), show countdown:
-.\Folder-Monitor.ps1 -TargetPaths '\\middough.local\corp\data\dept\Chicago\740','\\middough.local\corp\data\dept\Cleveland\740'
+.\Folder-Monitor.ps1 -TargetPaths '\\servername\foldername','\\servername\foldername2'
 
 # Limit recursion depth to 1 (only top-level files/folders):
 .\Folder-Monitor.ps1 -TargetPaths 'C:\Temp\1','C:\Temp\2' -Depth 1

@@ -1,4 +1,4 @@
-﻿# Git: Initialize a new Git repository
+# Git: Initialize a new Git repository
 git init
 
 # Git: Clone an existing repository

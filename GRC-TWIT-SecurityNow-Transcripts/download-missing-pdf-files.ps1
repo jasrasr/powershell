@@ -5,7 +5,7 @@
 # Modified Date : 2025-10-09
 
 # --- Config ---
-$DownloadFolder = "C:\Users\jason.lamb\OneDrive - middough\Documents\GitHub\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\PDF-Show-Notes"
+$DownloadFolder = "C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\documents\github\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\PDF-Show-Notes"
 $LogFolder      = "C:\temp\powershell-exports"
 $UserAgent      = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) PowerShell/7 URLChecker"
 

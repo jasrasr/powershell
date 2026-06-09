@@ -1,4 +1,4 @@
-﻿# Define the directory where the files are located
+# Define the directory where the files are located
 $directory = "N:\!newprojecttemplate-BIM"
 
 # Get all files in the directory and subfolders that match the pattern

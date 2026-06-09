@@ -54,7 +54,7 @@ LEO:  I wonder if he used his disassembler to figure out what the WMF interprete
 
 STEVE:  I have no doubt that he did.  In fact, I will be, if I end up writing a patch for Windows 9x.
 
-LEO:  Interesting.  Well, we're fortunate enough - he lives in Liège, Belgium, and it is after 10:00 o'clock at night there.  But we are fortunate enough to be able to talk to Ilfak right now.  So let's dial him in via Skype.  Hello, Ilfak.
+LEO:  Interesting.  Well, we're fortunate enough - he lives in Liï¿½ge, Belgium, and it is after 10:00 o'clock at night there.  But we are fortunate enough to be able to talk to Ilfak right now.  So let's dial him in via Skype.  Hello, Ilfak.
 
 ILFAK GUILFANOV:  Hi.
 
@@ -200,7 +200,7 @@ ILFAK:  Yeah.
 
 STEVE:  Well, that - yeah.  And of course it raises an interesting point.  People keep asking, how do I know if I've been infected by this?  And they misunderstand what the "this" is.  The exploit is sort of, like, creates an open door that allows anything else to be carried into your computer.  So it's not so much that you're being infected by this exploit as much as, you know, it's being used to install Lord only knows what into your machine.
 
-LEO:  And even if you close the barn door, the horse may well be gone.  Ilfak, I know it's late in Liège.  So we thank you so much for joining us.
+LEO:  And even if you close the barn door, the horse may well be gone.  Ilfak, I know it's late in Liï¿½ge.  So we thank you so much for joining us.
 
 ILFAK:  Thank you, Steve.  Thank you, Leo.
 

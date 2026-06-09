@@ -1,4 +1,4 @@
-﻿# Define an array of source directories
+# Define an array of source directories
 $sourceDirs = @("C:\Path\To\Source1", "C:\Path\To\Source2")
 
 # Define the template directory

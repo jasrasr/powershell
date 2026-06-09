@@ -1,3 +1,4 @@
+
 # Revision : 1.3
 # Description : Rename OneDrive host-conflict files by removing the computer name token and appending "-onedriveconflict<3-char nonce>". Logs original -> new with timestamp to a single rolling CSV log. Adds exclusion of specific folders. Rev 1.3
 # Author : Jason Lamb (with help from ChatGPT)
@@ -11,12 +12,12 @@ function Rename-OneDriveConflicts {
         [string]$Path,
 
         # Single rolling log file (appends forever)
-        [string]$LogFile = 'C:\temp\powershell-exports\onedrive-conflicts.log',
+        [string]$LogFile = "$psexports\onedrive-conflicts.log",
 
         # Hostname fragments to strip (OneDrive-added)
         [string[]]$HostFragments = @(
-            'CLEW112GFF814',
-            'CLE3RF6G94'
+            'OFCABC1234',
+            'OFCABC1235'
         ),
 
         # Folders to ignore (files under these paths will not be processed)
@@ -167,8 +168,7 @@ Rename-OneDriveConflicts -Path "$GitHubPath\PowerShell' -Recurse
 
 # Override or add more exclusions
 Rename-OneDriveConflicts -Path "$onedrivepath -Recurse -whatif -ExcludePaths @(
-    "$GitHubPath\PowerShell Transcript',
-    'C:\Users\jason.lamb\OneDrive - middough\Downloads\OneDrive_1_5-15-2025\PowerShell Transcript'
+    "$GitHubPath\folder1', "$GitHubPath\folder2'   '
 )
 
 # Include .git internals if needed (not typical)
@@ -189,7 +189,7 @@ Rename-OneDriveConflicts -Path "$GitHubPath\PowerShell" -Recurse
 Rename-OneDriveConflicts -Path "$GitHubPath\PowerShell" -Recurse -IncludeGit
 
 # This will turn:
-#   test-file-CLEW112GFF814.ps1  ->  test-file-onedriveconflictABC.ps1
+#   test-file.ps1  ->  test-file-onedriveconflictABC.ps1
 # where ABC is a 3-character nonce.
 ====================== #>
 

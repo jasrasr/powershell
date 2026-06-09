@@ -1,0 +1,368 @@
+# Filename : new-script-wordpress-draft.yml
+# Revision : 1.0.0
+# Description : Automatically creates WordPress draft blog posts for newly added PowerShell scripts in GitHub.
+# Author : Jason Lamb (with help from ChatGPT)
+# Created : 2026-05-07
+# Modified : 2026-05-07
+#
+# Requirements :
+# - GitHub repository secrets:
+#     WP_URL
+#     WP_USER
+#     WP_APP_PASSWORD
+#
+# - WordPress REST API enabled
+# - WordPress Contributor account recommended for Phase 1
+#
+# Notes :
+# - Only triggers on NEW *.ps1 files added to main branch
+# - Creates WordPress drafts only
+# - Duplicate detection enabled
+# - Description generated from script content analysis
+# - Supports multiple PowerShell parameter styles
+#
+# Revision History :
+# 1.0.0 - Initial release
+
+name: New PowerShell Script WordPress Draft
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.ps1'
+
+jobs:
+  create-wordpress-draft:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect newly added PowerShell scripts
+        id: detect
+        shell: pwsh
+        run: |
+          $files = git diff --name-status "${{ github.event.before }}" "${{ github.event.after }}" |
+            Where-Object { $_ -match '^A\s+.*\.ps1$' } |
+            ForEach-Object { ($_ -split "`t")[1] }
+
+          if (-not $files) {
+              $files = @()
+          }
+
+          $files | Set-Content new-scripts.txt
+
+          Write-Host "New PowerShell scripts detected : $($files.Count)"
+
+          $files | ForEach-Object {
+              Write-Host "New script : $_"
+          }
+
+          "count=$($files.Count)" >> $env:GITHUB_OUTPUT
+
+      - name: Create WordPress draft posts
+        if: steps.detect.outputs.count != '0'
+        shell: pwsh
+        env:
+          WP_URL: ${{ secrets.WP_URL }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: |
+
+          function ConvertTo-SafeHtml {
+              param (
+                  [string]$Text
+              )
+
+              if ([string]::IsNullOrWhiteSpace($Text)) {
+                  return ""
+              }
+
+              return [System.Net.WebUtility]::HtmlEncode($Text)
+          }
+
+          function Get-ScriptAutoDescription {
+              param (
+                  [string]$ScriptContent,
+                  [string]$ScriptName
+              )
+
+              $synopsis = ""
+              $commentHelpDescription = ""
+              $headerDescription = ""
+              $functions = @()
+              $parameters = @()
+              $detectedTools = @()
+
+              if ($ScriptContent -match '(?is)\.SYNOPSIS\s*(.+?)(\.DESCRIPTION|\.PARAMETER|\.EXAMPLE|#>|$)') {
+                  $synopsis = ($matches[1] -replace '\s+', ' ').Trim()
+              }
+
+              if ($ScriptContent -match '(?is)\.DESCRIPTION\s*(.+?)(\.PARAMETER|\.EXAMPLE|\.NOTES|#>|$)') {
+                  $commentHelpDescription = ($matches[1] -replace '\s+', ' ').Trim()
+              }
+
+              if ($ScriptContent -match '(?im)^\s*#\s*Description\s*:\s*(.+)$') {
+                  $headerDescription = $matches[1].Trim()
+              }
+
+              $functions = [regex]::Matches(
+                  $ScriptContent,
+                  '(?im)^\s*function\s+([a-zA-Z0-9_-]+)'
+              ) |
+              ForEach-Object {
+                  $_.Groups[1].Value
+              } |
+              Select-Object -Unique
+
+              $parameterMatches = @()
+
+              # Advanced parameter blocks
+              $parameterMatches += [regex]::Matches(
+                  $ScriptContent,
+                  '(?im)^\s*$begin:math:display$Parameter\.\*\?$end:math:display$\s*\r?\n\s*$begin:math:display$\[\^$end:math:display$]+\]\s*\$([a-zA-Z0-9_]+)'
+              )
+
+              # Typed param() variables
+              $parameterMatches += [regex]::Matches(
+                  $ScriptContent,
+                  '(?im)^\s*$begin:math:display$\[\^$end:math:display$]+\]\s*\$([a-zA-Z0-9_]+)'
+              )
+
+              # Untyped param() variables
+              $parameterMatches += [regex]::Matches(
+                  $ScriptContent,
+                  '(?im)^\s*\$([a-zA-Z0-9_]+)\s*[,\)]'
+              )
+
+              $parameters = $parameterMatches |
+                  ForEach-Object {
+                      $_.Groups[1].Value
+                  } |
+                  Where-Object {
+                      $_ -notmatch '^(true|false|null|matches|env|args|input)$'
+                  } |
+                  Select-Object -Unique
+
+              $toolChecks = @{
+                  "Active Directory" = "Get-ADUser|Set-ADUser|New-ADUser|Get-ADGroup|Add-ADGroupMember"
+                  "Exchange Online" = "Connect-ExchangeOnline|Get-Mailbox|Set-Mailbox|Start-ComplianceSearch|New-ComplianceSearchAction"
+                  "Microsoft Graph" = "Connect-MgGraph|Get-MgUser|Get-MgGroup|Invoke-MgGraphRequest"
+                  "SCCM/ConfigMgr" = "Get-CMApplication|Set-CMApplication|New-CMApplication|Import-CMApplication"
+                  "Robocopy" = "robocopy"
+                  "GitHub" = "git\s|Invoke-RestMethod.*github|api.github.com"
+                  "WordPress" = "wp-json|WordPress|wp/v2/posts"
+                  "Automox" = "Automox|amagent"
+                  "Bluebeam" = "Bluebeam|Revu"
+                  "Autodesk" = "Autodesk|Revit|AutoCAD|AdskLicensing"
+                  "CSV processing" = "Import-Csv|Export-Csv|ConvertTo-Csv"
+                  "JSON processing" = "ConvertFrom-Json|ConvertTo-Json"
+                  "logging" = "Start-Transcript|Add-Content|Write-Log|log"
+                  "file operations" = "Copy-Item|Move-Item|Remove-Item|Get-ChildItem|New-Item"
+                  "remote computer administration" = "Invoke-Command|Enter-PSSession|New-PSSession|Test-WSMan"
+              }
+
+              foreach ($tool in $toolChecks.Keys) {
+                  if ($ScriptContent -match $toolChecks[$tool]) {
+                      $detectedTools += $tool
+                  }
+              }
+
+              if (-not [string]::IsNullOrWhiteSpace($commentHelpDescription)) {
+                  return $commentHelpDescription
+              }
+
+              if (-not [string]::IsNullOrWhiteSpace($synopsis)) {
+                  return $synopsis
+              }
+
+              $descriptionParts = @()
+
+              if ($functions.Count -gt 0) {
+                  $descriptionParts += "This PowerShell script includes functions such as $($functions -join ', ')"
+              }
+              else {
+                  $descriptionParts += "This PowerShell script provides automation logic for $ScriptName"
+              }
+
+              if ($detectedTools.Count -gt 0) {
+                  $descriptionParts += "It appears to work with $($detectedTools -join ', ')"
+              }
+
+              if ($parameters.Count -gt 0) {
+                  $descriptionParts += "It accepts parameters including $($parameters -join ', ')"
+              }
+
+              if (-not [string]::IsNullOrWhiteSpace($headerDescription)) {
+                  $descriptionParts += "Header note: $headerDescription"
+              }
+
+              return ($descriptionParts -join ". ") + "."
+          }
+
+          function Get-ScriptDetails {
+              param (
+                  [string]$ScriptContent
+              )
+
+              $details = [ordered]@{
+                  Revision = ""
+                  Author = ""
+                  Created = ""
+                  Modified = ""
+              }
+
+              if ($ScriptContent -match '(?im)^\s*#\s*Revision\s*:\s*(.+)$') {
+                  $details.Revision = $matches[1].Trim()
+              }
+
+              if ($ScriptContent -match '(?im)^\s*#\s*Author\s*:\s*(.+)$') {
+                  $details.Author = $matches[1].Trim()
+              }
+
+              if ($ScriptContent -match '(?im)^\s*#\s*Created\s*:\s*(.+)$') {
+                  $details.Created = $matches[1].Trim()
+              }
+
+              if ($ScriptContent -match '(?im)^\s*#\s*Modified\s*:\s*(.+)$') {
+                  $details.Modified = $matches[1].Trim()
+              }
+
+              return $details
+          }
+
+          $scripts = Get-Content new-scripts.txt
+
+          $pair = "$env:WP_USER`:$env:WP_APP_PASSWORD"
+          $bytes = [System.Text.Encoding]::ASCII.GetBytes($pair)
+          $token = [Convert]::ToBase64String($bytes)
+
+          $headers = @{
+              Authorization = "Basic $token"
+              "Content-Type" = "application/json"
+          }
+
+          foreach ($script in $scripts) {
+
+              $scriptName = [System.IO.Path]::GetFileNameWithoutExtension($script)
+              $fileName = [System.IO.Path]::GetFileName($script)
+
+              $title = "New PowerShell Script Draft - $scriptName"
+
+              $encodedSearch = [uri]::EscapeDataString($title)
+
+              $searchUri = "$env:WP_URL/wp-json/wp/v2/posts?search=$encodedSearch&status=draft,publish,pending,private&per_page=10"
+
+              Write-Host "Checking WordPress for duplicate post : $title"
+
+              $existingPosts = Invoke-RestMethod `
+                  -Uri $searchUri `
+                  -Method GET `
+                  -Headers $headers
+
+              $duplicate = $existingPosts | Where-Object {
+                  $decodedTitle = [System.Net.WebUtility]::HtmlDecode($_.title.rendered)
+                  $decodedTitle -eq $title
+              }
+
+              if ($duplicate) {
+                  Write-Host "Duplicate found for $scriptName. Skipping draft creation."
+                  continue
+              }
+
+              $repoUrl = "https://github.com/${{ github.repository }}/blob/main/$script"
+
+              $rawUrl = "https://raw.githubusercontent.com/${{ github.repository }}/main/$script"
+
+              $scriptContent = Get-Content $script -Raw
+
+              $description = Get-ScriptAutoDescription `
+                  -ScriptContent $scriptContent `
+                  -ScriptName $scriptName
+
+              $details = Get-ScriptDetails `
+                  -ScriptContent $scriptContent
+
+              $safeTitle = ConvertTo-SafeHtml $title
+              $safeScriptName = ConvertTo-SafeHtml $scriptName
+              $safeFileName = ConvertTo-SafeHtml $fileName
+              $safeDescription = ConvertTo-SafeHtml $description
+              $safeRevision = ConvertTo-SafeHtml $details.Revision
+              $safeAuthor = ConvertTo-SafeHtml $details.Author
+              $safeCreated = ConvertTo-SafeHtml $details.Created
+              $safeModified = ConvertTo-SafeHtml $details.Modified
+              $safeRepoUrl = ConvertTo-SafeHtml $repoUrl
+              $safeRawUrl = ConvertTo-SafeHtml $rawUrl
+
+              $metadataHtml = ""
+
+              if (-not [string]::IsNullOrWhiteSpace($safeRevision)) {
+                  $metadataHtml += "<li><strong>Revision:</strong> $safeRevision</li>"
+              }
+
+              if (-not [string]::IsNullOrWhiteSpace($safeAuthor)) {
+                  $metadataHtml += "<li><strong>Author:</strong> $safeAuthor</li>"
+              }
+
+              if (-not [string]::IsNullOrWhiteSpace($safeCreated)) {
+                  $metadataHtml += "<li><strong>Created:</strong> $safeCreated</li>"
+              }
+
+              if (-not [string]::IsNullOrWhiteSpace($safeModified)) {
+                  $metadataHtml += "<li><strong>Modified:</strong> $safeModified</li>"
+              }
+
+              if ([string]::IsNullOrWhiteSpace($metadataHtml)) {
+                  $metadataHtml = "<li>No script header metadata found.</li>"
+              }
+
+              $content = @"
+<h2>$safeScriptName</h2>
+
+<p>$safeDescription</p>
+
+<h3>Script Details</h3>
+
+<ul>
+<li><strong>File:</strong> $safeFileName</li>
+$metadataHtml
+</ul>
+
+<h3>GitHub Links</h3>
+
+<ul>
+<li><a href="$safeRepoUrl">View Script on GitHub</a></li>
+<li><a href="$safeRawUrl">View Raw Script</a></li>
+</ul>
+
+<h3>Review Notes</h3>
+
+<ul>
+<li>This draft was automatically generated from a newly added PowerShell script in GitHub.</li>
+<li>The description was generated by inspecting script content, comment help, functions, parameters, and common cmdlet patterns.</li>
+<li>Review the post before publishing.</li>
+<li>Add screenshots, examples, or usage notes if needed.</li>
+</ul>
+"@
+
+              $body = @{
+                  title = $safeTitle
+                  content = $content
+                  status = "draft"
+              } | ConvertTo-Json -Depth 10
+
+              Write-Host "Creating WordPress draft : $title"
+
+              Invoke-RestMethod `
+                  -Uri "$env:WP_URL/wp-json/wp/v2/posts" `
+                  -Method POST `
+                  -Headers $headers `
+                  -Body $body
+
+              Write-Host "Created WordPress draft for $scriptName"
+          }

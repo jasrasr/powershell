@@ -1,4 +1,4 @@
-# backup @ $GitHubpath\PowerShell\Miscellaneous\ps-common-profile-COPY.ps1'
+# backup @ "$GitHubpath\PowerShell\Miscellaneous\ps-common-profile-COPY.ps1"
 
 function Start-CustomTranscript {
     $username = $env:USERNAME
@@ -64,7 +64,7 @@ Write-Warning "ENTER ADM CREDENTIALS"
 ####################
 
 # Generate a TOC of functions and aliases used in the $CommonProfilePath
-# . $githubpath\PowerShell-TableOfContents-TOC.ps1
+# . "$githubpath\PowerShell-TableOfContents-TOC.ps1"
 # show-scripttoc
 
 
@@ -509,7 +509,7 @@ Set-Alias jlgjs Git-jasrasr-Sync
 
 ####################
 
-import-module '${githubpath}\PowerShell-Private\MyCustomModule\mycustommodule.psm1'
+import-module "${githubpath}\PowerShell-Private\MyCustomModule\mycustommodule.psm1"
 
 
 ####################
@@ -555,12 +555,12 @@ write-host "$env:COMPUTERNAME \ $env:USERNAME" -ForegroundColor red
 
 # Create a hash table of computers
 $Computers = @(
-#    @{ ComputerName = "CLEW10BGZ32G2"; Model = "5510"; Location = "Home" }
-#    @{ ComputerName = "CLEW103LMHFH2"; Model = "5520"; Location = "Office" }
-#    @{ ComputerName = "CLEW11DZ93HW3"; Model = "7320"; Location = "Main Old" }
-#    @{ ComputerName = "CLEW1067LLFH2"; Model = "5285"; Location = "Office" }
-    @{ ComputerName = "CLEW112GFF814"; Model = "5680"; Location = "Office" }
-    @{ ComputerName = "CLE3RF6G94"; Model = "7350"; Location = "Main" }
+#    @{ ComputerName = "OFCW11ABC1234"; Model = "5510"; Location = "Home" }
+#    @{ ComputerName = "OFCW11ABC1235"; Model = "5520"; Location = "Office" }
+#    @{ ComputerName = "OFCW11ABC1236"; Model = "7320"; Location = "Main Old" }
+#    @{ ComputerName = "OFCW11ABC1237"; Model = "5285"; Location = "Office" }
+    @{ ComputerName = "OFCW11ABC1238"; Model = "5680"; Location = "Office" }
+    @{ ComputerName = "OFCW11ABC1239"; Model = "7350"; Location = "Main" }
     )
 
 # Get current computer name
@@ -581,11 +581,11 @@ function CopyPastePendingApp {
     param (
         [string]$FolderDate = (Read-Host 'Folder date (e.g., 20250320)'),
         [string]$Source = (Read-Host 'Source folder'),
-        [string]$Destination = "\\clesccm\e$\application source\cad applications\! Pending Creation\$FolderDate"
+        [string]$Destination = "\\servername\foldername\! Pending Creation\$FolderDate"
     )
 
-#    Write-Host "This assumes Source is 'C:\temp\autodesk\..' and Destination is '\\clesccm\e$\application source\cad applications\! Pending Creation\..'"
-#    Write-Host "This assumes Destination is '\\clesccm\e$\application source\cad applications\! Pending Creation\..'"
+#    Write-Host "This assumes Source is 'C:\temp\autodesk\..' and Destination is '\\servername\foldername\! Pending Creation\..'"
+#    Write-Host "This assumes Destination is '\\servername\foldername\! Pending Creation\..'"
 
     # Ensure the destination exists
     if (-not (Test-Path -Path $Destination)) {
@@ -794,7 +794,7 @@ function move-autodesk-nojob {
     $sourcename = Read-Host "Source folder name"
     $source = Join-Path $sourceroot $sourcename
 
-    $destinationroot = '\\clesccm\Application Source\Cad Applications\! Pending Creation'
+    $destinationroot = '\\servername\foldername\! Pending Creation'
     $destfolderdate = Get-Date -Format "yyyyMMdd"
     $destination = Join-Path $destinationroot $destfolderdate
 
@@ -820,7 +820,7 @@ function move-autodesk-job {
     $sourcename = Read-Host "Source folder name"
     $source = Join-Path $sourceroot $sourcename
 
-    $destinationroot = '\\clesccm\Application Source\Cad Applications\! Pending Creation'
+    $destinationroot = '\\servername\foldername\! Pending Creation'
     $destfolderdate = Get-Date -Format "yyyyMMdd"
     $destination = Join-Path $destinationroot $destfolderdate
 
@@ -892,28 +892,23 @@ $fileVersionr22
 
 ###############
 
-$onedrivepath = 'C:\users\jason.lamb\OneDrive - middough'
+$onedrivepath = "C:\users\$env:username\OneDrive - [tennantname]" #replace [tenantname] with the actual tenant name in the OneDrive folder path, e.g. "OneDrive - companyname"
 $githubpath = "$onedrivepath\documents\github"
 $gitpspath = "$githubpath\powershell"
 $temppath = 'C:temp'
 $ccmcache = 'C:\windows\ccmcache'
-$clesccm = '\\clesccm\e$\application source\cad applications'
-$middlocal = '\\middough.local\corp\data'
 #Function np { & 'C:\Program Files (x86)\Notepad++\notepad++.exe' @args }
 #Function notepadnew { & 'C:\Windows\System32\notepad.exe' @args }
-$psexec = "C:\Users\jason.lamb\OneDrive - middough\Github\PsExec"
-$domain = "middough" #${domain} for no space
-$domainup = "Middough" #${domain} for no space
-$username = "jason.lamb" #${username} for no space
-$ndrive = "\\middough.local\corp\data\proj"
-$udrive = "\\middough.local\corp\data\dept"
+$domain = "domainname" #$domain for no space
+$domainup = "Company Name" #$domain for no space
+$username = "username" #$username for no space
 
 ######################
 
-# delete duplicate desktop files on the desktop from OneDrive with the same "middough inc-*.lnk"
+# delete duplicate desktop files on the desktop from OneDrive with the same "filename-*.lnk"
 function delete-dupdesktop {
-$desktopfolder = "C:\users\$env:username\onedrive - middough\desktop"
-$desktopfiles = Get-ChildItem -Path $desktopfolder -Filter "middough inc-*.lnk"
+$desktopfolder = "$onedrivepath\desktop"
+$desktopfiles = Get-ChildItem -Path $desktopfolder -Filter "filename-*.lnk"
 foreach ($dupfile in $desktopfiles) {
 Write-host "File deleted: $dupfile"
 	Remove-Item -Path $dupfile.FullName -Force
@@ -1014,7 +1009,7 @@ $env:Path += ";C:\ProgramData\chocolatey\bin"
 
 ######################
 
-$users = 'jason.lamb', 'adm.jlamb'
+$users = 'user1', 'user2', 'user3' # replace with actual usernames
 $users | ForEach-Object {
     Get-ADUser -Identity $_ -Properties msDS-UserPasswordExpiryTimeComputed |
     Select-Object Name, @{Name="PasswordExpiryDate"; Expression = {[datetime]::FromFileTime($_."msDS-UserPasswordExpiryTimeComputed")}}
@@ -1034,10 +1029,6 @@ if ($isAdmin) {
     # Optionally, exit or prompt user
     # exit
 }
-
-######################
-
-$psetemp = 'c:\temp\powershell-exports'
 
 ######################
 
@@ -1149,7 +1140,7 @@ function Track-Package {
 
 ######################
 
-. '${githubpath}\!PS-custom-faq-help.ps1'
+. "${githubpath}\!PS-custom-faq-help.ps1"
 
 ######################
 
@@ -1174,19 +1165,19 @@ function dell {
     return $url
 }
 
-# call with 'dell 7QBMYK3'
+# call with 'dell ABC1234'
 # returns
-# C:\> dell 7QBMYK3
-# https://www.dell.com/support/home/en-us/product-support/servicetag/7QBMYK3
+# C:\> dell ABC1234
+# https://www.dell.com/support/home/en-us/product-support/servicetag/ABC1234
 # launches chrome in new window
 
-#. '${githubpath}\PowerShell-Private\File-Management-Scripts\compare-source-destination-files-and-csv-export-diff.ps1'
+#. "${githubpath}\PowerShell-Private\File-Management-Scripts\compare-source-destination-files-and-csv-export-diff.ps1"
 
 ######################
 
 # =========================
 # Run-Once-Per-Day Guard
-# Rev: 1.3  (J. Lamb)
+# Rev: 1.3  (Jason Lamb)
 # =========================
 
 # Assumes $githubpath is set elsewhere in your $PROFILE
@@ -1234,10 +1225,10 @@ if ($last -ne $today) {
     # ===== Your once-per-day steps =====
     try {
         # 1) Security Now! fetch
-        & '${githubpath}\PowerShell\GRC-TWIT-SecurityNow-Transcripts\download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com.ps1'
+        & "${githubpath}\PowerShell\GRC-TWIT-SecurityNow-Transcripts\download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com.ps1"
 
         # 2) File compare + CSV diff
-        & '${githubpath}\PowerShell-Private\File-Management-Scripts\compare-source-destination-files-and-csv-export-diff.ps1'
+        & "${githubpath}\PowerShell-Private\File-Management-Scripts\compare-source-destination-files-and-csv-export-diff.ps1"
 
         # 3) Git sync function
         jlgps2

@@ -1,5 +1,5 @@
 # check users in all groups 
-# ou example is MIDDOUGH.LOCAL/MIDD/Common/Local Admin
+# ou example is .local/MIDD/Common/Local Admin
 # CN=4QBMKY3,OU=Local Admin,OU=Common,OU=MIDD,DC=MIDDOUGH,DC=LOCAL
 
 $ou = "OU=Local Admin,OU=Common,OU=MIDD,DC=MIDDOUGH,DC=LOCAL"

@@ -1,11 +1,11 @@
-﻿# Revision : 1.2
+# Revision : 1.2
 # Description : Save a string list into an array-formatted PowerShell file, removing trailing comma on the last item, and append multiple foreach loop examples
 # Author : Jason Lamb
 # Created Date : 2025-07-23
 # Modified Date : 2025-09-12
 
 $datetime = Get-Date -Format "yyyyMMdd-HHmmss"
-$outputPath = "C:\temp\powershell-exports\path-array-output-$datetime.ps1"
+$outputPath = "$psexports\path-array-output-$datetime.ps1"
 
 $textToArray = @'
 item1

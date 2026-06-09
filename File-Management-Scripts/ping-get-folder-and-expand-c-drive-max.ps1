@@ -1,4 +1,4 @@
-﻿# Define the list of computers
+# Define the list of computers
 $computers = @('nerdio0924-2d07', 'nerdio0924-3511', 'nerdio0924-6af1',  'nerdio0924-be0c', 'nerdio0924-debe'  )  # Replace with actual computer names
 
 <#

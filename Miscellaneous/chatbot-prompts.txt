@@ -1,0 +1,20 @@
+prompt=hello|hi|hey
+reply=Hello there $env:USERNAME , nice to see you.
+
+prompt=time|clock
+reply=The current time is $(Get-Date).
+
+prompt=date|today
+reply=Today is $(Get-Date -Format 'yyyy-MM-dd').
+
+prompt=weather|forecast
+reply=I'm a bot inside PowerShell. Weather? It's probably cold. Because Ohio.
+
+prompt=help
+reply=I only know what you’ve trained me with. Add more prompts to my brain file.
+
+prompt=how are you
+reply=I cannot feel emotions but I can pretend. I am 100 percent operational.
+
+prompt=exit|quit
+reply=You cannot escape me. Just kidding. Close the window.

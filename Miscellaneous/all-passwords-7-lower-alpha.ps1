@@ -1,4 +1,4 @@
-﻿start-Job -Name "PasswordGeneration100k" -ScriptBlock {
+start-Job -Name "PasswordGeneration100k" -ScriptBlock {
 
     # Generate a dynamic file name with the current time in HHmmss format
     $timeSuffix = (Get-Date -Format "HHmmss")

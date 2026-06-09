@@ -1,7 +1,7 @@
 # ConvertCsvToXlsx.ps1
 
 # Define the folder to monitor
-$watchFolder = 'C:\Users\jason.lamb\OneDrive - middough\Downloads\csv2xlsx'
+$watchFolder = "$downloads\csv2xlsx" # $downloads defined in '!commonpowershellprofilepath.ps1'
 $processedFolder = Join-Path $watchFolder 'Processed'
 
 # Ensure the processed folder exists

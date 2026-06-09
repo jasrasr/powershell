@@ -1,0 +1,105 @@
+# Revision : 1.0
+# Description : Static analyzer for PowerShell scripts to flag suspicious patterns (non-executing). Rev 1.0
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-12-12
+# Modified Date : 2025-12-12
+
+param (
+    [Parameter(Mandatory = $true)]
+    [string]$ScriptPath
+)
+
+if (-not (Test-Path $ScriptPath)) {
+    Write-Host "File not found : $ScriptPath"
+    return
+}
+
+Write-Host "Analyzing script : $ScriptPath"
+Write-Host "----------------------------------------"
+
+$content = Get-Content $ScriptPath -Raw
+
+$checks = @(
+    @{
+        Name = "Invoke-Expression usage"
+        Pattern = 'Invoke-Expression|iex\s'
+        Severity = "HIGH"
+    },
+    @{
+        Name = "EncodedCommand usage"
+        Pattern = 'EncodedCommand'
+        Severity = "HIGH"
+    },
+    @{
+        Name = "Base64-like strings"
+        Pattern = '[A-Za-z0-9+/]{200,}={0,2}'
+        Severity = "HIGH"
+    },
+    @{
+        Name = "Download methods"
+        Pattern = 'Invoke-WebRequest|WebClient|DownloadString|DownloadFile|curl |wget '
+        Severity = "HIGH"
+    },
+    @{
+        Name = "Persistence registry keys"
+        Pattern = 'CurrentVersion\\Run|RunOnce'
+        Severity = "HIGH"
+    },
+    @{
+        Name = "Scheduled task creation"
+        Pattern = 'Register-ScheduledTask|schtasks'
+        Severity = "HIGH"
+    },
+    @{
+        Name = "Obfuscation indicators"
+        Pattern = '\[char\]|\bxor\b|-bxor'
+        Severity = "MEDIUM"
+    },
+    @{
+        Name = "Process injection hints"
+        Pattern = 'Add-Type.+DllImport|VirtualAlloc|WriteProcessMemory'
+        Severity = "HIGH"
+    },
+    @{
+        Name = "Network indicators"
+        Pattern = 'http://|https://|\d{1,3}(\.\d{1,3}){3}'
+        Severity = "MEDIUM"
+    },
+    @{
+        Name = "Infinite loop"
+        Pattern = 'while\s*\(\s*\$true\s*\)'
+        Severity = "LOW"
+    },
+    @{
+        Name = "Empty catch block"
+        Pattern = 'catch\s*\{\s*\}'
+        Severity = "MEDIUM"
+    }
+)
+
+$results = @()
+
+foreach ($check in $checks) {
+    if ($content -match $check.Pattern) {
+        $results += [pscustomobject]@{
+            Check = $check.Name
+            Severity = $check.Severity
+            MatchedPattern = $check.Pattern
+        }
+    }
+}
+
+if ($results.Count -eq 0) {
+    Write-Host "No suspicious patterns detected."
+}
+else {
+    Write-Host "Suspicious patterns found :"
+    $results | Sort-Object Severity | Format-Table -AutoSize
+}
+
+Write-Host "----------------------------------------"
+Write-Host "Analysis complete."
+
+# Example Usage
+# . .\Analyze-PSScript.ps1
+# Analyze-PSScript.ps1 -ScriptPath "C:\Temp\unknown-script.ps1"

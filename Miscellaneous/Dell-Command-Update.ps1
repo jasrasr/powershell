@@ -1,4 +1,4 @@
-﻿<#
+<#
 EVALUATION CODE
 
 # update 10/24/24 moved logs to 'C:\Temp\Automox-Exports\DCU'

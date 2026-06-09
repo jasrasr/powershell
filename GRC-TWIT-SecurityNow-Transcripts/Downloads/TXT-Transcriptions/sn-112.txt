@@ -10,13 +10,13 @@ FILE ARCHIVE:	http://www.GRC.com/securitynow.htm
 
 DESCRIPTION:  Steve and Leo discuss questions asked by listeners of their previous episodes.  They tie up loose ends, explore a wide range of topics that are too small to fill their own episode, clarify any confusion from previous installments, and present real world "application notes" for any of the security technologies and issues they have previously discussed.
 
-INTRO:  Netcasts you love, from people you trust.  This is TWiT.
+INTRO:  Netcasts you love, from people you trust.  This isï¿½TWiT.
 
-LEO LAPORTE:  Bandwidth for Security Now! is provided by AOL Radio at AOL.com/podcasting.
+LEO LAPORTE:  Bandwidth for Security Now! is provided by AOLï¿½Radio at AOL.com/podcasting.
 
 This is Security Now! with Steve Gibson, Episode 112 for October 4, 2007:  Your questions, Steve's answers #25.
 
-It's time for Security Now!, everybody's favorite security podcast, now officially the best security podcast of the year...
+It's time for Security Now!, everybody's favorite securityï¿½podcast, now officially the best security podcast of the year...
 
 STEVE GIBSON:  [Trumpeting]
 
@@ -42,7 +42,7 @@ STEVE:  I don't know what I'm going to get.
 
 LEO:  You'll get a plaque or something, I'm sure.
 
-STEVE:  Well, Elaine is going to be there with camera, so I may actually be able to put some photos up on the show notes.
+STEVE:  Well, Elaine is going to be there with camera, so Iï¿½may actually be able to put some photos up on the showï¿½notes.
 
 LEO:  Oh, good.  Elaine is the wonderful woman who transcribes all these Security Nows.  Yeah, we have to say that because she's typing even as we speak.
 
@@ -60,13 +60,13 @@ LEO:  Well, her bread and butter is court transcriptions, or court reporter.  An
 
 STEVE:  No, it's pretty dry.
 
-LEO:  Probably rare that he hears her giggling.  Maybe not, though, who knows.  So this is a listener feedback day, as are all our even podcasts these days, Listener Feedback 25.  And we've got a good set of questions.  No wacky 13th this time.
+LEO:  Probably rare that he hears her giggling.  Maybe not, though, who knows.  So this is a listener feedback day, as are all our even podcasts these days, Listener Feedback 25.  And we've got a good set of questions.  No wacky 13th thisï¿½time.
 
 STEVE:  No.
 
-LEO:  Speaking of nerds, Steve Gibson and I are here.  We are ready to nerd out with some of your questions.  Do you want to mention SpinRite real quick before we move onto that?
+LEO:  Speaking of nerds, Steve Gibson and I are here.  Weï¿½are ready to nerd out with some of your questions.  Do you want to mention SpinRite real quick before we move ontoï¿½that?
 
-STEVE:  Oh, I thought I would give it another vacation since we're...
+STEVE:  Oh, I thought I would give it another vacation sinceï¿½we're...
 
 LEO:  Steve...
 
@@ -84,7 +84,7 @@ LEO:  And that's where SpinRite can really help you.  And I haven't heard back f
 
 STEVE:  It probably is worth mentioning something that's been on my mind.  It's not a testimonial, but I should mention that we keep hearing from people who have been brought back from the brink of disaster.  Their computers wouldn't boot, they had lost their stuff, whatever.  I mean, those are pretty much what the testimonials are every week.  But had SpinRite been run on those drives prior to passing off the cliff, then the drives would have never had this problem.  I mean, Greg, in fact, my tech support guy, he says, "You know, Steve, you never mention to Security Now! listeners that it is preventative maintenance.  It's not just data recovery."  And I go, "I know, Greg, but I just don't think people are going to go out and spend $89 because they have extra money."
 
-LEO:  Well, they do if it's a crisis.  But you notice I always say "the world's best drive maintenance and recovery utility."
+LEO:  Well, they do if it's a crisis.  But you notice I always say "the world's best drive maintenance and recoveryï¿½utility."
 
 STEVE:  Yeah.  So I did want to mention that SpinRite does prevent these kinds of problems.  It is able to, way more often than not, bring a drive back into use that has already passed out of use.  But, boy, if you run it every couple months, it will never get into that trouble in the first place.  I mean, it's really the case.
 
@@ -98,7 +98,7 @@ STEVE:  And then my software would interact with that DLL.  That contained SSL t
 
 LEO:  It works.
 
-STEVE:  Yes.  And I was worried when VeriSign bought them.  It was like, oh, no, are they going to change the protocols or make me update something or mess with something that's already working perfectly?  And they have done apparently nothing, at least nothing bad, to it.  I mean, it just - it works beautifully.  And so if we have listeners who have an interest in doing eCommerce, for what it's worth, again, I have no relative comparison except to say that nothing has ever not worked perfectly with the Payflow Pro system, originally from CyberCash and now from VeriSign.  I mean, for what it's worth I can vouch for it absolutely.  And I would only caution people to be very careful about all the other aspects of doing an eCommerce site.  I mean, you really want to protect your users' information and just do everything you can to prevent there from being any sort of way of exploiting the site other than the back-end credit card charging process, which is really pretty much nailed down.
+STEVE:  Yes.  And I was worried when VeriSign bought them.  It was like, oh, no, are they going to change the protocols or make me update something or mess with something that's already working perfectly?  And they have done apparently nothing, at least nothing bad, to it.  I mean, it just - it works beautifully.  And so if we have listeners who have an interest in doing eCommerce, for what it's worth, again, I have no relative comparison except to say that nothing has ever not worked perfectly with the Payflow Pro system, originally from CyberCash and now from VeriSign.  I mean, for what it's worth I can vouch for it absolutely.  And I would only caution people to be very careful about all the other aspects of doing an eCommerce site.  I mean, you really want to protect your users' information and just do everything you can to prevent there from being any sort of way of exploiting the site other than the back-end credit card charging process, which is really pretty much nailedï¿½down.
 
 LEO:  Yeah, I mean, Payflow Pro is for somebody who's rolling their own solution.
 
@@ -122,7 +122,7 @@ STEVE:  Yes.
 
 LEO:  That's the total charges.  It may be PayPal takes some and the credit card company or whatever.  But that's...
 
-STEVE:  As opposed to, like, 2 cents, which would be 1 percent.
+STEVE:  As opposed to, like, 2 cents, which would be 1ï¿½percent.
 
 LEO:  Right.  Yeah, that's a lot.  Question No. 2, Russell Johnson in MinneSnowta - not MinneSnowta yet, but it's going to be MinneSnowta soon - wonders about the double-edged sword of SSL proxying.  What is your opinion of deploying an SSL proxy, similar to something offered like Finjan?  What are the privacy and legal issues of this technology?  I helped set up a system using this technology in a public school's network.  Also, what disclosures should be made so that users are aware the info they thought was encrypted from the browser to the server is actually being decrypted by the proxy?  A CEO of a large company may be unaware that an IT employee or outside contractor can now access his previously impervious encrypted data, like credit card numbers and passwords.  I know the intention of the software is to prevent using SSL to hide web surfing activity.  But is this going too far?  I wonder if ISPs would employ this kind of technology.  Now, that would scare me.
 
@@ -150,7 +150,7 @@ STEVE:  Yeah, exactly.  It's his company.  Especially if he's the CTO of the lar
 
 LEO:  He's the one who said it could be all right.
 
-STEVE:  Certainly I would say that it would be worth - and probably for, like, school district policy, or corporate policy in a corporate setting, in the policy manual it says you should know that you're using corporate property.  These are company computers.  They are subject to monitoring, logging, surveillance, filtering.  Basically behave yourself.
+STEVE:  Certainly I would say that it would be worth - andï¿½probably for, like, school district policy, or corporateï¿½policy in a corporate setting, in the policy manual it says you should know that you're using corporate property.  These are company computers.  They are subject to monitoring, logging, surveillance, filtering.  Basically behave yourself.
 
 LEO:  I'd like to point out, though, while that's good policy, it's not required by law.
 
@@ -160,7 +160,7 @@ LEO:  The law says it's a corporate computer.  They can do anything they want wi
 
 STEVE:  Right, from the get-go, without having to specifically notify you.
 
-LEO:  Don't have to tell you nothing.  Although I think it's a very good policy to do so.  I mean, that's just good citizenship.
+LEO:  Don't have to tell you nothing.  Although I think it'sï¿½a very good policy to do so.  I mean, that's just goodï¿½citizenship.
 
 STEVE:  Well, especially if some damage were to occur as a consequence of that proxying, like data escaped from the organization's control.
 
@@ -174,7 +174,7 @@ STEVE:  Exactly.  They would have to add a certificate to your browser.  And, I 
 
 LEO:  You keep bringing the Hong Kong - now, the truth is, though, many ISPs now give you a CD that has software to install.  Usually it's a PPOE dialer for DSL.  But there's no reason they couldn't be, I mean, they modify IE, and they often say "Provided by Verizon."
 
-STEVE:  And they convert it to their home page and do all that.  But you're right, Leo, I mean, from a technical standpoint they would not be prevented from doing this.  And this is why every time we talk about SSL and anti-phishing, I talk about looking up the chain of trust because what you would see is you thought you were on eBay, https://www.ebay.com, and you thought you were on a secure eBay page.  If this were being done, you would right-click on your browser's page, and you would see eBay, that the eBay certificate had been signed by Cox.net.  Now...
+STEVE:  And they convert it to their home page and do all that.  But you're right, Leo, I mean, from a technical standpoint they would not be prevented from doing this.  Andï¿½this is why every time we talk about SSL and anti-phishing, I talk about looking up the chain of trust because what you would see is you thought you were on eBay, https://www.ebay.com, and you thought you were on a secure eBay page.  If this were being done, you would right-click on your browser's page, and you would see eBay, that the eBay certificate had been signed by Cox.net.  Now...
 
 LEO:  Ah, okay.  So it'd still be an eBay certificate, but it would be signed by your Internet service provider or your boss or the school district.  It would be clear that it wasn't eBay's.
 
@@ -184,11 +184,11 @@ LEO:  Okay.  So there is a way to tell.  There's no way they can hide that.
 
 STEVE:  Right.  And in fact, well, for users who are smart enough and aware enough to perform this test.  I mean, I think it is the case - and this is a point I was going to mention last week when we were talking about the problem of phishing with OpenID service.  In general I think we're going to see motion towards preventing phishing attacks in the future.  We've already seen the green field in your URL that some browsers will now provide if you have an extended authentication certificate which, you know, you have to pay more money for, which bugs me.  But we're beginning to see this.  I imagine a system where web browsers preferentially connected over SSL if it was available.  So even though you go http://eBay.com, imagine that the web browser also tries to make an SSL connection, and does so, and prefers it over the non-secure connection if it's available.
 
-It used to be the case that SSL was very expensive in terms of computing to establish due to the computation overhead of secure sockets and the public key crypto that has to be done once during the connection.  But machines have gotten so powerful now, and servers are so powerful, that it just wasn't - it's still the case that SSL is, you know, doing a secure connection is a little more computationally burdensome, but not so that it's significant in this day and age.
+It used to be the case that SSL was very expensive in terms of computing to establish due to the computation overhead of secure sockets and the public key crypto that has to be done once during the connection.  But machines have gotten so powerful now, and servers are so powerful, that it just wasn't - it's still the case that SSL is, you know, doing a secure connection is a little more computationally burdensome, but not so that it's significant in this day andï¿½age.
 
 So I would say the other reason an ISP would be not motivated to insert their own certificate is it would really open them up to liability if anything ever happened and it was found that they were inserting themselves in secure connections without really clear, making it obvious that they were doing so.  Like, for example, adding their own line to every secure page that's displayed, saying this page has been filtered by your ISP.  And if they did that, who would use these people?
 
-LEO:  Yeah.  For your protection.  Filtered for your protection.
+LEO:  Yeah.  For your protection.  Filtered for yourï¿½protection.
 
 STEVE:  So it's exactly like the old spyware argument.  It's like, oh, well, we told our people that we were installing this new search system on their browsers.  Like, no, you didn't.  And if you did, they would hate you, so...
 
@@ -196,17 +196,17 @@ LEO:  So don't.
 
 STEVE:  Right.
 
-LEO:  Eric, anonymously somewhere near the Hong Kong Post Office...
+LEO:  Eric, anonymously somewhere near the Hong Kong Postï¿½Office...
 
 STEVE:  That's actually what he said in his posting, Leo.  I didn't make that up.  He was being funny.
 
 LEO:  Is there any way to use web-based email to send email while remaining completely anonymous?  I tried using TOR, but every web-based email I used asked me to turn on cookies or Java.  This, as we know, can defeat TOR and give away your local public IP.  I suppose that's why they require cookies and Java?
 
-STEVE:  Well, now, it's an interesting question because it's the case that your computer can only give away the information it has.  And if you're behind a residential or local NAT router of some kind, you always certainly have a private IP, not a public IP.  That is, your computer is 192.168. something or other, or 10., or 172. something.  So it might be that your computer doesn't know what your true local public IP is.  It only has your private IP.  So once that's the case, and you're running a TOR client on your machine so that your traffic is encrypted to the first TOR node, the second TOR node, and the third TOR node, after which it goes out, then you really are anonymous.  That is, even a web-based email service that was putting the client IP in the email headers, as we've talked about before, as far as I know they all do except Google.  For whatever reason Google Mail doesn't.  It uses probably something that they can decrypt into that, but at least it's not there; whereas Hotmail and Yahoo! Mail, the last time I looked, both were putting the client IP in there.
+STEVE:  Well, now, it's an interesting question because it'sï¿½the case that your computer can only give away the information it has.  And if you're behind a residential or local NAT router of some kind, you always certainly have a private IP, not a public IP.  That is, your computer is 192.168. something or other, or 10., or 172. something.  So it might be that your computer doesn't know what your true local public IP is.  It only has your private IP.  So once that's the case, and you're running a TOR client on your machine so that your traffic is encrypted to the first TOR node, the second TOR node, and the third TOR node, after which it goes out, then you really are anonymous.  That is, even a web-based email service that was putting the client IP in the email headers, as we've talked about before, as far as I know they all do except Google.  For whatever reason Google Mail doesn't.  It uses probably something that they can decrypt into that, but at least it's not there; whereas Hotmail and Yahoo! Mail, the last time I looked, both were putting the client IP in there.
 
 Still, what those web-based systems would see as the client would be the IP of the last TOR node in the chain.  So again, your browser, through which you are using this web-based email through TOR, it can't give away what it doesn't know.  And it doesn't know your local public IP.  So in fact I think you could be, if you're careful, you could be anonymous using TOR, as long as your local machine did not have your public IP, as long as you were behind a NAT router that was giving your machine a private 192.168 that absolutely does not identify you on the Internet.
 
-LEO:  There are, I should point out, web-based email services designed around privacy.  Phil Zimmermann, the creator of PGP, worked with a company called HushMail.  And Hush Mail uses PGP encryption and presumably has lots of other privacy protections.  They have secure free email.  They also have - by the way, they do certificates now, I see.  That's something new.  Something to look into, HushMail.com.
+LEO:  There are, I should point out, web-based email services designed around privacy.  Phil Zimmermann, the creator of PGP, worked with a company called HushMail.  Andï¿½Hush Mail uses PGP encryption and presumably has lots ofï¿½other privacy protections.  They have secure free email.ï¿½ï¿½They also have - by the way, they do certificates now, I see.  That's something new.  Something to look into,ï¿½HushMail.com.
 
 [Talking simultaneously]
 
@@ -216,7 +216,7 @@ LEO:  Yeah.  I think they're absolutely reliable in that regard.  Moving on to o
 
 Without TOR I'm trackable by IP address, of course.  But my data, assuming secure WiFi or LAN to router, goes from my PC through my ISP's machine and then is routed to the actual page I'm visiting.  The servers with access to my data, such as emails, passwords, and the like, all belong to web hosting companies - well, okay - in whom we place some degree of trust.  I assume that Be Broadband or BT or NTL will not be sniffing my HTTP stream for username/password form posts.  But contrast that with the use of TOR, especially now that we're seeing that there are TOR servers owned by governmental agencies, the Hong Kong Post - oh, no.  Sure, I'm now no longer trackable by IP address, but I place a significant degree of trust in the random person whose TOR node I'm using.  As evidenced by the comments in the last show, it is possible and not uncommon for there to be a sniffer at the TOR node.  So assuming that I'm engaging in normal web browsing without SSL or a VPN connection, it seems to me the risks of data sniffing vastly outweigh the benefits of anonymity.  What do you guys think?
 
-STEVE:  I think he raises a really good point.  Essentially, clearly there's this cluster of interest around TOR's exit traffic because people are doing things through TOR that require anonymity.  So you might argue that TOR is drawing people to itself, that is, spies or security researchers or governments or whatever, who are using TOR as potential high-value sources for questionable web traffic.  And David's point is that, by contrast, when he's not using TOR, his data goes to his ISP and immediately scatters to the winds.  It's going, you know, there's no central, except for the ISP machine where his data does egress onto the Internet, there's no central concentration of his data as there is in the case of a TOR node.  Nor, and I think more importantly, is there any reason for someone to suspect that that data might be interesting to them.  Whereas the data exiting TOR nodes, it's probably a little more risqué.
+STEVE:  I think he raises a really good point.  Essentially, clearly there's this cluster of interest around TOR's exit traffic because people are doing things through TOR that require anonymity.  So you might argue that TOR is drawing people to itself, that is, spies or security researchers or governments or whatever, who are using TOR as potential high-value sources for questionable web traffic.  And David's point is that, by contrast, when he's not using TOR, his data goes to his ISP and immediately scatters to the winds.  It's going, you know, there's no central, except for the ISP machine where his data does egress onto the Internet, there's no central concentration of his data as there is in the case of a TOR node.  Nor, and I think more importantly, is there any reason for someone to suspect that that data might be interesting to them.  Whereas the data exiting TOR nodes, it's probably a little more risquï¿½.
 
 LEO:  Yeah.  Well, again, let's emphasize, it's for anonymity, not security.  And it's good to know that.
 
@@ -242,17 +242,17 @@ LEO:  I think that's a good way to do it.  That's your cheat sheet.  No robots l
 
 Laura Cooksey in - is Laura next?  I want to make sure I didn't skip anybody.  Yeah, Laura Cooksey in Burke, VA, a suburb of Washington, D.C., says:  I've used Steve's free Unplug N' Pray widget to disable the Universal Plug and Play service on all my computers.  Also - I like you, Laura - disabled UPnP on my Linksys WRT54G router.  However, Microsoft strongly recommends that UPnP be turned on in routers used with Xbox Live to ensure best performance in multiplayer games.  Since I've disabled UPnP on my computers, is it safe to enable UPnP in my router full-time, or should I only enable it when I'm planning to game and then disable it when I'm done?  And while we're talking about that, maybe I could ask you about UPnP2, which Microsoft says solves the security issues of Universal Plug and Play.
 
-STEVE:  I have not yet looked at UPnP2, but I definitely will.
+STEVE:  I have not yet looked at UPnP2, but I definitelyï¿½will.
 
 LEO:  That's what their Windows Home Server uses.  And since a lot of people I think are going to use Windows Home Server as a router and a bridge to the Internet, I think we should look into this.
 
 STEVE:  Oh, I absolutely will for sure.  Laura's question was great because the answer is, well, first of all, no, that it is not safe to enable UPnP in the router.  And in fact, if you had to disable UPnP facility anywhere in your network, Laura, the one place you want to disable it is the router.  You could even leave it turned on on all the machines that are behind the router.  The reason I did Unplug N' Pray widget was that, as was the case with probably every server Microsoft ever created - and of course Universal Plug and Play service is a server, meaning that it had an open port.  So anybody not behind a router had this open port exposed to the Internet, and there was a buffer overflow that allowed people to take over your machines remotely.  So at the time I immediately created Unplug N' Pray just to turn it off because also at the time almost no one needed it.
 
-Now, for example, we're seeing the case that, with the Xbox, it would like to have Universal Plug and Play enabled on the router so that it's able to essentially open incoming ports back through the router to your LAN.  Thus the danger of having Universal Plug and Play first edition, that is, v1 of Universal Plug and Play, enabled on your router is that, even with the services disabled, your Windows Universal Plug and Play service disabled, it's still possible, just using some UDP and TCP traffic that any trojan could easily generate, it's still possible for them to query your LAN, find any Universal Plug and Play-equipped devices, determine it's a gateway, i.e., your router, and then talk to it behind your back in order to enable incoming unsolicited traffic, which is exactly why we've got the router there as one of the substantial security benefits, for example, if Windows, even in a vulnerable state, were behind the router, that Universal Plug and Play vulnerability would have never been a problem.  It was only for people whose machines were directly on the Internet, which even now just saying that just sort of makes me shudder because having a NAT router is just such good security.  But if you enable Universal Plug and Play on a router, and something did get into your machine that could talk to the router, then you're in trouble.
+Now, for example, we're seeing the case that, with the Xbox, it would like to have Universal Plug and Play enabled on the router so that it's able to essentially open incoming ports back through the router to your LAN.  Thus the danger of having Universal Plug and Play first edition, that is, v1 of Universal Plug and Play, enabled on your router is that, even with the services disabled, your Windows Universal Plug and Play service disabled, it's still possible, just using some UDP and TCP traffic that any trojan could easily generate, it's still possible for them to query your LAN, find any Universal Plug and Play-equipped devices, determine it's a gateway, i.e., your router, and then talk to it behind your back in order to enable incoming unsolicited traffic, which is exactly why we've got the router there as one of the substantial security benefits, for example, if Windows, even in a vulnerable state, were behind the router, that Universal Plug and Play vulnerability would have never been a problem.  It was only for people whose machines were directly on the Internet, which even now just saying that just sort of makes me shudder because having a NAT router isï¿½just such good security.  But if you enable Universal Plug and Play on a router, and something did get into your machine that could talk to the router, then you're inï¿½trouble.
 
 Now, the good news is - I did some research on this - there are only two ports that the Xbox actually has to have open.  Microsoft documents this in a Knowledge Base article, 908874.  And so if you just go to Microsoft.com and put in KB - for knowledge base - 908874, you can go there.  But I can also tell you what it is because it's very simple.
 
-The Xbox Live system needs the UDP port 88 and both UDP and TC ports 3074 mapped into your network.  So what you can do is - and obviously Laura is listening to this and is very tech savvy or security savvy, you would like to give your Xbox a static IP within your LAN.  Normally when you turn a computer on it gets the next address available, 192.168.0.1, .0.2., .0.3, .0.4, and just sort of goes up that way.  What you'd like to do, though, is you'd like your Xbox to always receive the same IP so that it's not floating around, its IP is not changing.  That's because you want to forward those ports I just named, UDP 88 and TCP and UDP 3074, you'd like to forward them to that fixed IP where the Xbox will always reside.
+The Xbox Live system needs the UDP port 88 and both UDP and TC ports 3074 mapped into your network.  So what you can do is - and obviously Laura is listening to this and is very tech savvy or security savvy, you would like to give your Xbox a static IP within your LAN.  Normally when you turn a computer on it gets the next address available, 192.168.0.1, .0.2., .0.3, .0.4, and just sort of goes up that way.  What you'd like to do, though, is you'd like your Xbox to always receive the same IP so that it's not floating around, its IP is not changing.  That's because you want to forward those ports I just named, UDP 88 and TCP and UDP 3074, you'd like to forward them to that fixed IP where the Xbox will alwaysï¿½reside.
 
 All routers now allow you to define a fixed IP based on the MAC address of the LAN adapter on the network.  So you first look at the client list to find your Xbox, and it'll be listed there based on its IP.  Then you can figure DHCP to always give that MAC address the same IP.  You probably want to pull it up out of your normal range, like 192.168.0.40 or something.  Doesn't want to be too high because some NAT routers won't allow the numbers to go all the way up to 255.  But 40 would be safe unless you've got 42 computers in your LAN, and I think few users probably do.  So that would always give the Xbox the same IP.
 
@@ -299,7 +299,7 @@ LEO:  Adam in Ottumwa, Iowa says:  I've been dutifully listening along with Secu
 
 STEVE:  Well, it didn't depend upon that.  I did not know what Safari's private browsing was until I got this posting and took a look around.  And I think it is extremely cool, Leo.  It's right there on the Safari main menu.  And you turn on private browsing, and it pops up a notice warning you about all the things that are deliberately not going to save your state.
 
-LEO:  When private browsing is turned on, web pages are not added to the history.  Items are automatically removed from the downloads window.  Information isn't saved for autofill.  Searches are not added to the pop-up menu.  Until you close the window, you still can click the back and forward buttons to return to pages you've opened.  And that's where it stops.  But just to go on, no cookies are saved; no state is saved.
+LEO:  When private browsing is turned on, web pages are not added to the history.  Items are automatically removed from the downloads window.  Information isn't saved for autofill.  Searches are not added to the pop-up menu.  Until you close the window, you still can click the back and forward buttons to return to pages you've opened.  And that's where it stops.  But just to go on, no cookies are saved; no state isï¿½saved.
 
 STEVE:  Isn't that cool?  I didn't even know that was there.  And it's funny because, as I was doing some research, I found some blogs that refer to it as "porn mode."
 
@@ -307,7 +307,7 @@ LEO:  Yeah.  That's what it's for, of course.  Everybody knows that.  Well, what
 
 STEVE:  Because, you know, so much effort has gone into eliminating the state of where people surf, with all kinds of third-party tools.  And I thought, wow, this is a cool feature for a browser to have, and all browsers ought to have it.
 
-LEO:  I think IE7 has something similar.  It basically clears history when you close it.  The point is, your system was designed specifically to get around that by not using cookies.
+LEO:  I think IE7 has something similar.  It basically clears history when you close it.  The point is, your system was designed specifically to get around that by not usingï¿½cookies.
 
 STEVE:  Yes.  And in fact my system would work perfectly, even with private browsing enabled in Safari and any other browser, because essentially it's the page itself, the page the user receives carries the state information, not cookies or URLs or history or any other mechanism.  So when you submit the form, that page that contained the data, a piece of it goes back with the form to the server.  So it is the case that at least GRC's eCommerce system functions without scripting or cookies of any sort because the actual page is where that state is saved.  But I just, for users who hadn't run across that private browsing feature, I wanted to put this question in because it's like, hey, I'm glad to know that's there.
 
@@ -341,7 +341,7 @@ STEVE:  No, in fact you would not want to run it on a so-called thick RAID contr
 
 LEO:  Ah, do individual drives.
 
-STEVE:  Exactly.  Stick it onto a regular motherboard connection, which you probably have right there on the motherboard, and SpinRite will see it and run on it just fine.
+STEVE:  Exactly.  Stick it onto a regular motherboard connection, which you probably have right there on the motherboard, and SpinRite will see it and run on it justï¿½fine.
 
 LEO:  And that works because you don't need a file system; you don't need to know that the files are all there.  You're looking at such a low level, you're not looking at how it's written or anything like that.
 
@@ -353,7 +353,7 @@ LEO:  Makes sense.  And actually I'm glad you addressed this notion of software 
 
 Eliezer Martinez, listening from Puerto Rico, wonders about OpenDNS.  He says:  I recently started using OpenDNS because it supposedly speeds up the loading of pages.  Seems to, he says, mostly because they block known phishing sites.  After listening to your latest feedback episode in which you explain the pros and mostly the cons of using TOR, it made me question whether OpenDNS is worth using.  Maybe I'm paranoid - thank you, Steve - but I stopped using it in fear that sensitive information like Internet banking transactions could be monitored by the OpenDNS people.  What are your thoughts about it?  Am I mixing up two different things, or should the same precautions be taken when redirecting web traffic through a third party with OpenDNS?
 
-STEVE:  Well, that's a really great question.  OpenDNS, of course, is essentially an independent domain name server system.  And it is popular with many security-conscious users.
+STEVE:  Well, that's a really great question.  OpenDNS, ofï¿½course, is essentially an independent domain name serverï¿½system.  And it is popular with many security-conscious users.
 
 LEO:  I use it all the time.
 

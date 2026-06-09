@@ -1,5 +1,5 @@
 # Define the OneDrive path specific to ${domain}
-$oneDrivePath = "C:\users\$env:USERNAME\OneDrive - ${domain}"
+$oneDrivePath = "C:\users\OneDrive"
 
 # Define the name of the OneDrive process
 $onedriveProcessName = "OneDrive"

@@ -1,4 +1,4 @@
-﻿# Define OneDrive path specific to ${domainup}
+# Define OneDrive path specific to ${domainup}
 
 $oneDrivePath = "C:\users\$env:USERNAME\OneDrive - ${domain}"
 # Check if OneDrive process is running

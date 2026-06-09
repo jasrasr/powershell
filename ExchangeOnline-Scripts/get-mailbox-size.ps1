@@ -5,7 +5,7 @@
 # Modified Date : 2025-10-08
 
 param(
-    [string]$MailboxIdentity = 'paula.stoneman@middough.com'
+    [string]$MailboxIdentity = 'email@domain.com'
 )
 
 function Convert-ToBytes {

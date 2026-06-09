@@ -1,7 +1,8 @@
 # Notification Manager Module
 # Author: Jason Lamb (@jasrasr) (with help from GitHub Copilot)
 # Created: 7/8/25
-# Description: PowerShell module for managing notifications with read/unread status
+# Modified: 2026-05-15
+# Description: PowerShell module for managing notifications with read/unread status and action logging
 
 # Define the notifications data file path
 $script:NotificationsPath = if ($IsLinux -or $IsMacOS) {
@@ -13,6 +14,11 @@ $script:NotificationsFile = if ($IsLinux -or $IsMacOS) {
     "$script:NotificationsPath/notifications.json"
 } else {
     "$script:NotificationsPath\notifications.json"
+}
+$script:NotificationsLogFile = if ($IsLinux -or $IsMacOS) {
+    "$script:NotificationsPath/notifications-log.jsonl"
+} else {
+    "$script:NotificationsPath\notifications-log.jsonl"
 }
 
 # Ensure the notifications directory exists
@@ -59,6 +65,29 @@ function Save-NotificationsToFile {
     }
 }
 
+# Helper function to append a log entry (JSONL - one JSON object per line)
+function Write-NotificationLog {
+    param(
+        [string]$Action,
+        [string]$NotificationId = "",
+        [string]$Details = ""
+    )
+
+    $entry = [PSCustomObject]@{
+        Timestamp      = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+        Action         = $Action
+        NotificationId = $NotificationId
+        Details        = $Details
+    }
+
+    try {
+        $entry | ConvertTo-Json -Compress | Add-Content -Path $script:NotificationsLogFile -Encoding UTF8
+    }
+    catch {
+        Write-Warning "Failed to write notification log: $_"
+    }
+}
+
 # Function to create a new notification
 function New-Notification {
     [CmdletBinding()]
@@ -100,6 +129,7 @@ function New-Notification {
     
     # Save to file
     if (Save-NotificationsToFile -Notifications $notifications) {
+        Write-NotificationLog -Action "New-Notification" -NotificationId $notification.Id -Details "Title: $Title | Type: $Type | Category: $Category"
         Write-Host "Notification created successfully: $Title" -ForegroundColor Green
         return $notification
     }
@@ -168,6 +198,7 @@ function Set-NotificationRead {
     if ($notification) {
         $notification.IsRead = $true
         if (Save-NotificationsToFile -Notifications $notifications) {
+            Write-NotificationLog -Action "Set-NotificationRead" -NotificationId $Id -Details "Title: $($notification.Title)"
             Write-Host "Notification marked as read" -ForegroundColor Green
             return $true
         }
@@ -196,6 +227,7 @@ function Set-NotificationUnread {
     if ($notification) {
         $notification.IsRead = $false
         if (Save-NotificationsToFile -Notifications $notifications) {
+            Write-NotificationLog -Action "Set-NotificationUnread" -NotificationId $Id -Details "Title: $($notification.Title)"
             Write-Host "Notification marked as unread" -ForegroundColor Yellow
             return $true
         }
@@ -323,6 +355,7 @@ function Remove-Notification {
     
     if ($notifications.Count -lt $originalCount) {
         if (Save-NotificationsToFile -Notifications $notifications) {
+            Write-NotificationLog -Action "Remove-Notification" -NotificationId $Id
             Write-Host "Notification removed successfully" -ForegroundColor Green
             return $true
         }
@@ -365,6 +398,8 @@ function Clear-Notifications {
     }
     
     if (Save-NotificationsToFile -Notifications $notifications) {
+        $scope = if ($ReadOnly) { "read-only" } else { "all" }
+        Write-NotificationLog -Action "Clear-Notifications" -Details "Scope: $scope"
         Write-Host "Notifications cleared successfully" -ForegroundColor Green
         return $true
     }
@@ -372,6 +407,37 @@ function Clear-Notifications {
         Write-Error "Failed to clear notifications"
         return $false
     }
+}
+
+# Function to read and display the action log
+function Get-NotificationLog {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $false)]
+        [int]$Last = 0,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("New-Notification", "Set-NotificationRead", "Set-NotificationUnread", "Remove-Notification", "Clear-Notifications")]
+        [string]$Action
+    )
+
+    if (-not (Test-Path -Path $script:NotificationsLogFile)) {
+        Write-Host "No log file found." -ForegroundColor Yellow
+        return @()
+    }
+
+    $lines = Get-Content -Path $script:NotificationsLogFile -Encoding UTF8 | Where-Object { $_ -ne "" }
+    $entries = $lines | ForEach-Object { $_ | ConvertFrom-Json }
+
+    if ($Action) {
+        $entries = $entries | Where-Object { $_.Action -eq $Action }
+    }
+
+    if ($Last -gt 0) {
+        $entries = $entries | Select-Object -Last $Last
+    }
+
+    return $entries
 }
 
 # Export functions for module use
@@ -386,6 +452,7 @@ if ($MyInvocation.MyCommand.Name -eq "NotificationManager.ps1") {
         'Show-Notifications',
         'Get-NotificationStatistics',
         'Remove-Notification',
-        'Clear-Notifications'
+        'Clear-Notifications',
+        'Get-NotificationLog'
     )
 }

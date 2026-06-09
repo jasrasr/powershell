@@ -1,12 +1,12 @@
 [2025-08-18 11:48:26] Checking TXT: sn-1030.txt
-[2025-08-18 11:48:27] Error: https://www.grc.com/sn/sn-1030.txt - Could not find a part of the path 'C:\users\jason.lamb\OneDrive - middough\documents\github\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\TXT-Transcriptions\sn-1030.txt'.
+[2025-08-18 11:48:27] Error: https://www.grc.com/sn/sn-1030.txt - Could not find a part of the path 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\documents\github\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\TXT-Transcriptions\\sn-1030.txt'.
 [2025-08-18 11:48:27] Checking TXT: sn-1031.txt
-[2025-08-18 11:48:28] Error: https://www.grc.com/sn/sn-1031.txt - Could not find a part of the path 'C:\users\jason.lamb\OneDrive - middough\documents\github\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\TXT-Transcriptions\sn-1031.txt'.
+[2025-08-18 11:48:28] Error: https://www.grc.com/sn/sn-1031.txt - Could not find a part of the path 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\documents\github\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\TXT-Transcriptions\\sn-1031.txt'.
 [2025-08-18 11:48:28] TXT stopped after 2 consecutive failures at sn-1032.txt
 [2025-08-18 11:48:28] Checking PDF: sn-1030-notes.pdf
-[2025-08-18 11:48:29] Error: https://www.grc.com/sn/sn-1030-notes.pdf - Could not find a part of the path 'C:\users\jason.lamb\OneDrive - middough\documents\github\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\PDF-Show-Notes\sn-1030-notes.pdf'.
+[2025-08-18 11:48:29] Error: https://www.grc.com/sn/sn-1030-notes.pdf - Could not find a part of the path 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\documents\github\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\PDF-Show-Notes\sn-1030-notes.pdf'.
 [2025-08-18 11:48:29] Checking PDF: sn-1031-notes.pdf
-[2025-08-18 11:48:29] Error: https://www.grc.com/sn/sn-1031-notes.pdf - Could not find a part of the path 'C:\users\jason.lamb\OneDrive - middough\documents\github\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\PDF-Show-Notes\sn-1031-notes.pdf'.
+[2025-08-18 11:48:29] Error: https://www.grc.com/sn/sn-1031-notes.pdf - Could not find a part of the path 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\documents\github\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\PDF-Show-Notes\sn-1031-notes.pdf'.
 [2025-08-18 11:48:29] PDF stopped after 2 consecutive failures at sn-1032-notes.pdf
 [2025-08-18 11:48:29] TXT files downloaded: 0
 [2025-08-18 11:48:29] PDF files downloaded: 0

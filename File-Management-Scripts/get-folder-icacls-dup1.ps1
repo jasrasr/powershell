@@ -19,7 +19,7 @@ foreach ($folder in $folders) {
         Write-Host "The specified folder path does not exist: $folder" -ForegroundColor Red
     }
 }
-notepad "$githubpathPowerShell-Private\File-Management-Scripts\n drive client and folder icacls.txt"
+notepad "$githubpath\PowerShell-Private\File-Management-Scripts\n drive client and folder icacls.txt"
 
 $files = @(
     "$githubpath\robocopy Logs\clean\robocopy-2025-03-31-12-58-44.log",

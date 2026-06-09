@@ -1,199 +1,351 @@
-# Revision : 1.8
-# Description : Downloads GRC Security Now transcripts and PDF show notes with resume, logging, and persistent tracking
-# Author : Jason Lamb (with help from ChatGPT)
-# Created Date : 2025-05-16
-# Modified Date : 2025-08-18
+# Filename: download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com.ps1
+# Revision: 2.6
+# Description: Downloads GRC Security Now TXT transcripts, PDF show notes, and JPG episode images (all weekly podcast) with smart empty folder detection and resume, logging, and persistent tracking
+# Author: Jason Lamb (with help from ChatGPT)
+# Created Date: 2025-05-16
+# Modified Date: 2026-03-20
+# Changelog:
+# 1.0 Initial release
+# 1.1 Added logging improvements
+# 1.2 Added resume via JSON tracking
+# 1.3 Added two-consecutive-failure stop logic
+# 1.4 Improved folder initialization and error handling
+# 1.5 Added PDF show notes support
+# 1.6 Refined resume handling and logging output
+# 1.7 Minor stability fixes
+# 1.8 Improved persistent tracking and resume reliability
+# 1.9 Added JPG download support
+# 2.0 Added proper JPG starting point (999) and unlimited forward growth
+# 2.1 Set TXT start to 001 (padded), PDF start to 595, starting numbers used only when JSON not present
+# 2.2 Updated JPG to grab all available from 1 to 1069+
+# 2.3 Removed hard 1069 limit, JPG now runs indefinitely for weekly podcast with smart failure detection
+# 2.4 All three file types (TXT, PDF, JPG) now run indefinitely with independent empty folder detection - works with new and existing computers
+# 2.5 Fixed jpgDownloaded init from 19 to 0; fixed no-JSON path to scan existing files instead of always restarting from hardcoded starting points
+# 2.6 All three file types now run through all episodes below 1070 without stopping on failures; stop after 2 consecutive failures at 1070 and beyond; updated PDF start to 432, JPG start to 980
 
 $global:downloadbase = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads"
 $global:baseUrl = "https://www.grc.com/sn/"
-$startingPoint = 1030
-$global:lastTXTDownloaded = $null
-$global:lastPDFDownloaded = $null
+$global:jpgBaseUrl = "https://www.grc.com/sn/"
+
+$startingPointTXT = 1     # 001
+$startingPointPDF = 432   # Earliest available PDF on grc.com
+$startingPointJPG = 980   # Earliest available JPG on grc.com
+
 $trackingFile = Join-Path $global:downloadbase 'last-downloaded.json'
 
-# Ensure base folder exists
-if (-not (Test-Path $global:downloadbase)) {
-    New-Item -Path $global:downloadbase -ItemType Directory -Force | Out-Null
-}
+# Ensure base folders exist
+New-Item -Path $global:downloadbase -ItemType Directory -Force | Out-Null
 
-# Init folders
-$txtFolder = "$global:downloadbase\TXT-Transcriptions"
-$pdfFolder = "$global:downloadbase\PDF-Show-Notes"
+$txtFolder = Join-Path $global:downloadbase "TXT-Transcriptions"
+$pdfFolder = Join-Path $global:downloadbase "PDF-Show-Notes"
+$jpgFolder = Join-Path $global:downloadbase "JPG-Episode-Images"
+$logFolder = Join-Path $global:downloadbase "Download-Logs"
 
-# Init log
-$global:logFile = "$global:downloadbase\Download-Logs\download-log-$(Get-Date -Format 'yyyyMMdd').txt"
-# Test if log file exist and create if not
-if(-not(Test-Path $global:logFile)) {
-    New-Item -Path "$global:downloadbase\Download-Logs" -ItemType Directory -Force | Out-Null
-}
+New-Item -Path $txtFolder -ItemType Directory -Force | Out-Null
+New-Item -Path $pdfFolder -ItemType Directory -Force | Out-Null
+New-Item -Path $jpgFolder -ItemType Directory -Force | Out-Null
+New-Item -Path $logFolder -ItemType Directory -Force | Out-Null
+
+$global:logFile = Join-Path $logFolder ("download-log-{0}.txt" -f (Get-Date -Format 'yyyyMMdd'))
 
 function Write-Log {
     param ([string]$Message)
     $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
-    Add-Content -Path $global:logFile -Value "[$timestamp] $Message"
+    Add-Content -Path $global:logFile -Value ("[{0}] {1}" -f $timestamp, $Message)
 }
 
-# Load last downloaded number or fallback to starting point
+function Get-HighestEpisodeFromFolder {
+    param (
+        [string]$Folder,
+        [string]$Filter,
+        [string]$Pattern
+    )
+
+    $maxEpisode = $null
+    Get-ChildItem -Path $Folder -Filter $Filter -File -ErrorAction SilentlyContinue | ForEach-Object {
+        if ($_.Name -match $Pattern) {
+            $episode = [int]$matches[1]
+            if ($null -eq $maxEpisode -or $episode -gt $maxEpisode) {
+                $maxEpisode = $episode
+            }
+        }
+    }
+
+    return $maxEpisode
+}
+
+# ===== CHECK IF FOLDERS ARE EMPTY =====
+$txtFilesExist = (Get-ChildItem -Path $txtFolder -Filter "*.txt" -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0
+$pdfFilesExist = (Get-ChildItem -Path $pdfFolder -Filter "*.pdf" -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0
+$jpgFilesExist = (Get-ChildItem -Path $jpgFolder -Filter "*.jpg" -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0
+
+# ===== SCAN FOLDERS FOR HIGHEST EXISTING EPISODE =====
+$global:baselineLastTXT = Get-HighestEpisodeFromFolder -Folder $txtFolder -Filter "sn-*.txt" -Pattern '^sn-(\d+)\.txt$'
+$global:baselineLastPDF = Get-HighestEpisodeFromFolder -Folder $pdfFolder -Filter "sn-*-notes.pdf" -Pattern '^sn-(\d+)-notes\.pdf$'
+$global:baselineLastJPG = Get-HighestEpisodeFromFolder -Folder $jpgFolder -Filter "*.jpg" -Pattern '^(\d+)\.jpg$'
+
+# ===== LOAD TRACKING =====
 if (Test-Path $trackingFile) {
     try {
-        $trackingData = Get-Content -Path $trackingFile | ConvertFrom-Json
-        $global:nextFileNumber = [int]$trackingData.LastTXT + 1
-        $global:nextfilenumberpdf = [int]$trackingData.LastPDF + 1
-        Write-Host "Resuming from JSON : TXT $($global:nextFileNumber), PDF $($global:nextfilenumberpdf)" -ForegroundColor Cyan
-        Write-Log "Resuming from last-downloaded.json"
-    } catch {
-        Write-Host "Failed to parse last-downloaded.json, defaulting to $startingPoint" -ForegroundColor Red
-        Write-Log "Failed to parse last-downloaded.json, defaulting to $startingPoint"
-        $global:nextFileNumber = $startingPoint
-        $global:nextfilenumberpdf = $startingPoint
-    }
-} else {
-    $global:nextFileNumber = $startingPoint
-    $global:nextfilenumberpdf = $startingPoint
-    Write-Host "No tracking file found, starting from $startingPoint" -ForegroundColor Yellow
-    Write-Log "No tracking file found, starting from $startingPoint"
-}
+        $trackingData = Get-Content $trackingFile -Raw | ConvertFrom-Json
 
+        # If folder is empty, force start from beginning (ignore JSON for that type)
+        if ($txtFilesExist) {
+            $global:nextTXT = [int]$trackingData.LastTXT + 1
+        }
+        else {
+            $global:nextTXT = $startingPointTXT
+            Write-Host "TXT folder is empty. Force-starting TXT download from $startingPointTXT." -ForegroundColor Yellow
+            Write-Log "TXT folder is empty. Force-starting TXT download from $startingPointTXT."
+        }
+
+        if ($pdfFilesExist) {
+            $global:nextPDF = [int]$trackingData.LastPDF + 1
+        }
+        else {
+            $global:nextPDF = $startingPointPDF
+            Write-Host "PDF folder is empty. Force-starting PDF download from $startingPointPDF." -ForegroundColor Yellow
+            Write-Log "PDF folder is empty. Force-starting PDF download from $startingPointPDF."
+        }
+
+        if ($jpgFilesExist) {
+            $global:nextJPG = [int]$trackingData.LastJPG + 1
+        }
+        else {
+            $global:nextJPG = $startingPointJPG
+            Write-Host "JPG folder is empty. Force-starting JPG download from $startingPointJPG." -ForegroundColor Yellow
+            Write-Log "JPG folder is empty. Force-starting JPG download from $startingPointJPG."
+        }
+
+        Write-Host ("Resuming from JSON : TXT {0:000}, PDF {1}, JPG {2}" -f $global:nextTXT, $global:nextPDF, $global:nextJPG) -ForegroundColor Cyan
+        Write-Log ("Resumed from JSON : TXT {0:000}, PDF {1}, JPG {2}" -f $global:nextTXT, $global:nextPDF, $global:nextJPG)
+    }
+    catch {
+        Write-Host "Tracking file corrupt. Using starting numbers." -ForegroundColor Red
+        Write-Log "Tracking file corrupt. Using starting numbers."
+
+        $global:nextTXT = $startingPointTXT
+        $global:nextPDF = $startingPointPDF
+        $global:nextJPG = $startingPointJPG
+    }
+}
+else {
+    # No JSON - resume from highest file found on disk, or use hardcoded starting points for fresh installs
+    $global:nextTXT = if ($null -ne $global:baselineLastTXT) { $global:baselineLastTXT + 1 } else { $startingPointTXT }
+    $global:nextPDF = if ($null -ne $global:baselineLastPDF) { $global:baselineLastPDF + 1 } else { $startingPointPDF }
+    $global:nextJPG = if ($null -ne $global:baselineLastJPG) { $global:baselineLastJPG + 1 } else { $startingPointJPG }
+
+    Write-Host ("No tracking file found. Starting from : TXT {0:000}, PDF {1}, JPG {2}" -f $global:nextTXT, $global:nextPDF, $global:nextJPG) -ForegroundColor Yellow
+    Write-Log ("No tracking file found. Starting from : TXT {0:000}, PDF {1}, JPG {2}" -f $global:nextTXT, $global:nextPDF, $global:nextJPG)
+}
 
 $global:txtDownloaded = 0
 $global:pdfDownloaded = 0
+$global:jpgDownloaded = 0
 
-function get-grctxttranscript {
+$global:lastTXT = $null
+$global:lastPDF = $null
+$global:lastJPG = $null
+
+# ===== TXT =====
+function Get-GRCTXT {
+
+    $maxConsecutiveFailures = 2
     $failureCount = 0
-    while ($failureCount -lt 2) {
-        Write-Host "Next TXT file number to check: $global:nextFileNumber"
-        Write-Log "Checking TXT: sn-$global:nextFileNumber.txt"
 
-        $txtUrl = "${global:baseUrl}sn-$global:nextFileNumber.txt"
-        $txtFilePath = "$txtFolder\sn-$global:nextFileNumber.txt"
+    while ($true) {
 
-        if (Test-Path $txtFilePath) {
-            Write-Host "TXT already exists: sn-$global:nextFileNumber.txt, skipping download." -ForegroundColor Green
-            Write-Log "Skipped (exists): sn-$global:nextFileNumber.txt"
+        $txtNumPadded = $global:nextTXT.ToString('000')
+        $txtUrl = "{0}sn-{1}.txt" -f $global:baseUrl, $txtNumPadded
+        $txtPath = Join-Path $txtFolder ("sn-{0}.txt" -f $txtNumPadded)
+
+        Write-Host ("Checking TXT : sn-{0}.txt" -f $txtNumPadded)
+        Write-Log ("Checking TXT : sn-{0}.txt" -f $txtNumPadded)
+
+        if (Test-Path $txtPath) {
             $failureCount = 0
-            $global:nextFileNumber++
+            $global:nextTXT++
             continue
-        } else {
-            try {
-                $txtResponse = Invoke-WebRequest -Uri $txtUrl -Method Head -ErrorAction Stop
-                if ($txtResponse.StatusCode -eq 200) {
-                    Write-Host "Downloading TXT: sn-$global:nextFileNumber.txt" -ForegroundColor Yellow
-                    Invoke-WebRequest -Uri $txtUrl -OutFile $txtFilePath
-                    Write-Host $txtUrl -ForegroundColor Yellow
-                    Write-Log "Downloaded: sn-$global:nextFileNumber.txt"
-                    $global:txtDownloaded++
-                    $global:lastTXTDownloaded = $global:nextFileNumber
-                    $failureCount = 0
-                    $global:nextFileNumber++
+        }
 
-                } else {
-                    Write-Host "TXT url not found on web: sn-$global:nextFileNumber.txt" -ForegroundColor Red
-                    Write-Log "Not found (HEAD 404): sn-$global:nextFileNumber.txt"
-                    $failureCount++
-                    $global:nextFileNumber++
-                }
-            } catch {
-                Write-Host "Error accessing the URL: $txtUrl" -ForegroundColor Red
-                Write-Log "Error: $txtUrl - $_"
-                $failureCount++
-                $global:nextFileNumber++
+        try {
+            $response = Invoke-WebRequest -Uri $txtUrl -Method Head -ErrorAction Stop
+            if ($response.StatusCode -eq 200) {
+                Invoke-WebRequest -Uri $txtUrl -OutFile $txtPath -ErrorAction Stop
+                $global:txtDownloaded++
+                $global:lastTXT = $global:nextTXT
+                $failureCount = 0
+                Write-Log ("Downloaded TXT : sn-{0}.txt" -f $txtNumPadded)
+            }
+        }
+        catch {
+            $failureCount++
+            Write-Log ("Missing TXT : sn-{0}.txt" -f $txtNumPadded)
+
+            # Before episode 1070, keep going through gaps - all episodes are known to exist in this range
+            # At 1070 and beyond, stop after 2 consecutive failures (new episode territory)
+            if ($global:nextTXT -ge 1070 -and $failureCount -ge $maxConsecutiveFailures) {
+                Write-Host ("Stopping TXT download after {0} consecutive failures at episode {1}" -f $maxConsecutiveFailures, $txtNumPadded) -ForegroundColor Yellow
+                Write-Log ("Stopping TXT download after {0} consecutive failures at episode {1}" -f $maxConsecutiveFailures, $txtNumPadded)
+                break
             }
         }
 
-        if ($failureCount -eq 2) {
-            Write-Host "Stopped downloading after two consecutive failures." -ForegroundColor Red
-            Write-Log "TXT stopped after 2 consecutive failures at sn-$global:nextFileNumber.txt"
-            break
-        }
+        $global:nextTXT++
     }
 }
 
-function get-grcpdfshownotes {
+# ===== PDF =====
+function Get-GRCPDF {
+
+    $maxConsecutiveFailures = 2
     $failureCount = 0
-    while ($failureCount -lt 2) {
-        Write-Host "Next PDF file number to check: $global:nextfilenumberpdf"
-        Write-Log "Checking PDF: sn-$global:nextfilenumberpdf-notes.pdf"
 
-        $pdfUrl = "${global:baseUrl}sn-$global:nextfilenumberpdf-notes.pdf"
-        $pdfFilePath = "$pdfFolder\sn-$global:nextfilenumberpdf-notes.pdf"
+    while ($true) {
 
-        if (Test-Path $pdfFilePath) {
-            Write-Host "PDF already exists: sn-$global:nextfilenumberpdf-notes.pdf, skipping download." -ForegroundColor Green
-            Write-Log "Skipped (exists): sn-$global:nextfilenumberpdf-notes.pdf"
+        $pdfUrl = "{0}sn-{1}-notes.pdf" -f $global:baseUrl, $global:nextPDF
+        $pdfPath = Join-Path $pdfFolder ("sn-{0}-notes.pdf" -f $global:nextPDF)
+
+        Write-Host ("Checking PDF : sn-{0}-notes.pdf" -f $global:nextPDF)
+        Write-Log ("Checking PDF : sn-{0}-notes.pdf" -f $global:nextPDF)
+
+        if (Test-Path $pdfPath) {
             $failureCount = 0
-            $global:nextfilenumberpdf++
+            $global:nextPDF++
             continue
-        } else {
-            try {
-                $pdfResponse = Invoke-WebRequest -Uri $pdfUrl -Method Head -ErrorAction Stop
-                if ($pdfResponse.StatusCode -eq 200) {
-                    Write-Host "Downloading PDF: sn-$global:nextfilenumberpdf-notes.pdf" -ForegroundColor Yellow
-                    Invoke-WebRequest -Uri $pdfUrl -OutFile $pdfFilePath
-                    Write-Host $pdfUrl -ForegroundColor Yellow
-                    Write-Log "Downloaded: sn-$global:nextfilenumberpdf-notes.pdf"
-                    $global:pdfDownloaded++
-                    $global:lastPDFDownloaded = $global:nextfilenumberpdf
-                    $failureCount = 0
+        }
 
-                } else {
-                    Write-Host "PDF url not found on web: sn-$global:nextfilenumberpdf-notes.pdf" -ForegroundColor Red
-                    Write-Host $pdfUrl -ForegroundColor Red
-                    Write-Log "Not found (HEAD 404): sn-$global:nextfilenumberpdf-notes.pdf"
-                    $failureCount++
-                }
-            } catch {
-                Write-Host "Error with URL: $pdfUrl" -ForegroundColor Red
-                Write-Log "Error: $pdfUrl - $_"
-                $failureCount++
+        try {
+            $response = Invoke-WebRequest -Uri $pdfUrl -Method Head -ErrorAction Stop
+            if ($response.StatusCode -eq 200) {
+                Invoke-WebRequest -Uri $pdfUrl -OutFile $pdfPath -ErrorAction Stop
+                $global:pdfDownloaded++
+                $global:lastPDF = $global:nextPDF
+                $failureCount = 0
+                Write-Log ("Downloaded PDF : sn-{0}-notes.pdf" -f $global:nextPDF)
             }
+        }
+        catch {
+            $failureCount++
+            Write-Log ("Missing PDF : sn-{0}-notes.pdf" -f $global:nextPDF)
 
-            $global:nextfilenumberpdf++
+            # Before episode 1070, keep going through gaps - all episodes are known to exist in this range
+            # At 1070 and beyond, stop after 2 consecutive failures (new episode territory)
+            if ($global:nextPDF -ge 1070 -and $failureCount -ge $maxConsecutiveFailures) {
+                Write-Host ("Stopping PDF download after {0} consecutive failures at episode {1}" -f $maxConsecutiveFailures, $global:nextPDF) -ForegroundColor Yellow
+                Write-Log ("Stopping PDF download after {0} consecutive failures at episode {1}" -f $maxConsecutiveFailures, $global:nextPDF)
+                break
+            }
         }
 
-        if ($failureCount -eq 2) {
-            Write-Host "Stopped downloading after two consecutive failures." -ForegroundColor Red
-            Write-Log "PDF stopped after 2 consecutive failures at sn-$global:nextfilenumberpdf-notes.pdf"
-            break
-        }
+        $global:nextPDF++
     }
 }
 
-function Save-LastDownloaded {
-    if ($global:txtDownloaded -eq 0 -and $global:pdfDownloaded -eq 0) {
-        Write-Host "No successful downloads, skipping update to last-downloaded.json" -ForegroundColor Yellow
-        Write-Log "No downloads — last-downloaded.json was NOT updated"
-        return
+# ===== JPG =====
+function Get-GRCJPG {
+
+    $maxConsecutiveFailures = 2
+    $failureCount = 0
+
+    while ($true) {
+
+        $jpgUrl = "{0}{1}.jpg" -f $global:jpgBaseUrl, $global:nextJPG
+        $jpgPath = Join-Path $jpgFolder ("{0}.jpg" -f $global:nextJPG)
+
+        Write-Host ("Checking JPG : {0}.jpg" -f $global:nextJPG)
+        Write-Log ("Checking JPG : {0}.jpg" -f $global:nextJPG)
+
+        if (Test-Path $jpgPath) {
+            $failureCount = 0
+            $global:nextJPG++
+            continue
+        }
+
+        try {
+            $response = Invoke-WebRequest -Uri $jpgUrl -Method Head -ErrorAction Stop
+            if ($response.StatusCode -eq 200) {
+                Invoke-WebRequest -Uri $jpgUrl -OutFile $jpgPath -ErrorAction Stop
+                $global:jpgDownloaded++
+                $global:lastJPG = $global:nextJPG
+                $failureCount = 0
+                Write-Log ("Downloaded JPG : {0}.jpg" -f $global:nextJPG)
+            }
+        }
+        catch {
+            $failureCount++
+            Write-Log ("Missing JPG : {0}.jpg" -f $global:nextJPG)
+
+            # Before episode 1070, keep going through gaps - all episodes are known to exist in this range
+            # At 1070 and beyond, stop after 2 consecutive failures (new episode territory)
+            if ($global:nextJPG -ge 1070 -and $failureCount -ge $maxConsecutiveFailures) {
+                Write-Host ("Stopping JPG download after {0} consecutive failures at episode {1}" -f $maxConsecutiveFailures, $global:nextJPG) -ForegroundColor Yellow
+                Write-Log ("Stopping JPG download after {0} consecutive failures at episode {1}" -f $maxConsecutiveFailures, $global:nextJPG)
+                break
+            }
+        }
+
+        $global:nextJPG++
     }
+}
+
+# ===== SAVE STATE =====
+function Save-State {
 
     $data = @{
-        LastTXT = if ($global:lastTXTDownloaded) { $global:lastTXTDownloaded } else { $global:nextFileNumber - 1 }
-        LastPDF = if ($global:lastPDFDownloaded) { $global:lastPDFDownloaded } else { $global:nextfilenumberpdf - 1 }
+        LastTXT = if ($null -ne $global:lastTXT) { $global:lastTXT } elseif ($null -ne $global:baselineLastTXT) { $global:baselineLastTXT } else { $startingPointTXT - 1 }
+        LastPDF = if ($null -ne $global:lastPDF) { $global:lastPDF } elseif ($null -ne $global:baselineLastPDF) { $global:baselineLastPDF } else { $startingPointPDF - 1 }
+        LastJPG = if ($null -ne $global:lastJPG) { $global:lastJPG } elseif ($null -ne $global:baselineLastJPG) { $global:baselineLastJPG } else { $startingPointJPG - 1 }
     }
 
     $data | ConvertTo-Json | Set-Content -Path $trackingFile -Encoding UTF8
-    Write-Host "Saved last downloaded numbers to: $trackingFile" -ForegroundColor Cyan
-    Write-Log "Saved last TXT : sn-$($data.LastTXT).txt"
-    Write-Log "Saved last PDF : sn-$($data.LastPDF)-notes.pdf"
+
+    Write-Host ("Saved JSON state : TXT {0:000}, PDF {1}, JPG {2}" -f $data.LastTXT, $data.LastPDF, $data.LastJPG) -ForegroundColor Cyan
+    Write-Log ("Saved JSON state : TXT {0:000}, PDF {1}, JPG {2}" -f $data.LastTXT, $data.LastPDF, $data.LastJPG)
 }
 
+# ===== RUN =====
+Get-GRCTXT
+Get-GRCPDF
+Get-GRCJPG
 
+Write-Host ("Downloaded TXT : {0}" -f $global:txtDownloaded) -ForegroundColor Cyan
+Write-Host ("Downloaded PDF : {0}" -f $global:pdfDownloaded) -ForegroundColor Cyan
+Write-Host ("Downloaded JPG : {0}" -f $global:jpgDownloaded) -ForegroundColor Cyan
 
-# Run downloads
-get-grctxttranscript
-get-grcpdfshownotes
+Write-Log ("Downloaded TXT : {0}" -f $global:txtDownloaded)
+Write-Log ("Downloaded PDF : {0}" -f $global:pdfDownloaded)
+Write-Log ("Downloaded JPG : {0}" -f $global:jpgDownloaded)
 
-# Summary
-Write-Host "Downloaded TXT transcripts : $global:txtDownloaded" -ForegroundColor Cyan
-Write-Host "Downloaded PDF notes       : $global:pdfDownloaded" -ForegroundColor Cyan
-Write-Log "TXT files downloaded: $global:txtDownloaded"
-Write-Log "PDF files downloaded: $global:pdfDownloaded"
+Save-State
 
-
-# Save last known downloaded state
-Save-LastDownloaded
-
-Write-Log "Log complete."
+Write-Log "Run complete"
 Write-Log "~~~`n"
 
-# Open the log file
 Start-Process -FilePath $global:logFile
+
+<# 
+======================
+EXAMPLE USAGE
+======================
+
+# Option 1 (dot-source then run):
+. .\download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com.ps1
+
+# Option 2 (run directly):
+.\download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com.ps1
+
+# Notes:
+# - Script works with NEW computers (no existing files) and EXISTING computers (with files)
+# - Each file type (TXT, PDF, JPG) is checked independently:
+#   * If folder is empty, it starts from the beginning
+#   * If folder has files, it resumes from JSON tracking file
+# - Starting points (used only when JSON tracking file is missing):
+#   TXT : 001
+#   PDF : 432
+#   JPG : 980
+# - All three file types run through all episodes below 1070 without stopping on failures (known archive)
+# - At episode 1070 and beyond, each type stops independently after 2 consecutive failures (new episode territory)
+# - Run this script weekly to pick up new episodes as they are released
+# - JSON tracking file (last-downloaded.json) is created/updated automatically
+#>

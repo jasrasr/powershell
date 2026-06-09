@@ -1,0 +1,26 @@
+2026-06-04 16:48:22 - Starting GitHub issue export.
+2026-06-04 16:48:22 - Repository : jasrasr/website
+2026-06-04 16:48:22 - Output folder : C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell\Github-Scripts\.tmp-github-issue-test-20260604164822
+2026-06-04 16:48:22 - Exporting open issues to JSON.
+2026-06-04 16:48:22 - Issue JSON exported : C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell\Github-Scripts\.tmp-github-issue-test-20260604164822\github-issues-20260604-164822.json
+2026-06-04 16:48:23 - Markdown task report created : C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell\Github-Scripts\.tmp-github-issue-test-20260604164822\github-issue-tasks-20260604-164822.md
+2026-06-04 16:48:23 - Codex prompt created : C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell\Github-Scripts\.tmp-github-issue-test-20260604164822\codex-github-issue-task-prompt-20260604-164822.txt
+2026-06-04 16:48:23 - Run Codex manually with:
+2026-06-04 16:48:23 - codex "Read this GitHub issues JSON file:
+
+C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell\Github-Scripts\.tmp-github-issue-test-20260604164822\github-issues-20260604-164822.json
+
+Create a markdown task report here:
+
+C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell\Github-Scripts\.tmp-github-issue-test-20260604164822\github-issue-tasks-20260604-164822.md
+
+Requirements:
+- Group issues by script area or feature area.
+- Create GitHub-flavored markdown task checkboxes.
+- Include issue number, title, URL, labels, and assignees when available.
+- Create acceptance criteria for each issue.
+- Flag unclear issues as "Needs clarification".
+- Do not change GitHub issues directly.
+- Do not invent requirements that are not in the issue body.
+- Use concise project language.
+"

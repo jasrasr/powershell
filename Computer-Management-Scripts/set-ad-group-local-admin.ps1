@@ -1,6 +1,5 @@
 # Get the current computer's hostname
-#$ComputerName = $env:COMPUTERNAME
-$ComputerName = 'ASHW10JLSD0J3'
+$ComputerName = $env:COMPUTERNAME
 
 # Define the AD group name (assumes group name matches computer name)
 $ADGroup = "$ComputerName"
