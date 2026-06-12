@@ -1,12 +1,18 @@
-# Revision : 5.6
+# Revision : 5.7
 # Description : GUI HEIC/HEIF to JPG Converter using bundled portable ImageMagick
 # Author : Jason Lamb (with help from ChatGPT & Claude Code)
 # Created Date : 2025-04-01
-# Modified Date : 2026-05-29
+# Modified Date : 2026-06-12
 
 # -----------------------------
 # Changelog
 # -----------------------------
+# v5.7 : Added support for running via `irm https://jasr.me/heic | iex`.
+#         Detects when no local script root is available and downloads
+#         magick.exe from the GitHub raw URL to a per-user cache at
+#         $env:LOCALAPPDATA\HEIC-Convert-To-JPG\ImageMagick\magick.exe.
+#         Cache is reused on subsequent runs. Uses Unblock-File so the
+#         downloaded binary isn't tagged with Zone.Identifier.
 # v5.6 : Fixed final "Conversion Complete" MessageBox being hidden behind the
 #         Topmost form. Pass the form as the MessageBox owner so it stacks on
 #         top of the parent. Same fix applied to validation MessageBoxes.
@@ -28,13 +34,45 @@
 # -----------------------------
 $global:collectedFiles = @()
 $logRoot = 'C:\temp\powershell-exports'
-$scriptRoot = Split-Path -Parent $PSCommandPath
-$magickCandidates = @(
-    (Join-Path $scriptRoot 'ImageMagick\magick-heic.exe'),
-    (Join-Path $scriptRoot 'ImageMagick\magick.exe'),
-    'magick'
-)
+
+# Detect script directory. Both $PSScriptRoot and $PSCommandPath are empty
+# when the script is executed via `irm <url> | iex`.
+$scriptRoot = $PSScriptRoot
+if (-not $scriptRoot -and $PSCommandPath) {
+    $scriptRoot = Split-Path -Parent $PSCommandPath
+}
+
+$magickCandidates = @()
+if ($scriptRoot) {
+    $magickCandidates += (Join-Path $scriptRoot 'ImageMagick\magick-heic.exe')
+    $magickCandidates += (Join-Path $scriptRoot 'ImageMagick\magick.exe')
+}
+$magickCandidates += 'magick'
 $magickExe = $magickCandidates | Where-Object { $_ -eq 'magick' -or (Test-Path $_) } | Select-Object -First 1
+
+# Fallback for `irm | iex` runs: download magick.exe from the GitHub raw URL
+# to a per-user cache and reuse it on subsequent runs.
+if (-not $magickExe) {
+    $cacheDir = Join-Path $env:LOCALAPPDATA 'HEIC-Convert-To-JPG\ImageMagick'
+    $cachedMagick = Join-Path $cacheDir 'magick.exe'
+    if (-not (Test-Path $cachedMagick)) {
+        try {
+            if (-not (Test-Path $cacheDir)) {
+                New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
+            }
+            $magickUrl = 'https://raw.githubusercontent.com/jasrasr/powershell/main/HEIC-Convert-To-JPG/ImageMagick/magick.exe'
+            Write-Host "ImageMagick not found locally. Downloading from GitHub (~24 MB) to $cachedMagick ..." -ForegroundColor Cyan
+            Invoke-WebRequest -Uri $magickUrl -OutFile $cachedMagick -UseBasicParsing
+            Unblock-File -Path $cachedMagick -ErrorAction SilentlyContinue
+            Write-Host "Download complete." -ForegroundColor Green
+        } catch {
+            Write-Warning "Failed to download ImageMagick: $($_.Exception.Message)"
+        }
+    }
+    if (Test-Path $cachedMagick) {
+        $magickExe = $cachedMagick
+    }
+}
 
 # -----------------------------
 # PowerShell Version Check
@@ -53,7 +91,7 @@ Add-Type -AssemblyName System.Drawing
 
 if (-not $magickExe) {
     [System.Windows.Forms.MessageBox]::Show(
-        "ImageMagick was not found. Expected '.\ImageMagick\magick.exe' or 'magick' in PATH.",
+        "ImageMagick was not found. Expected '.\ImageMagick\magick.exe', 'magick' in PATH, or a downloaded copy at '$env:LOCALAPPDATA\HEIC-Convert-To-JPG\ImageMagick\magick.exe'.",
         "ImageMagick Not Found"
     )
     exit
@@ -167,7 +205,7 @@ function Start-Convert {
 # GUI
 # -----------------------------
 $form = New-Object System.Windows.Forms.Form
-$form.Text = 'HEIC to JPG Converter (GUI Rev 5.5)'
+$form.Text = 'HEIC to JPG Converter (GUI Rev 5.7)'
 $form.Size = New-Object System.Drawing.Size(640,540)
 $form.StartPosition = 'CenterScreen'
 $form.Topmost = $true
@@ -181,7 +219,7 @@ $infoLabel.Font = New-Object System.Drawing.Font("Segoe UI",9)
 $form.Controls.Add($infoLabel)
 
 $metaLabel = New-Object System.Windows.Forms.Label
-$metaLabel.Text = "Author : Jason Lamb    Version : GUI Rev 5.5 (ImageMagick)"
+$metaLabel.Text = "Author : Jason Lamb    Version : GUI Rev 5.7 (ImageMagick)"
 $metaLabel.Font = New-Object System.Drawing.Font("Segoe UI",8,[System.Drawing.FontStyle]::Italic)
 $metaLabel.AutoSize = $true
 $metaLabel.Location = New-Object System.Drawing.Point(10,50)
@@ -315,3 +353,4 @@ $form.Add_Shown({ $form.Activate() })
 # Usage
 # -----------------------------
 # .\HEICconvert2JPG-GUI.ps1
+# irm https://jasr.me/heic | iex

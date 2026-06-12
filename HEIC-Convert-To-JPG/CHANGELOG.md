@@ -4,6 +4,40 @@ All notable changes to this project are documented in this file.
 
 ---
 
+## [5.7] – Remote Execution Support (`irm | iex`)
+### Added
+- Script now runs cleanly via `irm https://jasr.me/heic | iex` (or any pipe-to-iex)
+- When `$PSScriptRoot` / `$PSCommandPath` are empty, downloads `magick.exe` from the GitHub raw URL to `$env:LOCALAPPDATA\HEIC-Convert-To-JPG\ImageMagick\magick.exe` and caches it for subsequent runs
+- Uses `Unblock-File` on the downloaded binary to clear the Zone.Identifier stream
+
+### Fixed
+- `Split-Path` / `Join-Path` / `Test-Path` errors when the script has no on-disk location
+
+---
+
+## [5.6] – MessageBox Z-Order Fix
+### Fixed
+- Final "Conversion Complete" MessageBox no longer hidden behind the Topmost form
+- Pass the form as the MessageBox owner so it stacks on top of the parent
+- Same fix applied to validation MessageBoxes
+
+---
+
+## [5.5] – Switched Conversion Engine Back to ImageMagick
+### Changed
+- Switched conversion engine from Windows WIC (PresentationCore) back to ImageMagick (bundled portable or system PATH)
+- WIC failed with `0xC00D5212` because the HEIF AppX codec does not register with the WPF WIC layer
+- Merged `HEICconvert2JPG-GUI-1.ps1` into the main GUI script
+- Drag-drop now populates input/output path boxes
+- Archive folder now created per source directory (multi-folder drag-drop support)
+
+### Fixed
+- `metaLabel` clipping (AutoSize)
+- Case-insensitive extension matching (`-imatch`)
+- Improved catch block (logs exception message)
+
+---
+
 ## [5.4] – Windows-Native HEIC Conversion (WIC)
 ### Changed
 - Replaced ImageMagick HEIC decoding with Windows-native WIC (Windows Imaging Component)
