@@ -1,6 +1,6 @@
 <#
     Filename:    Remove-NetworkPrinters.ps1
-    Revision:    1.1.0
+    Revision:    1.2.0
     Description: Identifies and removes all network printers installed for the current user
                  or system-wide. Catches both Type=Connection printers and locally-added
                  TCP/IP printers whose port matches a specified IP range. Supports -WhatIf.
@@ -9,6 +9,7 @@
     Modified:    2026-06-08
 
     Changelog:
+        1.2.0 - Changed -IPFilter default to '*' to catch all IP printers by default
         1.1.0 - Added -IPFilter parameter to catch local-type printers on matching IP ports
         1.0.0 - Initial release
 #>
@@ -20,7 +21,7 @@ param (
     # Wildcard pattern matched against the printer's port name/address.
     # Matches IP_ prefixed ports (e.g. IP_192.168.1.50) and raw IP ports.
     # Set to $null or '' to skip IP-based matching entirely.
-    [string]$IPFilter = '192.168.*.*',
+    [string]$IPFilter = '*',
 
     [string]$LogPath = "$PSExports\Remove-NetworkPrinters_$(Get-Date -Format 'yyyyMMdd_HHmmss').csv"
 )
@@ -149,7 +150,7 @@ if ($skipped -gt 0) { Write-Host "  Skipped : $skipped (WhatIf mode)" -Foregroun
 # Example Usage:
 # .\Remove-NetworkPrinters.ps1
 # .\Remove-NetworkPrinters.ps1 -WhatIf
-# .\Remove-NetworkPrinters.ps1 -IPFilter '10.10.*.*'
+# .\Remove-NetworkPrinters.ps1 -IPFilter '192.168.*.*'
 # .\Remove-NetworkPrinters.ps1 -IPFilter '192.168.1.*'
 # .\Remove-NetworkPrinters.ps1 -IPFilter ''
 # .\Remove-NetworkPrinters.ps1 -AllUsers -WhatIf
