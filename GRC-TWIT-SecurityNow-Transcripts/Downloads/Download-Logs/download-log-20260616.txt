@@ -1,0 +1,27 @@
+[2026-06-16 10:44:04] Resumed from JSON : TXT 1082, PDF 1083, JPG 1083
+[2026-06-16 10:44:04] Checking TXT : sn-1082.txt
+[2026-06-16 10:44:04] Missing TXT : sn-1082.txt
+[2026-06-16 10:44:04] Checking TXT : sn-1083.txt
+[2026-06-16 10:44:05] Missing TXT : sn-1083.txt
+[2026-06-16 10:44:05] Stopping TXT download after 2 consecutive failures at episode 1083
+[2026-06-16 10:44:05] Checking PDF : sn-1083-notes.pdf
+[2026-06-16 10:44:06] Downloaded PDF : sn-1083-notes.pdf
+[2026-06-16 10:44:06] Checking PDF : sn-1084-notes.pdf
+[2026-06-16 10:44:06] Missing PDF : sn-1084-notes.pdf
+[2026-06-16 10:44:06] Checking PDF : sn-1085-notes.pdf
+[2026-06-16 10:44:07] Missing PDF : sn-1085-notes.pdf
+[2026-06-16 10:44:07] Stopping PDF download after 2 consecutive failures at episode 1085
+[2026-06-16 10:44:07] Checking JPG : 1083.jpg
+[2026-06-16 10:44:08] Downloaded JPG : 1083.jpg
+[2026-06-16 10:44:08] Checking JPG : 1084.jpg
+[2026-06-16 10:44:08] Missing JPG : 1084.jpg
+[2026-06-16 10:44:08] Checking JPG : 1085.jpg
+[2026-06-16 10:44:08] Missing JPG : 1085.jpg
+[2026-06-16 10:44:08] Stopping JPG download after 2 consecutive failures at episode 1085
+[2026-06-16 10:44:09] Downloaded TXT : 0
+[2026-06-16 10:44:09] Downloaded PDF : 1
+[2026-06-16 10:44:09] Downloaded JPG : 1
+[2026-06-16 10:44:09] Saved JSON state : TXT 1081, PDF 1083, JPG 1083
+[2026-06-16 10:44:09] Run complete
+[2026-06-16 10:44:09] ~~~
+
