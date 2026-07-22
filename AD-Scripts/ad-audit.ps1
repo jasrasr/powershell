@@ -22,10 +22,10 @@ param(
 
 # === CONFIGURABLE ===
 # Only this DC will be queried. Change when needed.
-$DomainController = 'CLEDC1'
+$DomainController = 'SERVERNAME'  # e.g. 'DC1', 'dc01.corp.local', etc.
 
 # Output location
-$OutDir  = 'C:\temp\powershell-exports'
+$OutDir  = $psexports
 if (-not (Test-Path $OutDir)) { New-Item -Path $OutDir -ItemType Directory | Out-Null }
 $Stamp   = Get-Date -Format 'yyyyMMdd-HHmmss'
 $OutFile = Join-Path $OutDir "ad-reactivation-audit-$($DomainController)-$Stamp.csv"

@@ -101,7 +101,7 @@ else {
 # ------------------------
 # Copy MSI Local and Install
 # ------------------------
-$sourceMsi  = "\\clesccm\Application Source\Accessories\Egnyte\3.29.1.175\EgnyteDesktopApp_3.29.1_175.msi"
+$sourceMsi  = "\\servername\foldername\Egnyte\3.29.1.175\EgnyteDesktopApp_3.29.1_175.msi"
 $localFolder = "C:\Temp"
 $localMsi    = Join-Path $localFolder "EgnyteDesktopApp_3.29.1_175.msi"
 
