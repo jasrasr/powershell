@@ -1,11 +1,12 @@
 # Filename: Add-SharedMailboxMember.ps1
-# Revision : 1.0.0
+# Revision : 1.1.0
 # Description : Interactively add members to a shared mailbox with FullAccess and SendAs permissions
 # Author : Jason Lamb (with help from Claude Code CLI)
 # Created Date : 2026-07-24
 # Modified Date : 2026-07-24
 # Changelog :
 # 1.0.0 initial release
+# 1.1.0 add flexible name/email lookup - accepts emails, display names, or partial usernames
 
 # Module check and import
 foreach ($module in @("ExchangeOnlineManagement")) {
@@ -54,6 +55,44 @@ if (-not $exoConnection) {
 }
 Write-Log "Connected as: $($exoConnection.UserPrincipalName)" "Green"
 
+function Resolve-Recipient {
+    <#
+    .SYNOPSIS
+    Flexible recipient lookup that accepts emails, display names, or partial names.
+    Returns a single recipient object if found, $null otherwise.
+    #>
+    param([string]$Identifier)
+
+    # Try exact match first (email, UPN, display name)
+    $recipient = Get-Recipient -Identity $Identifier -ErrorAction SilentlyContinue
+    if ($recipient) {
+        return $recipient
+    }
+
+    # Try wildcard search on display name or email
+    $recipients = Get-Recipient -Filter "DisplayName -like '*$Identifier*' -or PrimarySmtpAddress -like '*$Identifier*'" -ErrorAction SilentlyContinue
+
+    if ($recipients) {
+        if ($recipients -is [array]) {
+            # Multiple matches found
+            Write-Log "Multiple matches found for '$Identifier':" "Yellow"
+            for ($i = 0; $i -lt $recipients.Count; $i++) {
+                Write-Log "  $($i+1). $($recipients[$i].DisplayName) ($($recipients[$i].PrimarySmtpAddress))" "Yellow"
+            }
+            $selection = Read-Host "Select which user (enter number)"
+            if ($selection -ge 1 -and $selection -le $recipients.Count) {
+                return $recipients[$selection - 1]
+            }
+            return $null
+        } else {
+            # Single match found
+            return $recipients
+        }
+    }
+
+    return $null
+}
+
 function Prompt-MailboxEmail {
     <#
     .SYNOPSIS
@@ -86,29 +125,29 @@ function Prompt-MailboxEmail {
 function Prompt-MemberEmails {
     <#
     .SYNOPSIS
-    Prompts for comma-separated member emails until at least one valid email is resolved.
-    Returns two hashtables: valid members and failed emails.
+    Prompts for comma-separated member identifiers (emails, names, or partial usernames).
+    Returns two hashtables: valid members and failed identifiers.
     #>
     param([string]$MailboxEmail)
 
     while ($true) {
-        $emailInput = Read-Host "Enter member email(s) (comma-separated)"
+        $emailInput = Read-Host "Enter member email(s), name(s), or username(s) (comma-separated)"
 
         if (-not $emailInput) {
-            Write-Log "ERROR: Email list cannot be empty." "Red"
+            Write-Log "ERROR: Member list cannot be empty." "Red"
             continue
         }
 
-        $emails = @($emailInput -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+        $identifiers = @($emailInput -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
         $validMembers = @()
         $failedEmails = @()
 
-        foreach ($email in $emails) {
-            $recipient = Get-Recipient -Identity $email -ErrorAction SilentlyContinue
+        foreach ($identifier in $identifiers) {
+            $recipient = Resolve-Recipient -Identifier $identifier
             if ($recipient) {
                 $validMembers += $recipient
             } else {
-                $failedEmails += $email
+                $failedEmails += $identifier
             }
         }
 
