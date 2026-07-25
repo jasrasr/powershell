@@ -1,9 +1,9 @@
 # Filename: get-github-branches.ps1
-# Revision : 1.1.10
+# Revision : 1.1.12
 # Description : List local and remote branches for a GitHub repository with latest commit details and export options.
 # Author : Jason Lamb (with help from Codex CLI)
 # Created Date : 2026-07-21
-# Modified Date : 2026-07-21
+# Modified Date : 2026-07-22
 # Changelog :
 # 1.0.0 initial release
 # 1.1.0 add local repo auto-detection, remote branch support, protected filter, and export options
@@ -17,6 +17,8 @@
 # 1.1.8 add practical local working tree status column
 # 1.1.9 rename working tree status labels
 # 1.1.10 colorize working tree status in screen output
+# 1.1.11 rename dirty working tree status label while keeping red screen color
+# 1.1.12 rename clean working tree status label while keeping green screen color
 
 param(
     [Parameter(Mandatory = $false)]
@@ -119,10 +121,10 @@ function Get-BranchWorkingTreeStatus {
 
     if ($CurrentBranch -and $BranchName -eq $CurrentBranch) {
         if ($IsWorkTreeDirty) {
-            return 'Red'
+            return 'Dirty'
         }
 
-        return 'Green'
+        return 'Clean'
     }
 
     return 'NotCheckedOut'
@@ -171,8 +173,8 @@ function Show-BranchTable {
             if ($column -eq 'WorkingTreeStatus') {
                 $color = $null
                 switch ($row.WorkingTreeStatus) {
-                    'Green' { $color = 'Green' }
-                    'Red' { $color = 'Red' }
+                    'Clean' { $color = 'Green' }
+                    'Dirty' { $color = 'Red' }
                     default { $color = $null }
                 }
 
