@@ -1,0 +1,63 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\check-choco-updates.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-30 53a2b91 add 3 new files, modify 1 file
+
+Script preview:
+```powershell
+# check-choco-updates.ps1
+# Monitors Chocolatey package updates and shows Windows notification
+# Revision 1.0 | Author: Jason Lamb with help from Claude
+
+param(
+    [string]$LogPath = "$psexports\choco-updates.log"
+)
+
+# Ensure log directory exists
+if (-not (Test-Path (Split-Path $LogPath))) {
+    New-Item -ItemType Directory -Path (Split-Path $LogPath) -Force | Out-Null
+}
+
+# Get outdated packages
+$outdated = choco outdated --limit-output 2>&1 | Where-Object { $_ -match '\|' }
+$timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+
+if ($outdated) {
+    # Log the update
+    Add-Content -Path $LogPath -Value "$timestamp - OUTDATED PACKAGES FOUND:`n$($outdated -join "`n")`n"
+    
+    # Create notification message
+    $packages = $outdated | ConvertFrom-Csv -Delimiter '|' -Header 'Package','CurrentVersion','AvailableVersion','Pinned'
+    $title = "Chocolatey Updates Available"
+    $message = ($packages | ForEach-Object { "$($_.Package): $($_.CurrentVersion) → $($_.AvailableVersion)" }) -join "`n"
+    
+    # Show Windows notification popup
+    $action = { Start-Process pwsh -ArgumentList "-NoExit -Command `"choco upgrade all`"" }
+    New-BurntToastNotification -Text $title, $message -SnoozeAndDismiss -ExpirationTime (Get-Date).AddHours(1) -ActivatedAction $action
+    
+} else {
+    Add-Content -Path $LogPath -Value "$timestamp - No outdated packages`n"
+}
+```

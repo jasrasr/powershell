@@ -1,0 +1,115 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Regedit-Scripts\get-os-version-and-log-to-txt-file-with-date-time-stamp.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Revision, Description, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-02-17 7b7d1b4 git commit PowerShell function
+2025-02-17 0f6f60b git commit PowerShell function
+2025-02-17 eeeb445 git commit PowerShell function
+2025-02-17 055f6f6 git commit PowerShell function
+2024-11-15 c127e9c Auto-sync commit 20241115-230102
+2024-11-15 7a98879 Auto-sync commit 20241115-230102
+
+Script preview:
+```powershell
+# This script retrieves and logs the Windows version, build number, and relevant registry values related to Windows Update and upgrade notifications.
+# The results are saved to a timestamped text file in the C:\Temp\Automox-Exports\OS-Version directory.
+# The script also checks for the existence of specific registry keys and properties and logs their values if present.
+#author: Jason Lamb
+#updated date: 2024-11-15
+#version: 2.0
+
+# move any old OS-Version*.txt files to a subdirectory
+$sourceDir = 'C:\Temp\Automox-Exports'
+$destinationDir = 'C:\Temp\Automox-Exports\OS-Version'
+
+# Create the destination directory if it doesn't exist
+if (-not (Test-Path -Path $destinationDir)) {
+    New-Item -ItemType Directory -Path $destinationDir
+}
+
+# Get all files matching the pattern
+$filesToMove = Get-ChildItem -Path $sourceDir -Filter '*OS-Version-*.txt'
+
+# Check if any files were found and move them
+if ($filesToMove) {
+    foreach ($file in $filesToMove) {
+        Move-Item -Path $file.FullName -Destination $destinationDir -force
+        Write-Host "Moved: $($file.FullName) to $destinationDir"
+    }
+} else {
+    Write-Host "No files matching the pattern were found."
+}
+
+
+# Define Registry Paths
+$windowsUpdateRegPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate"
+$windowsStoreRegPath = "HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore"
+$upgradeNotificationRegPath = "HKLM:\SYSTEM\Setup\UpgradeNotification"
+
+# Create timestamp for the filename and define log file path
+$timestamp = (Get-Date).ToString("yyyy-MM-dd-HH-mm-ss")
+$logpath = "C:\Temp\Automox-Exports\OS-Version"
+$logfile = "$logpath\OS-Version-$timestamp.txt"
+
+# Create or ensure the $logpath directory exists
+if (-not (Test-Path $logpath)) {
+    New-Item -Path $logpath -ItemType Directory
+}
+
+# Function to output to screen and file
+function Output-Log {
+    param (
+        [string]$text
+    )
+    Write-Host $text
+    Add-Content -Path $logfile -Value $text
+}
+
+# Function to check if a registry key exists
+function Check-RegistryKey {
+    param (
+        [string]$path
+    )
+    try {
+        if (Test-Path $path) {
+            return $true
+        } else {
+            return $false
+        }
+    } catch {
+        return $false
+    }
+}
+
+# Function to check and log registry properties
+function Check-RegistryValue {
+    param (
+        [string]$path,
+        [string]$propertyName
+    )
+    if (Check-RegistryKey -path $path) {
+        try {
+            $value = (Get-ItemProperty -Path $path -ErrorAction Stop).$propertyName
+            if ($null -ne $value) {
+```

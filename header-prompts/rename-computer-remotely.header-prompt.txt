@@ -1,0 +1,81 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Computer-Management-Scripts\rename-computer-remotely.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.3
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-10-20 17cfd27 Enhance remote computer rename script
+2025-10-20 514aa01 Enhance remote computer rename script with prompts
+2025-10-01 5a214f1 Create rename-computer-remotely
+2025-10-01 cfeb630 Create rename-computer-remotely
+
+Script preview:
+```powershell
+# Revision : 1.3
+# Description : Prompts for old and new computer names, domain admin username, and password to rename a remote computer (no reboot)
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-10-20
+# Modified Date : 2025-10-20
+
+# prompts for domain, then admin user, then password, then old name, then new name
+# this does not rename the AD object, it only renames the computer by invoking the script
+# this does NOT force a reboot, a reboot is required for full name change
+# computer has to be on corporate network or vpn for script to work and contact computer
+
+# Prompt for details
+$domain = Read-Host "Enter the domain name (example : domain)"
+$username = Read-Host "Enter the admin username (example : adm.username)"
+$cred = Get-Credential -UserName "$domain\$username" -Message "Enter password for $domain\$username"
+$oldName = Read-Host "Enter the current (old) computer name"
+$newName = Read-Host "Enter the new computer name"
+
+try {
+    Write-Host "Renaming $oldName to $newName..." -ForegroundColor Cyan
+    Rename-Computer -ComputerName $oldName -NewName $newName -DomainCredential $cred -Force -ErrorAction Stop
+    Write-Host "Rename command executed successfully on $oldName." -ForegroundColor Green
+
+    # Optional verification (WinRM must be enabled)
+    Start-Sleep -Seconds 5
+    try {
+        $check = Invoke-Command -ComputerName $newName -Credential $cred -ScriptBlock { $env:COMPUTERNAME } -ErrorAction Stop
+        if ($check -eq $newName.ToUpper()) {
+            Write-Host "Verification successful : computer name is now $check" -ForegroundColor Green
+        }
+        else {
+            Write-Host "Verification warning : could not confirm name change yet (reboot likely required)" -ForegroundColor Yellow
+        }
+    }
+    catch {
+        Write-Host "Verification failed : $($_.Exception.Message)" -ForegroundColor Yellow
+        Write-Host "This may be expected if the computer has not yet rebooted."
+    }
+}
+catch {
+    Write-Host "Error renaming $oldName : $($_.Exception.Message)" -ForegroundColor Red
+}
+
+Write-Host "A reboot is required for the rename to take full effect." -ForegroundColor Yellow
+Write-Host "Old name : $oldName"
+Write-Host "New name : $newName"
+Write-Host "Renamed using account : $domain\$username"
+```

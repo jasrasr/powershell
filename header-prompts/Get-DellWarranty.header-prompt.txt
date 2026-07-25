@@ -1,0 +1,63 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\Get-DellWarranty.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2026-03-16 1b257cd update dell warranty and grc download files
+
+Script preview:
+```powershell
+param(
+    [string[]]$ServiceTags = @("CLRJGC4")
+)
+
+foreach ($tag in $ServiceTags) {
+    $url = "https://apiftr.dell.com/support/assetinfo/en-us/GetAssetWarrantyByServiceTag?svctag=$tag"
+    
+    $headers = @{
+        "User-Agent" = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        "Accept" = "application/json"
+        "Referer" = "https://www.dell.com/support/home/en-us/product-support/servicetag/$tag/warranty"
+    }
+    
+    try {
+        $response = Invoke-RestMethod -Uri $url -Headers $headers -Method GET
+        
+        Write-Host "`n=== $tag ==="
+        Write-Host "Model:     $($response.AssetHeaderData.ProductLineDescription)"
+        Write-Host "Ship Date: $($response.AssetHeaderData.ShipDate)"
+        
+        foreach ($item in $response.AssetEntitlementData) {
+            Write-Host "`n  Plan:   $($item.ServiceLevelDescription)"
+            Write-Host "  Start:  $($item.StartDate)"
+            Write-Host "  End:    $($item.EndDate)"
+            $status = if ((Get-Date) -lt [datetime]$item.EndDate) { "Active" } else { "Expired" }
+            Write-Host "  Status: $status"
+        }
+    }
+    catch {
+        Write-Host "Error looking up $tag : $_"
+    }
+}
+```

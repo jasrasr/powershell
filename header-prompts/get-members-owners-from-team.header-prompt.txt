@@ -1,0 +1,112 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\MS-365-Scripts\get-members-owners-from-team.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.0.0
+Revision history warning: Revision header is 1.0.0 but Git shows 3 commits touched this file
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2026-01-22 3cfac93 Update get-members-owners-from-team.ps1 - Add header template, auto-install module, smart import, and C:\temp\powershell-exports output
+2026-01-22 c6954b6 Create get-members-owners-from-team.ps1
+
+Script preview:
+```powershell
+# Revision : 1.0.0
+# Description : Get owners and members from a Microsoft Teams team and export to console and CSV
+# Author : Jason Lamb
+# Created Date : 2026-01-22
+# Modified Date : 2026-01-22
+# Changlog
+## Rev 1.0.0 - Initial release with auto-install module, smart import, and C:\temp\powershell-exports output
+
+param(
+    [Parameter(Mandatory = $true)]
+    [string]$TeamName
+)
+
+# Check if Microsoft Teams module is installed, if not install it
+if (-not (Get-Module -ListAvailable -Name MicrosoftTeams)) {
+    Write-Host "Microsoft Teams module not found.  Installing..." -ForegroundColor Yellow
+    try {
+        Install-Module -Name MicrosoftTeams -Force -AllowClobber -ErrorAction Stop
+        Write-Host "Microsoft Teams module installed successfully." -ForegroundColor Green
+    }
+    catch {
+        Write-Error "Failed to install Microsoft Teams module: $_"
+        exit
+    }
+}
+
+# Check if module is already imported, if not import it
+if (-not (Get-Module -Name MicrosoftTeams)) {
+    Write-Host "Importing Microsoft Teams module..." -ForegroundColor Cyan
+    try {
+        Import-Module MicrosoftTeams -ErrorAction Stop
+        Write-Host "Microsoft Teams module imported successfully." -ForegroundColor Green
+    }
+    catch {
+        Write-Error "Failed to import Microsoft Teams module:  $_"
+        exit
+    }
+}
+else {
+    Write-Host "Microsoft Teams module already imported." -ForegroundColor Green
+}
+
+# Connect to Microsoft Teams
+Write-Host "Connecting to Microsoft Teams..." -ForegroundColor Cyan
+try {
+    Connect-MicrosoftTeams -ErrorAction Stop
+}
+catch {
+    Write-Error "Failed to connect to Microsoft Teams:  $_"
+    exit
+}
+
+# Get the team by name
+Write-Host "Searching for team:  $TeamName" -ForegroundColor Cyan
+$team = Get-Team -DisplayName $TeamName -ErrorAction SilentlyContinue
+
+if (-not $team) {
+    Write-Error "Team '$TeamName' not found."
+    Disconnect-MicrosoftTeams
+    exit
+}
+
+Write-Host "Team found:  $($team.DisplayName) (GroupId: $($team.GroupId))" -ForegroundColor Green
+
+# Get all team users (owners and members)
+Write-Host "`nRetrieving team members..." -ForegroundColor Cyan
+$teamUsers = Get-TeamUser -GroupId $team.GroupId
+
+# Separate owners and members
+$owners = $teamUsers | Where-Object { $_.Role -eq "Owner" }
+$members = $teamUsers | Where-Object { $_.Role -eq "Member" }
+
+# Display results on screen
+Write-Host "`n========================================" -ForegroundColor Yellow
+Write-Host "OWNERS ($($owners.Count))" -ForegroundColor Yellow
+Write-Host "========================================" -ForegroundColor Yellow
+foreach ($owner in $owners) {
+    Write-Host "  Name: $($owner.Name)" -ForegroundColor White
+    Write-Host "  Email: $($owner.User)" -ForegroundColor Gray
+    Write-Host "  Role: $($owner.Role)" -ForegroundColor Green
+```

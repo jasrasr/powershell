@@ -1,0 +1,80 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\GRC-TWIT-SecurityNow-Transcripts\download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com-1.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-19 b6ed736 updating grc files
+2026-03-16 032565b update tons of files
+2026-03-13 ea4a486 Updated script to handle JPG download logic and state saving
+2026-02-25 bbeb7f5 Update script to download TXT, PDF, and JPG files
+2025-10-09 55ca652 Git sync : 2025-10-09 14:45:50
+2025-10-09 a7faf84 Git sync : 2025-10-09 14:45:50
+2025-08-18 634d154 git commit powershell private function 250813-141516
+2025-08-18 06151a6 git commit powershell private function 250813-141516
+
+Script preview:
+```powershell
+# PowerShell Script to Download Security Now Transcripts
+
+# Existing logic...
+
+# Check if JPG-Episode-Images folder is empty
+$jpgFolderPath = "JPG-Episode-Images"
+$jpgFiles = Get-ChildItem $jpgFolderPath -Filter *.jpg
+
+if ($jpgFiles.Count -eq 0) {
+    $nextJPG = 1   # Set nextJPG to 1 if no JPG files present
+} else {
+    # Logic for setting nextJPG based on existing JSON
+}
+
+# Download/check sequentially through at least 1069
+$startJPG = $nextJPG
+$endJPG = 1069
+$successCount = 0
+$misses = 0
+
+for ($currentJPG = $startJPG; $currentJPG -le $endJPG; $currentJPG++) {
+    # Download or check logic...
+    $downloaded = Download-JPG $currentJPG   # Example function to download
+    if ($downloaded) {
+        $successCount++
+        $lastJPG = $currentJPG
+        $misses = 0  # Reset misses on success
+    } else {
+        $misses++  # Increment misses
+        if ($misses -eq 2) {  # Stop after two consecutive misses
+            break
+        }
+    }
+}
+
+# Logic to save state
+$lastJPG = if ($successCount -gt 0) { $lastJPG } else { 0 }
+
+# Save the state with LastJPG
+Save-State -LastJPG $lastJPG
+
+# Existing logging style...
+Log-Message "Download process completed. Last JPG: $lastJPG"
+```

@@ -1,0 +1,111 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\file-hash-compare.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.0
+Revision history warning: 
+
+Git commit history (newest first):
+2025-10-09 817a414 Git sync : 2025-10-09 08:50:21
+2025-10-09 f80d97d Git sync : 2025-10-09 08:50:21
+
+Script preview:
+```powershell
+# Revision : 1.0
+# Description : Benchmark hash speeds (MD5 vs SHA1 vs SHA256) with progress, per-iteration stats, and CSV export. Rev 1.0
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-10-06
+# Modified Date : 2025-10-06
+
+param(
+    [Parameter(Mandatory)]
+    [string]$FilePath,
+
+    [int]$Iterations = 1,
+
+    [ValidateSet('MD5','SHA1','SHA256')]
+    [string[]]$Algorithms = @('MD5','SHA1','SHA256')
+)
+
+# --- Prep --------------------------------------------------------------------
+if (-not (Test-Path -LiteralPath $FilePath)) {
+    Write-Host "File not found : $FilePath" -ForegroundColor Red
+    return
+}
+
+try {
+    $fileInfo = Get-Item -LiteralPath $FilePath -ErrorAction Stop
+} catch {
+    Write-Host "Unable to access file : $_" -ForegroundColor Red
+    return
+}
+
+$bytesTotal   = $fileInfo.Length
+$sizeMB       = [math]::Round($bytesTotal / 1MB, 2)
+$dtStamp      = Get-Date -Format 'yyyyMMdd-HHmmss'
+$exportFolder = 'C:\temp\powershell-exports'
+$exportPath   = Join-Path $exportFolder "hash-benchmark-$dtStamp.csv"
+
+if (-not (Test-Path $exportFolder)) { New-Item -Path $exportFolder -ItemType Directory -Force | Out-Null }
+
+Write-Host "Benchmark target : $FilePath"
+Write-Host "File size (MB)   : $sizeMB"
+Write-Host "Iterations       : $Iterations"
+Write-Host "Algorithms       : $($Algorithms -join ', ')"
+Write-Host "CSV export path  : $exportPath"
+Write-Host ""
+
+# --- Helper : compute hash with progress -------------------------------------
+function Get-FileHashProgress {
+    param(
+        [Parameter(Mandatory)][string]$Path,
+        [Parameter(Mandatory)][string]$Algorithm,
+        [int]$BufferSize = 4MB,
+        [int]$ProgressId = 1
+    )
+
+    $stream = $null
+    $hashAlg = $null
+    try {
+        $stream  = [System.IO.File]::OpenRead($Path)
+        $hashAlg = [System.Security.Cryptography.HashAlgorithm]::Create($Algorithm)
+
+        $total   = $stream.Length
+        $buf     = New-Object byte[] $BufferSize
+        $readSum = 0
+        $lastPct = -1
+
+        $sw = [System.Diagnostics.Stopwatch]::StartNew()
+
+        while (($read = $stream.Read($buf,0,$BufferSize)) -gt 0) {
+            $hashAlg.TransformBlock($buf,0,$read,$null,0)
+            $readSum += $read
+            $pct = [int](($readSum / $total) * 100)
+            if ($pct -ne $lastPct) {
+                Write-Progress -Id $ProgressId -Activity "Hashing ${Algorithm}" -Status "$pct% ($([math]::Round($readSum/1MB,2)) / $([math]::Round($total/1MB,2)) MB)" -PercentComplete $pct
+                $lastPct = $pct
+            }
+        }
+
+        $hashAlg.TransformFinalBlock($buf,0,0) | Out-Null
+        $sw.Stop()
+        $hashBytes = $hashAlg.Hash
+        $hash = ($hashBytes | ForEach-Object { $_.ToString('x2') }) -join ''
+```

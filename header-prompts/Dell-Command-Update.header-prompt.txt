@@ -1,0 +1,86 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\Dell-Command-Update.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-02-17 7b7d1b4 git commit PowerShell function
+2025-02-17 0f6f60b git commit PowerShell function
+2025-02-17 eeeb445 git commit PowerShell function
+2025-02-17 055f6f6 git commit PowerShell function
+2024-10-25 2ec2882 Auto-sync commit 2024-10-25 12:01:02
+2024-10-25 81aa737 Auto-sync commit 2024-10-25 12:01:02
+2024-10-24 284fff8 initial commit, removing history
+
+Script preview:
+```powershell
+<#
+EVALUATION CODE
+
+# update 10/24/24 moved logs to 'C:\Temp\Automox-Exports\DCU'
+# update 10/24/24 - check if dcu-cli.exe file exist
+
+# Define the file path to check
+$filePath = "C:\Program Files (x86)\Dell\CommandUpdate\dcu-cli.exe"
+
+# Check if the file exists
+if (Test-Path -Path $filePath) {
+    Write-Host "File exists: $filePath"
+    exit 1  # File exists, exit with code 1
+} else {
+    Write-Host "File does not exist: $filePath"
+    exit 0  # File does not exist, exit with code 0
+}
+
+#>
+
+# Create a timestamp for the log file
+$timestamp = Get-Date -Format "yyyy-MM-dd-HH-mm-ss"
+$logPath = "C:\Temp\Automox-Exports\DCU\DellCommandUpdate-$timestamp.log"
+
+# Define the source and destination directories
+$sourceDirectory = "C:\Temp"
+$destinationDirectory = "C:\Temp\Automox-Exports\DCU"
+
+# Ensure the destination directory exists, if not create it
+if (-not (Test-Path -Path $destinationDirectory)) {
+    New-Item -ItemType Directory -Path $destinationDirectory -Force
+    Write-Host "Created directory: $destinationDirectory"
+}
+
+# Get all files in the source directory that match the pattern
+Get-ChildItem -Path $sourceDirectory -Filter "DellCommandUpdate*" | ForEach-Object {
+    # Move the file to the destination directory
+    $sourcePath = $_.FullName
+    $destinationPath = Join-Path $destinationDirectory $_.Name
+
+    Move-Item -Path $sourcePath -Destination $destinationPath
+    Write-Host "Moved file: $($_.Name) to $destinationDirectory"
+}
+
+# Start the process for Dell Command Update and wait for it to finish
+Start-Process -FilePath "C:\Program Files (x86)\Dell\CommandUpdate\dcu-cli.exe" -ArgumentList "/applyUpdates", "-silent", "-outputLog=$logPath" -Wait
+
+# Output the contents of the log file for review
+Get-Content -Path $logPath | Write-Host
+```

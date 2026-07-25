@@ -1,0 +1,91 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\get-local-users-and-groups.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.6
+Revision history warning: 
+
+Git commit history (newest first):
+2025-09-04 bf9ae8f Refactor get-local-users-and-groups.ps1 for user prompts
+2025-09-04 c78c2e0 Refactor get-local-users-and-groups.ps1 for user prompts
+2025-06-05 cef6e93 Update get-local-users-and-groups.ps1
+2025-06-05 ec1ff1b Update get-local-users-and-groups.ps1
+2025-04-08 6e4dfb1 Updated $domain ${domain} $onedrivepath ${username}  On branch main  Your branch is up to date with 'origin/main'.
+2025-04-08 9b0df64 Updated $domain ${domain} $onedrivepath ${username}  On branch main  Your branch is up to date with 'origin/main'.
+2025-02-17 7b7d1b4 git commit PowerShell function
+2025-02-17 0f6f60b git commit PowerShell function
+
+Script preview:
+```powershell
+# Revision : 1.6
+# Description : Query and optionally add a domain user to a local group on a remote computer
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2024-11-12
+# Modified Date : 2025-09-04
+
+# Prompt for computer name (default to current hostname if Enter is pressed)
+$ComputerName = Read-Host "Enter Computer Name (default : $env:COMPUTERNAME)"
+if ([string]::IsNullOrWhiteSpace($ComputerName)) {
+    $ComputerName = $env:COMPUTERNAME
+}
+
+# Prompt for group name (default to Administrators if Enter is pressed)
+$GroupName = Read-Host "Enter Group Name (default : Administrators)"
+if ([string]::IsNullOrWhiteSpace($GroupName)) {
+    $GroupName = "Administrators"
+}
+
+$UserName = "$env:USERDOMAIN\$env:USERNAME"
+
+# Test connectivity
+Write-Host "Pinging $ComputerName ..."
+if (Test-Connection -ComputerName $ComputerName -Count 2 -Quiet) {
+    Write-Host "$ComputerName is reachable."
+} else {
+    Write-Host "Error : $ComputerName is not reachable."
+    return
+}
+
+<# 
+# Uncomment this section to add user to group
+Invoke-Command -ComputerName $ComputerName -ScriptBlock {
+    param ($UserName, $GroupName)
+    try {
+        Add-LocalGroupMember -Group $GroupName -Member $UserName -ErrorAction Stop
+        Write-Host "User $UserName has been added to $GroupName on $env:COMPUTERNAME."
+    }
+    catch {
+        Write-Host "Error on $env:COMPUTERNAME : $_"
+    }
+} -ArgumentList $UserName, $GroupName
+#>
+
+# Get current local group members
+Invoke-Command -ComputerName $ComputerName -ScriptBlock {
+    param ($GroupName)
+    try {
+        Write-Host "Members of $GroupName on $env:COMPUTERNAME :"
+        Get-LocalGroupMember -Group $GroupName
+    }
+    catch {
+        Write-Host "Error retrieving $GroupName members on $env:COMPUTERNAME : $_"
+    }
+} -ArgumentList $GroupName
+```

@@ -1,0 +1,89 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\merge-pst-files-percent.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-02-17 7b7d1b4 git commit PowerShell function
+2025-02-17 0f6f60b git commit PowerShell function
+2025-02-17 eeeb445 git commit PowerShell function
+2025-02-17 055f6f6 git commit PowerShell function
+2024-10-31 4e368fc Create merge-pst-files-percent.ps1
+2024-10-31 cea1ec4 Create merge-pst-files.ps1
+2024-10-31 ec990e8 Create merge-pst-files.ps1
+
+Script preview:
+```powershell
+# Define source folder containing PST files and the destination PST file path
+$sourceFolder = "C:\Path\To\Your\PST\Files"  # Replace with the actual path
+$destinationPST = "C:\Path\To\Your\Destination\merged.pst"  # Replace with the desired path for merged PST
+
+# Open Outlook
+$outlook = New-Object -ComObject Outlook.Application
+$namespace = $outlook.GetNamespace("MAPI")
+
+# Check if the destination PST already exists, and if not, create it
+if (-not (Test-Path $destinationPST)) {
+    Write-Output "Creating new PST file for merged data: $destinationPST"
+    $namespace.AddStore($destinationPST)
+}
+
+# Load the destination PST into Outlook
+$destinationStore = $namespace.Folders | Where-Object { $_.FilePath -eq $destinationPST }
+if (-not $destinationStore) {
+    Write-Output "Loading destination PST into Outlook"
+    $destinationStore = $namespace.AddStore($destinationPST)
+}
+
+# Enumerate each PST file in the source folder
+foreach ($pstFile in Get-ChildItem -Path $sourceFolder -Filter "*.pst") {
+    Write-Output "Processing PST file: $($pstFile.FullName)"
+    
+    # Open the PST file in Outlook
+    $namespace.AddStore($pstFile.FullName)
+    $sourceStore = $namespace.Folders | Where-Object { $_.FilePath -eq $pstFile.FullName }
+    
+    # Copy all folders from the source PST to the destination PST
+    foreach ($folder in $sourceStore.Folders) {
+        Write-Output "Copying folder: $($folder.Name)"
+        $destinationFolder = $destinationStore.Folders | Where-Object { $_.Name -eq $folder.Name }
+        
+        if (-not $destinationFolder) {
+            $destinationFolder = $destinationStore.Folders.Add($folder.Name, $folder.DefaultItemType)
+        }
+        
+        # Copy all items from each folder
+        foreach ($item in $folder.Items) {
+            $item.Copy().MoveTo($destinationFolder)
+        }
+    }
+
+    # Close the source PST after copying is complete
+    $namespace.RemoveStore($sourceStore)
+}
+
+# Clean up and close Outlook
+$outlook.Quit()
+[System.Runtime.Interopservices.Marshal]::ReleaseComObject($outlook)
+Remove-Variable outlook
+Write-Output "PST files merged successfully into $destinationPST"
+```

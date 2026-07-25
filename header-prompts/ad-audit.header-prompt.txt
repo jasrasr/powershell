@@ -1,0 +1,112 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\AD-Scripts\ad-audit.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-09-20 f412a28 Git sync : 2025-09-20 15:16:38
+2025-09-20 fc579d8 Git sync : 2025-09-20 15:16:38
+
+Script preview:
+```powershell
+<#
+.SYNOPSIS
+  Audit AD "reactivations" (Event ID 4722) on a single DC (configurable).
+
+.DESCRIPTION
+  Queries the Security log on the chosen Domain Controller for Event ID 4722
+  (A user account was enabled) and reports who enabled it and when.
+  Optionally also grabs nearby disables (4725) for timeline context.
+
+.REFERENCES
+  4722 event details & fields (Target/Subject): Microsoft Docs
+  Advanced Audit Policy → User Account Management: Microsoft Docs
+#>
+
+param(
+  [Parameter(Mandatory = $true)]
+  [string] $UserSamAccountName,
+
+  [datetime] $StartTime = (Get-Date).AddDays(-30),
+  [datetime] $EndTime   = (Get-Date)
+)
+
+# === CONFIGURABLE ===
+# Only this DC will be queried. Change when needed.
+$DomainController = 'CLEDC1'
+
+# Output location
+$OutDir  = 'C:\temp\powershell-exports'
+if (-not (Test-Path $OutDir)) { New-Item -Path $OutDir -ItemType Directory | Out-Null }
+$Stamp   = Get-Date -Format 'yyyyMMdd-HHmmss'
+$OutFile = Join-Path $OutDir "ad-reactivation-audit-$($DomainController)-$Stamp.csv"
+
+Write-Host "Target DC     : $DomainController"
+Write-Host "Target user   : $UserSamAccountName"
+Write-Host "Time window   : $StartTime -> $EndTime"
+Write-Host "Output file   : $OutFile"
+
+function Convert-EventToRecord {
+  param([System.Diagnostics.Eventing.Reader.EventRecord] $Event)
+
+  # Parse XML safely instead of regexing strings
+  $xml = [xml]$Event.ToXml()
+
+  # Helper to read <Data Name="...">value</Data>
+  $kv = @{}
+  foreach ($d in $xml.Event.EventData.Data) {
+    if ($d.Name) { $kv[$d.Name] = $d.'#text' }
+  }
+
+  [pscustomobject]@{
+    TimeCreated        = $Event.TimeCreated
+    DC                 = $Event.MachineName
+    RecordId           = $Event.RecordId
+    EventId            = $Event.Id
+    TargetUserName     = $kv['TargetUserName']
+    TargetDomainName   = $kv['TargetDomainName']
+    SubjectUserName    = $kv['SubjectUserName']
+    SubjectDomainName  = $kv['SubjectDomainName']
+    SubjectUserSid     = $kv['SubjectUserSid']
+    SubjectLogonId     = $kv['SubjectLogonId']
+  }
+}
+
+# Query function for a single event ID and target user
+function Get-UserEvents {
+  param(
+    [int] $EventId,
+    [string] $UserName,
+    [datetime] $From,
+    [datetime] $To
+  )
+
+  $filter = @{
+    LogName   = 'Security'
+    Id        = $EventId
+    StartTime = $From
+    EndTime   = $To
+  }
+
+  try {
+```

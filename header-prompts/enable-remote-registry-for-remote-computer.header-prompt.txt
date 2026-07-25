@@ -1,0 +1,87 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Regedit-Scripts\enable-remote-registry-for-remote-computer.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.1
+Revision history warning: 
+
+Git commit history (newest first):
+2025-07-08 502e64e git commit PowerShell function 250707-120753
+2025-07-08 0e3f509 git commit PowerShell function 250707-120753
+
+Script preview:
+```powershell
+# Revision : 1.1
+# Description : Remotely enables RemoteRegistry service and key firewall rules, with interactive computer name prompt
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-07-08
+# Modified Date : 2025-07-08
+
+param (
+    [string]$ComputerName
+)
+
+# Prompt for computer name if not supplied
+if (-not $ComputerName) {
+    $ComputerName = Read-Host "Enter the target computer name"
+}
+
+# Check if the computer is online
+if (-not (Test-Connection -ComputerName $ComputerName -Count 2 -Quiet)) {
+    Write-Host "❌ $ComputerName is not reachable over the network." -ForegroundColor Red
+    return
+}
+
+Write-Host "✅ $ComputerName is reachable. Attempting remote configuration..." -ForegroundColor Green
+
+Invoke-Command -ComputerName $ComputerName -ScriptBlock {
+    try {
+        # Enable and start Remote Registry service
+        Set-Service -Name "RemoteRegistry" -StartupType Automatic
+        Start-Service -Name "RemoteRegistry"
+        Write-Host "✅ RemoteRegistry service started and set to automatic."
+
+        # Enable specific firewall rules instead of DisplayGroup
+        $rules = @(
+            'Remote Registry (RPC)',
+            'Remote Administration (RPC)',
+            'Remote Administration (RPC-EPMAP)',
+            'Windows Management Instrumentation (WMI-In)',
+            'Windows Remote Management (HTTP-In)'
+        )
+
+        foreach ($rule in $rules) {
+            try {
+                Enable-NetFirewallRule -DisplayName $rule -ErrorAction SilentlyContinue
+                Write-Host "✅ Enabled firewall rule : $rule"
+            } catch {
+                Write-Host "⚠️ Could not enable firewall rule : $rule — $_"
+            }
+        }
+
+        # Confirm service status
+        $svc = Get-Service -Name "RemoteRegistry"
+        Write-Host "🔍 RemoteRegistry status : $($svc.Status), StartType : $($svc.StartType)"
+
+    } catch {
+        Write-Host "❌ Failed to configure remote settings : $_" -ForegroundColor Red
+    }
+} -ErrorAction Stop -Credential (Get-Credential -Message "Enter admin credentials for $ComputerName")
+```

@@ -1,0 +1,111 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\parse-txt.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.0
+Revision history warning: 
+
+Git commit history (newest first):
+2025-10-09 817a414 Git sync : 2025-10-09 08:50:21
+2025-10-09 f80d97d Git sync : 2025-10-09 08:50:21
+
+Script preview:
+```powershell
+# Revision : 1.0
+# Description : Parse icacls text into CSV, bump MIDDOUGH\* with leading comma
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-10-06
+# Modified Date : 2025-10-06
+
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$InputPath,
+
+    [string]$OutFolder = 'C:\temp\powershell-exports\'
+)
+
+# Ensure output folder exists
+New-Item -ItemType Directory -Path $OutFolder -Force | Out-Null
+
+$dt = (Get-Date).ToString('yyyyMMdd-HHmmss')
+$outCsv = Join-Path $OutFolder "icacls-parsed-$dt.csv"
+
+Write-Host "Input file : $InputPath" -ForegroundColor Yellow
+Write-Host "Output CSV : $outCsv" -ForegroundColor Yellow
+
+function Parse-Ace {
+    param([string]$Line,[string]$Path)
+
+    if ($Line -notmatch "^(?<id>[^:]+):(?<rest>.+)$") { return $null }
+
+    $id   = ($Matches.id).Trim()
+    $rest = ($Matches.rest).Trim()
+
+    # Bump MIDDOUGH\* into next column for CSV
+    if ($id -like 'MIDDOUGH\*') { $id = ",$id" }
+
+    $tokens = [System.Text.RegularExpressions.Regex]::Matches($rest, "\((.*?)\)") |
+              ForEach-Object { $_.Groups[1].Value }
+
+    $inherited = $false
+    $flags = [System.Collections.Generic.List[string]]::new()
+    $perms = [System.Collections.Generic.List[string]]::new()
+
+    foreach ($t in $tokens) {
+        switch -Regex ($t) {
+            '^I$'   { $inherited = $true; continue }
+            '^(OI|CI|IO|NP)$' { $flags.Add($t); continue }
+            default { $perms.Add($t); continue }
+        }
+    }
+
+    $permExpanded = @()
+    foreach ($p in $perms) {
+        $permExpanded += ($p -split '\s*,\s*')
+    }
+
+    [pscustomobject]@{
+        Path        = $Path
+        Identity    = $id
+        Inherited   = $inherited
+        Flags       = ($flags -join ',')
+        Permissions = ($permExpanded -join ',')
+    }
+}
+
+# Read file and parse
+$lines = Get-Content -LiteralPath $InputPath
+$currentPath = $null
+$records = @()
+
+foreach ($line in $lines) {
+    $line = $line.Trim()
+    if ([string]::IsNullOrWhiteSpace($line)) { continue }
+
+    if ($line -notmatch ":") {
+        # Path line
+        $currentPath = $line
+        continue
+    }
+
+    $rec = Parse-Ace -Line $line -Path $currentPath
+    if ($rec) { $records += $rec }
+}
+```

@@ -1,0 +1,63 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\rename-files-in-bulk.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-02-17 7b7d1b4 git commit PowerShell function
+2025-02-17 0f6f60b git commit PowerShell function
+2025-02-17 eeeb445 git commit PowerShell function
+2025-02-17 055f6f6 git commit PowerShell function
+2024-10-25 2ec2882 Auto-sync commit 2024-10-25 12:01:02
+2024-10-25 81aa737 Auto-sync commit 2024-10-25 12:01:02
+2024-10-24 284fff8 initial commit, removing history
+
+Script preview:
+```powershell
+# Define the directory where the files are located
+$directory = "N:\!newprojecttemplate-BIM"
+
+# Get all files in the directory and subfolders that match the pattern
+Get-ChildItem -Path $directory -Recurse -Filter "* - internet*" | ForEach-Object {
+    # Store the current file name
+    $oldName = $_.Name
+    # Replace " - internet" with " - sharepoint"
+    $newName = $oldName -replace " - internet", " - sharepoint"
+    
+    # Create the full path for the old and new names
+    $oldFullPath = $_.FullName
+    $newFullPath = Join-Path $_.DirectoryName $newName
+    
+    # Rename the file
+    Rename-Item -Path $oldFullPath -NewName $newFullPath
+    Write-Host "Renamed file: $oldName to $newName"
+}
+
+
+
+# Define the directory to search
+#$directory = "N:\TEST\TEST2504"
+
+# List all files in the folder and subfolders
+Get-ChildItem -Path $directory -Recurse | Where-Object { -not $_.PSIsContainer } | Select-Object FullName
+```

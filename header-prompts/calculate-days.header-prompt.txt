@@ -1,0 +1,117 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\calculate-days.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 2.0
+Revision history warning: 
+
+Git commit history (newest first):
+2025-10-20 a230f14 git commit powershell private function 20251020_171226
+2025-10-20 4325490 Refactor calculate-days.ps1 for version 2.0
+2025-10-20 d3a7810 Clean up Read-DateWithDefault function
+2025-10-20 860bdf9 Git sync :
+2025-09-29 5ecb7be git commit powershell private function 20250929-110558
+2025-09-29 a9bb894 git commit powershell private function 20250929-110558
+2025-09-26 707ae8b Git sync : 2025-09-26 09:40:22
+2025-09-26 7babb8b Git sync : 2025-09-26 09:40:22
+
+Script preview:
+```powershell
+# Revision : 2.0
+# Description : Accept a date parameter or prompt for one; compute days until/since that date.
+#               After displaying results allow:
+#                 - Entering Y to start over (interactive prompt for a new date),
+#                 - Entering N (or blank) to exit,
+#                 - Or entering a date directly to compute immediately.
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-09-26
+# Modified Date: 2025-10-20
+
+<#
+.SYNOPSIS
+    Compute days until or since a provided date (via parameter or prompt),
+    then allow Y/N or direct-date input to continue.
+
+.DESCRIPTION
+    If a date is passed in as a parameter, the script uses it for the first run.
+    After finishing, the script accepts one of:
+      - Y  : start over interactively (prompt for a date)
+      - N  : exit (default)
+      - any date string: parse and immediately compute for that date, repeating until
+                         the user types Y, N, or blank.
+
+.PARAMETER TargetDate
+    An optional date (string or DateTime). If omitted, user is prompted.
+
+.NOTES
+    Author      : Jason "Lambo" Lamb
+    Version     : 2.0
+    Created Date: 2025-09-26
+    Modified Date: 2025-10-20
+#>
+
+param(
+    [Parameter(Mandatory = $false)]
+    [AllowNull()]
+    [object]$TargetDate
+)
+
+function Parse-DateManual {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Input
+    )
+
+    if ($null -eq $Input) { return $null }
+    $s = $Input.Trim()
+    if ([string]::IsNullOrWhiteSpace($s)) { return $null }
+
+    # Normalize whitespace
+    $s = ($s -replace '\s+', ' ').Trim()
+
+    # Split on '/', '-' or whitespace
+    $parts = $s -split '[\/\-\s]+'
+    if ($parts.Count -ne 3) {
+        return $null
+    }
+
+    for ($i = 0; $i -lt 3; $i++) { $parts[$i] = $parts[$i].Trim() }
+
+    try {
+        if ($parts[0].Length -eq 4 -and $parts[0] -match '^\d{4}$') {
+            $year  = [int]$parts[0]
+            $month = [int]$parts[1]
+            $day   = [int]$parts[2]
+        }
+        elseif ($parts[2].Length -eq 4 -and $parts[2] -match '^\d{4}$') {
+            $month = [int]$parts[0]
+            $day   = [int]$parts[1]
+            $year  = [int]$parts[2]
+        }
+        else {
+            $month = [int]$parts[0]
+            $day   = [int]$parts[1]
+            $ystr  = $parts[2]
+            if ($ystr -notmatch '^\d{2,4}$') { return $null }
+            if ($ystr.Length -eq 2) {
+                $yy = [int]$ystr
+                if ($yy -le 29) { $year = 2000 + $yy } else { $year = 1900 + $yy }
+            }
+```

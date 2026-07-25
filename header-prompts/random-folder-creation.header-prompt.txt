@@ -1,0 +1,116 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\random-folder-creation.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-02-17 7b7d1b4 git commit PowerShell function
+2025-02-17 0f6f60b git commit PowerShell function
+2025-02-17 eeeb445 git commit PowerShell function
+2025-02-17 055f6f6 git commit PowerShell function
+2024-11-20 d0f1799 Auto-sync commit 20241120-230102
+2024-11-20 1727d3d Auto-sync commit 20241120-230102
+
+Script preview:
+```powershell
+<# 
+Set-Location -path U:\Cleveland 
+$deptfolders = (Get-ChildItem -path u:\cleveland -Directory | Select-Object -ExpandProperty name)
+ForEach ($deptfolder in $deptfolders) {
+    mkdir J:\Cleveland\$deptfolder
+}
+#>
+<#
+Set-Location J:\
+$cityfolders = (Get-ChildItem -Directory | Select-Object -ExpandProperty name)
+foreach ( $cityfolder in $cityfolders ) { 
+    Copy-Item -Path j:\Cleveland\* -Destination J:\$cityfolder -Force -Recurse
+}
+
+copy-item -path j:\cleveland -destination j:\Ashland  -recurse -force
+copy-item -path j:\cleveland -destination J:\Buffalo -recurse -force
+copy-item -path j:\cleveland -destination J:\Chicago -recurse -force
+copy-item -path j:\cleveland -destination J:\Dallas -recurse -force
+copy-item -path j:\cleveland -destination J:\Indiana -recurse -force
+copy-item -path j:\cleveland -destination J:\Madison -recurse -force
+copy-item -path j:\cleveland -destination J:\Minneapolis -recurse -force
+copy-item -path j:\cleveland -destination J:\Pittsburgh -recurse -force
+copy-item -path j:\cleveland -destination J:\Toledo -recurse -force
+
+
+# Count the number of child items in each directory
+foreach ($cityfolder in $cityfolders) {
+    $childItemCount = (Get-ChildItem -Path J:\$cityfolder -Recurse | Measure-Object).Count
+    Write-Host "Directory: J:\$cityfolder has $childItemCount child items."
+}
+
+# Sample first names and last names
+$firstNames = @("John", "Jane", "Michael", "Sarah", "David", "Emily", "Robert", "Jessica", "Daniel", "Laura", 
+                "James", "Mary", "William", "Patricia", "Joseph", "Linda", "Charles", "Barbara", "Thomas", "Elizabeth",
+                "Christopher", "Jennifer", "Matthew", "Maria", "Anthony", "Susan", "Mark", "Margaret", "Paul", "Dorothy",
+                "Steven", "Lisa", "Andrew", "Nancy", "Kenneth", "Karen", "Joshua", "Betty", "Kevin", "Helen",
+                "Brian", "Sandra", "George", "Donna", "Edward", "Carol", "Ronald", "Ruth", "Timothy", "Sharon")
+$lastNames = @("Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez",
+                "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin",
+                "Lee", "Perez", "Thompson", "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson",
+                "Walker", "Young", "Allen", "King", "Wright", "Scott", "Torres", "Nguyen", "Hill", "Flores",
+                "Green", "Adams", "Nelson", "Baker", "Hall", "Rivera", "Campbell", "Mitchell", "Carter", "Roberts")
+
+# Generate 350 random folder names
+$folderNames = @()
+1..350 | ForEach-Object {
+    $firstName = $firstNames | Get-Random
+    $lastName = $lastNames | Get-Random
+    $folderName = "$firstName.$lastName"
+    $folderNames += $folderName
+}
+
+# Check for duplicates and recreate them
+$duplicateFolders = $folderNames | Group-Object | Where-Object { $_.Count -gt 1 }
+
+while ($duplicateFolders) {
+    foreach ($duplicate in $duplicateFolders) {
+        for ($i = 1; $i -lt $duplicate.Count; $i++) {
+            $firstName = $firstNames | Get-Random
+            $lastName = $lastNames | Get-Random
+            $newFolderName = "$firstName.$lastName"
+            $folderNames[$folderNames.IndexOf($duplicate.Name)] = $newFolderName
+        }
+    }
+    $duplicateFolders = $folderNames | Group-Object | Where-Object { $_.Count -gt 1 }
+}
+
+Write-Host "No duplicate folder names found."
+
+# Create the folders
+$basePath = "J:\RandomFolders"
+if (-not (Test-Path -Path $basePath)) {
+    New-Item -Path $basePath -ItemType Directory
+}
+
+foreach ($folderName in $folderNames) {
+    $folderPath = Join-Path -Path $basePath -ChildPath $folderName
+    if (-not (Test-Path -Path $folderPath)) {
+        New-Item -Path $folderPath -ItemType Directory
+    }
+```

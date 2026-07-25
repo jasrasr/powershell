@@ -1,0 +1,71 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Track-Package\combined.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.1
+Revision history warning: 
+
+Git commit history (newest first):
+2025-07-03 64538d8 Update combined.ps1
+2025-07-03 804345d Update combined.ps1
+2025-07-03 d36350c Create combined.ps1
+2025-07-03 1588a95 Create combined.ps1
+
+Script preview:
+```powershell
+# Revision : 1.1
+# Description : Unified FedEx, UPS, USPS tracking function with updated regex detection. Rev 1.1
+# call with track-package ###
+# the script should recognize the format of the 3 carriers tracking numbers
+# Author : Jason Lamb
+# Created Date : 2025-07-03
+# Modified Date : 2025-07-03
+
+function Get-Carrier {
+    param([string]$tn)
+    switch -regex ($tn) {
+        '^(1Z[0-9A-Z]{16})$'                                     { return 'UPS' }
+        '^(?:\d{12}|\d{15}|\d{20}|\d{22})$'                       { return 'FedEx' }
+        '^(?:(94|93|92|95)[0-9]{20,22}|[A-Z]{2}[0-9]{9}[A-Z]{2})$' { return 'USPS' }
+        default                                                  { return $null }
+    }
+}
+
+function Track-Package {
+    param([Parameter(Mandatory)][string]$TrackingNumber)
+
+    $carrier = Get-Carrier $TrackingNumber
+    if (-not $carrier) {
+        Write-Warning "Unrecognized tracking number format : $TrackingNumber"
+        return
+    }
+
+    switch ($carrier) {
+        'UPS'   { $url = "https://www.ups.com/track?track=yes&trackNums=$TrackingNumber" }
+        'FedEx' { $url = "https://www.fedex.com/fedextrack/?trknbr=$TrackingNumber" }
+        'USPS'  { $url = "https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=$TrackingNumber" }
+    }
+
+    Write-Host "Carrier detected : $carrier"
+    Write-Host "Tracking URL : $url"
+
+    Start-Process chrome.exe "--new-window $url"
+}
+```

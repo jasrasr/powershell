@@ -1,0 +1,113 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\remove-users-from-csv.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.8
+Revision history warning: 
+
+Git commit history (newest first):
+2025-10-09 817a414 Git sync : 2025-10-09 08:50:21
+2025-10-09 f80d97d Git sync : 2025-10-09 08:50:21
+2025-09-30 9f87956 Git sync : 2025-09-30 15:27:12
+2025-09-30 d6e6398 Git sync : 2025-09-30 15:27:12
+
+Script preview:
+```powershell
+# Revision : 1.8
+# Description : Robust header handling + exclude filtering. Extract/keep unique "Display Name" values excluding a provided CSV list, optionally filter source rows. Fixes "Display Name not found" by normalizing header quotes/whitespace/BOM. Shows progress. Rev 1.8
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-09-29
+# Modified Date : 2025-09-29
+
+function Get-UniqueDisplayNamesFiltered {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$InputCsv,
+
+        [Parameter(Mandatory)]
+        [string]$ExcludeListCsv,
+
+        [string]$ExcludeColumn = 'Display Name',
+
+        [int]$TotalLines = 0,
+
+        [int]$ProgressIntervalMS = 250,
+
+        [switch]$FilterSourceRows
+    )
+
+    # --- Path validation
+    if (-not (Test-Path -LiteralPath $InputCsv)) {
+        Write-Host "Input CSV $InputCsv : NOT FOUND" -ForegroundColor Red
+        return
+    }
+    if (-not (Test-Path -LiteralPath $ExcludeListCsv)) {
+        Write-Host "Exclude CSV $ExcludeListCsv : NOT FOUND" -ForegroundColor Red
+        return
+    }
+    $InputCsv       = (Resolve-Path -LiteralPath $InputCsv).Path
+    $ExcludeListCsv = (Resolve-Path -LiteralPath $ExcludeListCsv).Path
+    Write-Host "Input CSV $InputCsv : OK" -ForegroundColor Green
+    Write-Host "Exclude CSV $ExcludeListCsv : OK" -ForegroundColor Green
+
+    # --- Load exclude set (one-column CSV with header "Display Name" OR any CSV with that column)
+    function Get-ExcludeSet {
+        param(
+            [Parameter(Mandatory)] [string]$CsvPath,
+            [string]$ColName = 'Display Name'
+        )
+        $set = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+        $r = [System.IO.StreamReader]::new($CsvPath)
+        try {
+            $first = $r.ReadLine()
+            if (-not $first) { return $set }
+
+            $hdrRaw = $first -split ',(?=(?:[^"]*"[^"]*")*[^"]*$)'
+            # Normalize headers: trim whitespace, trim quotes, strip BOM
+            $hdr = $hdrRaw | ForEach-Object {
+                $s = $_.Trim()
+                if ($s.Length -gt 0 -and [int][char]$s[0] -eq 0xFEFF) { $s = $s.Substring(1) } # strip BOM
+                $s.Trim('"')
+            }
+
+            $idx = [Array]::IndexOf(($hdr | ForEach-Object { $_.ToLowerInvariant() }), $ColName.ToLowerInvariant())
+            if ($idx -ge 0) {
+                # file has header row; read remaining lines as data
+                while (-not $r.EndOfStream) {
+                    $line  = $r.ReadLine()
+                    if (-not $line) { continue }
+                    $cells = $line -split ',(?=(?:[^"]*"[^"]*")*[^"]*$)'
+                    if ($cells.Count -gt $idx) {
+                        $val = $cells[$idx].Trim().Trim('"')
+                        if ($val) { $null = $set.Add($val) }
+                    }
+                }
+            } else {
+                # no header; treat first line as value
+                $val = $hdrRaw[0].Trim().Trim('"')
+                if ($val) { $null = $set.Add($val) }
+                while (-not $r.EndOfStream) {
+                    $line = $r.ReadLine()
+                    if (-not $line) { continue }
+                    $val = ($line -split ',(?=(?:[^"]*"[^"]*")*[^"]*$)')[0].Trim().Trim('"')
+                    if ($val) { $null = $set.Add($val) }
+                }
+```

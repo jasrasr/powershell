@@ -1,0 +1,52 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\AD-Scripts\sync-ad-to-azure.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-04-08 01c331c add 3 new, modify 4
+2025-02-17 7b7d1b4 git commit PowerShell function
+2025-02-17 0f6f60b git commit PowerShell function
+2025-02-17 eeeb445 git commit PowerShell function
+2025-02-17 055f6f6 git commit PowerShell function
+2024-12-06 af5e253 Auto-sync commit 20241206-230102
+2024-12-06 c9c8688 Auto-sync commit 20241206-230102
+
+Script preview:
+```powershell
+param(
+    [Parameter(Mandatory = $true)]
+    [string]$ComputerName
+)
+
+$session = New-PSSession -ComputerName $ComputerName -Credential (Get-Credential)
+Invoke-Command -Session $session -ScriptBlock {
+    repadmin /syncall
+    Write-Host "Pausing 5 seconds"
+    for ($i = 5; $i -ge 1; $i--) {
+        Write-Host "$i"
+        Start-Sleep -Seconds 1
+    }
+    Write-Host "ADSync will fail if it is currently running"
+    Start-ADSyncSyncCycle -PolicyType Delta
+}
+```

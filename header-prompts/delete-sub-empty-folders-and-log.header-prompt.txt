@@ -1,0 +1,53 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\delete-sub-empty-folders-and-log.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.1
+Revision history warning: 
+
+Git commit history (newest first):
+2025-09-16 0b86a54 git commit powershell private function 250915-123335
+2025-09-16 2d8589e git commit powershell private function 250915-123335
+
+Script preview:
+```powershell
+# Revision : 1.1
+# Description : Remove empty folders inside target directory (test with -WhatIf first), log results to same folder  
+# Author : Jason Lamb (with help from ChatGPT)  
+# Created Date : 2025-09-12  
+# Modified Date : 2025-09-12  
+
+$targetPath = "\\server\folder"
+$timestamp  = Get-Date -Format "yyyyMMdd-HHmmss"
+$logFile    = Join-Path $targetPath "RemoveEmptyFolders-$timestamp.log"
+
+# Find empty folders
+$emptyFolders = Get-ChildItem -Path $targetPath -Recurse -Directory |
+    Where-Object { -not (Get-ChildItem -Path $_.FullName -Recurse -Force -ErrorAction SilentlyContinue) }
+
+# Write to log
+$emptyFolders.FullName | Out-File -FilePath $logFile -Encoding UTF8 -Force
+
+# Simulate removal
+$emptyFolders | Remove-Item -WhatIf
+
+Write-Host "Empty folders logged to $logFile"
+Write-Host "Use Remove-Item without -WhatIf to actually delete them."
+```

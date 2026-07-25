@@ -1,0 +1,113 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\rename-clean-file-names.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.5
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2026-01-07 92a2a48 Fix typos in Write-Host color parameters
+2026-01-07 ba97a6c Rename script and update usage instructions
+2026-01-07 803c498 Add setup instructions to clean-file-names.ps1
+
+Script preview:
+```powershell
+# Revision : 1.5
+# Description : Clean file names only (no folder renames). 
+#               Removes tildes, single quotes, leading/trailing underscores, trims spaces,
+#               collapses double spaces, excludes RE_ email replies.
+#               Creates per-directory change logs only when changes occur
+#               and a master CSV audit log. Idempotent normalization (single-pass).
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2026-01-07
+# Modified Date : 2026-01-07
+
+# write-host needs to use single quotes for this alert
+write-host "MAKE SURE to setup newpaths = @('\\server\folder1', '\\server\folder2', '\\server\folder3') before running this." -foregroundcolor YELLOW
+write-host "USE DOUBLE QUOTES in array because a folder/file with single quote will mess up the array." -foregroundcolor YELLOW
+
+
+$WhatIfMode = $true   # set to $false when ready
+
+$logFolder = "C:\temp\powershell-exports"
+$timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+$masterLog = Join-Path $logFolder "file-rename-master-$timestamp.csv"
+
+if (-not (Test-Path $logFolder)) {
+    New-Item -Path $logFolder -ItemType Directory | Out-Null
+}
+
+function Get-CleanFileName {
+    param ([string] $FileName)
+
+    $name = [System.IO.Path]::GetFileNameWithoutExtension($FileName)
+    $ext  = [System.IO.Path]::GetExtension($FileName)
+
+    $clean = $name
+
+    do {
+        $previous = $clean
+
+        $clean = $clean -replace '~', ''
+        $clean = $clean -replace "'", ''
+        $clean = $clean.Trim()
+
+        while ($clean -match '  ') {
+            $clean = $clean -replace '  ', ' '
+        }
+
+        $clean = $clean -replace '^_+', ''
+        $clean = $clean -replace '_+$', ''
+
+    } while ($clean -ne $previous)
+
+    return "$clean$ext"
+}
+
+"Timestamp,Folder,OriginalName,NewName,Status" | Out-File -FilePath $masterLog -Encoding utf8
+
+foreach ($path in $newPaths | Sort-Object -Unique) {
+
+    if (-not (Test-Path $path)) {
+        Write-Host "Path not found : $path" -forgroundcolor red
+        continue
+    }
+
+    Write-Host "Processing folder : $path" -foregroundcolor cyan
+
+    $directoryChanges = @()
+
+    Get-ChildItem -Path $path -File | ForEach-Object {
+
+        $originalName = $_.Name
+        $cleanName    = $originalName
+        $status       = "Skipped"
+
+        if ($originalName -match '^(?i)RE_') {
+            $status = "Excluded-RE"
+        }
+        else {
+            $cleanName = Get-CleanFileName $originalName
+
+            if ($originalName -ne $cleanName) {
+
+                Write-Host "Rename file : $originalName -> $cleanName"
+```

@@ -1,0 +1,98 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\progress-bar.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 2.1
+Revision history warning: 
+
+Git commit history (newest first):
+2025-07-07 bce023b git commit PowerShell function 250707-113258
+2025-07-07 c6c40cc git commit PowerShell function 250707-113258
+2025-07-01 ead081d git commit PowerShell function 250701-141015
+2025-07-01 81da9e9 git commit PowerShell function 250701-141015
+2025-07-01 8637399 git commit PowerShell function 250701-141015
+2025-07-01 fd66696 git commit PowerShell function 250701-141015
+
+Script preview:
+```powershell
+# Revision : 2.1
+# Description : GUI version of variable-time progress bar using WinForms (param fix)
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-07-01
+# Modified Date : 2025-07-01
+
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+
+# === CONFIGURATION ===
+$MinSeconds = 3
+$MaxSeconds = 10
+
+# Generate random duration
+$duration = Get-Random -Minimum $MinSeconds -Maximum ($MaxSeconds + 1)
+$steps = 100
+$interval = $duration / $steps
+
+# === BUILD GUI ===
+$form = New-Object System.Windows.Forms.Form
+$form.Text = "Progress Task"
+$form.Size = New-Object System.Drawing.Size(400,120)
+$form.StartPosition = "CenterScreen"
+$form.Topmost = $true
+
+# Label
+$label = New-Object System.Windows.Forms.Label
+$label.AutoSize = $true
+$label.Location = New-Object System.Drawing.Point(10,10)
+$label.Text = "Processing... 0%"
+$form.Controls.Add($label)
+
+# Progress bar
+$progressBar = New-Object System.Windows.Forms.ProgressBar
+$progressBar.Location = New-Object System.Drawing.Point(10,40)
+$progressBar.Size = New-Object System.Drawing.Size(360,25)
+$progressBar.Minimum = 0
+$progressBar.Maximum = 100
+$form.Controls.Add($progressBar)
+
+# Timer
+$timer = New-Object System.Windows.Forms.Timer
+$timer.Interval = $interval * 1000  # milliseconds
+
+$i = 0
+$timer.Add_Tick({
+    $i++
+    $progressBar.Value = $i
+    $label.Text = "Processing... $i%"
+
+    if ($i -ge 100) {
+        $timer.Stop()
+        $label.Text = "Completed in $duration seconds!"
+        Start-Sleep -Milliseconds 500
+        $form.Close()
+    }
+})
+
+# Start timer when form is shown
+$form.Add_Shown({ $timer.Start() })
+
+# Show the GUI
+[void]$form.ShowDialog()
+```

@@ -1,0 +1,78 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\write-host-foregroundcolors.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-10-10 fa41b40 Git sync :
+2025-10-10 8fb0692 Git sync :
+
+Script preview:
+```powershell
+# Demonstrate Write-Host with various ForegroundColor options
+write-host 'White' -foregroundcolor White
+write-host 'Gray' -foregroundcolor Gray
+write-host 'DarkGray' -foregroundcolor DarkGray
+write-host 'Black' -foregroundcolor Black
+write-host 'Green' -foregroundcolor Green
+write-host 'Green' -foregroundcolor Green
+write-host 'DarkGreen' -foregroundcolor DarkGreen
+write-host 'Cyan' -foregroundcolor Cyan
+write-host 'DarkCyan' -foregroundcolor DarkCyan
+write-host 'Red' -foregroundcolor Red
+write-host 'DarkRed' -foregroundcolor DarkRed
+write-host 'Magenta' -foregroundcolor Magenta
+write-host 'DarkMagenta' -foregroundcolor DarkMagenta
+write-host 'Yellow' -foregroundcolor Yellow
+write-host 'DarkYellow' -foregroundcolor DarkYellow
+write-host 'Blue' -foregroundcolor Blue
+write-host 'DarkBlue' -foregroundcolor DarkBlue
+
+
+# Define an array of color names (must match valid console color names)
+$colors = @(
+'White',
+'Gray',
+'DarkGray',
+'Black',
+'Green',
+'Green',
+'DarkGreen',
+'Cyan',
+'DarkCyan',
+'Red',
+'DarkRed',
+'Magenta',
+'DarkMagenta',
+'Yellow',
+'DarkYellow',
+'Blue',
+'DarkBlue'
+)
+
+# Pick one at random
+$randomColor = Get-Random -InputObject $colors
+
+# Use it
+Write-Host "Hello in a random color" -ForegroundColor $randomColor
+
+```

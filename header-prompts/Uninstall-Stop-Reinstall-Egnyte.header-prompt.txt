@@ -1,0 +1,111 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Uninstall-Stop-Reinstall-Egnyte.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.8
+Revision history warning: 
+
+Git commit history (newest first):
+2025-11-17 f7c4d61 Update Egnyte script to version 1.8
+2025-11-17 1283b31 Add script to manage Egnyte installation and processes
+
+Script preview:
+```powershell
+# Revision : 1.8
+# Description : Self-elevate, stop Egnyte Desktop App processes, uninstall all versions with reboot suppression, copy MSI local, install Egnyte 3.29.1.175, and wait for keypress. Rev 1.8
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-11-17
+# Modified Date : 2025-11-17
+
+# ------------------------
+# Self Elevation Block
+# ------------------------
+$windowsIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
+$windowsPrincipal = New-Object Security.Principal.WindowsPrincipal($windowsIdentity)
+$isAdmin = $windowsPrincipal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
+
+if (-not $isAdmin) {
+    Write-Host "⚠ Not running as Administrator. Attempting to relaunch with elevation ..." -ForegroundColor Yellow
+
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName = "powershell.exe"
+    $psi.Arguments = "-ExecutionPolicy Bypass -File `"$PSCommandPath`""
+    $psi.Verb = "runas"
+
+    try {
+        [System.Diagnostics.Process]::Start($psi) | Out-Null
+        exit
+    }
+    catch {
+        Write-Host "❌ User declined elevation. Continuing without admin ..." -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "✔ Running with administrative privileges." -ForegroundColor Green
+}
+
+# ------------------------
+# Stop Egnyte Desktop App Processes
+# ------------------------
+Write-Host "`nStopping Egnyte Desktop App processes ..."
+
+$egnyteProcesses = @(
+    "Egnyte WebEdit",
+    "EgnyteClient",
+    "EgnyteDrive",
+    "EgnyteSyncService",
+    "EgnyteUpdate"
+)
+
+foreach ($proc in $egnyteProcesses) {
+    $p = Get-Process -Name $proc -ErrorAction SilentlyContinue
+    if ($p) {
+        Write-Host "Stopping process $proc : PID $($p.Id)"
+        Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
+    }
+}
+
+# ------------------------
+# Uninstall Egnyte Desktop App (ALL versions)
+# ------------------------
+Write-Host "`nChecking for installed Egnyte Desktop App entries ..."
+
+$uninstallRoot = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
+
+$egnyteApps = Get-ChildItem $uninstallRoot -ErrorAction SilentlyContinue |
+    ForEach-Object {
+        $props = Get-ItemProperty $_.PsPath -ErrorAction SilentlyContinue
+        if ($props.DisplayName -eq "Egnyte Desktop App" -or $props.Publisher -eq "Egnyte, Inc.") {
+            $props
+        }
+    }
+
+if ($egnyteApps.Count -eq 0) {
+    Write-Host "No Egnyte Desktop App installations found. Skipping uninstall."
+}
+else {
+    foreach ($app in $egnyteApps) {
+        Write-Host "`nFound Egnyte Desktop App : $($app.DisplayName)"
+        Write-Host "Version installed : $($app.DisplayVersion)"
+        Write-Host "MSI GUID : $($app.PSChildName)"
+
+        $guid = $app.PSChildName
+
+        if ($guid -and $guid -match "^\{.*\}$") {
+```

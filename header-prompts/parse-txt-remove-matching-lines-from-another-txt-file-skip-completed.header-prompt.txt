@@ -1,0 +1,111 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\parse-txt-remove-matching-lines-from-another-txt-file-skip-completed.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 2.7
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-11-05 4b8191c Git sync :
+
+Script preview:
+```powershell
+# Revision : 2.7
+# Description : Cleans text files with a given prefix by removing standard subfolder patterns and child paths. 
+#               Skips files that already have a cleaned version. 
+#               Processes all *.txt files beginning with -BatchFilePrefix.
+#               Overwrites cleaned files but appends results and totals to egnyte-clean-summary.csv with date/time tracking.
+#               Loads exclusion patterns from external exclude-patterns.txt.
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-11-04
+# Modified Date : 2025-11-04
+
+param(
+    [Parameter(Mandatory = $true)]
+    [string]$BatchFolder,
+
+    [Parameter(Mandatory = $true)]
+    [string]$BatchFilePrefix
+)
+
+# --- VARIABLES ---
+$RunDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+$SummaryCsv  = Join-Path $BatchFolder "egnyte-clean-summary.csv"
+$PatternFile = Join-Path $BatchFolder "exclude-patterns.txt"
+
+# --- LOAD EXCLUSION PATTERNS ---
+if (Test-Path $PatternFile) {
+    $patterns = Get-Content $PatternFile | Where-Object { $_.Trim() -ne "" }
+    Write-Host "Loaded $($patterns.Count) exclusion patterns from $PatternFile" -ForegroundColor Cyan
+} else {
+    Write-Host "⚠️ Pattern file not found at $PatternFile — no exclusions loaded." -ForegroundColor Yellow
+    $patterns = @()
+}
+
+# --- FIND MATCHING FILES ---
+$BatchFiles = Get-ChildItem -Path $BatchFolder -Filter "$BatchFilePrefix*.txt" |
+               Where-Object { $_.Name -notmatch '-cleaned' }
+
+if (-not $BatchFiles) {
+    Write-Host "No eligible batch files found with prefix '$BatchFilePrefix' in $BatchFolder." -ForegroundColor Red
+    exit
+}
+
+$summary = @()
+
+foreach ($file in $BatchFiles) {
+    $outFile = [System.IO.Path]::Combine($BatchFolder, ($file.BaseName + "-cleaned" + $file.Extension))
+
+    if (Test-Path $outFile) {
+        Write-Host "`nSkipping (already cleaned) : $($file.Name)" -ForegroundColor Yellow
+        continue
+    }
+
+    Write-Host "`nProcessing : $($file.Name)" -ForegroundColor Cyan
+
+    $lines   = Get-Content $file.FullName
+    $total   = $lines.Count
+
+    $filtered = if ($patterns.Count -gt 0) {
+        $lines | Where-Object {
+            $line = $_
+            -not ($patterns | Where-Object { $line -like "*$_*" })
+        }
+    } else {
+        $lines
+    }
+
+    $kept     = $filtered.Count
+    $removed  = $total - $kept
+    $percent  = if ($total -gt 0) { [math]::Round(($kept / $total) * 100, 1) } else { 0 }
+
+    # Overwrite cleaned file
+    $filtered | Set-Content -Path $outFile -Encoding UTF8 -Force
+
+    Write-Host "Original lines : $total" -ForegroundColor Yellow
+    Write-Host "Removed lines  : $removed" -ForegroundColor Red
+    Write-Host "Kept lines     : $kept ($percent`%)" -ForegroundColor Green
+    Write-Host "Cleaned file saved : $outFile" -ForegroundColor White
+
+    $summary += [PSCustomObject]@{
+        RunDateTime   = $RunDateTime
+        FileName      = $file.Name
+```

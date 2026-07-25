@@ -1,0 +1,117 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\get-ms-teams-owners-and-members.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-04-08 6e4dfb1 Updated $domain ${domain} $onedrivepath ${username}  On branch main  Your branch is up to date with 'origin/main'.
+2025-04-08 9b0df64 Updated $domain ${domain} $onedrivepath ${username}  On branch main  Your branch is up to date with 'origin/main'.
+2025-02-17 7b7d1b4 git commit PowerShell function
+2025-02-17 0f6f60b git commit PowerShell function
+2025-02-17 eeeb445 git commit PowerShell function
+2025-02-17 055f6f6 git commit PowerShell function
+2024-11-21 22a5f6c Auto-sync commit 20241121-230102
+2024-11-21 8c61418 Auto-sync commit 20241121-230102
+
+Script preview:
+```powershell
+#get date/time YYMMDD_HHMMSS
+$datetime = Get-Date -Format "yyMMddHHmmss"
+
+# Install Required Modules
+Install-Module -Name PowerShellGet -Force -AllowClobber
+Install-Module -Name MicrosoftTeams -Force
+
+# Connect to Microsoft Teams
+Connect-MicrosoftTeams
+
+# Disconnect from Microsoft Teams after the script completes
+try {
+    # Your existing code here
+} finally {
+    Disconnect-MicrosoftTeams
+}
+
+
+
+# Path to save the report
+$reportfile = "${onedrivepath}\Documents\GitHub\out-file\TeamsOwnersAndMembers-$datetime.csv"
+
+# Function to Get Team Owners and Members
+function Get-TeamOwnersAndMembers {
+    param (
+        [Parameter(Mandatory = $true)] 
+        [string]$TeamId
+    )
+
+    # Get the team owners and members
+    $owners = Get-TeamUser -GroupId $TeamId -Role Owner
+    $members = Get-TeamUser -GroupId $TeamId -Role Member
+
+    # Create a report array
+    $report = @()
+
+    # Process owners
+    foreach ($owner in $owners) {
+        if ($owner.DisplayName -and $owner.UserPrincipalName) {
+            $report += [PSCustomObject]@{
+                Role        = "Owner"
+                DisplayName = $owner.DisplayName
+                Email       = $owner.UserPrincipalName
+            }
+        }
+    }
+
+    # Process members
+    foreach ($member in $members) {
+        if ($member.DisplayName -and $member.UserPrincipalName) {
+            $report += [PSCustomObject]@{
+                Role        = "Member"
+                DisplayName = $member.DisplayName
+                Email       = $member.UserPrincipalName
+            }
+        }
+    }
+
+    return $report
+}
+
+# Get all Teams
+$teams = Get-Team
+$allTeamsReport = @()
+
+# Process each team
+foreach ($team in $teams) {
+    Write-Output "Processing Team: $($team.DisplayName)"
+    $teamReport = Get-TeamOwnersAndMembers -TeamId $team.GroupId
+    foreach ($entry in $teamReport) {
+        $entry | Add-Member -MemberType NoteProperty -Name "TeamName" -Value $team.DisplayName
+    }
+    $allTeamsReport += $teamReport
+}
+
+# Select and format the output
+$formattedReport = $allTeamsReport | Select-Object TeamName, Role, DisplayName, Email
+
+# Export report to CSV
+$formattedReport | Export-Csv -Path $reportfile -NoTypeInformation -Force
+```

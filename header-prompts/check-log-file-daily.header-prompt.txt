@@ -1,0 +1,46 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\check-log-file-daily.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-08-20 cdcb79c git commit powershell private function 250813-141516
+2025-08-20 b146dad git commit powershell private function 250813-141516
+
+Script preview:
+```powershell
+# Path to the log
+$logFile = "\\server\c$\temp\logfile.log"
+
+# Expected: modified today
+$lastWrite = (Get-Item $logFile).LastWriteTime
+$today     = (Get-Date).Date
+
+if ($lastWrite.Date -eq $today) {
+    Write-Host "OK : $logFile was modified today at $lastWrite" -ForegroundColor Green
+} else {
+    Write-Host "ALERT : $logFile has not been modified today! Last change: $lastWrite" -ForegroundColor Red
+}
+
+$logPath = "C:\temp\powershell-exports\check-adkit-log-$(Get-Date -Format 'yyyyMMdd').log"
+Add-Content -Path $logPath -Value "$(Get-Date) : $logFile - File last modified $lastWrite"
+```

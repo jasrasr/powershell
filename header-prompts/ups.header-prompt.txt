@@ -1,0 +1,61 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Track-Package\ups.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.0
+Revision history warning: Revision header is 1.0 but Git shows 3 commits touched this file
+
+Git commit history (newest first):
+2025-07-03 1edefd0 Update ups.ps1
+2025-07-03 114393d Update ups.ps1
+2025-07-03 64e04ac Update ups.ps1
+2025-07-03 a9b8532 Update ups.ps1
+2025-07-03 0192388 Create ups.ps1
+2025-07-03 62437bb Create ups.ps1
+
+Script preview:
+```powershell
+# Revision : 1.0
+# Description : Launches a UPS tracking URL in a new Chrome window and returns the URL for logging or further use
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-07-03
+# Modified Date : 2025-07-03
+
+function ups {
+    param(
+        [Parameter(Mandatory)][string]$TrackingNumber
+    )
+
+    # Construct the UPS tracking URL
+    $url = "https://www.ups.com/track?track=yes&trackNums=$TrackingNumber"
+
+    # Launch Chrome in a new window with the tracking page
+    Start-Process chrome.exe "--new-window $url"
+
+    # Return the URL for logging or further use
+    return $url
+}
+
+# call with 'ups 1Z################'
+# returns
+# C:\> ups 1Z################
+# https://www.ups.com/track?track=yes&trackNums=1Z################
+# launches chrome in new window
+```

@@ -1,0 +1,112 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\SCCM-Scripts\new-cmapp.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-09-29 5ecb7be git commit powershell private function 20250929-110558
+2025-09-29 a9bb894 git commit powershell private function 20250929-110558
+
+Script preview:
+```powershell
+<#
+.SYNOPSIS
+Create a ConfigMgr Application with MSI or Script deployment type + detection, then optionally distribute content.
+
+.PARAMETER SiteCode
+Three-letter site code, e.g. ABC
+
+.PARAMETER SiteServer
+Your primary site server FQDN, e.g. cm01.contoso.com
+
+.PARAMETER AppName
+Application name as shown in Software Center
+
+.PARAMETER Publisher
+Publisher metadata
+
+.PARAMETER Version
+Software version metadata
+
+.PARAMETER IconPath
+Optional path to icon file (ico/png/jpg/exe/dll)
+
+.PARAMETER DeployType
+'MSI' or 'Script'
+
+.PARAMETER ContentPath
+Network path to source content (folder or MSI full path)
+
+.PARAMETER InstallCmd
+For Script DT: the install command line (e.g., "setup.exe /S"). Ignored for MSI.
+
+.PARAMETER UninstallCmd
+Optional uninstall command (both MSI and Script DT support it)
+
+.PARAMETER MsiProductCode
+For MSI DT detection/version pinning (GUID). Optional but recommended.
+
+.PARAMETER ExpectedMsiVersion
+Optional version string for MSI detection (e.g., 23.1.0). If omitted, ProductCode alone can be used.
+
+.PARAMETER DetectFilePath
+For Script DT: full path to a file to detect (e.g., "C:\Program Files\App\app.exe")
+
+.PARAMETER DPName
+Optional single Distribution Point name to distribute to
+
+.PARAMETER DPGroupName
+Optional Distribution Point Group name to distribute to
+
+.EXAMPLE
+.\New-CMApp.ps1 -SiteCode ABC -SiteServer cm01.contoso.com -AppName "7-Zip 23.01" `
+  -Publisher "7-Zip.org" -Version "23.01" -DeployType MSI `
+  -ContentPath "\\cm01\Sources\Apps\7-Zip\7z2301-x64.msi" `
+  -MsiProductCode "{23170F69-40C1-2702-2301-000001000000}" `
+  -ExpectedMsiVersion "23.01" -IconPath "\\cm01\Sources\Icons\7zip.png" `
+  -DPGroupName "All DPs"
+
+.EXAMPLE
+.\New-CMApp.ps1 -SiteCode ABC -SiteServer cm01.contoso.com -AppName "Acme Tool" `
+  -Publisher "Acme" -Version "1.2.3" -DeployType Script `
+  -ContentPath "\\cm01\Sources\Apps\AcmeTool" `
+  -InstallCmd "setup.exe /quiet /norestart" -UninstallCmd "setup.exe /uninstall /quiet" `
+  -DetectFilePath "C:\Program Files\Acme\tool.exe" -DPName "DP-CLE-01"
+#>
+
+[CmdletBinding(SupportsShouldProcess)]
+param(
+    [Parameter(Mandatory)][string] $SiteCode,
+    [Parameter(Mandatory)][string] $SiteServer,
+    [Parameter(Mandatory)][string] $AppName,
+    [Parameter(Mandatory)][string] $Publisher,
+    [Parameter(Mandatory)][string] $Version,
+    [string] $IconPath,
+
+    [Parameter(Mandatory)][ValidateSet('MSI','Script')] [string] $DeployType,
+
+    [Parameter(Mandatory)][string] $ContentPath,
+    [string] $InstallCmd,
+    [string] $UninstallCmd,
+
+```

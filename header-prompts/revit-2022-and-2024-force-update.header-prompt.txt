@@ -1,0 +1,112 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Software-Managagement-Scripts\revit-2022-and-2024-force-update.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-04-01 2de81ba git commit PowerShell function
+2025-04-01 42b916d git commit PowerShell function
+
+Script preview:
+```powershell
+# ================================
+# CONFIGURATION SECTION
+# ================================
+
+# List of target computers
+$computers = @(
+    "CLEW101RWH382", "CLEW101W5D1J3", "CLEW101Z630J3", "CLEW11208Q6G3",
+    "CLEW112GFF814", "TOLW1130GLRV3", "CLEW103LMHFH2", "PITW103TNG0J3",
+    "CLEW1040TQLG3", "CLEW104JV26M3", "CHIW114MVD814", "CHIW104T0HQW1",
+    "PITW114YYC0J3", "CHIW11550F814", "CLEW105W140J3", "CLEW105YQQLG3",
+    "PITW116LTG0J3", "PITW116QVD814", "CLEW1070P4BK3", "CLEW1074FB4J3",
+    "NWIW118199GK3", "BUFW1081DB4J3", "NWIW108G0Q2J3", "MADW108JBFGK3",
+    "CLEW108K3KFH2", "CHIW1091730J3", "CLEW109KYHRV3", "CLEW119L2F4J3",
+    "BUFW109P4Y1J3", "CHIW119ZZD814", "CHIW11B20F814", "PITW11B3ZP5J3",
+    "CLEW11B9LQ5J3", "CLEW10BG9JRV3", "CLEW10BKF69K3", "CHIW11BZSQ5J3",
+    "PITW10C40F814", "CLEW10C7RQLG3", "BUFW10CPVD814", "CHIW10D0136M3",
+    "CLEW11D25D0J3", "CHIW10D4VLNN2", "PITW10D7LLFH2", "MADW11DF4F814",
+    "CHIW10DK1BTV3", "PITW11DXPW2J3", "ASHW11F5HH2J3", "CLEW11FR8F814",
+    "CHIW10G10PRV3", "PITW10GFQHNN2", "CLEW10GL4F814", "NWIW10GM7Q5J3",
+    "TOLW10H6W30J3", "NWIW11HGTG0J3", "CHIW10HP1BTV3", "TOLW10HP8F814",
+    "CLEW11HQBD0J3", "CLEW10HW8F814", "CHIW10J3PN1J3", "CLEW10J3VF814",
+    "CHIW11J7H20J3", "CHIW10J8W66L3", "PITW10JMSC0J3", "CHIW11JP4D1J3",
+    "PITW11JRJG814"
+)
+
+# Define build-to-version mapping
+$revitBuildMap = @{
+    '22.0.2.392'   = '2022.0.0'
+    '22.1.10.541'  = '2022.1.1'
+    '22.1.21.13'   = '2022.1.2'
+    '22.1.30.34'   = '2022.1.3'
+    '22.1.50.17'   = '2022.1.5'
+    '22.1.60.18'   = '2022.1.6'
+    '22.1.70.9'    = '2022.1.7'
+    '22.1.80.32'   = '2022.1.8'
+    '24.0.5.432'   = '2024'
+    '24.1.10.25'   = '2024.1.1'
+    '24.1.11.26'   = '2024.1.2'
+    '24.2.0.63'    = '2024.2'
+    '24.2.10.64'   = '2024.2.1'
+    '24.2.20.41'   = '2024.2.2'
+    '24.3.0.13'    = '2024.3'
+    '24.3.10.22'   = '2024.3.1'
+}
+
+# Define latest expected builds
+$latest2022 = [version]'22.1.80.32'
+$latest2024 = [version]'24.3.10.22'
+
+# Local source folders for updates
+$source2022 = "C:\Temp\autodesk\Revit 2022.1.8"
+$source2024 = "C:\Temp\autodesk\Revit 2024.3.1"
+
+# CCM cache target (on each remote computer)
+$tempfolder = Get-Date -Format 'yyyyMMdd'
+
+
+# Log file path
+$logPath = "C:\temp\Autodesk\check-copy.log"
+if (-not (Test-Path "C:\Autodesk")) { New-Item -Path "C:\Autodesk" -ItemType Directory -Force | Out-Null }
+New-Item -Path $logPath -ItemType File -Force | Out-Null
+
+# Init global update lists
+$global:revitNeedsUpdate2022 = @()
+$global:revitNeedsUpdate2024 = @()
+
+# ================================
+# STEP 1 – PING COMPUTERS
+# ================================
+$pingableComputers = @()
+
+$Results = $computers | ForEach-Object -Parallel {
+    $Reachable = Test-Connection -ComputerName $_ -Count 1 -Quiet
+    if ($Reachable) {
+         Write-Host "$_ is pingable"
+        $pingableComputers += $_
+    } else {
+        Write-Host "$_ is not reachable"
+    }
+    [PSCustomObject]@{
+```

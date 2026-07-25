@@ -1,0 +1,57 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\check-files-and-permissions.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-09-18 56bdee5 Refactor file paths and add new files
+2025-09-18 017d411 Refactor file paths and add new files
+2025-09-16 0b86a54 git commit powershell private function 250915-123335
+2025-09-16 2d8589e git commit powershell private function 250915-123335
+
+Script preview:
+```powershell
+
+
+$files =@(
+    'subfolder1\file1.txt',
+    'subfolder2\file2.txt'
+   )
+
+$filerserver = @(
+'\\server1',
+'\\server2',
+)
+
+
+
+foreach ($file in $files) {
+    write-host $file
+
+    foreach ($filer in $filerserver) {
+    $fullfolder = Join-Path -Path $filer -ChildPath $file
+        write-host $fullfolder " - " (test-path $fullfolder)
+
+    }
+    write-host .
+}
+```

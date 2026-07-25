@@ -1,0 +1,85 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Computer-Management-Scripts\Get-InstalledSoftware,ps1.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-09-29 41e8a72 Git sync : 2025-09-29 16:19:52
+2025-09-29 cc578cb Git sync : 2025-09-29 16:19:52
+
+Script preview:
+```powershell
+function Get-InstalledSoftware {
+    param(
+        [string]$ComputerName = $env:COMPUTERNAME
+    )
+
+    # Paths to check on remote machine
+    $lmKeys = @(
+        "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
+        "SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+    )
+
+    try {
+        # Open remote HKLM hive
+        $remoteHKLM = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey(
+            [Microsoft.Win32.RegistryHive]::LocalMachine,
+            $ComputerName
+        )
+
+        $software = @()
+
+        foreach ($subKey in $lmKeys) {
+            $key = $remoteHKLM.OpenSubKey($subKey)
+            if ($null -eq $key) { continue }
+            foreach ($name in $key.GetSubKeyNames()) {
+                $skey = $key.OpenSubKey($name)
+                if ($skey -eq $null) { continue }
+
+                $dispName = $skey.GetValue("DisplayName")
+                if ([string]::IsNullOrEmpty($dispName)) { continue }
+
+                $obj = [PSCustomObject]@{
+                    ComputerName     = $ComputerName
+                    DisplayName      = $dispName
+                    DisplayVersion   = $skey.GetValue("DisplayVersion")
+                    Publisher        = $skey.GetValue("Publisher")
+                    InstallDate      = $skey.GetValue("InstallDate")
+                    UninstallString  = $skey.GetValue("UninstallString")
+                }
+                $software += $obj
+            }
+        }
+
+        return $software
+    }
+    catch {
+        Write-Warning "Failed to query $ComputerName: $_"
+    }
+}
+
+<#
+Example Usage:
+Get-InstalledSoftware -ComputerName "Server01" | Format-Table -AutoSize
+#>
+```

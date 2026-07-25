@@ -1,0 +1,96 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Software-Managagement-Scripts\revit-2022-and-2024-force-update-only.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-04-01 2de81ba git commit PowerShell function
+2025-04-01 42b916d git commit PowerShell function
+
+Script preview:
+```powershell
+# Array of target computers
+$computers = @(
+    'CHIW104T0HQW1',
+    'CHIW10DK1BTV3',
+    'CLEW105YQQLG3',
+    'CLEW109KYHRV3',
+    'CLEW10BKF69K3',
+    'CLEW112GFF814',
+    'CLEW11FR8F814',
+    'PITW11B3ZP5J3'
+)
+foreach ($computer in $computers) {
+    if (Test-Connection -ComputerName $computer -Count 1 -Quiet) {
+        Write-Host "✅ $computer is reachable."
+        Get-ChildItem "\\$computer\c$\windows\ccmcache\20250329"
+    } else {
+        Write-Host "❌ $computer is not reachable."
+    }
+}
+
+# Log file path
+$logPath = "C:\Temp\Autodesk\revit-install.txt"
+if (-not (Test-Path "C:\Temp\Autodesk")) { 
+    New-Item -Path "C:\Temp\Autodesk" -ItemType Directory -Force | Out-Null 
+}
+New-Item -Path $logPath -ItemType File -Force | Out-Null
+
+# Function to silently install executables
+function Install-Silent {
+    param (
+        [string]$folderPath
+    )
+
+    # Get all .exe files in the folder
+    $exeFiles = Get-ChildItem -Path $folderPath -Filter "*.exe" -File
+
+    foreach ($exe in $exeFiles) {
+        $logEntry = "[$(Get-Date -Format yyyy-MM-dd-HH-mm-ss)] Installing: $($exe.FullName)"
+        Write-Host "Installing: $($exe.FullName)"
+        "$logEntry" | Out-File -FilePath $logPath -Append
+
+        try {
+            # Start the silent installation process
+            Start-Process -FilePath $exe.FullName -ArgumentList "-q" -Wait -NoNewWindow
+            Write-Host "✅ Successfully installed: $($exe.FullName)"
+            "$logEntry SUCCESS" | Out-File -FilePath $logPath -Append
+        } catch {
+            Write-Host "❌ Failed to install: $($exe.FullName). Error: $_"
+            "$logEntry FAIL - $_" | Out-File -FilePath $logPath -Append
+        }
+    }
+}
+
+# Iterate through each computer
+foreach ($computer in $computers) {
+    $targetFolder = "$computer\c$\windows\ccmcache\20250329"
+    
+    if (Test-Path $targetFolder) {
+        Write-Host "Processing computer: $computer"
+        Install-Silent -folderPath $targetFolder
+    } else {
+        Write-Host "Folder not found on $computer"
+        "[$(Get-Date -Format yyyy-MM-dd-HH-mm-ss)] Folder missing: $targetFolder" | Out-File -FilePath $logPath -Append
+    }
+}
+```

@@ -1,0 +1,115 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Notifications\NotificationManager.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Revision, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-05-15 b4a8656 Add action logging to NotificationManager
+2026-03-16 032565b update tons of files
+2025-07-09 4e0ad91 Update script headers with new date and author format
+2025-07-09 e8f7524 Update script headers with new date and author format
+2025-07-08 075a61b Implement complete notification system with read/unread status
+2025-07-08 1fe097d Implement complete notification system with read/unread status
+
+Script preview:
+```powershell
+# Notification Manager Module
+# Author: Jason Lamb (@jasrasr) (with help from GitHub Copilot)
+# Created: 7/8/25
+# Modified: 2026-05-15
+# Description: PowerShell module for managing notifications with read/unread status and action logging
+
+# Define the notifications data file path
+$script:NotificationsPath = if ($IsLinux -or $IsMacOS) {
+    "$env:HOME/.local/share/powershell/notifications"
+} else {
+    "$env:APPDATA\PowerShell\Notifications"
+}
+$script:NotificationsFile = if ($IsLinux -or $IsMacOS) {
+    "$script:NotificationsPath/notifications.json"
+} else {
+    "$script:NotificationsPath\notifications.json"
+}
+$script:NotificationsLogFile = if ($IsLinux -or $IsMacOS) {
+    "$script:NotificationsPath/notifications-log.jsonl"
+} else {
+    "$script:NotificationsPath\notifications-log.jsonl"
+}
+
+# Ensure the notifications directory exists
+if (-not (Test-Path -Path $script:NotificationsPath)) {
+    New-Item -Path $script:NotificationsPath -ItemType Directory -Force | Out-Null
+}
+
+# Initialize notifications file if it doesn't exist
+if (-not (Test-Path -Path $script:NotificationsFile)) {
+    @() | ConvertTo-Json | Out-File -FilePath $script:NotificationsFile -Encoding UTF8
+}
+
+# Helper function to load notifications from JSON file
+function Get-NotificationsFromFile {
+    try {
+        $content = Get-Content -Path $script:NotificationsFile -Raw -ErrorAction Stop
+        if ([string]::IsNullOrWhiteSpace($content)) {
+            return @()
+        }
+        $notifications = $content | ConvertFrom-Json
+        # Ensure we always return an array
+        if ($notifications -eq $null) {
+            return @()
+        }
+        return @($notifications)
+    }
+    catch {
+        Write-Warning "Failed to load notifications: $_"
+        return @()
+    }
+}
+
+# Helper function to save notifications to JSON file
+function Save-NotificationsToFile {
+    param([Array]$Notifications)
+    
+    try {
+        $Notifications | ConvertTo-Json -Depth 3 | Out-File -FilePath $script:NotificationsFile -Encoding UTF8
+        return $true
+    }
+    catch {
+        Write-Warning "Failed to save notifications: $_"
+        return $false
+    }
+}
+
+# Helper function to append a log entry (JSONL - one JSON object per line)
+function Write-NotificationLog {
+    param(
+        [string]$Action,
+        [string]$NotificationId = "",
+        [string]$Details = ""
+    )
+
+    $entry = [PSCustomObject]@{
+        Timestamp      = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+        Action         = $Action
+        NotificationId = $NotificationId
+        Details        = $Details
+```

@@ -1,0 +1,112 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Computer-Management-Scripts\chrome-clean.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-09-23 6ab47d4 git commit powershell private function 250923-105603
+2025-09-23 216c299 git commit powershell private function 250923-105603
+
+Script preview:
+```powershell
+<# 
+    Script     : Chrome-Clean.ps1
+    Revision   : 1.0
+    Description: Cleans Google Chrome junk for all local profiles (Default + Profile 1/2/…).
+                 Supports Light (default) and Deep modes, kills Chrome before cleaning,
+                 logs actions + freed space, and supports -WhatIf.
+    Author     : Jason Lamb (with help from ChatGPT)
+    Created    : 2025-09-22
+    Modified   : 2025-09-22
+
+    Usage:
+      # Dry run (see what would happen)
+      .\Chrome-Clean.ps1 -WhatIf
+
+      # Light clean (safe: cache and temp only)
+      .\Chrome-Clean.ps1
+
+      # Deep clean (removes cookies/history etc.)
+      .\Chrome-Clean.ps1 -Deep
+
+      # Relaunch Chrome after cleaning
+      .\Chrome-Clean.ps1 -Deep -Relaunch
+#>
+
+[CmdletBinding(SupportsShouldProcess = $true)]
+param(
+    [switch] $Deep,
+    [switch] $Relaunch
+)
+
+# ---------- Settings ----------
+$logRoot = 'C:\temp\powershell-exports'
+if (-not (Test-Path $logRoot)) { New-Item -ItemType Directory -Path $logRoot -Force | Out-Null }
+$timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+$logPath   = Join-Path $logRoot "chrome-clean-$timestamp.log"
+
+# ---------- Helpers ----------
+# Replace the existing Write-Log with this version that ignores -WhatIf
+function Write-Log {
+    param(
+        [string] $Message,
+        [string] $Level = 'INFO'
+    )
+    $line = "{0} [{1}] {2}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), $Level, $Message
+
+    # Always print to console
+    Write-Host $line
+
+    # Bypass WhatIf by using .NET file I/O (AppendAllText creates the file if missing)
+    try {
+        [System.IO.File]::AppendAllText($logPath, $line + [Environment]::NewLine, [System.Text.Encoding]::UTF8)
+    } catch {
+        # As a fallback, at least show the error on screen
+        Write-Host ("{0} [WARN] Failed to write log file : {1}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), $_)
+    }
+}
+
+
+function Get-FolderSizeBytes {
+    param([string] $Path)
+    if (-not (Test-Path $Path)) { return 0 }
+    try {
+        $sum = Get-ChildItem -LiteralPath $Path -Recurse -Force -ErrorAction SilentlyContinue |
+               Where-Object { -not $_.PSIsContainer } |
+               Measure-Object -Sum Length
+        return ($sum.Sum | ForEach-Object { $_ })  # handle $null
+    } catch {
+        Write-Log "Error calculating size for $Path : $_" 'WARN'
+        return 0
+    }
+}
+
+function Remove-Path {
+    param([string] $Target)
+    if (Test-Path -LiteralPath $Target) {
+        if ($PSCmdlet.ShouldProcess($Target, 'Remove-Item -Recurse -Force')) {
+            try {
+                Remove-Item -LiteralPath $Target -Recurse -Force -ErrorAction Stop
+                Write-Log "Removed $Target"
+            } catch {
+```

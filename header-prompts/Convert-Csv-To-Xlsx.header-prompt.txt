@@ -1,0 +1,67 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\Convert-Csv-To-Xlsx.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-05-27 26cd778 git commit PowerShell function
+2025-05-27 3fcd867 git commit PowerShell function
+
+Script preview:
+```powershell
+# ConvertCsvToXlsx.ps1
+
+# Define the folder to monitor
+$watchFolder = "$downloads\csv2xlsx" # $downloads defined in '!commonpowershellprofilepath.ps1'
+$processedFolder = Join-Path $watchFolder 'Processed'
+
+# Ensure the processed folder exists
+if (!(Test-Path -Path $processedFolder)) {
+    New-Item -ItemType Directory -Path $processedFolder | Out-Null
+}
+
+# Import the ImportExcel module
+if (!(Get-Module -ListAvailable -Name ImportExcel)) {
+    Install-Module -Name ImportExcel -Scope CurrentUser -Force
+}
+Import-Module ImportExcel
+
+# Get all CSV files in the watch folder
+$csvFiles = Get-ChildItem -Path $watchFolder -Filter '*.csv' -File
+
+foreach ($file in $csvFiles) {
+    try {
+        $xlsxPath = [System.IO.Path]::ChangeExtension($file.FullName, '.xlsx')
+
+        # Convert CSV to XLSX
+        Import-Csv -Path $file.FullName | Export-Excel -Path $xlsxPath -WorksheetName 'Data' -AutoSize
+
+        # Move processed CSV to the processed folder
+        Move-Item -Path $file.FullName -Destination $processedFolder
+    }
+    catch {
+        Write-Error "Failed to process $($file.FullName): $_"
+    }
+}
+
+```

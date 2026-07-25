@@ -1,0 +1,89 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\GRC-TWIT-SecurityNow-Transcripts\pdf-txt-jpg start at zero.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-24 35f1828 Update from bulk PowerShell script
+2026-03-20 a3b4dda update latest grc files, update grc script...
+
+Script preview:
+```powershell
+# start with https://www.grc.com/sn/1.jpg and go to https://www.grc.com/sn/998.jpg to see if file exist and then download to $githubpath\powershell\GRC-TWIT-SecurityNow-Transcripts\Downloads\JPG-Episode-Images\
+
+$githubpath = 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github'
+$downloadbase = Join-Path $githubpath 'powershell\GRC-TWIT-SecurityNow-Transcripts\Downloads'
+$jpgDownloadPath = Join-Path $downloadbase 'JPG-Episode-Images' 
+$pdfDownloadPath = Join-Path $downloadbase 'PDF-Transcripts'
+$txtDownloadPath = Join-Path $downloadbase 'TXT-Transcripts'    
+
+# Download JPG files from https://www.grc.com/sn/1.jpg to 998.jpg
+$baseUrl = 'https://www.grc.com/sn'
+
+for ($i = 1; $i -le 998; $i++) {
+    $url = "$baseUrl/$i.jpg"
+    $outputPath = Join-Path $jpgDownloadPath "Episode-$i.jpg"
+    
+    try {
+        if ((Invoke-WebRequest -Uri $url -Method Head -ErrorAction Stop).StatusCode -eq 200) {
+            Invoke-WebRequest -Uri $url -OutFile $outputPath
+            Write-Host "Downloaded: Episode-$i.jpg"
+        }
+    }
+    catch {
+        Write-Host "Not found or error: Episode-$i.jpg"
+    }
+}
+
+# same for PDF and TXT files, just change the extension and output path accordingly
+# example txt url https://www.grc.com/sn/sn-1069.txt
+# example pdf url https://www.grc.com/sn/sn-1069-notes.pdf
+
+for ($i = 1; $i -le 998; $i++) {
+    $txtNumPadded = $i.ToString('000')
+    $pdfUrl = "$baseUrl/sn-$i-notes.pdf"
+    $pdfOutputPath = Join-Path $pdfDownloadPath "Episode-$i.pdf"
+    
+    try {
+        if ((Invoke-WebRequest -Uri $pdfUrl -Method Head -ErrorAction Stop).StatusCode -eq 200) {
+            Invoke-WebRequest -Uri $pdfUrl -OutFile $pdfOutputPath
+            Write-Host "Downloaded: Episode-$i.pdf"
+        }
+    }
+    catch {
+        Write-Host "Not found or error: Episode-$i.pdf"
+    }
+
+    $txtUrl = "$baseUrl/sn-$txtNumPadded.txt"
+    $txtOutputPath = Join-Path $txtDownloadPath "Episode-$i.txt"
+    
+    try {
+        if ((Invoke-WebRequest -Uri $txtUrl -Method Head -ErrorAction Stop).StatusCode -eq 200) {
+            Invoke-WebRequest -Uri $txtUrl -OutFile $txtOutputPath
+            Write-Host "Downloaded: Episode-$i.txt"
+        }
+    }
+    catch {
+        Write-Host "Not found or error: Episode-$i.txt"
+    }
+}
+```

@@ -1,0 +1,117 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\HEIC-Convert-To-JPG\HEICconvert2JPG-GUI.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 5.7
+Revision history warning: 
+
+Git commit history (newest first):
+2026-06-12 62c2238 HEIC GUI v5.7: support running via 'irm | iex' with cached magick.exe
+2026-06-02 35e8575 HEIC-Convert-To-JPG: GUI v5.6 MessageBox owner fix; Monitor v1.3.0 pre-scan existing files
+2026-03-23 7f9d638 update HEIC converter to ImageMagick engine, add changelog, merge duplicate script
+2026-01-27 1a640ab Refactor HEIC to JPG converter to use WIC decoding
+2025-06-25 282af97 git commit PowerShell function 250624-154434
+2025-06-25 7c0f51d git commit PowerShell function 250624-154434
+2025-06-25 630f507 git commit PowerShell function 250624-154434
+2025-06-25 2b8288d git commit PowerShell function 250624-154434
+
+Script preview:
+```powershell
+# Revision : 5.7
+# Description : GUI HEIC/HEIF to JPG Converter using bundled portable ImageMagick
+# Author : Jason Lamb (with help from ChatGPT & Claude Code)
+# Created Date : 2025-04-01
+# Modified Date : 2026-06-12
+
+# -----------------------------
+# Changelog
+# -----------------------------
+# v5.7 : Added support for running via `irm https://jasr.me/heic | iex`.
+#         Detects when no local script root is available and downloads
+#         magick.exe from the GitHub raw URL to a per-user cache at
+#         $env:LOCALAPPDATA\HEIC-Convert-To-JPG\ImageMagick\magick.exe.
+#         Cache is reused on subsequent runs. Uses Unblock-File so the
+#         downloaded binary isn't tagged with Zone.Identifier.
+# v5.6 : Fixed final "Conversion Complete" MessageBox being hidden behind the
+#         Topmost form. Pass the form as the MessageBox owner so it stacks on
+#         top of the parent. Same fix applied to validation MessageBoxes.
+# v5.5 : Switched conversion engine from Windows WIC (PresentationCore) to
+#         ImageMagick (bundled portable or system PATH). WIC failed with
+#         0xC00D5212 because the HEIF AppX codec does not register with the
+#         WPF WIC layer. Merged HEICconvert2JPG-GUI-1.ps1 into this file.
+#         Fixed metaLabel clipping (AutoSize). Drag-drop now populates input/
+#         output path boxes. Case-insensitive extension matching (-imatch).
+#         Improved catch block (logs exception message). Archive folder now
+#         created per source directory (multi-folder drag-drop support).
+# v5.4 : Added WIC-based conversion (Windows.Media.Imaging). Added stream
+#         leak fixes (try/finally). Fixed undefined $file in catch block.
+#         Added progress bar. Added CSV conversion log to C:\temp\powershell-exports.
+# v5.0 : Initial GUI release with drag-drop, browse, output folder selection.
+
+# -----------------------------
+# Globals
+# -----------------------------
+$global:collectedFiles = @()
+$logRoot = 'C:\temp\powershell-exports'
+
+# Detect script directory. Both $PSScriptRoot and $PSCommandPath are empty
+# when the script is executed via `irm <url> | iex`.
+$scriptRoot = $PSScriptRoot
+if (-not $scriptRoot -and $PSCommandPath) {
+    $scriptRoot = Split-Path -Parent $PSCommandPath
+}
+
+$magickCandidates = @()
+if ($scriptRoot) {
+    $magickCandidates += (Join-Path $scriptRoot 'ImageMagick\magick-heic.exe')
+    $magickCandidates += (Join-Path $scriptRoot 'ImageMagick\magick.exe')
+}
+$magickCandidates += 'magick'
+$magickExe = $magickCandidates | Where-Object { $_ -eq 'magick' -or (Test-Path $_) } | Select-Object -First 1
+
+# Fallback for `irm | iex` runs: download magick.exe from the GitHub raw URL
+# to a per-user cache and reuse it on subsequent runs.
+if (-not $magickExe) {
+    $cacheDir = Join-Path $env:LOCALAPPDATA 'HEIC-Convert-To-JPG\ImageMagick'
+    $cachedMagick = Join-Path $cacheDir 'magick.exe'
+    if (-not (Test-Path $cachedMagick)) {
+        try {
+            if (-not (Test-Path $cacheDir)) {
+                New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
+            }
+            $magickUrl = 'https://raw.githubusercontent.com/jasrasr/powershell/main/HEIC-Convert-To-JPG/ImageMagick/magick.exe'
+            Write-Host "ImageMagick not found locally. Downloading from GitHub (~24 MB) to $cachedMagick ..." -ForegroundColor Cyan
+            Invoke-WebRequest -Uri $magickUrl -OutFile $cachedMagick -UseBasicParsing
+            Unblock-File -Path $cachedMagick -ErrorAction SilentlyContinue
+            Write-Host "Download complete." -ForegroundColor Green
+        } catch {
+            Write-Warning "Failed to download ImageMagick: $($_.Exception.Message)"
+        }
+    }
+    if (Test-Path $cachedMagick) {
+        $magickExe = $cachedMagick
+    }
+}
+
+# -----------------------------
+# PowerShell Version Check
+# -----------------------------
+if ($PSVersionTable.PSVersion.Major -lt 7) {
+```
