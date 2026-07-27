@@ -1,0 +1,73 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\SCCM-Scripts\Retrieve-all-Applications-from-sccm.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-05-27 1ce4927 Rename Retrieve-all-Applications-from-sccm.ps1 to SCCM-Scripts/Retrieve-all-Applications-from-sccm.ps1
+2025-05-27 c2d0771 Rename Retrieve-all-Applications-from-sccm.ps1 to SCCM-Scripts/Retrieve-all-Applications-from-sccm.ps1
+2025-05-27 5bbc2c5 Update Retrieve-all-Applications-from-sccm.ps1
+2025-05-27 1115f31 Update Retrieve-all-Applications-from-sccm.ps1
+2025-04-01 2de81ba git commit PowerShell function
+2025-04-01 42b916d git commit PowerShell function
+2025-03-28 47362e4 git commit PowerShell function
+2025-03-28 2a6c3d6 git commit PowerShell function
+
+Script preview:
+```powershell
+# Connection to SCCM server required before running this script
+
+# Retrieve all Applications with Deployment Count and Status
+$applications = Get-CMApplication | ForEach-Object {
+    $deployments = Get-CMDeployment | Where-Object { $_.PackageName -eq $_.LocalizedDisplayName }
+    [PSCustomObject]@{
+        Name            = $_.LocalizedDisplayName
+        DeploymentCount = $deployments.Count
+        Status          = if ($deployments) {
+            if (($deployments | Select-Object -First 1).Enabled) { 'Enabled' } else { 'Disabled' }
+        } else {
+            'No Deployments'
+        }
+    }
+}
+
+# Retrieve all Packages with Deployment Count and Status
+$packages = Get-CMPackage | ForEach-Object {
+    $deployments = Get-CMDeployment | Where-Object { $_.PackageID -eq $_.PackageID }
+    [PSCustomObject]@{
+        Name            = $_.Name
+        DeploymentCount = $deployments.Count
+        Status          = if ($deployments) {
+            if (($deployments | Select-Object -First 1).Enabled) { 'Enabled' } else { 'Disabled' }
+        } else {
+            'No Deployments'
+        }
+    }
+}
+
+# Output results
+Write-Host "`n===== Applications =====`n"
+$applications | Format-Table -AutoSize
+
+Write-Host "`n===== Packages =====`n"
+$packages | Format-Table -AutoSize
+```

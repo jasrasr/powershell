@@ -1,0 +1,113 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\run-function-every-x-minutes.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.1
+Revision history warning: 
+
+Git commit history (newest first):
+2025-10-09 3ba45df git commit powershell private function 251009-151926
+2025-10-09 d058649 git commit powershell private function 251009-151926
+2025-10-09 36641bb git commit powershell private function 251009-151926
+2025-10-09 8a82b5b git commit powershell private function 251009-151926
+
+Script preview:
+```powershell
+# Revision : 1.1
+# Description : Run a target function every N minutes until you stop it, with a live countdown to next iteration. Rev 1.1
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-10-09
+# Modified Date : 2025-10-09
+
+<#
+.SYNOPSIS
+    Repeatedly runs a function on a fixed interval until stopped.
+
+.EXAMPLE
+    # Define any function you want to run
+    function Test-Heartbeat {
+        Write-Host "Heartbeat at $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" -ForegroundColor Cyan
+    }
+
+    # Run it every 5 minutes (default) until you press Ctrl+C or create C:\Temp\stop.loop
+    .\run-function-every-x-minutes.ps1 -FunctionName 'Test-Heartbeat'
+
+.EXAMPLE
+    # Run with custom interval and custom stop file
+    .\run-function-every-x-minutes.ps1 -FunctionName 'Test-Heartbeat' -IntervalMinutes 2 -StopFile 'C:\Temp\stop.please'
+
+.EXAMPLE
+    # Pass arguments to your function
+    function Do-Work { param($Name) Write-Host "Hello $Name at $(Get-Date)" -ForegroundColor Yellow }
+    .\run-function-every-x-minutes.ps1 -FunctionName 'Do-Work' -FunctionArgs 'Jason' -IntervalMinutes 1
+#>
+
+
+[CmdletBinding()]
+param(
+    [Parameter(Mandatory)]
+    [ValidateNotNullOrEmpty()]
+    [string]$FunctionName,
+
+    [object[]]$FunctionArgs = @(),
+
+    [ValidateRange(1, 1440)]
+    [int]$IntervalMinutes = 5,
+
+    [string]$StopFile = 'C:\Temp\stop.loop',
+
+    [switch]$Quiet
+)
+
+# --- Setup ---
+$ExportFolder = 'C:\Temp\powershell-exports'
+if (-not (Test-Path $ExportFolder)) {
+    New-Item -Path $ExportFolder -ItemType Directory -Force | Out-Null
+}
+
+$TimeStamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+$LogFile   = Join-Path $ExportFolder "invoke-repeated-$TimeStamp.log"
+
+function Write-Log {
+    param(
+        [string]$Message,
+        [ConsoleColor]$Color = [ConsoleColor]::Gray
+    )
+    $stamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+    $line  = "[$stamp] $Message"
+    $line | Out-File -FilePath $LogFile -Append -Encoding UTF8
+    if (-not $Quiet) {
+        Write-Host $line -ForegroundColor $Color
+    }
+}
+
+if (-not (Get-Command -Name $FunctionName -CommandType Function -ErrorAction SilentlyContinue)) {
+    Write-Host "Function '$FunctionName' was not found in the current session. Define it before running." -ForegroundColor Red
+    exit 1
+}
+
+Write-Log "Starting Invoke-Repeated for function '$FunctionName' every $IntervalMinutes minute(s)."
+Write-Log "Stop file path : $StopFile"
+Write-Log "Log file path  : $LogFile"
+
+if (-not $Quiet) {
+    Write-Host "Press Ctrl+C to stop at any time, or create the stop file : $StopFile" -ForegroundColor DarkYellow
+}
+```

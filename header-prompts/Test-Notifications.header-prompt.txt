@@ -1,0 +1,114 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Notifications\Test-Notifications.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Revision, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-07-09 4e0ad91 Update script headers with new date and author format
+2025-07-09 e8f7524 Update script headers with new date and author format
+2025-07-08 075a61b Implement complete notification system with read/unread status
+2025-07-08 1fe097d Implement complete notification system with read/unread status
+
+Script preview:
+```powershell
+# Basic Tests for Notification System
+# Author: Jason Lamb (@jasrasr) (with help from GitHub Copilot)
+# Created: 7/8/25
+# Description: Basic tests to verify notification system functionality
+
+# Import the notification manager
+. "$PSScriptRoot\NotificationManager.ps1"
+
+# Test counter
+$script:TestCount = 0
+$script:PassedTests = 0
+$script:FailedTests = 0
+
+function Test-Assert {
+    param(
+        [string]$TestName,
+        [bool]$Condition,
+        [string]$ExpectedResult = "",
+        [string]$ActualResult = ""
+    )
+    
+    $script:TestCount++
+    
+    if ($Condition) {
+        Write-Host "✓ PASS: $TestName" -ForegroundColor Green
+        $script:PassedTests++
+    } else {
+        Write-Host "✗ FAIL: $TestName" -ForegroundColor Red
+        if ($ExpectedResult -and $ActualResult) {
+            Write-Host "  Expected: $ExpectedResult" -ForegroundColor Yellow
+            Write-Host "  Actual: $ActualResult" -ForegroundColor Yellow
+        }
+        $script:FailedTests++
+    }
+}
+
+# Clear any existing notifications for clean testing
+Clear-Notifications -Force
+
+Write-Host "=== NOTIFICATION SYSTEM TESTS ===" -ForegroundColor Cyan
+Write-Host "Running basic functionality tests...`n" -ForegroundColor White
+
+# Test 1: Create a notification
+Write-Host "Test 1: Create notification" -ForegroundColor Yellow
+$notification = New-Notification -Title "Test Notification" -Message "This is a test message" -Type "Info" -Category "Test"
+Test-Assert -TestName "Create notification returns object" -Condition ($null -ne $notification)
+Test-Assert -TestName "Notification has correct title" -Condition ($notification.Title -eq "Test Notification")
+Test-Assert -TestName "Notification has correct message" -Condition ($notification.Message -eq "This is a test message")
+Test-Assert -TestName "Notification has correct type" -Condition ($notification.Type -eq "Info")
+Test-Assert -TestName "Notification has correct category" -Condition ($notification.Category -eq "Test")
+Test-Assert -TestName "Notification is unread by default" -Condition ($notification.IsRead -eq $false)
+Test-Assert -TestName "Notification has valid ID" -Condition ($notification.Id -match "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
+
+# Test 2: Get notifications
+Write-Host "`nTest 2: Get notifications" -ForegroundColor Yellow
+$notifications = Get-Notifications
+Test-Assert -TestName "Get notifications returns array" -Condition ($notifications -is [array] -or $notifications.Count -gt 0)
+Test-Assert -TestName "Get notifications contains our test notification" -Condition ($notifications.Count -eq 1)
+Test-Assert -TestName "Retrieved notification matches created notification" -Condition ($notifications[0].Id -eq $notification.Id)
+
+# Test 3: Mark notification as read
+Write-Host "`nTest 3: Mark notification as read" -ForegroundColor Yellow
+$readResult = Set-NotificationRead -Id $notification.Id
+Test-Assert -TestName "Set-NotificationRead returns true" -Condition ($readResult -eq $true)
+
+$updatedNotifications = Get-Notifications
+Test-Assert -TestName "Notification is marked as read" -Condition ($updatedNotifications[0].IsRead -eq $true)
+
+# Test 4: Get unread notifications
+Write-Host "`nTest 4: Get unread notifications" -ForegroundColor Yellow
+$unreadNotifications = Get-Notifications -UnreadOnly
+Test-Assert -TestName "No unread notifications after marking as read" -Condition ($unreadNotifications.Count -eq 0)
+
+# Test 5: Get read notifications
+Write-Host "`nTest 5: Get read notifications" -ForegroundColor Yellow
+$readNotifications = Get-Notifications -ReadOnly
+Test-Assert -TestName "One read notification exists" -Condition ($readNotifications.Count -eq 1)
+
+# Test 6: Mark notification as unread
+Write-Host "`nTest 6: Mark notification as unread" -ForegroundColor Yellow
+```

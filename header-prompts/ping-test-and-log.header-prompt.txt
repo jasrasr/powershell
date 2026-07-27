@@ -1,0 +1,111 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\ping-test-and-log.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.2
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-10-21 408e778 Create ping-test-and-log.ps1
+
+Script preview:
+```powershell
+# Revision : 1.2
+# Description : Periodic internet speed test with live countdown timer, real-time log writing after every test. Rev 1.2
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-10-21
+# Modified Date : 2025-10-21
+
+param(
+    [int]$RunForMinutes = 60,
+    [int]$IntervalMinutes = 5,
+    [string]$LogPath = "C:\temp\powershell-exports\speedtest-network.log",
+    [switch]$AutoInstall
+)
+
+# --- Setup folders ---
+$logFolder = Split-Path -Path $LogPath -Parent
+if (-not (Test-Path $logFolder)) { New-Item -Path $logFolder -ItemType Directory -Force | Out-Null }
+
+# --- Write banner to log ---
+$startBanner = "===== Speedtest Session Started : $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') ====="
+Add-Content -Path $LogPath -Value $startBanner
+Write-Host $startBanner
+
+# --- Locate or install Ookla CLI ---
+function Get-OklaSpeedtestPath {
+    $cmd = Get-Command speedtest -ErrorAction SilentlyContinue
+    if ($cmd) { return $cmd.Source }
+
+    if ($AutoInstall) {
+        Write-Host "speedtest.exe not found, attempting winget install : Ookla.Speedtest.CLI"
+        try {
+            winget install --id Ookla.Speedtest.CLI -e --accept-package-agreements --accept-source-agreements | Out-Null
+            Start-Sleep -Seconds 3
+            $cmd = Get-Command speedtest -ErrorAction SilentlyContinue
+            if ($cmd) { return $cmd.Source }
+        } catch {
+            Write-Host "Auto-install failed : $_"
+            Add-Content -Path $LogPath -Value "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] Auto-install failed : $_"
+        }
+    }
+    return $null
+}
+
+$speedtestPath = Get-OklaSpeedtestPath
+if (-not $speedtestPath) {
+    $msg = "ERROR : speedtest.exe not found. Install from https://www.speedtest.net/apps/cli or run with -AutoInstall."
+    Write-Host $msg
+    Add-Content -Path $LogPath -Value $msg
+    return
+}
+
+# --- Core test ---
+function Invoke-NetworkSpeedTest {
+    try {
+        $raw = & $speedtestPath --accept-license --accept-gdpr -f json 2>$null
+        if ([string]::IsNullOrWhiteSpace($raw)) { throw "speedtest returned no output." }
+
+        $j = $raw | ConvertFrom-Json
+        $dlMbps = [math]::Round(($j.download.bandwidth * 8) / 1MB, 2)
+        $ulMbps = [math]::Round(($j.upload.bandwidth * 8) / 1MB, 2)
+        $lat    = $j.ping.latency
+        $loss   = $j.packetLoss
+        $isp    = $j.isp
+        $srvN   = $j.server.name
+        $srvL   = $j.server.location
+        $url    = $j.result.url
+        $ts     = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+
+        $entry = "[${ts}]  DL : ${dlMbps} Mbps  UL : ${ulMbps} Mbps  Ping : ${lat} ms  ISP : ${isp}  Server : ${srvN} (${srvL})  URL : ${url}"
+        Write-Host $entry
+        Add-Content -Path $LogPath -Value $entry
+    }
+    catch {
+        $ts = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+        $err = "[${ts}]  ERROR running speed test : $_"
+        Write-Host $err
+        Add-Content -Path $LogPath -Value $err
+    }
+}
+
+# --- Countdown timer ---
+```

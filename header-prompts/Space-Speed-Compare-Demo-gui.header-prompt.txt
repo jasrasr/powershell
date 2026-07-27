@@ -1,0 +1,113 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Space-Speed-Compare-Demo\Space-Speed-Compare-Demo-gui.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-06-05 4260023 Add Firefox support to bookmark extraction and enhance SQLite reader
+2026-03-16 032565b update tons of files
+2025-10-29 fda6ed6 Git sync :
+2025-10-29 1ca4624 Create Space-Speed-Compare-Demo
+
+Script preview:
+```powershell
+<#
+.SYNOPSIS
+    Byte ↔ Bit Converter GUI with Download/Upload Simulation
+.DESCRIPTION
+    Converts between bytes and bits (KB/MB/GB/TB) and simulates both download
+    and upload speeds using colored progress bars and directional animation.
+.AUTHOR
+    Jason Lamb (jasr.me)
+.REVISION
+    4.0.1
+.CREATED
+    2025-10-29
+.CHANGES
+    4.0.1 - Fixed Add-Type compile errors on PowerShell 7 by passing
+            -ReferencedAssemblies for WinForms/Drawing. Guarded type definition
+            so the script is safely re-runnable in the same session.
+    4.0   - Initial release of dual-mode (download/upload) simulator with
+            colored progress bar.
+#>
+
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+
+# --- Custom colored ProgressBar class ---
+# Guard so re-running in the same PS session doesn't error on "type already exists".
+# -ReferencedAssemblies is required on PowerShell 7+ — WinForms/Drawing are not auto-referenced.
+if (-not ('ColorProgressBar' -as [type])) {
+    Add-Type -ReferencedAssemblies System.Windows.Forms, System.Drawing -TypeDefinition @"
+using System;
+using System.Windows.Forms;
+using System.Drawing;
+public class ColorProgressBar : ProgressBar
+{
+    public Color BarColor = Color.LimeGreen;
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        Rectangle rect = e.ClipRectangle;
+        if (ProgressBarRenderer.IsSupported)
+            ProgressBarRenderer.DrawHorizontalBar(e.Graphics, rect);
+        rect.Inflate(-3, -3);
+        int width = (int)((float)Value / Maximum * rect.Width);
+        if (width <= 0) width = 1;
+        using (SolidBrush brush = new SolidBrush(BarColor))
+        {
+            e.Graphics.FillRectangle(brush, rect.X, rect.Y, width, rect.Height);
+        }
+    }
+}
+"@
+}
+
+# --- Create Form ---
+$form               = New-Object System.Windows.Forms.Form
+$form.Text          = "Byte ↔ Bit Converter + NetSim"
+$form.Size          = New-Object System.Drawing.Size(440,470)
+$form.StartPosition = "CenterScreen"
+$form.BackColor     = [System.Drawing.Color]::WhiteSmoke
+
+# --- Title ---
+$lblTitle = New-Object System.Windows.Forms.Label
+$lblTitle.Text = "Byte ↔ Bit Converter"
+$lblTitle.Font = New-Object System.Drawing.Font("Segoe UI",14,[System.Drawing.FontStyle]::Bold)
+$lblTitle.AutoSize = $true
+$lblTitle.Location = New-Object System.Drawing.Point(90,20)
+$form.Controls.Add($lblTitle)
+
+# --- Input fields ---
+$lblInput = New-Object System.Windows.Forms.Label
+$lblInput.Text = "Enter Value:"
+$lblInput.Location = New-Object System.Drawing.Point(30,70)
+$form.Controls.Add($lblInput)
+
+$txtInput = New-Object System.Windows.Forms.TextBox
+$txtInput.Location = New-Object System.Drawing.Point(120,65)
+$txtInput.Width = 120
+$form.Controls.Add($txtInput)
+
+$lblUnit = New-Object System.Windows.Forms.Label
+$lblUnit.Text = "Unit:"
+$lblUnit.Location = New-Object System.Drawing.Point(30,110)
+```

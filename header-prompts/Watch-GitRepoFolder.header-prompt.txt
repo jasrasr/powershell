@@ -1,0 +1,110 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\Watch-GitRepoFolder.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-04-30 2ee198c update several files
+
+Script preview:
+```powershell
+<#
+.SYNOPSIS
+Monitors a local Git repository folder for file/folder changes and automatically commits and pushes to GitHub.
+
+.DESCRIPTION
+This script uses FileSystemWatcher to detect file/folder additions, modifications, renames, and deletions
+in a specified Git repository directory. When changes are detected, the script automatically stages,
+commits with intelligent messages, and pushes to the remote GitHub repository.
+
+The script includes debouncing to avoid duplicate commits from rapid file operations, comprehensive
+logging, and graceful error handling. It runs continuously until manually stopped (Ctrl+C).
+
+.PARAMETER RepoPath
+The local path to the Git repository to monitor. Must be a valid Git repository with a remote origin.
+Default: Current working directory.
+
+.PARAMETER CommitNameOverride
+Optional. If specified, uses this as the commit author name instead of Git's configured user.name.
+
+.PARAMETER LogLevel
+Verbosity level for logging: 'Info', 'Warn', 'Error'. Default: 'Info'.
+
+.EXAMPLE
+.\Watch-GitRepoFolder.ps1 -RepoPath "C:\repos\my-project"
+
+.EXAMPLE
+.\Watch-GitRepoFolder.ps1 -RepoPath "C:\repos\my-project" -CommitNameOverride "Automated Sync"
+
+.NOTES
+Filename: Watch-GitRepoFolder.ps1
+Revision: 1.0
+Author: Jason Lamb with help from Claude
+Created: 2026-04-15
+Modified: 2026-04-15
+Changelog:
+    v1.0 - Initial release. FileSystemWatcher-based monitoring with auto-commit/push.
+
+Requirements:
+    - Git must be installed and available in PATH
+    - The folder must be a valid Git repository (has .git folder)
+    - GitHub remote origin must be configured
+    - Adequate credentials (SSH key or PAT) for pushing
+
+Known Limitations:
+    - Binary files will be detected but not intelligently staged
+    - Does not handle merge conflicts—user intervention required
+    - Rapid file operations within debounce window are batched into single commit
+#>
+
+param(
+    [Parameter(Mandatory = $false)]
+    [ValidateScript({ Test-Path $_ -PathType Container })]
+    [string]$RepoPath = (Get-Location).Path,
+
+    [Parameter(Mandatory = $false)]
+    [string]$CommitNameOverride,
+
+    [Parameter(Mandatory = $false)]
+    [ValidateSet('Info', 'Warn', 'Error')]
+    [string]$LogLevel = 'Info'
+)
+
+# ============================================================================
+# INITIALIZATION & CONFIGURATION
+# ============================================================================
+
+$ErrorActionPreference = 'Continue'
+$WarningPreference = 'Continue'
+
+# Validate repository exists and is a Git repo
+if (-not (Test-Path (Join-Path $RepoPath '.git') -PathType Container)) {
+    Write-Error "Path '$RepoPath' is not a valid Git repository (no .git folder found)."
+    exit 1
+}
+
+# Set up logging
+$PSExports = if ($env:PSExports) { $env:PSExports } else { [System.Environment]::GetEnvironmentVariable('PSExports', 'User') }
+if (-not $PSExports) {
+    $PSExports = Join-Path $env:USERPROFILE 'PSExports'
+    if (-not (Test-Path $PSExports)) { New-Item -ItemType Directory -Path $PSExports -Force | Out-Null }
+```

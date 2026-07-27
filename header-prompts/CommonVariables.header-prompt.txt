@@ -1,0 +1,71 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\CommonVariables.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-05-27 af008ab Update CommonVariables.ps1
+2025-05-27 3b80d56 Update CommonVariables.ps1
+2025-04-08 6e4dfb1 Updated $domain ${domain} $onedrivepath ${username}  On branch main  Your branch is up to date with 'origin/main'.
+2025-04-08 9b0df64 Updated $domain ${domain} $onedrivepath ${username}  On branch main  Your branch is up to date with 'origin/main'.
+2024-10-30 ed8f406 Update CommonVariables.ps1
+2024-10-30 ef1521b Update CommonVariables.ps1
+
+Script preview:
+```powershell
+# Use this script to get all $variable tags from a folder of *.ps1 files
+
+# Define the folder path where your .ps1 files are located
+$scriptFolder = "C:\users\..\powershell-scripts"
+
+# Get all .ps1 files in the folder
+$ps1Files = Get-ChildItem -Path $scriptFolder -Filter *.ps1
+
+# Initialize an empty array to hold variable information
+$allVariables = @()
+
+# Loop through each .ps1 file
+foreach ($file in $ps1Files) {
+    # Read the contents of the script
+    $scriptContent = Get-Content -Path $file.FullName
+
+    # Use a regular expression to find all variable definitions (lines that start with $)
+    $variables = $scriptContent | Select-String -Pattern "\$[a-zA-Z_][a-zA-Z0-9_]*" | ForEach-Object {
+        # Clean up the variable name to remove any unwanted characters like `=` or `,`
+        $_.Matches.Value -replace "[^a-zA-Z0-9_$]", ""
+    }
+
+    # Create a custom object for each variable to store the filename and variable name
+    foreach ($var in $variables) {
+        $allVariables += [pscustomobject]@{
+            ScriptFile  = $file.Name
+            Variable    = $var
+        }
+    }
+}
+
+# Output the list of variables to the console
+$allVariables | Format-Table -AutoSize
+
+# Optionally, export the results to a CSV file for further analysis
+#$allVariables | Export-Csv -Path "$scriptFolder\VariablesReport.csv" -NoTypeInformation
+```

@@ -1,0 +1,115 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\install-update-powershell-commandlets.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-02-17 7b7d1b4 git commit PowerShell function
+2025-02-17 0f6f60b git commit PowerShell function
+2025-02-17 eeeb445 git commit PowerShell function
+2025-02-17 055f6f6 git commit PowerShell function
+2024-11-05 062ec29 Auto-sync commit 2024-11-05 23:01:01
+2024-11-05 3c16b91 Auto-sync commit 2024-11-05 23:01:01
+
+Script preview:
+```powershell
+# Check if the script is running with administrator privileges
+function Ensure-RunAsAdministrator {
+    # Check if the current user has admin rights
+    if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+        Write-Host "This script needs to be run as an administrator. Restarting with elevated permissions..."
+        
+        # Relaunch the script with elevated privileges
+        $newProcess = Start-Process -FilePath "powershell" -ArgumentList "-ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs -PassThru
+        $newProcess.WaitForExit()
+        
+        # Exit the original, non-elevated instance
+        Exit
+    }
+}
+
+# Ensure we are running as Administrator
+Ensure-RunAsAdministrator
+
+# If we reach here, the script is running with elevated privileges
+Write-Host "Running with administrative privileges."
+
+# Define a list of essential modules and their minimum versions
+$essentialModules = @(
+    @{ Name = "ExchangeOnlineManagement" ; MinVersion = "3.0.0" }    # Exchange Online module
+    @{ Name = "MicrosoftTeams"           ; MinVersion = "4.9.1" }    # Microsoft Teams module
+    @{ Name = "ActiveDirectory"          ; MinVersion = "1.0.0.0" }  # On-premises Active Directory module
+    @{ Name = "AzureAD"                  ; MinVersion = "2.0.2.138" } # Azure AD module
+    @{ Name = "Microsoft.Graph"          ; MinVersion = "1.0.0" }    # Microsoft Graph SDK for Azure AD
+    @{ Name = "AzureAD.Standard.Preview" ; MinVersion = "0.0.1" }    # Azure AD Preview module
+)
+
+# Function to check if a module meets the minimum version requirement
+function Get-ModuleInstalledStatus {
+    param (
+        [string]$ModuleName,
+        [string]$MinVersion
+    )
+
+    $module = Get-Module -ListAvailable -Name $ModuleName | Where-Object { $_.Version -ge (New-Object Version $MinVersion) }
+    return $null -ne $module
+}
+
+# Ensure PSGallery is set as a trusted repository
+if (-not (Get-PSRepository -Name "PSGallery" -ErrorAction SilentlyContinue | Where-Object { $_.InstallationPolicy -eq "Trusted" })) {
+    Write-Host "Setting PSGallery as a trusted repository..."
+    Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+}
+
+# Install or update each essential module as needed
+foreach ($moduleInfo in $essentialModules) {
+    $moduleName = $moduleInfo.Name
+    $minVersion = $moduleInfo.MinVersion
+
+    # Check if the module meets the minimum version requirement
+    if (-not (Get-ModuleInstalledStatus -ModuleName $moduleName -MinVersion $minVersion)) {
+        Write-Host "Installing or updating module '$moduleName' (minimum version: $minVersion)..."
+        try {
+            Install-Module -Name $moduleName -MinimumVersion $minVersion -Scope CurrentUser -Force -AllowClobber
+            Write-Host "Module '$moduleName' installed or updated successfully."
+        } catch {
+            Write-Host "Failed to install or update module '$moduleName'. Error: $_"
+        }
+    } else {
+        Write-Host "Module '$moduleName' (version $minVersion or higher) is already installed."
+
+        # Attempt to update the module to the latest version if possible
+        try {
+            Update-Module -Name $moduleName -Scope CurrentUser -Force -ErrorAction SilentlyContinue
+            Write-Host "Module '$moduleName' updated to the latest version if an update was available."
+        } catch {
+            Write-Host "No updates available for module '$moduleName' or failed to update."
+        }
+    }
+}
+
+# Function to check and upgrade applications via WinGet
+function InstallOrUpdateApplication {
+    param (
+        [string]$AppName,
+        [string]$WingetId
+```

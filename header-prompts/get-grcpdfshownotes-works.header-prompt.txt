@@ -1,0 +1,98 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\GRC-TWIT-SecurityNow-Transcripts\testing\get-grcpdfshownotes-works.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-09-22 598a921 Git sync : 2025-09-22 11:52:13
+2025-09-22 ee712d4 Git sync : 2025-09-22 11:52:13
+2025-08-18 5118605 git commit powershell private function 250813-141516
+2025-08-18 2ea6468 git commit powershell private function 250813-141516
+2025-07-10 5c00d2b git commit powershell private function 250710-132935
+2025-07-10 acc7bc7 git commit powershell private function 250710-132935
+
+Script preview:
+```powershell
+function get-grcpdfshownotes{
+    # Define the base URL and file pattern
+    $baseUrl = "https://grc.com/sn/"
+    $pdfFolder = "$onedrivepath\Downloads\GRC_SN_Files\PDF Show Notes"
+
+    # Initialize failure count and the starting file number
+    $failureCount = 0
+    $nextFileNumber = 1000  # Start at 1000 (or set explicitly to the highest number)
+
+    # Keep downloading until two consecutive failures
+    while ($failureCount -lt 2) {
+
+        Write-Host "Next file number to check: $nextFileNumber"
+
+        # Format the URL for the next pdf file
+        $pdfUrl = "${baseUrl}sn-$nextFileNumber-notes.pdf"
+
+        # Define the local file path
+        $pdfFilePath = "$pdfFolder\sn-$nextFileNumber-notes.pdf"
+
+        # Check if the pdf file already exists, if so, skip
+        if (Test-Path $pdfFilePath) {
+            Write-Host "PDF already exists: sn-$nextFileNumber-notes.pdf, skipping download." -ForegroundColor Green
+            # Reset failure count since file exists
+            $failureCount = 0
+            $nextFileNumber++  # Increment to the next file number
+            continue # restart the loop for next file
+        } else {
+            # Attempt to download if the file does not exist
+            try {
+                $pdfResponse = Invoke-WebRequest -Uri $pdfUrl -Method Head -ErrorAction Stop
+                if ($pdfResponse.StatusCode -eq 200) {
+                    Write-Host "Downloading PDF: sn-$nextFileNumber-notes.pdf"
+                    Invoke-WebRequest -Uri $pdfUrl -OutFile $pdfFilePath
+                    Write-Host $pdfUrl
+
+                    # Reset failure count since file was successfully downloaded
+                    $failureCount = 0
+                } else {
+                    Write-Host "PDF not found: sn-$nextFileNumber-notes.pdf" -ForegroundColor Red
+                    Write-Host $pdfUrl -ForegroundColor Red
+
+                    # Increment failure count if file is not found
+                    $failureCount++
+                }
+            } catch {
+                Write-Host "Error with URL: $pdfUrl" -ForegroundColor Red
+                $failureCount++
+            }
+
+            # Increment the file number after processing
+            $nextFileNumber++
+        }
+
+        # Exit the loop if two consecutive failures occur
+        if ($failureCount -eq 2) {
+            Write-Host "Stopped downloading after two consecutive failures."
+            break
+        }
+    }
+}
+
+get-grcpdfshownotes
+```

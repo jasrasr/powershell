@@ -1,0 +1,81 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\get-file-hash-sha256.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.1
+Revision history warning: 
+
+Git commit history (newest first):
+2025-10-09 817a414 Git sync : 2025-10-09 08:50:21
+2025-10-09 f80d97d Git sync : 2025-10-09 08:50:21
+
+Script preview:
+```powershell
+# Revision : 1.1
+# Description : Quick SHA256 file hash calculator (no console spam). Rev 1.1
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-10-06
+# Modified Date : 2025-10-06
+
+param(
+    [Parameter(Mandatory)]
+    [string]$FilePath
+)
+
+if (-not (Test-Path -LiteralPath $FilePath)) {
+    Write-Host "File not found : $FilePath" -ForegroundColor Red
+    return
+}
+
+$bufferSize = 4MB
+$stream     = [System.IO.File]::OpenRead($FilePath)
+$hashAlg    = [System.Security.Cryptography.SHA256]::Create()
+$buffer     = New-Object byte[] $bufferSize
+$totalBytes = $stream.Length
+$readBytes  = 0
+$lastPct    = -1
+$start      = Get-Date
+
+Write-Host "Calculating SHA256 hash for $FilePath ..."
+while (($read = $stream.Read($buffer,0,$bufferSize)) -gt 0) {
+    $hashAlg.TransformBlock($buffer,0,$read,$null,0) | Out-Null   # suppress 4194304 spam
+    $readBytes += $read
+    $pct = [int](($readBytes / $totalBytes) * 100)
+    if ($pct -ne $lastPct) {
+        Write-Progress -Activity "Hashing file" `
+                       -Status "$pct% ($([math]::Round($readBytes / 1MB,2)) / $([math]::Round($totalBytes / 1MB,2)) MB)" `
+                       -PercentComplete $pct
+        $lastPct = $pct
+    }
+}
+$hashAlg.TransformFinalBlock($buffer,0,0) | Out-Null
+$hash = ($hashAlg.Hash | ForEach-Object { $_.ToString('x2') }) -join ''
+$stream.Close()
+$hashAlg.Dispose()
+
+$elapsed = (Get-Date) - $start
+$mbps = [math]::Round(($totalBytes / 1MB) / $elapsed.TotalSeconds,2)
+
+Write-Progress -Activity "Hashing file" -Completed
+Write-Host "SHA256 hash  : $hash"
+Write-Host "File size    : $([math]::Round($totalBytes / 1MB,2)) MB"
+Write-Host "Time elapsed : $([math]::Round($elapsed.TotalSeconds,2)) sec"
+Write-Host "Throughput   : $mbps MB/s"
+```

@@ -1,0 +1,65 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\replace-files-with-source-dir-array.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-02-17 7b7d1b4 git commit PowerShell function
+2025-02-17 0f6f60b git commit PowerShell function
+2025-02-17 eeeb445 git commit PowerShell function
+2025-02-17 055f6f6 git commit PowerShell function
+2024-10-25 2ec2882 Auto-sync commit 2024-10-25 12:01:02
+2024-10-25 81aa737 Auto-sync commit 2024-10-25 12:01:02
+2024-10-24 284fff8 initial commit, removing history
+
+Script preview:
+```powershell
+# Define an array of source directories
+$sourceDirs = @("C:\Path\To\Source1", "C:\Path\To\Source2")
+
+# Define the template directory
+$templateDir = "C:\Path\To\Template"
+
+# Define files to remove and copy
+$filesToRemove = @("file1.txt", "file2.txt")
+$filesToCopy = @("template1.txt", "template2.txt")
+
+foreach ($sourceDir in $sourceDirs) {
+    # Remove specific files if found
+    foreach ($file in $filesToRemove) {
+        $filePath = Join-Path -Path $sourceDir -ChildPath $file
+        if (Test-Path -Path $filePath) {
+            Remove-Item -Path $filePath -Force
+            Write-Host "Removed: $filePath"
+        }
+    }
+
+    # Copy files from the template directory
+    foreach ($file in $filesToCopy) {
+        $sourceFilePath = Join-Path -Path $templateDir -ChildPath $file
+        $destFilePath = Join-Path -Path $sourceDir -ChildPath $file
+        Copy-Item -Path $sourceFilePath -Destination $destFilePath -Force
+        Write-Host "Copied: $sourceFilePath to $destFilePath"
+    }
+}
+```

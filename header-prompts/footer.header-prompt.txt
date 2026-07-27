@@ -1,0 +1,48 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\! Templates\footer.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-06-09 3b1469f updated several files 2026-06-09 03:18
+2026-06-05 58a847f Create footer.ps1
+2026-06-05 ec943b9 Create header.ps1
+
+Script preview:
+```powershell
+# Footer/finalization template.
+try {
+    # Main script work goes here.
+    Write-Log -Message 'Script completed successfully.'
+}
+catch {
+    $ErrorMessage = $_.Exception.Message
+
+    if (Get-Command -Name Write-Log -ErrorAction SilentlyContinue) {
+        Write-Log -Message $ErrorMessage -Level ERROR
+    } else {
+        Write-Host "ERROR: $ErrorMessage" -ForegroundColor Red
+    }
+
+    exit 1
+}
+```

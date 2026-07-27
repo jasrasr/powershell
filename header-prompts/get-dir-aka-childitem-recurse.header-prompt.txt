@@ -1,0 +1,48 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\get-dir-aka-childitem-recurse.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-02-17 7b7d1b4 git commit PowerShell function
+2025-02-17 0f6f60b git commit PowerShell function
+2025-02-17 eeeb445 git commit PowerShell function
+2025-02-17 055f6f6 git commit PowerShell function
+2024-11-21 22a5f6c Auto-sync commit 20241121-230102
+2024-11-21 8c61418 Auto-sync commit 20241121-230102
+
+Script preview:
+```powershell
+#Get-ChildItem -Path "N:\!newprojecttemplate-BIM" -Recurse
+#Get-ChildItem -Path "N:\!newprojecttemplate-BIM" -Recurse | Select-Object -ExpandProperty FullName
+Get-ChildItem -Path "N:\!newprojecttemplate-BIM" -Recurse -Directory | Select-Object -ExpandProperty FullName
+robocopy "N:\!newprojecttemplate-BIM" "n:\test\test112124" -copyall /mt:128 /r:1 /w:1 /j
+
+$source = "N:\!newprojecttemplate-BIM"
+$destination = "N:\test\test112124"
+
+# Robocopy command with performance optimizations
+Start-Process robocopy -ArgumentList @"
+"$source" "$destination" /MIR /MT:32 /R:1 /W:1 /NFL /NDL /NP /J"
+"@ -NoNewWindow -Wait
+
+```

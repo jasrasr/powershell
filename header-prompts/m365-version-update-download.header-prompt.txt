@@ -1,0 +1,113 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\m365-version-update-download.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Created Date, Modified Date, Changelog
+Current revision: 1.4
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-10-24 85d1653  Changes to be committed: 	modified:   File-Management-Scripts/m365-version-update-download.ps1 	modified:   Miscellaneous/list-to-array.ps1
+2025-10-02 96a00db Git sync : 2025-10-02 17:05:24
+2025-10-02 2f07258 Git sync : 2025-10-02 17:05:24
+
+Script preview:
+```powershell
+# Revision : 1.4
+# Description : Check Microsoft 365 Apps "Current Channel" build on MS Learn.
+#               On change: create ODT folder named <version>_<build>, copy setup/config,
+#               run ODT download, then mirror to $clesccm\Microsoft\Office 365\<version>_<build>.
+# Author : Jason Lamb (with help from ChatGPT)
+# Created : 2025-04-15
+# Modified : 2025-10-02
+
+[CmdletBinding()]
+param(
+    [string]$Url = 'https://learn.microsoft.com/en-us/officeupdates/update-history-microsoft365-apps-by-date',
+    [string]$ChannelToCheck = 'Current Channel',
+    [string]$OutFolder = 'C:\temp\powershell-exports\',
+    [switch]$Quiet
+)
+
+# Ensure folders exist
+if (-not (Test-Path $OutFolder)) { New-Item -Path $OutFolder -ItemType Directory | Out-Null }
+$OdtRoot = Join-Path $onedrivepath 'odt'
+if (-not (Test-Path $OdtRoot)) { New-Item -Path $OdtRoot -ItemType Directory | Out-Null }
+
+# State file lives with ODT bits
+$StateFile = Join-Path $OdtRoot 'm365-currentchannel-build.txt'
+
+# Per-run log with timestamp
+$LogFile = Join-Path $OutFolder ("m365-currentchannel-check-{0:yyyyMMdd-HHmmss}.log" -f (Get-Date))
+
+function Write-Log {
+    param([string]$Message,[string]$Level = 'INFO')
+    $stamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+    $line = "$stamp [$Level] $Message"
+    $line | Tee-Object -FilePath $LogFile -Append | ForEach-Object {
+        if (-not $Quiet) { Write-Host $_ }
+    }
+}
+
+try {
+    Write-Log "Downloading page $Url ..."
+    $resp = Invoke-WebRequest -Uri $Url -MaximumRedirection 5 -ErrorAction Stop
+    $html = ($resp.Content -replace '\s+', ' ')  # normalize whitespace
+
+    # Find row: Channel | Version | Build
+    $pattern1 = '<tr[^>]*>\s*<td[^>]*>\s*' + [regex]::Escape($ChannelToCheck) + '\s*</td>\s*<td[^>]*>\s*(?<version>[^<]+?)\s*</td>\s*<td[^>]*>\s*(?<build>\d+(?:\.\d+)+)\s*</td>'
+    $m = [regex]::Match($html, $pattern1, 'IgnoreCase')
+    if (-not $m.Success) {
+        # Sometimes the first cell can be <th>
+        $pattern2 = '<tr[^>]*>\s*<(?:td|th)[^>]*>\s*' + [regex]::Escape($ChannelToCheck) + '\s*</(?:td|th)>\s*<td[^>]*>\s*(?<version>[^<]+?)\s*</td>\s*<td[^>]*>\s*(?<build>\d+(?:\.\d+)+)\s*</td>'
+        $m = [regex]::Match($html, $pattern2, 'IgnoreCase')
+    }
+
+    if (-not $m.Success) {
+        throw "Could not locate the '$ChannelToCheck' row with Version and Build"
+    }
+
+    $version = $m.Groups['version'].Value.Trim()
+    $build   = $m.Groups['build'].Value.Trim()
+    $versionBuild = "{0}_{1}" -f $version, $build  # use underscore style everywhere
+
+    Write-Log "Parsed row Channel = $ChannelToCheck , Version = $version , Build = $build ; FolderName = $versionBuild"
+
+    # Load previous build
+    $previousBuild = if (Test-Path $StateFile) { (Get-Content $StateFile -ErrorAction SilentlyContinue | Select-Object -First 1).Trim() } else { '' }
+
+    if ([string]::IsNullOrWhiteSpace($previousBuild)) {
+        Write-Log "No previous build recorded. Saving $build to $StateFile"
+        $build | Set-Content -Path $StateFile -Encoding ASCII
+        exit 2
+    }
+
+    if ($previousBuild -ne $build) {
+        Write-Log "Build changed from $previousBuild to $build 🎉" 'WARN'
+        $build | Set-Content -Path $StateFile -Encoding ASCII
+
+        # === ACTIONS ON CHANGE ===
+        $targetFolder = Join-Path $OdtRoot $versionBuild
+        if (-not (Test-Path $targetFolder)) {
+            Write-Log "Creating folder $targetFolder"
+            New-Item -Path $targetFolder -ItemType Directory | Out-Null
+        }
+
+```

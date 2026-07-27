@@ -1,0 +1,110 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Tic-Tac-Toe\SuperTicTacToe.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 2.3
+Revision history warning: 
+
+Git commit history (newest first):
+2025-11-20 edfcffe update tic-tac-toe files
+
+Script preview:
+```powershell
+# test winning combo
+<#
+1,1
+2,1
+1,2
+2,2
+1,3
+2,3s
+4,1
+5,1
+4,2
+5,2
+4,3
+5,3
+7,1
+8,1
+7,2
+8,2
+7,3
+#>
+
+# Revision : 2.3
+# Description : Undo functionality fixed using ArrayList. Board redraws correctly. Cleaned logic.
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-07-09
+# Modified Date : 2025-11-15
+
+# rev 1.9.1 - fix powershell 5 compatibility on win detection of major version
+# rev 1.9.2 - added AutoPlay stop on key press and draw detection
+# rev 1.9.3 - fixed error when no moves left in AutoPlay mode
+# rev 1.9.4 - fix u and r commands to work correctly
+# rev 1.9.5 - added confirmation prompt for reset commands
+# rev 2.0 - add play log
+# rev 2.0.1 - update play log to last 10 moves instead of 5
+# rev 2.0.2 - update log from B1 S1 to (B,S) and Last moves header
+# rev 2.1 - add guide next to big board winner display
+# rev 2.1.1 - fixes play again
+# rev 2.1.2 - fixes auto after play again yes
+# rev 2.2 - add rev to top of game play
+# rev 2.3 - fixed variable scope bug: $FinalGameOver, $AutoPlay, $TestMode needed $global: prefix
+
+
+
+# --- CONFIG ---
+$ShowRevision = $true  # Set to $false to hide revision info
+$GameRevision = "2.3"
+
+Clear-Host
+
+# --- Initialize Board ---
+function Initialize-Board {
+    $global:Board = @{}
+    $global:BigWinners = @{}
+    $global:MoveHistory = [System.Collections.ArrayList]::new()
+    $global:currentPlayerSymbol = "X"
+    $global:FinalGameOver = $false
+    $global:AutoPlay = $false
+    $global:TestMode = $false
+    $global:TestMoves = @()
+    $global:TestMoveIndex = 0
+
+    for ($i = 1; $i -le 9; $i++) {
+        $Board[$i] = @{}
+        $BigWinners[$i] = " "
+        for ($j = 1; $j -le 9; $j++) {
+            $Board[$i][$j] = " "
+        }
+    }
+}
+
+Initialize-Board
+
+# --- Win Conditions ---
+$winningCombinations = @(
+    @(1,2,3), @(4,5,6), @(7,8,9),
+    @(1,4,7), @(2,5,8), @(3,6,9),
+    @(1,5,9), @(3,5,7)
+)
+
+# --- Player Setup ---
+```

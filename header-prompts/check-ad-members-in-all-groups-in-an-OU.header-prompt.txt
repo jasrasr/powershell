@@ -1,0 +1,47 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\AD-Scripts\check-ad-members-in-all-groups-in-an-OU.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-10-16 a11d365 git commit powershell private function 20251016_222840
+2025-10-16 8c63b07 git commit powershell private function 20251016_222840
+
+Script preview:
+```powershell
+# check users in all groups 
+# ou example is .local/MIDD/Common/Local Admin
+# CN=4QBMKY3,OU=Local Admin,OU=Common,OU=MIDD,DC=MIDDOUGH,DC=LOCAL
+
+$ou = "OU=Local Admin,OU=Common,OU=MIDD,DC=MIDDOUGH,DC=LOCAL"
+Get-ADGroup -Filter * -SearchBase $ou | ForEach-Object {
+    $group = $_
+    Get-ADGroupMember -Identity $group | ForEach-Object {
+        $user = $_
+        [PSCustomObject]@{
+            GroupName = $group.Name
+            UserName  = $user.SamAccountName
+        }
+    }
+} | Format-Table -AutoSize
+```

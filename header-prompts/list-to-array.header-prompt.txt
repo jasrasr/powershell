@@ -1,0 +1,117 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\list-to-array.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.2
+Revision history warning: 
+
+Git commit history (newest first):
+2026-07-01 614d8e7 Add download logs for June 16 and June 29, 2026
+2026-03-20 b94a014 Update from PowerShell script
+2026-03-19 b6ed736 updating grc files
+2026-03-16 032565b update tons of files
+2025-11-04 44f164d git commit powershell private function 20251104_095948
+2025-11-03 ae50c57 Replace email list with item placeholders
+2025-10-31 9212953 git commit powershell private function 20251031_214708
+2025-10-24 85d1653  Changes to be committed: 	modified:   File-Management-Scripts/m365-version-update-download.ps1 	modified:   Miscellaneous/list-to-array.ps1
+
+Script preview:
+```powershell
+# Revision : 1.2
+# Description : Save a string list into an array-formatted PowerShell file, removing trailing comma on the last item, and append multiple foreach loop examples
+# Author : Jason Lamb
+# Created Date : 2025-07-23
+# Modified Date : 2025-09-12
+
+$datetime = Get-Date -Format "yyyyMMdd-HHmmss"
+$outputPath = "$psexports\path-array-output-$datetime.ps1"
+
+$textToArray = @'
+\\ALTFS01V\F$\Apps
+\\ALTFS01V\F$\Apps\00_Altronic _Apps_Stage
+\\ALTFS01V\F$\Apps\00_Altronic_Panels_Apps_Stage
+\\ALTFS01V\F$\Apps\01_Altronic_Apps_Production
+\\ALTFS01V\F$\Apps\01_Altronic_Panels_App_Prod
+\\ALTFS01V\F$\Common
+\\ALTFS01V\F$\Common\K Neuhaus
+\\ALTFS01V\F$\Common\Paul Olbrych\Management Review Info
+\\ALTFS01V\F$\Common\RISK Management
+\\ALTFS01V\F$\Common\wagner
+\\ALTFS01V\F$\Groups
+\\ALTFS01V\F$\Groups\$SPEA
+\\ALTFS01V\F$\Groups\Accounting
+\\ALTFS01V\F$\Groups\Administration
+\\ALTFS01V\F$\Groups\DxDesigner
+\\ALTFS01V\F$\Groups\Engineering
+\\ALTFS01V\F$\Groups\Engineering Managers
+\\ALTFS01V\F$\Groups\Engineering\EngFax
+\\ALTFS01V\F$\Groups\EngineSolutions
+\\ALTFS01V\F$\Groups\ep
+\\ALTFS01V\F$\Groups\HR
+\\ALTFS01V\F$\Groups\IT
+\\ALTFS01V\F$\Groups\Logistics
+\\ALTFS01V\F$\Groups\MachineShop
+\\ALTFS01V\F$\Groups\Manufacturing
+\\ALTFS01V\F$\Groups\Manufacturing\CutNClinch
+\\ALTFS01V\F$\Groups\Manufacturing\Production Logs\SAFI2
+\\ALTFS01V\F$\Groups\Manufacturing\SMT Live Notes
+\\ALTFS01V\F$\Groups\Manufacturing\SMT Profiles
+\\ALTFS01V\F$\Groups\Methods
+\\ALTFS01V\F$\Groups\Order Processing
+\\ALTFS01V\F$\Groups\Panel_Engineering
+\\ALTFS01V\F$\Groups\Panel_Engineering\acaddwgs
+\\ALTFS01V\F$\Groups\Panel_QC
+\\ALTFS01V\F$\Groups\Panel_QC\Firmware
+\\ALTFS01V\F$\Groups\Panel_Sales
+\\ALTFS01V\F$\Groups\Panel_Supply_Chain
+\\ALTFS01V\F$\Groups\Panels
+\\ALTFS01V\F$\Groups\Purchasing
+\\ALTFS01V\F$\Groups\QA and Test Engineering
+\\ALTFS01V\F$\Groups\QC
+\\ALTFS01V\F$\Groups\QC\DigitalQC Log Sheets
+\\ALTFS01V\F$\Groups\Safety
+\\ALTFS01V\F$\Groups\SAKI_data
+\\ALTFS01V\F$\Groups\Sales
+\\ALTFS01V\F$\Teams
+\\ALTFS01V\F$\Teams\AltEngShared
+\\ALTFS01V\F$\Teams\Altronic Building Plans
+\\ALTFS01V\F$\Teams\Altronic Management Team
+\\ALTFS01V\F$\Teams\Artworks
+\\ALTFS01V\F$\Teams\Bartender Labels
+\\ALTFS01V\F$\Teams\Coil Files
+\\ALTFS01V\F$\Teams\Compliance
+\\ALTFS01V\F$\Teams\Contracts
+\\ALTFS01V\F$\Teams\DataFlo Archives
+\\ALTFS01V\F$\Teams\Digital Signage
+\\ALTFS01V\F$\Teams\DIV Engine Altronic
+\\ALTFS01V\F$\Teams\DMP Security
+\\ALTFS01V\F$\Teams\Document Control
+\\ALTFS01V\F$\Teams\Drawings
+\\ALTFS01V\F$\Teams\Drawings\DESKTOP\ALT\Label Artwork
+\\ALTFS01V\F$\Teams\Engineering Documents
+\\ALTFS01V\F$\Teams\Engineering Documents\Altronic
+\\ALTFS01V\F$\Teams\Engineering Documents\Panels
+\\ALTFS01V\F$\Teams\Engineering Project Management Snap Shot
+\\ALTFS01V\F$\Teams\Environmental Management
+\\ALTFS01V\F$\Teams\EverAlert Clocks
+\\ALTFS01V\F$\Teams\Export Documentation
+\\ALTFS01V\F$\Teams\Flash-Memories
+\\ALTFS01V\F$\Teams\HRTrainingVideos
+```

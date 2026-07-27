@@ -1,0 +1,60 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\remove-space-replace-underscore.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-01-09 b1bf8b2 Add example usage for Remove-Spaces function
+2026-01-09 0feb3ee Refactor space replacement logic into a function
+2026-01-09 f2f3945 Modify script to accept user input and copy result
+2026-01-09 67fade4 Add script to replace spaces and dashes with underscores
+2026-01-06 355e985 Add PowerShell script to replace text and copy to clipboard
+
+Script preview:
+```powershell
+    function Remove-Spaces {
+        param(
+            [Parameter(Mandatory=$false, Position=0)]
+            [string]$Text
+        )
+        
+        # Prompt for input if no parameter given
+        if ([string]::IsNullOrEmpty($Text)) {
+            $Text = Read-Host "Enter text to process"
+        }
+        
+        # replace space with _
+        $result = $Text -replace ' ', '_'
+        # replace - with _
+        $result = $result -replace '-', '_'
+        # replace multiple _ with single _
+        $result = $result -replace '_+', '_'
+        
+        # output final result
+        $result
+        # add to clipboard
+        $result | Set-Clipboard
+    }
+
+# Example Usage:
+# & { . "$githubpath\PowerShell\Miscellaneous\remove-space-replace-underscore.ps1"; Remove-Spaces "my text here 2" }
+```

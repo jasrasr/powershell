@@ -1,0 +1,110 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Computer-Management-Scripts\yellowkey-fix.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-05-28 ff634b7 updated several files 2026-05-28 10:50
+
+Script preview:
+```powershell
+<#
+.SYNOPSIS
+    Removes autofstx.exe from the WinRE BootExecute registry value.
+
+.DESCRIPTION
+    This remediation script removes the "autofstx.exe" entry from the BootExecute
+    REG_MULTI_SZ value inside the Windows Recovery Environment (WinRE) offline
+    SYSTEM registry hive. This is a security fix to prevent autofstx.exe from
+    executing during WinRE boot.
+
+    The script performs the following steps:
+      1. Verify administrator privileges
+      2. Verify WinRE is enabled
+      3. Mount the WinRE image via reagentc
+      4. Load the offline SYSTEM registry hive
+      5. Read BootExecute and remove autofstx.exe if present
+      6. Unload the offline hive
+      7. Unmount the WinRE image with commit
+      8. Disable and re-enable WinRE to re-seal BitLocker trust chain
+
+    Exit 0 = Success (entry removed or not present)
+    Exit 1 = Failure (error during remediation)
+
+.PARAMETER MountPath
+    Directory to use as the WinRE mount point. Created if it does not exist.
+    Default: C:\Mount
+
+.EXAMPLE
+    # Standard run
+    .\Remove-AutoFsTxFromWinRE.ps1
+
+.EXAMPLE
+    # Custom mount path
+    .\Remove-AutoFsTxFromWinRE.ps1 -MountPath D:\mount
+
+.NOTES
+    Requirements: Windows with WinRE and reagentc support, Administrator privileges.
+    The WinRE disable/enable cycle at the end is required to re-seal the
+    BitLocker measurement chain after modifying the WinRE image.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+#>
+param(
+    [Parameter(Mandatory = $false)]
+    [string]$MountPath = "C:\Mount"
+)
+
+# Target entry to remove from BootExecute
+$EntryToRemove = "autofstx.exe"
+
+# Internal constant for the offline hive key name
+$HiveName = "WinREHive"
+
+# State tracking for cleanup
+$hiveLoaded   = $false
+$imageMounted = $false
+$mountCreated = $false
+$changesMade  = $false
+
+Write-Host "Remove autofstx.exe from WinRE BootExecute"
+
+# 1. Verify Administrator Privileges
+# PS Version: All | Admin: Yes | System Requirements: None
+try {
+    $identity  = [Security.Principal.WindowsIdentity]::GetCurrent()
+    $principal = [Security.Principal.WindowsPrincipal]$identity
+    $isAdmin   = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+    if (-not $isAdmin) {
+        Write-Host "[1/8] Administrator check: FAILED" -ForegroundColor Red
+        Write-Host "  This script must be run as Administrator."
+        Write-Host "  Right-click PowerShell and select 'Run as administrator'."
+        exit 1
+    }
+```

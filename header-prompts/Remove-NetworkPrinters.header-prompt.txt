@@ -1,0 +1,111 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Networking-Scripts\Remove-NetworkPrinters.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-06-15 1176ef2 Add download log for June 9, 2026, with new files and status updates
+2026-06-08 9a6ef9f Add script to identify and remove network printers for users
+
+Script preview:
+```powershell
+<#
+    Filename:    Remove-NetworkPrinters.ps1
+    Revision:    1.2.0
+    Description: Identifies and removes all network printers installed for the current user
+                 or system-wide. Catches both Type=Connection printers and locally-added
+                 TCP/IP printers whose port matches a specified IP range. Supports -WhatIf.
+    Author:      Jason Lamb with help from Claude Code
+    Created:     2026-06-08
+    Modified:    2026-06-08
+
+    Changelog:
+        1.2.0 - Changed -IPFilter default to '*' to catch all IP printers by default
+        1.1.0 - Added -IPFilter parameter to catch local-type printers on matching IP ports
+        1.0.0 - Initial release
+#>
+
+[CmdletBinding(SupportsShouldProcess)]
+param (
+    [switch]$AllUsers,
+
+    # Wildcard pattern matched against the printer's port name/address.
+    # Matches IP_ prefixed ports (e.g. IP_192.168.1.50) and raw IP ports.
+    # Set to $null or '' to skip IP-based matching entirely.
+    [string]$IPFilter = '*',
+
+    [string]$LogPath = "$PSExports\Remove-NetworkPrinters_$(Get-Date -Format 'yyyyMMdd_HHmmss').csv"
+)
+
+#region Functions
+
+function Get-TargetPrinters {
+    param (
+        [switch]$AllUsers,
+        [string]$IPFilter
+    )
+
+    $allPrinters = Get-Printer -ErrorAction SilentlyContinue
+
+    # Network connections (\\server\share, WSD, etc.)
+    $networkPrinters = $allPrinters | Where-Object { $_.Type -eq 'Connection' }
+
+    # Local-type printers whose port resolves to an IP in the target range.
+    # Port names are typically "IP_192.168.1.50" or sometimes the raw IP.
+    $ipPrinters = @()
+    if ($IPFilter) {
+        $ipPrinters = $allPrinters | Where-Object {
+            $_.Type -eq 'Local' -and (
+                $_.PortName -like "IP_$IPFilter" -or
+                $_.PortName -like $IPFilter
+            )
+        }
+    }
+
+    $combined = @($networkPrinters) + @($ipPrinters) |
+        Sort-Object Name -Unique
+
+    if (-not $AllUsers) {
+        $combined = $combined | Where-Object {
+            $_.ComputerName -eq $env:COMPUTERNAME -or [string]::IsNullOrEmpty($_.ComputerName)
+        }
+    }
+
+    return $combined
+}
+
+#endregion
+
+#region Main
+
+Write-Host "`nRemove-NetworkPrinters.ps1" -ForegroundColor Cyan
+
+if ($IPFilter) {
+    Write-Host "IP filter  : $IPFilter" -ForegroundColor Gray
+}
+else {
+    Write-Host "IP filter  : (none - Type=Connection only)" -ForegroundColor Gray
+}
+
+Write-Host "Scanning for network printers...`n" -ForegroundColor Gray
+
+```

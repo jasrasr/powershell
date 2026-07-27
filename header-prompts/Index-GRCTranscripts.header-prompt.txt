@@ -1,0 +1,66 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\GRC-TWIT-SecurityNow-Transcripts\testing\Index-GRCTranscripts.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-09-22 598a921 Git sync : 2025-09-22 11:52:13
+2025-09-22 ee712d4 Git sync : 2025-09-22 11:52:13
+2025-08-18 5118605 git commit powershell private function 250813-141516
+2025-08-18 2ea6468 git commit powershell private function 250813-141516
+2025-07-10 5c00d2b git commit powershell private function 250710-132935
+2025-07-10 acc7bc7 git commit powershell private function 250710-132935
+
+Script preview:
+```powershell
+$TranscriptFolder = "$onedrivepath\Downloads\GRC_SN_Files\Transcriptions"
+$OutputCSV = "$TranscriptFolder\transcript-index.csv"
+
+# Create empty array for index
+$IndexData = @()
+
+# Loop through all .txt files
+Get-ChildItem -Path $TranscriptFolder -Filter "*.txt" | Sort-Object Name | ForEach-Object {
+    $File = $_.FullName
+    $Content = Get-Content -Path $File -Raw
+
+    # Extract Metadata
+    $Episode = ($Content -match "EPISODE:\s+#(\d+)") ? $Matches[1] : ""
+    $Date    = ($Content -match "DATE:\s+(.+?)\r?\n") ? $Matches[1].Trim() : ""
+    $Title   = ($Content -match "TITLE:\s+(.+?)\r?\n") ? $Matches[1].Trim() : ""
+    $Desc    = ($Content -match "DESCRIPTION:\s+(.+?)\r?\n") ? $Matches[1].Trim() : ""
+
+    # Add to array
+    $IndexData += [PSCustomObject]@{
+        Episode = $Episode
+        Date    = $Date
+        Title   = $Title
+        Description = $Desc
+        FileName = $_.Name
+    }
+}
+
+# Export as CSV
+$IndexData | Export-Csv -Path $OutputCSV -NoTypeInformation -Encoding UTF8
+
+Write-Host "Index completed. Output saved to: $OutputCSV"
+```

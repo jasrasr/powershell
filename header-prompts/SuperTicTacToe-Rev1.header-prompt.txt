@@ -1,0 +1,111 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Tic-Tac-Toe\SuperTicTacToe-Rev1.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-04-21 ea28811 Add files via upload
+2025-04-21 aed5b3f Add files via upload
+
+Script preview:
+```powershell
+<#
+Super Tic Tac Toe (Ultimate Tic Tac Toe) - PowerShell Edition
+Version: Rev3
+By: ChatGPT + User collaboration
+Features:
+- 9x9 Board
+- X and O take turns
+- Win detection on small boards
+- Lockout of won small boards
+- Full game win detection (3 Big Squares in a row)
+- Simple Console UI
+#>
+
+Clear-Host
+
+# --- Initialize Board ---
+$Board = @{}
+$BigWinners = @{}  # Track who wins each big square
+
+for ($big = 1; $big -le 9; $big++) {
+    $Board[$big] = @{}
+    $BigWinners[$big] = " "  # Initialize as empty (no winner)
+    for ($small = 1; $small -le 9; $small++) {
+        $Board[$big][$small] = " "  # Initialize small squares
+    }
+}
+
+# --- Winning Combinations (Rows, Columns, Diagonals) ---
+$winningCombinations = @(
+    @(1, 2, 3),
+    @(4, 5, 6),
+    @(7, 8, 9),
+    @(1, 4, 7),
+    @(2, 5, 8),
+    @(3, 6, 9),
+    @(1, 5, 9),
+    @(3, 5, 7)
+)
+
+# --- Player Setup ---
+$players = @("X", "O")
+$currentPlayer = 0
+
+# --- Function: Show Board ---
+function Show-Board {
+    Clear-Host
+    Write-Host "`nSUPER TIC TAC TOE (X vs O)" -ForegroundColor Cyan
+    for ($bigRow = 0; $bigRow -lt 3; $bigRow++) {
+        for ($smallRow = 0; $smallRow -lt 3; $smallRow++) {
+            $line = ""
+            for ($bigCol = 0; $bigCol -lt 3; $bigCol++) {
+                $bigIndex = ($bigRow * 3) + $bigCol + 1
+                for ($smallCol = 0; $smallCol -lt 3; $smallCol++) {
+                    $smallIndex = ($smallRow * 3) + $smallCol + 1
+                    $value = $Board[$bigIndex][$smallIndex]
+                    if ($value -eq " ") { $value = "." }
+                    $line += " $value "
+                }
+                $line += " | "
+            }
+            Write-Host $line
+        }
+        Write-Host ("-" * 36)
+    }
+
+    Write-Host "`nBig Board Wins:"
+    for ($i = 1; $i -le 9; $i++) {
+        $status = if ($BigWinners[$i] -ne " ") { $BigWinners[$i] } else { "." }
+        Write-Host -NoNewline " $status "
+        if ($i % 3 -eq 0) { Write-Host "" }
+    }
+}
+
+# --- Function: Check Small Board Win ---
+function Check-SmallBoardWin {
+    param (
+        [int]$bigSquare,
+        [string]$player
+    )
+
+```

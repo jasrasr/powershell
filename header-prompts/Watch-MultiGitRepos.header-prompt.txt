@@ -1,0 +1,110 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\Watch-MultiGitRepos.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-04-30 2ee198c update several files
+
+Script preview:
+```powershell
+<#
+.SYNOPSIS
+Monitors multiple Git repositories in a parent folder and automatically commits/pushes with AI-generated commit messages.
+
+.DESCRIPTION
+This script discovers all Git repositories within a specified parent directory and monitors each one
+for file/folder changes using FileSystemWatcher. When changes are detected in any repo, the script
+uses Claude's AI model to analyze the changes and generate intelligent, contextual commit messages.
+
+The script manages multiple watchers concurrently, handles cross-repo interactions, and maintains
+separate logs for each repository. It includes debouncing to prevent duplicate commits from rapid
+file operations and comprehensive error handling.
+
+.PARAMETER ParentPath
+The parent directory containing multiple Git repositories. Script auto-discovers all .git folders.
+Default: Current working directory.
+
+.PARAMETER AnthropicApiKey
+The API key for Anthropic Claude AI. Can also be set via $env:ANTHROPIC_API_KEY.
+Required for AI-generated commit messages.
+
+.PARAMETER DebounceIntervalMs
+Time in milliseconds to wait before processing changes. Higher values batch more changes together.
+Default: 2000
+
+.PARAMETER SkipAI
+Switch to disable AI commit messages and use simple templated messages instead.
+
+.PARAMETER DryRun
+Switch to preview what would happen without actually committing/pushing.
+
+.EXAMPLE
+.\Watch-MultiGitRepos.ps1 -ParentPath "C:\repos" -AnthropicApiKey "sk-ant-..."
+
+.EXAMPLE
+.\Watch-MultiGitRepos.ps1 -ParentPath "C:\src" -DebounceIntervalMs 3000 -SkipAI
+
+.NOTES
+Filename: Watch-MultiGitRepos.ps1
+Revision: 1.0
+Author: Jason Lamb with help from Claude
+Created: 2026-04-15
+Modified: 2026-04-15
+Changelog:
+    v1.0 - Initial release. Multi-repo monitoring with Claude AI integration for commit messages.
+
+Requirements:
+    - Git must be installed and available in PATH
+    - Anthropic API key (for AI-generated messages; optional if -SkipAI is used)
+    - Adequate GitHub credentials (SSH key or PAT) for pushing
+
+Environment Variables:
+    $env:ANTHROPIC_API_KEY - API key (used if -AnthropicApiKey not provided)
+    $env:PSExports - Output directory for logs (default: ~/PSExports)
+
+Known Limitations:
+    - AI model calls have a small latency (usually <1s); adjust debounce interval if needed
+    - Binary file changes provide limited context to AI
+    - Merge conflicts require manual intervention
+    - Rate limits on Anthropic API should be considered for high-frequency commits
+#>
+
+param(
+    [Parameter(Mandatory = $false)]
+    [ValidateScript({ Test-Path $_ -PathType Container })]
+    [string]$ParentPath = (Get-Location).Path,
+
+    [Parameter(Mandatory = $false)]
+    [string]$AnthropicApiKey,
+
+    [Parameter(Mandatory = $false)]
+    [int]$DebounceIntervalMs = 2000,
+
+    [Parameter(Mandatory = $false)]
+    [switch]$SkipAI,
+
+    [Parameter(Mandatory = $false)]
+    [switch]$DryRun
+)
+
+```

@@ -1,0 +1,93 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\SCCM-Scripts\new-app-via-csv.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-10-09 817a414 Git sync : 2025-10-09 08:50:21
+2025-10-09 f80d97d Git sync : 2025-10-09 08:50:21
+2025-09-30 9f87956 Git sync : 2025-09-30 15:27:12
+2025-09-30 d6e6398 Git sync : 2025-09-30 15:27:12
+
+Script preview:
+```powershell
+param(
+    [Parameter(Mandatory=$true)]
+    [string] $CsvPath,
+
+    [string] $ConfigFile = '$githubpath\PowerShell-Private\SCCM-Scripts\new-app-via-csv-params.psd1'
+)
+
+# Import the PSD1 file (returns a hashtable)
+$config = Import-PowerShellDataFile -Path $ConfigFile
+
+# Now extract your values if present, or fallback defaults
+$SiteCode = if ($null -ne $config.SiteCode) { $config.SiteCode } else { 'ABC' } # replace with your default site code
+$SiteServer = if ($null -ne $config.SiteServer) { $config.SiteServer } else { 'server.domain.local' } # replace with your default site server
+$DefaultDPNames = if ($null -ne $config.DefaultDPNames) { $config.DefaultDPNames } else {
+    @('server1.domain.local','server2.domain.local')  # example defaults
+}
+
+# Import CSV rows
+$appRows = Import-Csv -Path $CsvPath
+
+foreach ($row in $appRows) {
+    # compute DPNames for this row
+    $dpnames = if ($row.DPNames) {
+        $row.DPNames -split ',' | ForEach-Object { $_.Trim() }
+    } else {
+        $DefaultDPNames
+    }
+
+    # Build params for one app
+    $params = @{
+        SiteCode    = $SiteCode
+        SiteServer  = $SiteServer
+        AppName     = $row.AppName
+        Publisher   = $row.Publisher
+        Version     = $row.Version
+        IconPath    = $row.IconPath
+        DeployType  = $row.DeployType
+        ContentPath = $row.ContentPath
+        DPNames     = $dpnames
+    }
+
+    if ($row.InstallCmd)        { $params.InstallCmd         = $row.InstallCmd }
+    if ($row.UninstallCmd)      { $params.UninstallCmd       = $row.UninstallCmd }
+    if ($row.MsiProductCode)    { $params.MsiProductCode     = $row.MsiProductCode }
+    if ($row.ExpectedMsiVersion){ $params.ExpectedMsiVersion = $row.ExpectedMsiVersion }
+    if ($row.DetectFilePath)    { $params.DetectFilePath     = $row.DetectFilePath }
+    if ($row.DetectDirectoryPath){ $params.DetectDirectoryPath = $row.DetectDirectoryPath }
+    if ($row.DPGroupNames) {
+        $params.DPGroupNames = ($row.DPGroupNames -split ',') | ForEach-Object { $_.Trim() }
+    }
+
+    Write-Host "`n>>> Creating app $($row.AppName) ..."
+    try {
+        .\New-CMApp.ps1 @params
+    }
+    catch {
+        Write-Warning "Failed to create app $($row.AppName): $_"
+    }
+    Write-Host ">>> Done $($row.AppName)`n"
+}
+```

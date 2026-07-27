@@ -1,0 +1,78 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\get-office-365-user-licenses-and-apps.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-04-08 6e4dfb1 Updated $domain ${domain} $onedrivepath ${username}  On branch main  Your branch is up to date with 'origin/main'.
+2025-04-08 9b0df64 Updated $domain ${domain} $onedrivepath ${username}  On branch main  Your branch is up to date with 'origin/main'.
+2025-02-17 7b7d1b4 git commit PowerShell function
+2025-02-17 0f6f60b git commit PowerShell function
+2025-02-17 eeeb445 git commit PowerShell function
+2025-02-17 055f6f6 git commit PowerShell function
+2024-11-13 56e4a59 Auto-sync commit 20241113-110144
+2024-11-13 e41aff0 Auto-sync commit 20241113-110144
+
+Script preview:
+```powershell
+# Specify the users' emails or User Principal Names (UPNs)
+$UserPrincipalNames = @(
+    "andy.minderman@${domain}.com", 
+    "charles.bridge@${domain}.com",
+    "david.bridenstine@${domain}.com",
+    "justin.walters@${domain}.com",
+    "nathan.ingram@${domain}.com",
+    "jackie.morris@${domain}.com",
+    "paula.stoneman@${domain}.com",
+    "keyana.williams@${domain}.com",
+    "matt.bedee@${domain}.com"
+)  # Replace with the specific users' UPNs
+
+# ...existing code...
+
+# Retrieve and process each user by UPN
+foreach ($UserPrincipalName in $UserPrincipalNames) {
+    $User = Get-MsolUser -UserPrincipalName $UserPrincipalName
+
+    # Check if the user is licensed
+    if ($User -and $User.isLicensed) {
+        Write-Output "User: $($User.UserPrincipalName)"
+        $Licenses = $User.Licenses
+        
+        foreach ($License in $Licenses) {
+            if ($License.AccountSkuId -eq "${domain}:SPE_E3") {
+                Write-Output " License SKU: $($License.AccountSkuId)"
+                
+                # Check enabled services under the license
+                foreach ($Service in $License.ServiceStatus) {
+                    if ($Service.ServicePlan.ServiceName -eq "SHAREPOINTENTERPRISE") {
+                        $Status = if ($Service.ProvisioningStatus -eq "Success") { "Enabled" } else { "Disabled" }
+                        Write-Output "   Service: $($Service.ServicePlan.ServiceName) - Status: $Status"
+                    }
+                }
+            }
+        }
+    } else {
+        Write-Output "The specified user $UserPrincipalName is not licensed or does not exist."
+    }
+}
+```

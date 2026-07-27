@@ -1,0 +1,93 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Server-Management-Scripts\get-task-and-runas-user.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Revision, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-06-02 256f139 Update get-task-and-runas-user.ps1
+2025-06-02 919946c Update get-task-and-runas-user.ps1
+2025-06-02 0d5ef09 git commit PowerShell function
+2025-06-02 9924548 git commit PowerShell function
+2025-06-02 dea89fc Create get task and runas user.ps1
+2025-06-02 b000228 Create get task and runas user.ps1
+
+Script preview:
+```powershell
+# Revision # 14
+# Description : Retrieves scheduled tasks from multiple remote servers, normalizes missing RunAsUser values, removes RunspaceId noise, displays results in the console, and exports to CSV.
+# Author      : Jason Lamb (help from ChatGPT 4o)
+# Date        : 2025-06-02
+
+$servers = @('CLEDC1', 'TOLDC1', 'CHIDC1')  # Replace with your server names
+$cred = Get-Credential
+$allResults = @()
+
+foreach ($server in $servers) {
+    Write-Host "`n===== $server =====" -ForegroundColor Cyan
+
+    try {
+        $results = Invoke-Command -ComputerName $server -Credential $cred -ScriptBlock {
+            $tasks = Get-ScheduledTask
+
+            foreach ($task in $tasks) {
+                $userId = $task.Principal.UserId
+
+                if ([string]::IsNullOrWhiteSpace($userId)) {
+                    switch ($task.Principal.LogonType) {
+                        'Interactive'     { $userId = 'INTERACTIVE' }
+                        'Group'           { $userId = 'GROUP' }
+                        'ServiceAccount'  { $userId = 'SERVICE ACCOUNT' }
+                        default           { $userId = 'UNKNOWN' }
+                    }
+                }
+
+                [PSCustomObject]@{
+                    TaskName   = $task.TaskName
+                    Folder     = $task.TaskPath
+                    RunAsUser  = $userId
+                }
+            }
+        }
+
+        # Tag results with server name and remove RunspaceId
+        foreach ($r in $results) {
+            $r.PSObject.Properties.Remove('RunspaceId')
+            $r | Add-Member -NotePropertyName Server -NotePropertyValue $server
+        }
+
+        $allResults += $results
+    } catch {
+        Write-Host "Error connecting to $server : $_" -ForegroundColor Red
+    }
+}
+
+# Output to screen
+$allResults | Select-Object Server, TaskName, Folder, RunAsUser | Format-Table -AutoSize
+
+# Export to CSV
+$exportPath = 'C:\temp\powershell-exports\server-tasks.csv'
+$allResults | Select-Object Server, TaskName, Folder, RunAsUser |
+Export-Csv -Path $exportPath -NoTypeInformation
+
+Write-Host "`nExport complete : $exportPath" -ForegroundColor Green
+notepad $exportpath
+```

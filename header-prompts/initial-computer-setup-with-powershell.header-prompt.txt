@@ -1,0 +1,79 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\initial-computer-setup-with-powershell.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-05-27 1b39ed2 Update initial-computer-setup-with-powershell.ps1
+2025-05-27 ad4a3fc Update initial-computer-setup-with-powershell.ps1
+2025-04-01 2de81ba git commit PowerShell function
+2025-04-01 42b916d git commit PowerShell function
+2025-02-17 7b7d1b4 git commit PowerShell function
+2025-02-17 0f6f60b git commit PowerShell function
+
+Script preview:
+```powershell
+#run as admin
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+install-module powershellget -force -allowclobber
+import-module powershellget
+Install-Module -Name PSWindowsUpdate -Force -allowclobber
+import-module pswindowsupdate
+get-windowsupdate
+
+vmhostname WinDev2407Eval
+### TRANSFER FILE TO HYPER-V VM
+$vmName = "YourVMName"
+
+Copy-VMFile $vmname -SourcePath "c:\temp\Dell_IAX.zip" -DestinationPath "c:\temp\Dell_IAX.zip" -CreateFullPath -FileSource Host
+
+Invoke-Command -VMName $vmName -ScriptBlock {
+	Expand-Archive -Path "c:\temp\Dell_IAX.zip" -DestinationPath "c:\temp\Dell_IAX"
+	#New-Item -Path "C:\temp1" -ItemType Directory
+}
+
+
+
+### INSTALL WINGET
+$progressPreference = 'silentlyContinue'
+Write-Host "Installing WinGet PowerShell module from PSGallery..."
+Install-PackageProvider -Name NuGet -Force | Out-Null
+Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery | Out-Null
+Write-Host "Using Repair-WinGetPackageManager cmdlet to bootstrap WinGet..."
+Repair-WinGetPackageManager
+Write-Host "Done."
+
+<#
+
+# $profile file locations
+# VSC aka Visual Studio Code or VS Code, PS5 = PowerShell v5+ and PS7 = PowerShell v7+
+VSC = "C:\Users\$env:username\Documents\PowerShell\Microsoft.VSCode_profile.ps1" 
+PS5 = "C:\Users\$env:username\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
+PS7 = "C:\Users\$env:username\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+# same for different admin user on the same computer, replace $env:username with admin username
+
+MOST IMPORTANT - add dot reference to the common profile file for common variables
+. $commonProfilePath
+$commonProfilePath = "C:\Users\$env:username\Documents\!PowerShellCommonProfile.ps1"
+
+#>
+```

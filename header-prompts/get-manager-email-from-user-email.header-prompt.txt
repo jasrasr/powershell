@@ -1,0 +1,62 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\AD-Scripts\get-manager-email-from-user-email.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-11-03 febd76d Add user existence check in email retrieval script
+2025-10-31 9212953 git commit powershell private function 20251031_214708
+
+Script preview:
+```powershell
+$users = @(
+    "user1@domain.com",
+    "user2@domain.com"
+)
+
+foreach ($user in $users) {
+    # Do something with $item
+    Write-Host "Processing : $user"
+     # get username from email in ad
+    $username = (Get-ADUser -Filter {EmailAddress -eq $user} -Properties SamAccountName | Select-Object -ExpandProperty SamAccountName)
+ 
+    #check if user exists
+    if ($username) {
+        Write-Host "Found user: $username"
+    } else {
+        Write-Host "User not found for email: $user"
+    }
+
+    
+# get ad user manager email
+   
+    $managerEmail = (Get-ADUser -Identity $username -Properties Manager | Select-Object -ExpandProperty Manager)
+    # get email of manager
+    $managerEmail = (Get-ADUser -Identity $managerEmail -Properties EmailAddress | Select-Object -ExpandProperty EmailAddress)
+
+    # add to new array
+    $managerEmails += $managerEmail
+}
+# get unique manager emails
+$managerEmails = $managerEmails | Select-Object -Unique
+$managerEmails
+```

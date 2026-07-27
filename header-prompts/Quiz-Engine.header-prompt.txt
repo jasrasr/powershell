@@ -1,0 +1,112 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\PowerShell-Quiz\Quiz-Engine.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.8
+Revision history warning: 
+
+Git commit history (newest first):
+2025-10-20 860bdf9 Git sync :
+2025-10-18 49f859d git commit powershell private function 20251018_002233
+2025-10-17 e693dda Create Quiz-Engine.ps1
+
+Script preview:
+```powershell
+# Revision : 1.8
+# Description : Quiz-Engine.ps1 — PS7+ compatibility hotfix, shuffle-by-default, cooldown + logging (Rev 1.8)
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-10-17
+# Modified Date : 2025-10-17
+
+<#
+  File     : Quiz-Engine.ps1
+  Purpose  : Reusable PowerShell Quiz Engine (WinForms) with automatic question shuffling per attempt.
+  Notes    : - Loads question set via -QuestionSetPath (dot-sourced)
+             - Automatically shuffles question order at load and on every reset
+             - Answers remain XOR-obfuscated in the question set files
+             - Reveals plaintext answers ONLY when score == 100%
+             - If <100%, offers Restart with forced cooldown and logs attempts
+#>
+
+param(
+    [Parameter(Mandatory)]
+    [string] $QuestionSetPath,                 # path to a question set file (dot-source)
+    [int] $RetryCooldownSeconds = 10           # forced cooldown before retry (seconds)
+)
+
+# ---------------------------
+# Load Question Set (dot-source)
+# ---------------------------
+if (-not (Test-Path -LiteralPath $QuestionSetPath)) {
+    throw "Question set not found at path: $QuestionSetPath"
+}
+. $QuestionSetPath
+
+# Validate required variables
+if (-not $Questions -or -not $ObfuscatedAnswers -or -not $AnswerKeyXor) {
+    throw "Question set must define `$Questions (array), `$ObfuscatedAnswers ([byte[]]) and `$AnswerKeyXor."
+}
+
+# ---------------------------
+# Helpers: decode / encoders / hash (PS7-safe)
+# ---------------------------
+function Get-DecodedAnswers {
+    param([byte[]] $Blob, [byte] $Key)
+    ($Blob | ForEach-Object { [char]($_ -bxor $Key) }) -join ''
+}
+
+function To-Base64 {
+    param([string] $s)
+    [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($s))
+}
+
+function To-BinaryString {
+    param([string] $s)
+    ($s.ToCharArray() | ForEach-Object { [Convert]::ToString([byte][char]$_,2).PadLeft(8,'0') }) -join ' '
+}
+
+function Compute-SHA256Hex {
+    param([string] $plain)
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($plain)
+    $hash = $sha.ComputeHash($bytes)
+    -join ($hash | ForEach-Object { $_.ToString("x2") })
+}
+
+function Format-TimeSpan {
+    param([TimeSpan] $ts)
+    "{0:00}:{1:00}:{2:00}.{3:000}" -f [int]$ts.Hours, [int]$ts.Minutes, [int]$ts.Seconds, [int]($ts.Milliseconds)
+}
+
+# ---------------------------
+# Shuffle helper (always used)
+# ---------------------------
+function Invoke-QuestionShuffle {
+    param(
+        [Parameter(Mandatory=$true)][object[]] $Qs,
+        [Parameter(Mandatory=$true)][byte[]] $Obf
+    )
+
+    $indices = 0..($Qs.Count - 1)
+    $perm = Get-Random -InputObject $indices -Count $indices.Count
+
+    $newQs = @()
+    $newObf = New-Object byte[] ($Obf.Length)
+```

@@ -1,0 +1,85 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\SharePoint-Scripts\move-sharepoint-list-from-one-site-to-another.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-04-08 6e4dfb1 Updated $domain ${domain} $onedrivepath ${username}  On branch main  Your branch is up to date with 'origin/main'.
+2025-04-08 9b0df64 Updated $domain ${domain} $onedrivepath ${username}  On branch main  Your branch is up to date with 'origin/main'.
+2025-04-07 8330657 git commit PowerShell function
+2025-04-07 636d49f git commit PowerShell function
+2025-04-05 fc2718d update
+2025-04-05 6326446 update
+
+Script preview:
+```powershell
+  Install-Module PnP.PowerShell
+import-Module PnP.PowerShell
+
+  $SourceSiteURL = "https://${domain}.sharepoint.com/sites/Operations"
+Connect-PnPOnline -Url $SourceSiteURL -Interactive
+
+Register-PnPEntraIDAppForInteractiveLogin -ApplicationName "PnP PowerShell App" -Tenant ${domain}.onmicrosoft.com -Interactive
+
+
+$ListName = "Software License to Build Numbers" #https://${domain}.sharepoint.com/sites/Operations/Lists/Software%20License%20to%20Build%20Numbers/AllItems.aspx
+$TemplateFile = "C:\Temp\Software-License-to-Build-Numbers.xml"
+
+# Export the list schema
+Get-PnPSiteTemplate -Out $TemplateFile -ListsToExtract $ListName -Handlers Lists
+
+# Include data in the template
+Add-PnPDataRowsToSiteTemplate -Path $TemplateFile -List $ListName
+
+
+$DestinationSiteURL = "https://${domain}.sharepoint.com/sites/InformationTechnology" #https://${domain}.sharepoint.com/sites/InformationTechnology/Lists/${domain}%20Software%20Updates/AllItems.aspx?as=json
+Connect-PnPOnline -Url $DestinationSiteURL -Interactive
+
+
+# Apply the template to create the list with data
+Invoke-PnPSiteTemplate -Path $TemplateFile
+
+###
+
+# Revision 2
+
+# Parameters
+$SourceSiteURL = "https://${domain}.sharepoint.com/sites/Operations"
+$DestinationSiteURL = "https://${domain}.sharepoint.com/sites/InformationTechnology"
+$ListName = "Software License to Build Numbers"
+$TemplateFile = "$env:TEMP\ListTemplate.xml"
+
+# Connect to the Source Site
+Connect-PnPOnline -Url $SourceSiteURL -ClientId "your-client-id" -Tenant "${domain}.onmicrosoft.com" -Interactive
+
+# Export the List Structure
+Get-PnPSiteTemplate -Out $TemplateFile -ListsToExtract $ListName -Handlers Lists
+
+# Include Data in the Template
+Add-PnPDataRowsToSiteTemplate -Path $TemplateFile -List $ListName
+
+# Connect to the Destination Site
+Connect-PnPOnline -Url $DestinationSiteURL -ClientId "your-client-id" -Tenant "yourtenant.onmicrosoft.com" -Interactive
+
+# Apply the Template to Create the List with Data
+Invoke-PnPSiteTemplate -Path $TemplateFile
+```

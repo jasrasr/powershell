@@ -1,0 +1,84 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\sync-bb-stamps-from-sharepoint-onedrive.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-04-08 6e4dfb1 Updated $domain ${domain} $onedrivepath ${username}  On branch main  Your branch is up to date with 'origin/main'.
+2025-04-08 9b0df64 Updated $domain ${domain} $onedrivepath ${username}  On branch main  Your branch is up to date with 'origin/main'.
+2025-02-17 7b7d1b4 git commit PowerShell function
+2025-02-17 0f6f60b git commit PowerShell function
+2025-02-17 eeeb445 git commit PowerShell function
+2025-02-17 055f6f6 git commit PowerShell function
+2024-11-25 904d950 Auto-sync commit 20241125-230102
+2024-11-25 f7f3e39 Auto-sync commit 20241125-230102
+
+Script preview:
+```powershell
+$TimeStamp = Get-Date -Format "yyyy-MM-dd-HH-mm-ss"
+
+#$SourceFolder = "C:\Temp\test\bbstamps"
+#Remove-Item C:\temp\test\bbstamps\* -Recurse
+Remove-Item C:\temp\test\bbstamps\* -Recurse
+#$SourceFolder1 = "c:\users\$env:USERNAME\${domain}\Quality - MAPP\6.0 - DESIGN EXECUTION\6.0 - QUALITY ASSURANCE AND CONTROL\6.0.6 Document Control\MAPP 6.0.6.1 Electronic Package and Stamping\Engineering Stamps" #matt
+#$SourceFolder2 = "c:\users\$env:USERNAME\onedrive - ${domain}\MAPP\6.0 - DESIGN EXECUTION\6.0 - QUALITY ASSURANCE AND CONTROL\6.0.6 Document Control\MAPP 6.0.6.1 Electronic Package and Stamping\Engineering Stamps" #jason
+$SourceFolder1 = "c:\users\matt.bedee\${domain}\Quality - MAPP\6.0 - DESIGN EXECUTION\6.0 - QUALITY ASSURANCE AND CONTROL\6.0.6 Document Control\MAPP 6.0.6.1 Electronic Package and Stamping\Engineering Stamps" #matt
+$SourceFolder2 = "c:\users\jason.lamb\onedrive - ${domain}\MAPP\6.0 - DESIGN EXECUTION\6.0 - QUALITY ASSURANCE AND CONTROL\6.0.6 Document Control\MAPP 6.0.6.1 Electronic Package and Stamping\Engineering Stamps" #jason
+$SourceFolder3 = "C:\Users\justin.walters\OneDrive - ${domain}\Documents - Quality\MAPP\6.0 - DESIGN EXECUTION\6.0 - QUALITY ASSURANCE AND CONTROL\6.0.6 Document Control\MAPP 6.0.6.1 Electronic Package and Stamping\Engineering Stamps" #justin
+$BBDestinationFolder = "C:\ProgramData\Bluebeam Software\Bluebeam Revu\21\Stamps\test"
+Remove-Item $BBDestinationFolder\* -Recurse
+$RunLogPath = "$BBDestinationFolder\! $timestamp.txt"
+New-Item -Path $RunLogPath -ItemType File -Force
+
+if (Test-Path $BBDestinationFolder) {
+    Write-Host "destination folder found"
+}
+else {
+    Write-Host "No destination folder found"
+}
+
+if (Test-Path $SourceFolder1) {
+        copy-Item -Path "$SourceFolder1\*" -Destination $BBDestinationFolder -Recurse -Force
+        write-host "Copied from sourcefolder1 - $sourcefolder1"
+    }
+else {
+        Write-Host "No sourcefolder1 folder found"
+}
+
+if (Test-Path $SourceFolder2) { 
+        Copy-Item -Path "$SourceFolder2\*" -Destination $BBDestinationFolder -Recurse -Force
+        write-host "Copied from sourcefolder2 - $sourcefolder2"
+    }
+else {
+        Write-Host "No sourcefolder2 folder found"
+}
+
+if (Test-Path $SourceFolder3) { 
+    Copy-Item -Path "$SourceFolder3\*" -Destination $BBDestinationFolder -Recurse -Force
+    write-host "Copied from sourcefolder3 - $sourcefolder3"
+}
+else {
+    Write-Host "No sourcefolder3 folder found"
+}
+
+
+```

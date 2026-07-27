@@ -1,0 +1,112 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\AD-Scripts\M365UserOffBoarding-Hardened.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-20 b94a014 Update from PowerShell script
+2025-12-26 0f1de6e Comment out DisconnectModules call
+2025-12-26 d6267f4 Create M365UserOffBoarding-Hardened.ps1
+
+Script preview:
+```powershell
+<#
+=============================================================================================
+Name:           Automate Microsoft 365 User Offboarding (Hardened)
+Version:        2.3
+Default Mode:   SAFE (WhatIf)
+
+Changes in 2.3:
+- Removed: remove-all-groups, remove mobile phone, remove app role assignments (as requested)
+- Added: targeted group removal (allowlist) for Azure group-based licensing
+- Menu preserved: individual actions + Run All
+- Run All order: group removal BEFORE license removal to reduce group-license removal errors
+
+Jason Lamb did not create this script in any way. It is a heavily modified version of the original script created by Vlad Catrinescu, which can be found here:
+https://www.powershellgallery.com/packages/M365UserOffBoarding/1.0.0
+=============================================================================================
+#>
+
+param(
+    [string]$TenantId,
+    [string]$ClientId,
+    [string]$CertificateThumbprint,
+    [string]$CSVFilePath,
+    [string]$UPNs,
+    [switch]$Force
+)
+
+# SAFE BY DEFAULT
+$WhatIf = -not $Force
+
+# ================= LICENSE GROUP ALLOWLIST =================
+# Only these groups will be removed when choosing the targeted group-removal step.
+$LicenseRemovalGroups = @(
+    "O365 Microsoft Teams Phone Standard",
+    "O365 partial M365 E3 and Audio Conf"
+)
+
+# ================= LOGGING =================
+$Location  = Get-Location
+$Timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
+
+$ExportCSV     = "$Location\M365_Offboard_Status_$Timestamp.csv"
+$ErrorsLogFile = "$Location\M365_Offboard_Errors_$Timestamp.log"
+$PasswordLog   = "$Location\M365_Offboard_Passwords_$Timestamp.log"
+$InvalidUserLog= "$Location\M365_Offboard_InvalidUsers_$Timestamp.log"
+
+function Write-AuditLog {
+    param([string]$Message)
+    "$((Get-Date).ToString('yyyy-MM-dd HH:mm:ss')) | $Message" |
+        Out-File $ErrorsLogFile -Append
+}
+
+function Invoke-SafeAction {
+    param(
+        [string]$Action,
+        [scriptblock]$Code
+    )
+
+    if ($WhatIf) {
+        Write-Host "[WHATIF] $Action" -ForegroundColor Yellow
+        Write-AuditLog "[WHATIF] $Action"
+        return "WhatIf"
+    }
+
+    try {
+        & $Code
+        Write-AuditLog "[SUCCESS] $Action"
+        return "Success"
+    }
+    catch {
+        Write-AuditLog "[FAILED] $Action | $($_.Exception.Message)"
+        return "Failed"
+    }
+}
+
+function ConnectModules {
+    Import-Module Microsoft.Graph -ErrorAction Stop
+    Import-Module ExchangeOnlineManagement -ErrorAction Stop
+
+    if ($TenantId -and $ClientId -and $CertificateThumbprint) {
+        Connect-MgGraph -TenantId $TenantId -ClientId $ClientId -CertificateThumbprint $CertificateThumbprint
+```

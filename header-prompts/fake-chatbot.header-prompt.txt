@@ -1,0 +1,111 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\fake-chatbot.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.1
+Revision history warning: 
+
+Git commit history (newest first):
+2025-12-03 942824e Upgrade chatbot to version 1.1 with file support
+2025-12-03 f282136 Add simple WinForms GUI chatbot script
+
+Script preview:
+```powershell
+# Revision : 1.1
+# Description : WinForms Chat Bot with external prompt-answer text file support. Rev 1.1
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-12-03
+# Modified Date : 2025-12-03
+
+<# 
+    Recap / Changes in Rev 1.1
+    - Added Get-StoredReply function to load prompts + answers from file
+    - Prompts file format:
+           prompt=hello|hi|hey
+           reply=Hello there, human.
+
+           prompt=time
+           reply=The current time is $(Get-Date).
+
+           prompt=weather
+           reply=I am not a weather bot, but it's probably cold. Because Ohio.
+
+    - Script now checks keywords in the message and returns the stored reply
+    - Falls back to default "I heard you" answer if no match exists
+#>
+
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+
+# Path to prompts file (modify as needed)
+$PromptsFile = "C:\temp\chatbot-prompts.txt"
+
+function Get-StoredReply {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$UserMessage
+    )
+
+    if (-not (Test-Path $PromptsFile)) {
+        return "Prompts file missing at $PromptsFile , so I'm just guessing."
+    }
+
+    $content = Get-Content $PromptsFile -Raw
+    $blocks  = $content -split '(?=prompt=)'  # split on each "prompt=" line
+
+    $msgLower = $UserMessage.ToLower()
+
+    foreach ($block in $blocks) {
+        if ($block.Trim().Length -eq 0) { continue }
+
+        # Extract prompt keywords
+        if ($block -match "prompt=(.+)"){
+            $keywords = $Matches[1].Split("|") | ForEach-Object { $_.Trim().ToLower() }
+        }
+
+        # Extract reply text
+        if ($block -match "reply=(.+)") {
+            $reply = $Matches[1].Trim()
+        }
+
+        # Keyword match — any keyword must appear in message
+        foreach ($k in $keywords) {
+            if ($msgLower -like "*$k*") {
+                # Evaluate PowerShell inside the reply if it exists
+                if ($reply -match '\$\(') {
+                    return (Invoke-Expression "`"$reply`"")
+                }
+                return $reply
+            }
+        }
+    }
+
+    return $null  # No match found
+}
+
+function Get-ChatBotReply {
+    param(
+        [string]$Message
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Message)) {
+        return "Please type something so I can respond."
+    }
+```

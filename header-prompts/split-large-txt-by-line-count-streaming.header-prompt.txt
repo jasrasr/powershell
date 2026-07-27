@@ -1,0 +1,112 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\split-large-txt-by-line-count-streaming.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.5
+Revision history warning: 
+
+Git commit history (newest first):
+2025-11-05 4b8191c Git sync :
+2025-09-26 707ae8b Git sync : 2025-09-26 09:40:22
+2025-09-26 7babb8b Git sync : 2025-09-26 09:40:22
+
+Script preview:
+```powershell
+# Revision : 1.5
+# Description : Stream-split a large TXT by line count with robust LOCAL STAGING for network paths (Egnyte/Panzura), retries, and heartbeats. Rev 1.5
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-09-25
+# Modified Date : 2025-11-04
+
+param(
+    [Parameter(Mandatory = $true)]
+    [string] $InputTxt,
+    [Parameter(Mandatory = $true)]
+    [string] $OutputFolder,
+    [Parameter(Mandatory = $true)]
+    [int] $LinesPerFile,
+    [ValidateSet('Auto','Always','Never')]
+    [string] $StageMode = 'Auto',           # Auto = stage if path is UNC or mapped drive; Always = always stage; Never = never stage
+    [int] $Retries = 5,
+    [int] $RetryDelaySec = 3
+)
+
+function Resolve-FullPath {
+    param([string] $Path)
+    try {
+        return (Resolve-Path -LiteralPath $Path -ErrorAction Stop).Path
+    } catch {
+        $candidate = Join-Path -Path (Get-Location) -ChildPath $Path
+        if (Test-Path -LiteralPath $candidate) {
+            return (Resolve-Path -LiteralPath $candidate).Path
+        } else {
+            throw "Cannot resolve path $Path"
+        }
+    }
+}
+
+function Test-IsNetworkPath {
+    param([string] $FullPath)
+    if ($FullPath.StartsWith('\\')) { return $true }
+    $qual = Split-Path -Path $FullPath -Qualifier
+    if ($qual -and $qual -match '^[A-Za-z]:$') {
+        $drive = Get-PSDrive -Name $qual.TrimEnd(':') -ErrorAction SilentlyContinue
+        if ($drive -and $drive.DisplayRoot -and $drive.DisplayRoot.StartsWith('\\')) { return $true }
+    }
+    return $false
+}
+
+function Copy-WithRobocopy {
+    param(
+        [string] $SourceFile,
+        [string] $DestFile
+    )
+    $srcDir  = Split-Path -Path $SourceFile -Parent
+    $srcName = Split-Path -Path $SourceFile -Leaf
+    $dstDir  = Split-Path -Path $DestFile -Parent
+
+    if (-not (Test-Path -LiteralPath $dstDir)) {
+        New-Item -ItemType Directory -Path $dstDir | Out-Null
+    }
+
+    $args = @(
+        "`"$srcDir`"", "`"$dstDir`"", "`"$srcName`"",
+        '/NFL','/NDL','/NJH','/NJS','/NP',
+        '/R:3','/W:2','/Z','/J','/COPY:DAT'
+    )
+    $process = Start-Process -FilePath robocopy.exe -ArgumentList $args -NoNewWindow -PassThru -Wait
+
+    return ($process.ExitCode -le 3)
+}
+
+function Copy-WithStream {
+    param(
+        [string] $SourceFile,
+        [string] $DestFile
+    )
+    $dstDir = Split-Path -Path $DestFile -Parent
+    if (-not (Test-Path -LiteralPath $dstDir)) {
+        New-Item -ItemType Directory -Path $dstDir | Out-Null
+    }
+
+    try {
+        $src = [System.IO.File]::Open($SourceFile,
+            [System.IO.FileMode]::Open,
+```

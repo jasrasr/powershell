@@ -1,0 +1,110 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\compare-two-xlsx-files.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.5
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+
+Script preview:
+```powershell
+# Revision : 1.5
+# Description : Auto-picks the latest two Excel files in a folder (newest = $NewFile, second-newest = $OldFile) and compares by Project# (A) vs Stat (B).
+#               Headers start on row 2. Exports a SINGLE CSV with only Added/Removed/Modified rows and auto-opens it in Excel. Rev 1.5
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-09-04
+# Modified Date : 2025-09-04
+
+param(
+    # Where your dated project list XLSX files live
+    [string] $Folder = '\\servername\foldername',
+    # Pattern to match the dated files (e.g., "filename.xlsx")
+    [string] $SearchMask = 'filename*.xlsx',
+
+    # Excel compare settings
+    [string] $WorksheetName = 'worksheet1',
+    [string] $KeyHeader = 'Project#',
+    [string] $StatusHeader = 'Stat',
+    [switch] $StrictMatch,
+
+    # Output
+    [string] $OutputFolder = "$psexports"
+)
+
+# --- Setup ---
+$null = New-Item -Path $OutputFolder -ItemType Directory -Force | Out-Null
+$TimeStamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+$OutCsv    = Join-Path $OutputFolder "excel-status-changes-$TimeStamp.csv"
+
+# --- Find latest two files ---
+if (-not (Test-Path -LiteralPath $Folder)) {
+    Write-Host "Folder not found : $Folder"
+    exit 1
+}
+
+$files = Get-ChildItem -LiteralPath $Folder -Filter $SearchMask -File -ErrorAction Stop |
+         Sort-Object LastWriteTime -Descending
+
+if ($files.Count -lt 2) {
+    Write-Host "Not enough files found in $Folder matching $SearchMask . Need at least 2."
+    if ($files.Count -gt 0) { Write-Host "Found latest file : $($files[0].FullName)" }
+    exit 1
+}
+
+$NewFile = $files[0].FullName
+$OldFile = $files[1].FullName
+
+Write-Host "New file : $NewFile"
+Write-Host "Old file : $OldFile"
+
+# --- Require ImportExcel (PowerShell 7 compatible) ---
+if (-not (Get-Module -ListAvailable -Name ImportExcel)) {
+    try {
+        Write-Host "ImportExcel module missing, installing to CurrentUser..."
+        Install-Module ImportExcel -Scope CurrentUser -Force -ErrorAction Stop
+        Write-Host "ImportExcel installed successfully."
+    } catch {
+        Write-Host "Failed to install ImportExcel : $_"
+        exit 1
+    }
+}
+Import-Module ImportExcel -ErrorAction Stop
+
+# --- Allowed statuses ---
+$AllowedStatuses = @(
+    'ACTIVE',
+    'PERMANENTLY CLOSED',
+    'RESTRICTED',
+    'PERM CLOSE IN PROGRESS',
+    'INACTIVE'
+)
+
+function Normalize-Status {
+    param([string] $s)
+    if ($StrictMatch) { return $s }
+    if ([string]::IsNullOrWhiteSpace($s)) { return '' }
+    $t = ($s -replace '\s+', ' ').Trim().ToUpperInvariant()
+    return $t
+}
+
+function Read-ExcelRows {
+```

@@ -1,0 +1,72 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\combine-all-txt-files-in-a-folder.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 2.0
+Revision history warning: 
+
+Git commit history (newest first):
+2025-11-05 4b8191c Git sync :
+
+Script preview:
+```powershell
+# Revision : 2.0
+# Description : Merge all TXT files in a folder into one CSV by appending lines vertically (one after another). Rev 2.0
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-11-04
+# Modified Date : 2025-11-04
+
+param(
+    [Parameter(Mandatory = $true)]
+    [string] $SourceFolder,
+    [Parameter(Mandatory = $true)]
+    [string] $OutputCsv
+)
+
+# Get all TXT files in the folder
+$txtFiles = Get-ChildItem -Path $SourceFolder -Filter *.txt -File
+
+if (-not $txtFiles) {
+    Write-Host "No TXT files found in $SourceFolder" -ForegroundColor Yellow
+    exit
+}
+
+Write-Host "Merging $($txtFiles.Count) TXT files from $SourceFolder ..." -ForegroundColor Cyan
+
+# Collect all lines
+$allLines = @()
+foreach ($file in $txtFiles) {
+    Write-Host "Reading : $($file.Name)"
+    $content = Get-Content $file.FullName | Where-Object { $_.Trim() -ne "" }   # Skip blank lines
+    $allLines += $content
+}
+
+# Convert each line to an object for CSV export
+$csvData = $allLines | ForEach-Object { [PSCustomObject]@{ Line = $_ } }
+
+# Export to CSV (no quotes, just raw data)
+"Line" | Out-File -FilePath $OutputCsv -Encoding UTF8
+$csvData | ForEach-Object { $_.Line } | Out-File -Append -FilePath $OutputCsv -Encoding UTF8
+
+Write-Host "Merged all TXT files into $OutputCsv successfully." -ForegroundColor Green
+
+# Example Usage
+# .\Merge-AllTxt-To-Csv.ps1 -SourceFolder "C:\temp\egnyte-110425\depth3" -OutputCsv "C:\temp\egnyte-110425\merged.csv"
+```

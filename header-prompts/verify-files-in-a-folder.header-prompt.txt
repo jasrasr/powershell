@@ -1,0 +1,55 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\verify-files-in-a-folder.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2026-01-30 d0facd1 Replace exit commands with return to keep PowerShell session open
+2026-01-30 f768bba Remove exit commands to keep PowerShell session open
+2026-01-30 ef1de1e Add script to verify chunk backup files 0001-0138
+2026-01-30 209478f Create verify-files-in-a-folder.ps1 script
+
+Script preview:
+```powershell
+# Verify Files in a Folder
+
+# This script verifies the presence of specific files in a folder
+
+$folderPath = "C:\path\to\your\folder"
+$requiredFiles = @("file1.txt", "file2.txt", "file3.txt")
+
+foreach ($file in $requiredFiles) {
+    if (-Not (Test-Path (Join-Path $folderPath $file))) {
+        Write-Host "Missing file: $file"
+        # Change from 'exit 1' to 'return' to keep the session open
+        return
+    }
+}
+
+Write-Host "All required files are present"
+
+# Additional logic can go here
+
+# Change from 'exit 1' to 'return' to keep the session open
+return
+```

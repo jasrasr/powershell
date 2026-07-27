@@ -1,0 +1,71 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\Get-FolderList.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-30 53a2b91 add 3 new files, modify 1 file
+
+Script preview:
+```powershell
+# Get-FolderList.ps1
+# Prompts for one or more directories and exports a recursive folder list per directory to C:\temp\
+
+$directories = @()
+
+Write-Host "Enter directories to scan (one per line). Leave blank and press Enter when done."
+
+while ($true) {
+    $input = Read-Host "Directory"
+    if ([string]::IsNullOrWhiteSpace($input)) { break }
+    if (-not (Test-Path $input -PathType Container)) {
+        Write-Warning "Path not found or is not a directory: $input"
+    } else {
+        $directories += $input
+    }
+}
+
+if ($directories.Count -eq 0) {
+    Write-Warning "No valid directories entered. Exiting."
+    exit
+}
+
+if (-not (Test-Path "C:\temp")) {
+    New-Item -ItemType Directory -Path "C:\temp" | Out-Null
+}
+
+$datetime = Get-Date -Format "yyyy-MM-dd_HHmmss"
+
+foreach ($dir in $directories) {
+    $folderName = Split-Path $dir -Leaf
+    $logFile = "C:\temp\$datetime-$folderName-folders.log"
+
+    Write-Host "Scanning: $dir"
+    Get-ChildItem -Path $dir -Directory -Recurse |
+        Select-Object -ExpandProperty FullName |
+        Out-File -FilePath $logFile -Encoding utf8
+
+    Write-Host "Log saved: $logFile"
+}
+
+Write-Host "`nDone. $($directories.Count) director$(if ($directories.Count -eq 1) {'y'} else {'ies'}) scanned."
+```

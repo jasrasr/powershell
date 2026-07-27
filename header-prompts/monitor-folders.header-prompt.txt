@@ -1,0 +1,113 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\monitor-folders.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.5
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-23 c46704d add new scripts, sample files, and gitignore; update monitor-folders
+2026-03-16 032565b update tons of files
+2025-09-25 de9eb53 git commit powershell private function 250925-080350
+2025-09-25 20c8b09 git commit powershell private function 250925-080350
+
+Script preview:
+```powershell
+# Revision : 1.5
+# Description : Monitor provided folders for total file count, folder count, and size every 60 seconds; stop when 5 sequential snapshots are identical. Includes -Depth, per-iteration runtime, and a visible countdown to the next run. Rev 1.5
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-09-25
+# Modified Date : 2026-03-20
+
+param(
+    [Parameter(Mandatory = $true)]
+    [string[]] $TargetPaths,
+
+    [int] $IntervalSeconds = 60,
+
+    [int] $SameThreshold = 5,
+
+    [switch] $ShowPerPath,
+
+    [int] $Depth = -1   # -1 means full recursion (no depth limit)
+)
+
+. "C:\Users\jason.lamb\OneDrive - Cooper Machinery Services\Documents\Github\PowerShell Transcript\Send-NtfyNotification.ps1"
+
+function Convert-Size {
+    param([long] $Bytes)
+    if ($Bytes -lt 1KB) { '{0:N0} B' -f [long]$Bytes; return }
+    $units = 'KB','MB','GB','TB','PB'
+    $size = [double]$Bytes
+    foreach ($u in $units) {
+        $size = $size / 1KB
+        if ($size -lt 1024) { return ('{0:N2} ' + $u) -f $size }
+    }
+    return ('{0:N2} EB' -f ($size / 1024))
+}
+
+function Get-PathStats {
+    param([string] $Path, [int] $Depth)
+
+    $fileCount   = 0
+    $folderCount = 0
+    $totalBytes  = 0L
+    $ok          = $true
+    $err         = $null
+
+    try {
+        if (-not (Test-Path -LiteralPath $Path)) {
+            throw "Path not found"
+        }
+
+        $dirParams = @{ LiteralPath = $Path; Force = $true; ErrorAction = 'Stop' }
+        if ($Depth -ge 0) { $dirParams['Depth'] = $Depth } else { $dirParams['Recurse'] = $true }
+
+        # Folders
+        $folderCount = (Get-ChildItem @dirParams -Directory | Measure-Object).Count
+
+        # Files + size
+        $files = Get-ChildItem @dirParams -File
+        $m     = $files | Measure-Object -Property Length -Sum
+        $fileCount  = [int]$m.Count
+        $totalBytes = [long]($m.Sum)
+    }
+    catch {
+        $ok  = $false
+        $err = $_.Exception.Message
+        Write-Host "Error scanning ${Path} : $err" -ForegroundColor Red
+    }
+
+    [PSCustomObject]@{
+        Path        = $Path
+        OK          = $ok
+        Error       = $err
+        FileCount   = $fileCount
+        FolderCount = $folderCount
+        TotalBytes  = $totalBytes
+        HumanSize   = Convert-Size -Bytes $totalBytes
+    }
+}
+
+function Get-CombinedStats {
+    param([string[]] $Paths, [int] $Depth)
+
+    $start = Get-Date
+```

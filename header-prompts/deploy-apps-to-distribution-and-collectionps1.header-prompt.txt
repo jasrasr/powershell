@@ -1,0 +1,112 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\SCCM-Scripts\deploy-apps-to-distribution-and-collectionps1.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.1
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-10-16 a11d365 git commit powershell private function 20251016_222840
+2025-10-16 8c63b07 git commit powershell private function 20251016_222840
+
+Script preview:
+```powershell
+# Revision : 1.1
+# Description : Deploy multiple applications as "Available" to a user collection in Software Center and distribute content to a list of Distribution Points. Rev 1.1
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-10-14
+# Modified Date : 2025-10-14
+
+<#
+.SYNOPSIS
+Deploy multiple applications as "Available" to a user collection in Software Center and distribute content to specified Distribution Points.
+
+.NOTES
+- Requires ConfigurationManager module.
+- Idempotent deployment: skips apps already deployed to the target collection.
+- Distributes content for each app to each DP provided.
+- Shows a summary table at the end.
+#>
+
+param(
+    [Parameter(Mandatory)]
+    [string] $SiteCode,               # e.g. ABC
+
+    [Parameter(Mandatory)]
+    [string] $SiteServer,             # e.g. cm01.contoso.com
+
+    [Parameter(Mandatory)]
+    [string] $UserCollectionName,     # e.g. "All Marketing Users"
+
+    [Parameter(Mandatory)]
+    [string[]] $ApplicationNames,     # e.g. "7-Zip","VLC","Notepad++"
+
+    [Parameter(Mandatory)]
+    [string[]] $DistributionPoints,   # e.g. "DP01.contoso.com","DP02.contoso.com"
+
+    [switch] $WhatIf
+)
+
+# --- Load module & connect to site drive ---
+try {
+    if (-not (Get-Module -Name ConfigurationManager -ListAvailable)) {
+        $cmPath = Join-Path $env:SMS_ADMIN_UI_PATH "..\ConfigurationManager.psd1"
+        if (Test-Path $cmPath) { Import-Module $cmPath -ErrorAction Stop }
+        else { Import-Module ConfigurationManager -ErrorAction Stop }
+    }
+    else {
+        Import-Module ConfigurationManager -ErrorAction Stop
+    }
+}
+catch {
+    throw "Could not import the ConfigurationManager module. $_"
+}
+
+# Create PSDrive if it doesn't exist
+if (-not (Get-PSDrive -Name $SiteCode -PSProvider CMSite -ErrorAction SilentlyContinue)) {
+    New-PSDrive -Name $SiteCode -PSProvider CMSite -Root $SiteServer -Description "Primary site" | Out-Null
+}
+
+# Switch to site drive
+Set-Location -Path ("$SiteCode :")
+
+# --- Validate collection ---
+$collection = Get-CMCollection -Name $UserCollectionName -ErrorAction SilentlyContinue
+if (-not $collection) { throw "Collection '$UserCollectionName' not found." }
+
+# --- Helper : Distribute content for one app to all DPs ---
+function Invoke-ContentDistribution {
+    param(
+        [Parameter(Mandatory)][Microsoft.ConfigurationManagement.ApplicationManagement.Application] $App,
+        [Parameter(Mandatory)][string[]] $DPs,
+        [switch] $WhatIf
+    )
+    $distResults = @()
+    foreach ($dp in $DPs) {
+        try {
+            if ($WhatIf) {
+                Start-CMContentDistribution -ApplicationName $App.LocalizedDisplayName -DistributionPointName $dp -WhatIf
+                $distResults += [pscustomobject]@{ Application = $App.LocalizedDisplayName; DistributionPoint = $dp; DistributionStatus = "WhatIf - would distribute" }
+            }
+            else {
+                Start-CMContentDistribution -ApplicationName $App.LocalizedDisplayName -DistributionPointName $dp | Out-Null
+                $distResults += [pscustomobject]@{ Application = $App.LocalizedDisplayName; DistributionPoint = $dp; DistributionStatus = "Distributed" }
+```

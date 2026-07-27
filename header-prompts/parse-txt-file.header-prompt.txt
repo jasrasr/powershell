@@ -1,0 +1,117 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\parse-txt-file.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 3.0
+Revision history warning: 
+
+Git commit history (newest first):
+2026-06-09 2ae7a68 update old files
+2025-11-03 3e6e32e remove parse-txt-file.ps1
+2025-10-13 3f9c162 git commit powershell private function 20251013_132559
+2025-10-13 58adc67 git commit powershell private function 20251013_132559
+2025-10-13 45c61f8 git commit powershell private function 20251013_100935
+2025-10-13 cd6de7e git commit powershell private function 20251013_100935
+2025-10-13 e88f932 git commit powershell private function 20251013_090355
+2025-10-13 afaa546 git commit powershell private function 20251013_090355
+
+Script preview:
+```powershell
+<<<<<<< HEAD
+# Revision : 3.0
+=======
+# Revision : 2.9
+>>>>>>> 958b4992f536344ed19b8eb80fdc154faabcce07
+# Description : Timestamped backup, then (optionally) apply selected filters:
+#   (1) remove lines with 11+ backslashes,
+#   (2) remove lines ending in specific file extensions,
+#   (3) remove specific Newforma child folders (keep Newforma root),
+#   (4) remove rows under a provided child-folder list (proper "\*" handling; includes your expanded list),
+#   (5) remove children under '11.0 Issued Documents' (keep folder root),
+#   (6) remove children under _Gen, _Stds, _Transfer at archive\<*>\ (keep roots) + general Issued Documents and Photos children removal,
+#   (7) remove duplicate lines (case-insensitive; keeps first occurrence),
+<<<<<<< HEAD
+#   (8) remove rows containing a comma,
+#   (9) remove lines that match entries from -RemoveListFile (literal or regex; optional case sensitivity).
+=======
+#   (8) export (do NOT delete) any rows containing a comma to a separate file.
+# Includes progress bar and final report. Rev 2.9
+>>>>>>> 958b4992f536344ed19b8eb80fdc154faabcce07
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-10-12
+# Modified Date : 2025-10-13
+
+param(
+    [Parameter(Position = 0, Mandatory = $true)]
+    [string]$InputFile,
+
+    # Choose which filters to apply. If none specified (and no RemoveListFile), all enabled by default.
+    [switch]$RemoveSlash11,            # Rule 1
+    [switch]$RemoveExtensions,         # Rule 2
+    [switch]$RemoveNewformaChildren,   # Rule 3
+    [switch]$RemoveChildFolders,       # Rule 4
+    [switch]$RemoveIssuedChildren,     # Rule 5
+    [switch]$RemoveGSTChildren,        # Rule 6 (_Gen, _Stds, _Transfer + Issued/Photos children)
+<<<<<<< HEAD
+    [switch]$RemoveDuplicates,         # Rule 7
+    [switch]$RemoveCommaRows,          # Rule 8
+    [string]$RemoveListFile,           # Rule 9 : file of patterns/lines to remove
+    [switch]$RemoveListIsRegex,        # Rule 9 : treat list lines as regex
+    [switch]$RemoveListCaseSensitive   # Rule 9 : case-sensitive matching
+)
+
+# If no switches provided (and no RemoveListFile), enable all rules by default
+if (-not ($RemoveSlash11 -or $RemoveExtensions -or $RemoveNewformaChildren -or $RemoveChildFolders -or $RemoveIssuedChildren -or $RemoveGSTChildren -or $RemoveDuplicates -or $RemoveCommaRows -or $RemoveListFile)) {
+=======
+    [switch]$RemoveDuplicates,         # Rule 7 (deduplicate lines)
+    [switch]$ExportCommaRows           # Rule 8 (export rows containing commas, do not delete)
+)
+
+# If no switches provided, enable all rules by default
+if (-not ($RemoveSlash11 -or $RemoveExtensions -or $RemoveNewformaChildren -or $RemoveChildFolders -or $RemoveIssuedChildren -or $RemoveGSTChildren -or $RemoveDuplicates -or $ExportCommaRows)) {
+>>>>>>> 958b4992f536344ed19b8eb80fdc154faabcce07
+    $RemoveSlash11 = $true
+    $RemoveExtensions = $true
+    $RemoveNewformaChildren = $true
+    $RemoveChildFolders = $true
+    $RemoveIssuedChildren = $true
+    $RemoveGSTChildren = $true
+    $RemoveDuplicates = $true
+<<<<<<< HEAD
+    $RemoveCommaRows = $true
+=======
+    $ExportCommaRows = $true
+>>>>>>> 958b4992f536344ed19b8eb80fdc154faabcce07
+    Write-Host "No filters specified, applying all filters by default." -ForegroundColor DarkYellow
+}
+
+# Create timestamp for backup suffix
+$datetime = Get-Date -Format 'yyyyMMdd-HHmmss'
+
+<<<<<<< HEAD
+# Define backup path
+=======
+# Backup path(s)
+>>>>>>> 958b4992f536344ed19b8eb80fdc154faabcce07
+$backupFile = "$($InputFile)-backup-$datetime.txt"
+$commaFile  = "$($InputFile)-comma-$datetime.txt"
+
+# Copy the original file to backup
+```

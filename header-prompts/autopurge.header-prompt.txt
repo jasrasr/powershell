@@ -1,0 +1,51 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\AutoCAD\autopurge.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-10-23 ebe69b7 Git sync :
+
+Script preview:
+```powershell
+# Paths
+$coreConsolePath = "C:\Program Files\Autodesk\AutoCAD 2026\accoreconsole.exe"
+$scriptFile     = "C:\Temp\193-Scrubber-Oil\autopurge.scr"
+$dwgFull        = "C:\Temp\193-Scrubber-Oil\193-P-1908.dwg"
+
+Write-Host "Purging file: $dwgFull" -ForegroundColor Cyan
+
+# Construct the argument list with quoted paths for spaces
+$args = @(
+    "/i",  "`"$dwgFull`"",
+    "/s",  "`"$scriptFile`""
+)   
+
+# Run CoreConsole
+$proc = Start-Process -FilePath $coreConsolePath -ArgumentList $args -Wait -NoNewWindow -PassThru
+
+if ($proc.ExitCode -ne 0) {
+    Write-Host "❌ Error purging $dwgFull (ExitCode: $($proc.ExitCode))" -ForegroundColor Red
+} else {
+    Write-Host "✅ OK: $dwgFull" -ForegroundColor Green
+}
+```

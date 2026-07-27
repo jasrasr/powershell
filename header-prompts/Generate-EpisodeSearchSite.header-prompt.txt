@@ -1,0 +1,117 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\GRC-TWIT-SecurityNow-Transcripts\testing\Generate-EpisodeSearchSite.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-10-16 a11d365 git commit powershell private function 20251016_222840
+2025-10-16 8c63b07 git commit powershell private function 20251016_222840
+2025-09-22 598a921 Git sync : 2025-09-22 11:52:13
+2025-09-22 ee712d4 Git sync : 2025-09-22 11:52:13
+2025-08-18 5118605 git commit powershell private function 250813-141516
+2025-08-18 2ea6468 git commit powershell private function 250813-141516
+2025-07-10 5c00d2b git commit powershell private function 250710-132935
+2025-07-10 acc7bc7 git commit powershell private function 250710-132935
+
+Script preview:
+```powershell
+# generate-episodesearchsite.ps1
+
+# Directories for transcripts and PDF show notes
+$TranscriptsDir = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\TXT-Transcriptions"
+$PdfNotesDir    = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads\PDF-Show-Notes"
+
+# Output folders and files
+$OutputFolder   = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\testing\Output\101625"
+$EpisodesJsonDir = Join-Path $OutputFolder 'episodes'
+$IndexJsonFile  = Join-Path $OutputFolder 'index.json'
+$OutputHtml     = Join-Path $OutputFolder 'grc_sn_searchable.html'
+$ReadmeFile     = Join-Path $OutputFolder 'README.md'
+
+# Ensure output folders exist
+New-Item -ItemType Directory -Force -Path $OutputFolder, $EpisodesJsonDir | Out-Null
+
+#########################################
+# Function: Get-AITags
+# Uses simple keyword matching to produce tags.
+function Get-AITags {
+    param ([string]$Text)
+    $tags = @()
+    $textLower = $Text.ToLower()
+    if ($textLower -match 'rsa') { $tags += 'RSA' }
+    if ($textLower -match 'quantum') { $tags += 'Quantum Computing' }
+    if ($textLower -match 'drone') { $tags += 'Drones' }
+    if ($textLower -match 'credential exchange') { $tags += 'Credential Exchange Protocol' }
+    if ($textLower -match 'deepfake') { $tags += 'Deepfake' }
+    return $tags
+}
+
+#########################################
+# Function: Process each transcript into its own JSON file.
+function Process-Episodes {
+    $indexList = @()
+
+    Get-ChildItem -Path $TranscriptsDir -Filter *.txt | Sort-Object Name | ForEach-Object {
+        $baseName = $_.BaseName
+        $transcriptPath = $_.FullName
+        $pdfPath = Join-Path $PdfNotesDir ($baseName + '.pdf')
+        $hasPdf = Test-Path $pdfPath
+
+        $content = Get-Content $transcriptPath -Raw
+        $tags = Get-AITags -Text $content
+
+        # Create a preview: first 1000 characters (if content is shorter, use full)
+        $preview = $content.Substring(0, [Math]::Min(1000, $content.Length)) + '...'
+
+        # Build an object for the episode
+        $epData = [PSCustomObject]@{
+            Title       = "Episode $baseName"
+            Transcript  = $transcriptPath
+            NotesPdf    = if ($hasPdf) { $pdfPath } else { $null }
+            Tags        = $tags
+            Preview     = $preview
+            FullContent = $content
+        }
+
+        # Save the full episode data to its own JSON file in the EpisodesJsonDir
+        $jsonFilename = "$baseName.json"
+        $jsonFilePath = Join-Path $EpisodesJsonDir $jsonFilename
+        $epData | ConvertTo-Json -Depth 10 | Out-File -FilePath $jsonFilePath -Encoding UTF8
+
+        # Add metadata for the index JSON (only preview, title, tags, and reference to JSON file)
+        $indexList += [PSCustomObject]@{
+            Title      = $epData.Title
+            Preview    = $epData.Preview
+            Tags       = $epData.Tags
+            JsonFile   = "episodes/$jsonFilename"
+        }
+    }
+
+    # Save the index JSON
+    $indexList | ConvertTo-Json -Depth 5 | Out-File -FilePath $IndexJsonFile -Encoding UTF8
+
+    return $indexList
+}
+
+#########################################
+# Function: Generate searchable HTML file.
+```

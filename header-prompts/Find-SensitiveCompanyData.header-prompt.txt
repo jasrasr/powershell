@@ -1,0 +1,110 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Github-Scripts\Find-SensitiveCompanyData.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-06-05 4260023 Add Firefox support to bookmark extraction and enhance SQLite reader
+
+Script preview:
+```powershell
+<#
+.SYNOPSIS
+    Scans company documents for likely sensitive data before file migration.
+
+.DESCRIPTION
+    Scans PPT, PPTX, DOC, DOCX, XLS, XLSX, PDF, CSV, TXT, JSON, XML, HTML, LOG, MD, and similar text files
+    for likely PHI, PII, payroll, credential, financial, and HR-sensitive data.
+
+.NOTES
+    Script Name   : Find-SensitiveCompanyData.ps1
+    Revision      : 1.0.0
+    Author        : Jason Lamb with help from ChatGPT
+    Created Date  : 2026-05-29
+    Modified Date : 2026-05-29
+
+.REVISION HISTORY
+    1.0.0 - Initial PowerShell project version.
+          - Added function-based structure.
+          - Added timestamped CSV and log output.
+          - Added masked sensitive match reporting.
+          - Added optional ACL reporting for matched files.
+          - Added OpenXML extraction for DOCX, PPTX, XLSX without requiring Office.
+          - Added optional PDF text extraction using pdftotext.exe.
+          - Added commented usage examples.
+#>
+
+function Find-SensitiveCompanyData {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$RootPath,
+
+        [string]$OutputFolder = 'C:\temp\powershell-exports',
+
+        [string]$PdfToTextPath = '',
+
+        [switch]$IncludeAclReport,
+
+        [switch]$IncludeHash,
+
+        [switch]$NoRecurse,
+
+        [switch]$PauseAtEnd
+    )
+
+    $scriptRevision = '1.0.0'
+    $timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+
+    if (-not (Test-Path -Path $OutputFolder)) {
+        New-Item -Path $OutputFolder -ItemType Directory -Force | Out-Null
+    }
+
+    $findingCsv = Join-Path $OutputFolder "sensitive-data-findings-$timestamp.csv"
+    $aclCsv = Join-Path $OutputFolder "sensitive-data-acl-report-$timestamp.csv"
+    $logFile = Join-Path $OutputFolder "sensitive-data-scan-$timestamp.log"
+
+    function Write-ScanLog {
+        param(
+            [string]$Message,
+            [string]$Level = 'INFO'
+        )
+
+        $line = "[{0}] [{1}] {2}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), $Level, $Message
+        Write-Host $line
+        Add-Content -Path $logFile -Value $line
+    }
+
+    function Mask-Value {
+        param([string]$Value)
+
+        if ([string]::IsNullOrWhiteSpace($Value)) {
+            return ''
+        }
+
+        $cleanValue = $Value.Trim()
+
+        if ($cleanValue.Length -le 4) {
+            return ('*' * $cleanValue.Length)
+        }
+
+```

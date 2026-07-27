@@ -1,0 +1,117 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\ps-common-profile-COPY.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-09-23 6ab47d4 git commit powershell private function 250923-105603
+2025-09-23 216c299 git commit powershell private function 250923-105603
+2025-09-16 09f5d69 git commit powershell private function 250916-120751
+2025-09-16 f9f0e90 git commit powershell private function 250916-120751
+2025-09-16 6a04a89 git commit powershell private function 250915-123335
+2025-09-16 897d78d git commit powershell private function 250915-123335
+2025-08-20 cdcb79c git commit powershell private function 250813-141516
+
+Script preview:
+```powershell
+# backup @ "$GitHubpath\PowerShell\Miscellaneous\ps-common-profile-COPY.ps1"
+
+function Start-CustomTranscript {
+    $username = $env:USERNAME
+    $hostname = $env:COMPUTERNAME
+    $timestamp = (Get-Date).ToString("yyyyMMdd_HHmmss")
+    $transcriptDir = "${githubpath}\PowerShell Transcript"
+    $transcriptPath = "$transcriptDir\PStranscript-$hostname-$username-$timestamp.txt"
+    
+    if (!(Test-Path $transcriptDir)) {
+        New-Item -ItemType Directory -Path $transcriptDir | Out-Null
+    }
+    
+    Start-Transcript -Path $transcriptPath -Append
+}
+    Start-CustomTranscript
+
+####################
+
+Write-host "Script Updated 8:20 AM 9/8/2025" -foregroundcolor darkyellow 
+#& '.\script-update-date-time.ps1'
+
+####################
+<#
+# https://www.hanselman.com/blog/how-to-make-a-pretty-prompt-in-windows-terminal-with-powerline-nerd-fonts-cascadia-code-wsl-and-ohmyposh
+Import-Module -Name Terminal-Icons
+Import-Module posh-git
+Import-Module oh-my-posh
+Set-PoshPrompt -Theme Paradox
+#>
+
+# Add Import-Module line if not already present
+$profileContent = Get-Content -Path $PROFILE -ErrorAction SilentlyContinue
+if ($profileContent -notmatch 'Import-Module\s+Terminal-Icons') {
+    Add-Content -Path $PROFILE -Value "`n# Load Terminal-Icons for fancy directory/file icons`nImport-Module -Name Terminal-Icons -ErrorAction SilentlyContinue"
+    Write-Host "Updated profile to auto-load Terminal-Icons."
+} else {
+    Write-Host "Profile already includes Terminal-Icons import."
+}
+
+####################
+
+# Load credentials from the file for each computer
+# Construct the path to the credential file based on the computer name
+$credPath = Join-Path -Path ${githubpath} -ChildPath "admincred-$env:COMPUTERNAME.xml"
+
+# Check if the credential file exists
+if (Test-Path $credPath) {
+    try {
+        # Import the credential
+        $Global:AdminCred = Import-Clixml -Path $credPath
+        Write-Host "Credential loaded for $env:COMPUTERNAME" -ForegroundColor Green
+    } catch {
+        Write-Warning "Failed to import credential file: $_"
+    }
+} else {
+    Write-Warning "Credential file not found: $credPath"
+Write-Warning "ENTER ADM CREDENTIALS"
+#. "${githubpath}\set-save-admincred-per-computer.ps1"
+}
+
+# $admincred = Import-Clixml -Path "${githubpath}\admincred.xml"
+
+####################
+
+# Generate a TOC of functions and aliases used in the $CommonProfilePath
+# . "$githubpath\PowerShell-TableOfContents-TOC.ps1"
+# show-scripttoc
+
+
+####################
+
+
+function Git-PowerShell-Private-Sync {
+
+    $repoPath = "${githubpath}\PowerShell-Private"
+
+#START RENAME FILES WITH SPACES TO DASHES - PRIVATE
+
+# Define the root folder to search
+```

@@ -1,0 +1,112 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\fix-onedrive-file-conflicts.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.3
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-10-10 d76929c Git sync : 2025-10-10 07:30:49
+2025-10-10 d098b71 Git sync : 2025-10-10 07:30:49
+
+Script preview:
+```powershell
+
+# Revision : 1.3
+# Description : Rename OneDrive host-conflict files by removing the computer name token and appending "-onedriveconflict<3-char nonce>". Logs original -> new with timestamp to a single rolling CSV log. Adds exclusion of specific folders. Rev 1.3
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-10-09
+# Modified Date : 2025-10-09
+
+function Rename-OneDriveConflicts {
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [Parameter(Mandatory)]
+        [string]$Path,
+
+        # Single rolling log file (appends forever)
+        [string]$LogFile = "$psexports\onedrive-conflicts.log",
+
+        # Hostname fragments to strip (OneDrive-added)
+        [string[]]$HostFragments = @(
+            'OFCABC1234',
+            'OFCABC1235'
+        ),
+
+        # Folders to ignore (files under these paths will not be processed)
+        [string[]]$ExcludePaths = @(
+            "$GitHubPath\PowerShell Transcript",
+            "$onedrivepath\Downloads\OneDrive_1_5-15-2025\PowerShell Transcript"
+        ),
+
+        # Recurse into subfolders
+        [switch]$Recurse,
+
+        # Include .git internals (off by default)
+        [switch]$IncludeGit
+    )
+
+    begin {
+        try {
+            if (-not (Test-Path $Path)) {
+                throw "Path not found : $Path"
+            }
+
+            $logDir = Split-Path $LogFile -Parent
+            if (-not (Test-Path $logDir)) {
+                New-Item -ItemType Directory -Path $logDir -Force | Out-Null
+            }
+
+            if (-not (Test-Path $LogFile)) {
+                'Timestamp,OriginalPath,NewPath' | Out-File -FilePath $LogFile -Encoding UTF8
+            }
+
+            # Build a single regex that matches "-<fragment>" for any fragment
+            $escaped = $HostFragments | ForEach-Object { [Regex]::Escape($_) }
+            $global:__ConflictRegex = "-($($escaped -join '|'))"
+
+            # Normalize exclude roots (remove trailing \, full paths, case-insensitive)
+            $global:__ExcludeRoots = $ExcludePaths |
+                Where-Object { $_ -and (Test-Path $_) } |
+                ForEach-Object {
+                    ([IO.Path]::GetFullPath($_)).TrimEnd('\')
+                }
+
+            Write-Host "Scanning path : $Path" -ForegroundColor Cyan
+            Write-Host "Log file       : $LogFile" -ForegroundColor DarkCyan
+            Write-Host "Fragments      : $($HostFragments -join '; ')" -ForegroundColor DarkCyan
+            if ($__ExcludeRoots.Count -gt 0) {
+                Write-Host "Excluded roots : $($global:__ExcludeRoots -join '; ')" -ForegroundColor DarkYellow
+            } else {
+                Write-Host "Excluded roots : (none resolved)" -ForegroundColor DarkYellow
+            }
+            Write-Host "Regex          : $__ConflictRegex" -ForegroundColor DarkGray
+        }
+        catch {
+            Write-Host "Error initializing : $_" -ForegroundColor Red
+            return
+        }
+    }
+    process {
+        try {
+            function Test-IsExcludedPath {
+                param([string]$FullPath)
+```

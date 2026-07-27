@@ -1,0 +1,75 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\speedtest.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-02-17 7b7d1b4 git commit PowerShell function
+2025-02-17 0f6f60b git commit PowerShell function
+2025-02-17 eeeb445 git commit PowerShell function
+2025-02-17 055f6f6 git commit PowerShell function
+2024-11-07 3c9be64 Auto-sync commit 20241107-230101
+2024-11-07 5ad7fbe Auto-sync commit 20241107-230101
+
+Script preview:
+```powershell
+<#
+.SYNOPSIS
+    This script performs a speed test and outputs the results.
+
+.DESCRIPTION
+    This script downloads the Ookla Speedtest CLI, runs a speed test, and outputs the download speed, upload speed, and ping.
+
+.NOTES
+    Author: Jason Lamb
+    Date: 11/7/24
+    Version: 1
+#>
+
+# Generate the timestamp
+$timestamp = (Get-Date).ToString("yyyy-MM-dd-HH-mm-ss")
+
+# Set the folder path and create it if necessary
+$FolderPath = "C:\temp\Automox-exports\Speedtest"
+if (-not (Test-Path -Path $FolderPath)) {
+    New-Item -Path $FolderPath -ItemType Directory -Force
+}
+
+# Download and extract the Speedtest CLI
+Invoke-WebRequest -Uri https://install.speedtest.net/app/cli/ookla-speedtest-1.1.1-win64.zip -OutFile "$FolderPath\speedtest.zip"
+Expand-Archive -Path "$FolderPath\speedtest.zip" -DestinationPath "$FolderPath\SpeedtestCLI"
+
+# Run the speed test
+& "$FolderPath\SpeedtestCLI\speedtest.exe" --accept-license --accept-gdpr
+
+# Capture and parse the speed test result
+$speedtestResult = & "$FolderPath\SpeedtestCLI\speedtest.exe" --accept-license --accept-gdpr --format=json | ConvertFrom-Json
+
+# Output results with a separator for clarity
+Write-Output "----------------------------------------"
+Write-Output $timestamp
+Write-Output "Speedtest Results:"
+Write-Output "Download Speed: $([math]::Round($speedtestResult.download.bandwidth * 8 / 1000000, 2)) Mbps"
+Write-Output "Upload Speed: $([math]::Round($speedtestResult.upload.bandwidth * 8 / 1000000, 2)) Mbps"
+Write-Output "Ping: $($speedtestResult.ping.latency) ms"
+Write-Output "----------------------------------------"
+```

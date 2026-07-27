@@ -1,0 +1,79 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\rename-files-with-spaces-to-dashes.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-10-09 ca950cd cleaned folder paths and filenames to use variables instead of hardcoded user paths.
+2025-10-09 cb16cd2 cleaned folder paths and filenames to use variables instead of hardcoded user paths.
+
+Script preview:
+```powershell
+$folderpaths = @(
+    "$GitHubPath\PowerShell",
+    "$GitHubPath\PowerShell-private"
+)
+
+foreach ($rootFolder in $folderpaths) {
+ 
+
+Get-ChildItem -Path $rootFolder -Recurse -Force | ForEach-Object {
+    if ($_.Name -match '\s') {
+        $baseName = $_.Name -replace '\s', '-'
+        $directory = $_.DirectoryName
+        $targetPath = Join-Path $directory $baseName
+
+        # If it's a file, split name and extension
+        if (-not $_.PSIsContainer) {
+            $nameNoExt = [System.IO.Path]::GetFileNameWithoutExtension($baseName)
+            $ext = [System.IO.Path]::GetExtension($baseName)
+
+            # Add -dup until it's unique
+            while (Test-Path $targetPath) {
+                $nameNoExt += "-dup"
+                $baseName = "$nameNoExt$ext"
+                $targetPath = Join-Path $directory $baseName
+            }
+        }
+        else {
+            # It's a folder
+            while (Test-Path $targetPath) {
+                $baseName += "-dup"
+                $targetPath = Join-Path $directory $baseName
+            }
+        }
+
+        try {
+            Rename-Item -Path $_.FullName -NewName $baseName -Force
+            Write-Host "Renamed: '$($_.FullName)' → '$targetPath'"
+        }
+        catch {
+            Write-Warning "Failed to rename: '$($_.FullName)' → '$targetPath' - $($_.Exception.Message)"
+        }
+    }
+}
+}
+
+# output example:
+# Renamed: '$GitHubPath\PowerShell\Folder\file with spaces.ps1' → '$GitHubPath\PowerShell\Folder\file-with-spaces.ps1'
+```

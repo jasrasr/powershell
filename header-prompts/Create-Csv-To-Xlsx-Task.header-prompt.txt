@@ -1,0 +1,51 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\Create-Csv-To-Xlsx-Task.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-05-27 26cd778 git commit PowerShell function
+2025-05-27 3fcd867 git commit PowerShell function
+
+Script preview:
+```powershell
+# CreateCsvToXlsxTask.ps1
+
+# Define the path to the PowerShell script
+$scriptPath = 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\documents\github\PowerShell\Miscellaneous\ConvertCsvToXlsx.ps1'
+
+# Define the action to execute the PowerShell script
+$action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`""
+
+# Define the trigger to run at system startup
+$trigger = New-ScheduledTaskTrigger -AtStartup
+
+# Define the principal to run the task with highest privileges
+$principal = New-ScheduledTaskPrincipal -UserId 'SYSTEM' -LogonType ServiceAccount -RunLevel Highest
+
+# Define task settings
+$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
+
+# Register the scheduled task
+Register-ScheduledTask -TaskName 'CsvToXlsxConverter' -Action $action -Trigger $trigger -Principal $principal -Settings $settings
+```

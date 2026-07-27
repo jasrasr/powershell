@@ -1,0 +1,47 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\code\remote.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2025-02-16 4dbf0e0 Update remote.ps1
+2025-02-16 d763b31 Update remote.ps1
+2025-02-16 b98442d Update remote.ps1
+2025-02-16 f3321f9 Update remote.ps1
+2025-02-16 3d6a28a Create remote.ps1
+2025-02-16 8c6c476 Create remote.ps1
+
+Script preview:
+```powershell
+# remote.ps1
+$url2 = "http://jasr.me/code/remote1.ps1"
+
+# Download and execute remote1.ps1 directly
+Invoke-Expression (Invoke-WebRequest -Uri $url2).Content
+
+# Optionally, download remote1.ps1 to disk for inspection and manual execution
+$path = "C:\temp\remote1.ps1"
+$client = New-Object System.Net.WebClient
+$client.DownloadFile($url2, $path)
+
+Write-Output "remote1.ps1 has been saved to $path. You can inspect and run it manually if needed."
+```

@@ -1,0 +1,115 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\GRC-TWIT-SecurityNow-Transcripts\testing\generate-html-with-links.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.7
+Revision history warning: 
+
+Git commit history (newest first):
+2025-09-22 598a921 Git sync : 2025-09-22 11:52:13
+2025-09-22 ee712d4 Git sync : 2025-09-22 11:52:13
+2025-09-18 3b269e1 Remove hardcoded GitHub path in PowerShell script
+2025-09-18 6b8793e Remove hardcoded GitHub path in PowerShell script
+2025-08-20 cdcb79c git commit powershell private function 250813-141516
+2025-08-20 b146dad git commit powershell private function 250813-141516
+
+Script preview:
+```powershell
+# Revision : 1.7
+# Description : Split Export-MarkdownIndex from HTML export. Markdown index now only creates README.md, separate Export-HtmlIndex will handle HTML table layout
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-08-18
+# Modified Date : 2025-08-18
+
+function Export-MarkdownIndex {
+    $global:downloadbase = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads"
+    $txtFolder = Join-Path $global:downloadbase 'TXT-Transcriptions'
+    $pdfFolder = Join-Path $global:downloadbase 'PDF-Show-Notes'
+    $outputPath = Join-Path $global:downloadbase 'README.md'
+
+    $txtFiles = Get-ChildItem -Path $txtFolder -Filter 'sn-*.txt' | Where-Object { $_.Name -match 'sn-(\d+)\.txt' }
+    $pdfFiles = Get-ChildItem -Path $pdfFolder -Filter 'sn-*-notes.pdf' | Where-Object { $_.Name -match 'sn-(\d+)-notes\.pdf' }
+
+    $allEpisodes = @{}
+
+    foreach ($txt in $txtFiles) {
+        if ($txt.Name -match 'sn-(\d+)\.txt') {
+            $ep = [int]$matches[1]
+            if (-not $allEpisodes.ContainsKey($ep)) {
+                $allEpisodes[$ep] = @{}
+            }
+            $allEpisodes[$ep].TXT = $txt.Name
+        }
+    }
+
+    foreach ($pdf in $pdfFiles) {
+        if ($pdf.Name -match 'sn-(\d+)-notes\.pdf') {
+            $ep = [int]$matches[1]
+            if (-not $allEpisodes.ContainsKey($ep)) {
+                $allEpisodes[$ep] = @{}
+            }
+            $allEpisodes[$ep].PDF = $pdf.Name
+        }
+    }
+
+    $sortedEpisodes = $allEpisodes.Keys | Sort-Object -Descending
+    $grouped = $sortedEpisodes | Group-Object { [math]::Floor($_ / 100) * 100 }
+
+    $md = @()
+    $md += "# Security Now! Transcripts and Show Notes"
+    $md += "Quick access to downloaded TXT and PDF files for each episode."
+    $md += ""
+    $md += "---"
+    $md += ""
+
+    foreach ($group in $grouped) {
+        $range = "$($group.Name)-$($group.Name + 99)"
+        $md += "## Episodes $range"
+
+        foreach ($ep in $group.Group) {
+            $epData = $allEpisodes[$ep]
+            $txtLink = if ($epData.TXT) { "[TXT](TXT-Transcriptions/${epData.TXT})" } else { "" }
+            $pdfLink = if ($epData.PDF) { "[PDF](PDF-Show-Notes/${epData.PDF})" } else { "" }
+            $md += "- Episode $ep : $txtLink $pdfLink"
+        }
+
+        $md += ""
+    }
+
+    $generated = Get-Date -Format 'yyyy-MM-dd HH:mm'
+    $md += "---"
+    $md += "Generated on $generated"
+    $md | Set-Content -Path $outputPath -Encoding UTF8
+
+    
+}
+
+function Export-HtmlIndex {
+    $global:downloadbase = "$githubpath\PowerShell\GRC-TWIT-SecurityNow-Transcripts\Downloads"
+    $txtFolder = Join-Path $global:downloadbase 'TXT-Transcriptions'
+    $pdfFolder = Join-Path $global:downloadbase 'PDF-Show-Notes'
+    $outputPath = Join-Path $global:downloadbase 'index.html'
+
+    $txtFiles = Get-ChildItem -Path $txtFolder -Filter 'sn-*.txt' | Where-Object { $_.Name -match 'sn-(\d+)\.txt' }
+    $pdfFiles = Get-ChildItem -Path $pdfFolder -Filter 'sn-*-notes.pdf' | Where-Object { $_.Name -match 'sn-(\d+)-notes\.pdf' }
+
+    $allEpisodes = @{}
+
+```

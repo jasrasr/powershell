@@ -1,0 +1,113 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Computer-Management-Scripts\ping-and-reg-autodesk-access-revit-version.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 1.7
+Revision history warning: 
+
+Git commit history (newest first):
+2025-09-23 6ab47d4 git commit powershell private function 250923-105603
+2025-09-23 216c299 git commit powershell private function 250923-105603
+2025-09-20 f412a28 Git sync : 2025-09-20 15:16:38
+2025-09-20 fc579d8 Git sync : 2025-09-20 15:16:38
+
+Script preview:
+```powershell
+# Revision : 1.7
+# Description : Query Autodesk Access and all Revit 2026 components (incl. FormIt Converter), return full table: Computer, RegistryPath, Publisher, DisplayVersion, DisplayName, InstallDate; run local when host matches; log to C:\temp\powershell-exports\  [Rev 1.7]
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-09-18
+# Modified Date : 2025-09-18
+
+# -------------------------
+# Config / Inputs
+# -------------------------
+$computerstoping = @(
+    'CLEW112GFF814'
+)
+
+# Ensure output folder exists
+$null = New-Item -Path 'C:\temp\powershell-exports' -ItemType Directory -Force -ErrorAction SilentlyContinue
+
+# Timestamped output file
+$filePath = "C:\temp\powershell-exports\AutodeskInstalledApplications-$((Get-Date).ToString('yyyy-MM-dd-HH-mm-ss')).txt"
+
+# Registry hives to check
+$regHives = @(
+  'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall',
+  'HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall',
+  'HKLM:\SOFTWARE\Autodesk\UPI2'
+)
+
+# Match rule: include Autodesk Access AND anything that mentions "Revit 2026" (captures FormIt Converter for Revit 2026, etc.)
+$matchScriptBlock = {
+    param($name)
+    if (-not $name) { return $false }
+    return ($name -eq 'Autodesk Access') -or ($name -match 'Revit 2026')
+}
+
+# -------------------------
+# Helpers
+# -------------------------
+function Get-FirstPresentValue {
+    param(
+        [object]$Entry,
+        [string[]]$PropertyNames
+    )
+    foreach ($p in $PropertyNames) {
+        if ($Entry.PSObject.Properties.Name -contains $p) {
+            $v = $Entry.$p
+            if ($null -ne $v -and ($v -isnot [string] -or $v.Trim() -ne '')) {
+                return $v
+            }
+        }
+    }
+    return $null
+}
+
+function Convert-EntryToResultObject {
+    param($entry)
+
+    $name = Get-FirstPresentValue -Entry $entry -PropertyNames @('DisplayName','ProductName','Name','Title')
+
+    $publisher = Get-FirstPresentValue -Entry $entry -PropertyNames @('Publisher','Vendor','Manufacturer','Company')
+
+    $version = Get-FirstPresentValue -Entry $entry -PropertyNames @('DisplayVersion','ProductVersion','Version','VersionString')
+
+    $installDateStr = $null
+    $rawDate = Get-FirstPresentValue -Entry $entry -PropertyNames @('InstallDate','InstallDateUTC','Installed','InstallTime')
+    if ($rawDate) {
+        if ($rawDate -is [datetime]) {
+            $installDateStr = $rawDate.ToString('yyyy-MM-dd')
+        }
+        elseif ($rawDate -is [string] -and $rawDate -match '^\d{8}$') {
+            try { $installDateStr = [datetime]::ParseExact($rawDate, 'yyyyMMdd', $null).ToString('yyyy-MM-dd') } catch { $installDateStr = $null }
+        }
+        else {
+            try { $installDateStr = ([datetime]$rawDate).ToString('yyyy-MM-dd') } catch { $installDateStr = $null }
+        }
+    }
+
+    [pscustomobject]@{
+        Computer       = $env:COMPUTERNAME
+        RegistryPath   = ($entry.PSPath -replace '^Microsoft\.PowerShell\.Core\\Registry::','')
+        Publisher      = $publisher
+        DisplayVersion = $version
+```

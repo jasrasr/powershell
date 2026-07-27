@@ -1,0 +1,112 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\MS-365-Scripts\get-entra-user-details-for-org-chart.ps1
+Audit status: IncompleteHeader
+Missing fields: Changelog
+Current revision: 1.7
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-18 f0a61ec rename file
+2026-03-18 7be7a6c new file
+2026-03-16 032565b update tons of files
+
+Script preview:
+```powershell
+# Filename: get-entra-user-details.ps1
+# Revision: 1.7
+# Description: Gets all Entra/Azure AD user details including first, last, display, email,
+#              job title, department, company, manager, manager email, mailbox type, and status
+#              Exports a full report and a trimmed org chart CSV
+# Author: Jason Lamb (with help from Claude)
+# Created Date: 2026-03-16
+# Modified Date: 2026-03-16
+# Changelog
+# 1.0 Initial release - basic user export with department filter
+# 1.1 Switched from AzureAD module to Microsoft.Graph
+# 1.2 Added manager lookup using AdditionalProperties
+# 1.3 Added progress bar, switched to List for performance
+# 1.4 Added Status column (Active/Disabled/Shared), dual CSV export with timestamp
+# 1.5 Switched output path to $PSExports, added summary with domain breakdown
+# 1.6 Filter to active user mailboxes only, skip users with no manager assigned
+# 1.7 Added Department and CompanyName columns, skip self-referencing managers (e.g. Annie Creager)
+
+# ── CONFIG ─────────────────────────────────────────────────────────────────────
+$outputDir  = $PSExports
+$timestamp  = Get-Date -Format "yyyy-MM-dd_HHmm"
+$exportPath = "$outputDir\orgchart_$timestamp.csv"
+$latestPath = "$outputDir\orgchart.csv"
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Ensure output folder exists
+if (-not (Test-Path $outputDir)) {
+    New-Item -ItemType Directory -Path $outputDir | Out-Null
+    Write-Host "Created folder: $outputDir" -ForegroundColor Cyan
+}
+
+# ── STEP 1: Connect ────────────────────────────────────────────────────────────
+Write-Host "`nConnecting to Microsoft Graph..." -ForegroundColor Cyan
+Connect-MgGraph -Scopes "User.Read.All", "Directory.Read.All" | Out-Null
+Write-Host "Connected." -ForegroundColor Green
+
+# ── STEP 2: Fetch user list ────────────────────────────────────────────────────
+# Excludes: guests, disabled accounts, shared mailboxes (AccountEnabled = false)
+Write-Host "`nFetching user list..." -ForegroundColor Cyan
+$allUsers = Get-MgUser -All -Property Id, DisplayName, GivenName, Surname, UserPrincipalName, JobTitle, Department, CompanyName, UserType, AccountEnabled |
+    Where-Object {
+        $_.UserType       -ne "Guest" -and
+        $_.AccountEnabled -eq $true
+    }
+
+$total = $allUsers.Count
+Write-Host "Found $total users. Starting manager lookups..." -ForegroundColor Cyan
+
+# ── STEP 3: Manager lookups with progress bar ──────────────────────────────────
+$report = [System.Collections.Generic.List[PSCustomObject]]::new()
+$i = 0
+
+foreach ($user in $allUsers) {
+    $i++
+    $pct = [math]::Round(($i / $total) * 100)
+
+    Write-Progress -Activity "Looking up managers" `
+                   -Status "$i of $total — $($user.DisplayName)" `
+                   -PercentComplete $pct
+
+    try {
+        $manager      = Get-MgUserManager -UserId $user.UserPrincipalName -ErrorAction Stop
+        $managerName  = $manager.AdditionalProperties["displayName"]
+        $managerEmail = $manager.AdditionalProperties["userPrincipalName"]
+    } catch {
+        $managerName  = "No Manager"
+        $managerEmail = ""
+    }
+
+    # Skip users with no manager assigned
+    if ($managerEmail -eq "") { continue }
+
+    # Skip self-referencing managers (e.g. top of org like Annie Creager reports to herself)
+    # These users will appear as root nodes in the org chart via the HTML's root detection
+    if ($managerEmail -eq $user.UserPrincipalName.ToLower()) {
+        $managerName  = ""
+        $managerEmail = ""
+    }
+
+    $report.Add([PSCustomObject]@{
+```

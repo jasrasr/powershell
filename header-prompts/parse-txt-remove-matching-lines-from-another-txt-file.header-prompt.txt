@@ -1,0 +1,90 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\File-Management-Scripts\parse-txt-remove-matching-lines-from-another-txt-file.ps1
+Audit status: IncompleteHeader
+Missing fields: Filename, Changelog
+Current revision: 2.0
+Revision history warning: 
+
+Git commit history (newest first):
+2026-03-16 032565b update tons of files
+2025-11-05 4b8191c Git sync :
+
+Script preview:
+```powershell
+# Revision : 2.0
+# Description : Remove lines from *-cleaned.txt files that appear in a reference file (egnyte-permission-report.txt)
+# Author : Jason Lamb (with help from ChatGPT)
+# Created Date : 2025-11-04
+# Modified Date : 2025-11-04
+
+param(
+    [Parameter(Mandatory = $true)]
+    [string] $Folder,                      # Folder containing *-cleaned.txt files
+    [Parameter(Mandatory = $true)]
+    [string] $ReferenceFile                # Path to egnyte-permission-report.txt
+)
+
+# --- Load reference file lines ---
+if (-not (Test-Path $ReferenceFile)) {
+    Write-Host "Reference file not found : $ReferenceFile" -ForegroundColor Red
+    exit
+}
+
+$referenceLines = Get-Content $ReferenceFile | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "" } | Sort-Object -Unique
+Write-Host "Loaded $($referenceLines.Count) reference lines from $ReferenceFile" -ForegroundColor Yellow
+
+# --- Find target files ---
+$files = Get-ChildItem -Path $Folder -Filter '*-cleaned.txt' -File
+if (-not $files) {
+    Write-Host "No *-cleaned.txt files found in $Folder" -ForegroundColor Yellow
+    exit
+}
+
+foreach ($file in $files) {
+    Write-Host "Processing : $($file.Name)" -ForegroundColor Cyan
+
+    try {
+        # Load current file lines
+        $content = Get-Content -Path $file.FullName
+
+        # Filter out lines that match any from reference
+        $filtered = $content | Where-Object { $referenceLines -notcontains $_ }
+
+        # Build output name (e.g., chunk_0036-cleaned-dedup.txt)
+        $newname = ($file.BaseName -replace '-cleaned$', '-cleaned-dedup') + '.txt'
+        $newpath = Join-Path $file.DirectoryName $newname
+
+        # Write filtered content to new file
+        $filtered | Set-Content -Path $newpath -Encoding UTF8
+
+        $removedCount = $content.Count - $filtered.Count
+        Write-Host "Created : $newname  |  Original : $($content.Count)  Removed : $removedCount  Remaining : $($filtered.Count)" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "Error processing $($file.Name) : $_" -ForegroundColor Red
+    }
+}
+
+Write-Host "All *-cleaned.txt files processed successfully." -ForegroundColor Cyan
+
+
+# example usage
+# .\parse-txt-remove-matching-lines-from-another-txt-file.ps1 -Folder 'C:\Temp\egnyte-110425\depth3' -ReferenceFile 'C:\Temp\egnyte-110425\egnyte-permission-report.txt'
+```

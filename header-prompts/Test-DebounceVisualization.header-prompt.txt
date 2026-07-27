@@ -1,0 +1,110 @@
+Create or repair a Jason-style PowerShell comment header for this script.
+
+Rules:
+- Return only the header comment block.
+- Do not change any code.
+- Use this exact field order:
+  Filename
+  Revision
+  Description
+  Author
+  Created Date
+  Modified Date
+  Changelog
+- Keep the description concise but specific to what the script does.
+- If the script appears to have a change history, use the Git commits below to draft a short changelog.
+- If history is unclear, use a minimal changelog such as 1.0.0 initial release.
+- Preserve any existing field values when they are already present and sensible.
+
+Script path: C:\Users\jason\Github\powershell\Miscellaneous\Test-DebounceVisualization.ps1
+Audit status: MissingHeader
+Missing fields: Filename, Revision, Description, Author, Created Date, Modified Date, Changelog
+Current revision: 
+Revision history warning: 
+
+Git commit history (newest first):
+2026-04-30 2ee198c update several files
+
+Script preview:
+```powershell
+<#
+.SYNOPSIS
+Demonstrates the debounce timing behavior with simulated file change events.
+
+.DESCRIPTION
+This script simulates FileSystemWatcher events and shows how the debounce mechanism
+batches changes together. Useful for understanding timing and tuning debounce interval.
+
+.PARAMETER DurationSeconds
+How long to run the simulation. Default: 30
+
+.PARAMETER DebounceIntervalMs
+Debounce interval to test (1000-10000ms). Default: 2000
+
+.PARAMETER SimulationType
+'quick-saves' | 'rapid-fire' | 'batch-copy' | 'mixed'
+
+.EXAMPLE
+.\Test-DebounceVisualization.ps1 -SimulationType 'quick-saves' -DebounceIntervalMs 2000
+
+.NOTES
+Filename: Test-DebounceVisualization.ps1
+Revision: 1.0
+Author: Jason Lamb with help from Claude
+Created: 2026-04-15
+#>
+
+param(
+    [Parameter(Mandatory = $false)]
+    [int]$DurationSeconds = 30,
+
+    [Parameter(Mandatory = $false)]
+    [int]$DebounceIntervalMs = 2000,
+
+    [Parameter(Mandatory = $false)]
+    [ValidateSet('quick-saves', 'rapid-fire', 'batch-copy', 'mixed')]
+    [string]$SimulationType = 'quick-saves'
+)
+
+# ============================================================================
+# SETUP
+# ============================================================================
+
+$startTime = Get-Date
+$changeQueue = @()
+$debounceTimer = $null
+$commitCount = 0
+$totalEvents = 0
+
+function Get-ElapsedMs {
+    $elapsed = (Get-Date) - $startTime
+    return [int]$elapsed.TotalMilliseconds
+}
+
+function Write-Timeline {
+    param([string]$Event, [string]$Color = 'Cyan')
+    $elapsed = Get-ElapsedMs
+    $seconds = $elapsed / 1000
+    Write-Host "[$(Get-Date -Format 'HH:mm:ss')] +${elapsed}ms (${seconds:F1}s) | $Event" -ForegroundColor $Color
+}
+
+function Simulate-CommitProcess {
+    Write-Timeline "==========================================================" Green
+    Write-Timeline "Timer: DEBOUNCE TIMER FIRED - Processing changes" Green
+    Write-Timeline "Queue contained: $($changeQueue.Count) events" Green
+    
+    # Show what would be committed
+    $files = $changeQueue | Select-Object -Unique
+    Write-Timeline "Files changed: $($files.Count) unique file(s)" Green
+    
+    foreach ($file in $files) {
+        $count = @($changeQueue | Where-Object { $_ -eq $file }).Count
+        Write-Timeline "  • $file ($count event$(if ($count -gt 1) { 's' }))" Green
+    }
+
+    Write-Timeline "-> Simulating: git add -A" Magenta
+    Start-Sleep -Milliseconds 50
+    
+    Write-Timeline "-> Simulating: git diff for context" Magenta
+    Start-Sleep -Milliseconds 30
+```
