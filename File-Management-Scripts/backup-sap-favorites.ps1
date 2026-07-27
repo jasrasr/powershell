@@ -69,5 +69,8 @@ foreach ($file in $filesFound) {
 Write-Host "Backup completed successfully!" -ForegroundColor Green
 Write-Host "Location: $destFolder" -ForegroundColor Green
 
+# Open the backup folder
+Invoke-Item $destFolder
+
 # Example Usage:
 #   .\backup-sap-favorites.ps1
