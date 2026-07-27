@@ -26,9 +26,10 @@ $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $filesToBackup = @("NwbcFavorites.xml", "NWBC.fav")
 $filesFound = @()
 
-# Check if source folder exists
+# Validate source folder exists
 if (-not (Test-Path $sourceFolder)) {
     Write-Host "ERROR: Source folder not found: $sourceFolder" -ForegroundColor Red
+    Write-Host "Expected path: %APPDATA%\SAP\NWBC" -ForegroundColor Yellow
     exit 1
 }
 
@@ -40,9 +41,10 @@ foreach ($file in $filesToBackup) {
     }
 }
 
-# Exit if no files found
+# Validate at least one file was found
 if ($filesFound.Count -eq 0) {
-    Write-Host "ERROR: No backup files found in $sourceFolder" -ForegroundColor Red
+    Write-Host "ERROR: Required backup files not found in $sourceFolder" -ForegroundColor Red
+    Write-Host "Looking for: $($filesToBackup -join ', ')" -ForegroundColor Yellow
     exit 1
 }
 
