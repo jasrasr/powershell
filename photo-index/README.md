@@ -17,6 +17,18 @@ No database, web server, thumbnail generation, or external PowerShell module is 
 
 See [ROADMAP.md](./ROADMAP.md) for planned releases and future features.
 
+## Screenshots
+
+### Detailed table report
+
+![Photo table report example](./screenshots/photo-table.svg)
+
+### Compact filename report
+
+![Photo list report example](./screenshots/photo-list.svg)
+
+The screenshots use example data. Actual counts, paths, filenames, dates, and sizes are generated from the selected photo collection.
+
 ## Features
 
 - Graphical folder picker when `-Path` is omitted
@@ -137,7 +149,10 @@ Browser performance ultimately depends on the number of indexed files and availa
 photo-index/
 ├── New-ImageIndex.ps1
 ├── README.md
-└── ROADMAP.md
+├── ROADMAP.md
+└── screenshots/
+    ├── photo-table.svg
+    └── photo-list.svg
 ```
 
 ## Roadmap
