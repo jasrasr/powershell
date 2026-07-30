@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="900" viewBox="0 0 1500 900">
+  <style>
+    .title{font:700 28px Arial,sans-serif;fill:#111827}.label{font:14px Arial,sans-serif;fill:#64748b}.value{font:700 16px Arial,sans-serif;fill:#111827}.text{font:15px Arial,sans-serif;fill:#111827}.small{font:14px Arial,sans-serif;fill:#475569}
+  </style>
+  <rect width="1500" height="900" fill="#f4f6f8"/>
+  <text x="40" y="54" class="title">Photo List</text>
+  <rect x="40" y="78" width="1420" height="150" rx="10" fill="#fff" stroke="#cbd5e1"/>
+  <text x="60" y="108" class="label">Total image files</text><text x="60" y="132" class="value">5,247</text>
+  <text x="270" y="108" class="label">Folders containing images</text><text x="270" y="132" class="value">183</text>
+  <text x="520" y="108" class="label">Total image size</text><text x="520" y="132" class="value">41.72 GB</text>
+  <text x="750" y="108" class="label">Newest image</text><text x="750" y="132" class="value">Woodshop-Project.png (2026-07-28 18:41)</text>
+  <text x="60" y="168" class="label">Oldest image</text><text x="60" y="192" class="value">Family-Archive-001.jpg (2008-04-16 09:22)</text>
+  <text x="560" y="168" class="label">Generated</text><text x="560" y="192" class="value">2026-07-30 05:15</text>
+  <text x="900" y="168" class="label">Root path</text><text x="900" y="192" class="value">C:\Users\Jason\OneDrive\Pictures</text>
+  <rect x="40" y="252" width="600" height="44" rx="7" fill="#fff" stroke="#94a3b8"/><text x="58" y="280" class="small">Search filenames or folders...</text>
+  <rect x="665" y="252" width="290" height="44" rx="7" fill="#fff" stroke="#94a3b8"/><text x="685" y="280" class="text">Date: Newest first ▼</text>
+  <g>
+    <rect x="40" y="338" width="210" height="48" rx="7" fill="#fff" stroke="#94a3b8"/><text x="54" y="368" class="text">IMG_1001.JPG</text>
+    <rect x="270" y="338" width="210" height="48" rx="7" fill="#fff" stroke="#94a3b8"/><text x="284" y="368" class="text">IMG_1002.JPG</text>
+    <rect x="500" y="338" width="210" height="48" rx="7" fill="#fff" stroke="#94a3b8"/><text x="514" y="368" class="text">IMG_1003.JPG</text>
+    <rect x="730" y="338" width="210" height="48" rx="7" fill="#fff" stroke="#94a3b8"/><text x="744" y="368" class="text">IMG_1004.JPG</text>
+    <rect x="960" y="338" width="210" height="48" rx="7" fill="#fff" stroke="#94a3b8"/><text x="974" y="368" class="text">IMG_1005.JPG</text>
+    <rect x="1190" y="338" width="210" height="48" rx="7" fill="#e8f2ff" stroke="#94a3b8"/><text x="1204" y="368" class="text">IMG_1006.JPG</text>
+    <rect x="40" y="406" width="210" height="48" rx="7" fill="#fff" stroke="#94a3b8"/><text x="54" y="436" class="text">IMG_1007.JPG</text>
+    <rect x="270" y="406" width="210" height="48" rx="7" fill="#fff" stroke="#94a3b8"/><text x="284" y="436" class="text">IMG_1008.JPG</text>
+    <rect x="500" y="406" width="210" height="48" rx="7" fill="#fff" stroke="#94a3b8"/><text x="514" y="436" class="text">IMG_1009.JPG</text>
+    <rect x="730" y="406" width="210" height="48" rx="7" fill="#fff" stroke="#94a3b8"/><text x="744" y="436" class="text">IMG_1010.JPG</text>
+    <rect x="960" y="406" width="210" height="48" rx="7" fill="#fff" stroke="#94a3b8"/><text x="974" y="436" class="text">IMG_1011.JPG</text>
+    <rect x="1190" y="406" width="210" height="48" rx="7" fill="#fff" stroke="#94a3b8"/><text x="1204" y="436" class="text">IMG_1012.JPG</text>
+    <rect x="40" y="474" width="210" height="48" rx="7" fill="#fff" stroke="#94a3b8"/><text x="54" y="504" class="text">DellTag01.jpg</text>
+    <rect x="270" y="474" width="210" height="48" rx="7" fill="#fff" stroke="#94a3b8"/><text x="284" y="504" class="text">LicensePlate-OH.jpg</text>
+    <rect x="500" y="474" width="210" height="48" rx="7" fill="#fff" stroke="#94a3b8"/><text x="514" y="504" class="text">Vacation-001.heic</text>
+    <rect x="730" y="474" width="210" height="48" rx="7" fill="#fff" stroke="#94a3b8"/><text x="744" y="504" class="text">Woodshop.png</text>
+  </g>
+  <text x="40" y="790" class="small">Search filters instantly. Sort by name, folder, date, or size. Links reuse the PhotoPreview tab.</text>
+</svg>
