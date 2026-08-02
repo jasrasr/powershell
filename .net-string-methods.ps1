@@ -36,14 +36,18 @@ $string.Length                     # Number of characters
 "one,two,three".Split(",")         # → array: "one" "two" "three"
 @("one", "two") -join "|"          # → "one|two"
 
-# File path helpers
+# File path manipulation using System.IO.Path methods
+# File path helpers if $path = "C:\folder\file.txt"
+$path = "C:\folder\file.txt"
 [System.IO.Path]::GetFileName($path)        # "file.txt"
 [System.IO.Path]::GetDirectoryName($path)   # "C:\folder"
 [System.IO.Path]::GetExtension($path)       # ".txt"
-[System.IO.Path]::ChangeExtension($path, ".bak")  # Change file extension
+[System.IO.Path]::ChangeExtension($path, ".bak")  # C:\folder\file.bak -  Change file extension
+
+
 
 # Practical examples
-" jason.lamb ".Trim().ToUpper()             # "JASON.LAMB"
+"first.last".Trim().ToUpper()             # "FIRST.LAST"
 "report-2025.pdf".Replace("2025","2026")    # "report-2026.pdf"
 "one,two,three".Split(",")                  # "one","two","three"
 @("x", "y", "z") -join ";"                   # "x;y;z"
