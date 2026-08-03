@@ -1,5 +1,5 @@
 # Filename: Find-ScriptsMissingHeader.ps1
-# Revision : 1.1.0
+# Revision : 1.2.0
 # Description : Scans a folder for PowerShell scripts that are missing Jason-style
 #               commented headers or are missing required header fields. Can also
 #               export AI-ready prompt files with script context and Git history.
@@ -10,6 +10,7 @@
 # 1.0.0 initial release
 # 1.1.0 optionally flag scripts whose Revision header is still 1.0 or 1.0.0
 #       even though Git shows multiple commits touched the file
+# 1.2.0 add timestamped text/csv report output and wrapped narrow-screen display
 
 [CmdletBinding()]
 param(
@@ -39,6 +40,15 @@ param(
     # Optional CSV export path for the audit results.
     [string]$CsvPath,
 
+    # Optional text report path for the audit results.
+    [string]$TextReportPath,
+
+    # Save timestamped text and CSV reports automatically.
+    [switch]$AutoSaveReport,
+
+    # Folder for auto-saved timestamped reports.
+    [string]$ReportOutputPath = (Get-Location).Path,
+
     # Return audit objects to the pipeline in addition to the default table output.
     [switch]$PassThru,
 
@@ -57,7 +67,11 @@ param(
 
     # Number of script lines to include in prompt context.
     [ValidateRange(20, 250)]
-    [int]$PreviewLineCount = 80
+    [int]$PreviewLineCount = 80,
+
+    # Width used for plain-text table rendering.
+    [ValidateRange(80, 500)]
+    [int]$DisplayWidth = 140
 )
 
 $ErrorActionPreference = 'Stop'
@@ -269,8 +283,61 @@ function New-AiPromptFile {
     return $promptFile
 }
 
+function Get-DisplayRows {
+    param(
+        [Parameter(Mandatory)]
+        [object[]]$Results
+    )
+
+    $Results | Select-Object FileName, Status, Revision, GitCommitCount,
+        @{ Name = 'MissingFields'; Expression = { $_.MissingFields } },
+        @{ Name = 'RevisionWarning'; Expression = { $_.RevisionWarning } },
+        @{ Name = 'ScriptPath'; Expression = { $_.ScriptPath } },
+        @{ Name = 'PromptFile'; Expression = { $_.PromptFile } }
+}
+
+function Write-WrappedTable {
+    param(
+        [Parameter(Mandatory)]
+        [object[]]$Results,
+
+        [Parameter(Mandatory)]
+        [int]$Width
+    )
+
+    $table = Get-DisplayRows -Results $Results | Format-Table -Wrap -AutoSize | Out-String -Width $Width
+    Write-Host $table.TrimEnd()
+}
+
+function Save-TextReport {
+    param(
+        [Parameter(Mandatory)]
+        [object[]]$Results,
+
+        [Parameter(Mandatory)]
+        [string]$Path,
+
+        [Parameter(Mandatory)]
+        [int]$Width
+    )
+
+    $table = Get-DisplayRows -Results $Results | Format-Table -Wrap -AutoSize | Out-String -Width $Width
+    Set-Content -LiteralPath $Path -Value $table.TrimEnd() -Encoding UTF8
+}
+
 if (-not (Test-Path -LiteralPath $Path -PathType Container)) {
     throw "Path does not exist or is not a folder: $Path"
+}
+
+if ($AutoSaveReport) {
+    New-Item -ItemType Directory -Path $ReportOutputPath -Force | Out-Null
+    $timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+    if (-not $CsvPath) {
+        $CsvPath = Join-Path -Path $ReportOutputPath -ChildPath "missing-headers-$timestamp.csv"
+    }
+    if (-not $TextReportPath) {
+        $TextReportPath = Join-Path -Path $ReportOutputPath -ChildPath "missing-headers-$timestamp.txt"
+    }
 }
 
 if ($PromptOutputPath) {
@@ -325,10 +392,20 @@ if ($CsvPath) {
     $auditResults | Export-Csv -LiteralPath $CsvPath -NoTypeInformation -Encoding UTF8
 }
 
+if ($TextReportPath) {
+    Save-TextReport -Results $auditResults -Path $TextReportPath -Width $DisplayWidth
+}
+
 if ($PassThru) {
     $auditResults
 } else {
-    $auditResults |
-        Select-Object FileName, Status, Revision, GitCommitCount, MissingFields, RevisionWarning, ScriptPath, PromptFile |
-        Format-Table -AutoSize
+    Write-WrappedTable -Results $auditResults -Width $DisplayWidth
+
+    if ($CsvPath) {
+        Write-Host "CSV report saved to: $CsvPath" -ForegroundColor Cyan
+    }
+
+    if ($TextReportPath) {
+        Write-Host "Text report saved to: $TextReportPath" -ForegroundColor Cyan
+    }
 }
