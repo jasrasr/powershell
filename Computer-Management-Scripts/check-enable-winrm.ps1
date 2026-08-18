@@ -1,5 +1,5 @@
 $list2array = @(
-    "computernmae1",
+    "computername1",
 		"computername2"
 )
 
