@@ -6,8 +6,26 @@
     { "name": "7-Zip", "id": "7zip.7zip", "enabled": true },
     { "name": "Google Chrome", "id": "Google.Chrome", "enabled": true },
     { "name": "Microsoft PowerToys", "id": "Microsoft.PowerToys", "enabled": true },
-    { "name": "Everything", "id": "voidtools.Everything", "enabled": false }
+    { "name": "Everything", "id": "voidtools.Everything", "enabled": true },
+    { "name": "Greenshot", "id": "Greenshot.Greenshot", "enabled": true },
+    { "name": "Ditto Clipboard Manager", "id": "Ditto.Ditto", "enabled": false },
+    { "name": "Node.js LTS (includes npm)", "id": "OpenJS.NodeJS.LTS", "enabled": true },
+    { "name": "PHP 8.5", "id": "PHP.PHP.8.5", "enabled": true },
+    { "name": "Chocolatey", "id": "Chocolatey.Chocolatey", "enabled": true }
   ],
+  "npmPackages": [
+    { "name": "Codex CLI", "id": "@openai/codex", "enabled": true },
+    { "name": "Claude Code", "id": "@anthropic-ai/claude-code", "enabled": true }
+  ],
+  "powershellModules": [
+    { "name": "ExchangeOnlineManagement", "enabled": true },
+    { "name": "Microsoft.Graph", "enabled": true },
+    { "name": "MicrosoftTeams", "enabled": true }
+  ],
+  "windowsCapabilities": [
+    { "name": "Active Directory RSAT tools", "id": "Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0", "enabled": true }
+  ],
+  "profile": { "enabled": true },
   "registrySettings": [
     {
       "description": "Show file extensions",
@@ -22,22 +40,6 @@
       "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
       "name": "Hidden",
       "value": 1,
-      "type": "DWord",
-      "enabled": true
-    },
-    {
-      "description": "Use dark app mode",
-      "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
-      "name": "AppsUseLightTheme",
-      "value": 0,
-      "type": "DWord",
-      "enabled": true
-    },
-    {
-      "description": "Use dark Windows mode",
-      "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
-      "name": "SystemUsesLightTheme",
-      "value": 0,
       "type": "DWord",
       "enabled": true
     }

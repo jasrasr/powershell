@@ -20,7 +20,7 @@ Only use the short URL after confirming that its redirect still points at your G
 
 ## Customize
 
-Edit [`setup.json`](./setup.json) to add applications or change settings. Find package IDs with:
+Edit [`setup.json`](./setup.json) to add applications, npm tools, PowerShell modules, Windows capabilities, or settings. Find package IDs with:
 
 ```powershell
 winget search <name>
@@ -46,4 +46,8 @@ To test an unpublished configuration, pass its raw URL:
 - WinGet (included with a current version of Microsoft App Installer)
 - Internet access
 
-The initial defaults install PowerShell 7, Git, Visual Studio Code, 7-Zip, Chrome, and PowerToys. They also show file extensions and hidden files and enable dark mode for the current user. No execution policy or machine-wide security setting is changed.
+The defaults include PowerShell 7, Git, Visual Studio Code, 7-Zip, Chrome, PowerToys, Everything, Greenshot, Node.js/npm, PHP, Chocolatey, Codex CLI, Claude Code, and the Exchange Online, Microsoft Graph, and Teams PowerShell modules. Active Directory RSAT is installed when the command runs in an elevated PowerShell session.
+
+The profile setup preserves existing content. It adds a marked, replaceable block to the PowerShell 5.1 and PowerShell 7 all-hosts profiles and creates a shared `Profile.Common.ps1` with UTF-8 output and PSReadLine defaults.
+
+`Ditto Clipboard Manager` is listed but disabled until "3d clipboard" is confirmed to mean Ditto. Enable it in `setup.json` if that is the intended application. Dark mode is not changed; hidden files and file extensions are shown.
