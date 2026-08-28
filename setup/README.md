@@ -46,8 +46,8 @@ To test an unpublished configuration, pass its raw URL:
 - WinGet (included with a current version of Microsoft App Installer)
 - Internet access
 
-The defaults include PowerShell 7, Git, Visual Studio Code, 7-Zip, Chrome, PowerToys, Everything, Greenshot, Node.js/npm, PHP, Chocolatey, Codex CLI, Claude Code, and the Exchange Online, Microsoft Graph, and Teams PowerShell modules. Active Directory RSAT is installed when the command runs in an elevated PowerShell session.
+The defaults include PowerShell 7, Git, Visual Studio Code, 7-Zip, Chrome, PowerToys, Everything, Greenshot, 3D Clipboard, Node.js/npm, PHP, Chocolatey, Codex CLI, Claude Code, and the Exchange Online, Microsoft Graph, and Teams PowerShell modules. Active Directory RSAT is installed when the command runs in an elevated PowerShell session.
 
 The profile setup preserves existing content. It adds a marked, replaceable block to the PowerShell 5.1 and PowerShell 7 all-hosts profiles and creates a shared `Profile.Common.ps1` with UTF-8 output and PSReadLine defaults.
 
-`Ditto Clipboard Manager` is listed but disabled until "3d clipboard" is confirmed to mean Ditto. Enable it in `setup.json` if that is the intended application. Dark mode is not changed; hidden files and file extensions are shown.
+3D Clipboard is not distributed through WinGet or Chocolatey, so the official version 1.5.1 installer is downloaded directly. The script verifies its pinned SHA-256 hash and valid Authenticode signature before running it. Dark mode is not changed; hidden files and file extensions are shown.

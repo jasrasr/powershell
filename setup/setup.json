@@ -8,10 +8,20 @@
     { "name": "Microsoft PowerToys", "id": "Microsoft.PowerToys", "enabled": true },
     { "name": "Everything", "id": "voidtools.Everything", "enabled": true },
     { "name": "Greenshot", "id": "Greenshot.Greenshot", "enabled": true },
-    { "name": "Ditto Clipboard Manager", "id": "Ditto.Ditto", "enabled": false },
     { "name": "Node.js LTS (includes npm)", "id": "OpenJS.NodeJS.LTS", "enabled": true },
     { "name": "PHP 8.5", "id": "PHP.PHP.8.5", "enabled": true },
     { "name": "Chocolatey", "id": "Chocolatey.Chocolatey", "enabled": true }
+  ],
+  "directInstallers": [
+    {
+      "name": "3D Clipboard",
+      "version": "1.5.1",
+      "url": "https://www.3dclipboard.com/release/3dclip-1.5.1.exe",
+      "sha256": "7E6256892A412D16242D84811FB84992D14C22EEC2CF7BF3F5A4501428268843",
+      "arguments": "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-",
+      "displayNamePattern": "3D Clipboard*",
+      "enabled": true
+    }
   ],
   "npmPackages": [
     { "name": "Codex CLI", "id": "@openai/codex", "enabled": true },

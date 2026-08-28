@@ -46,6 +46,23 @@ function Update-ProcessPath {
     $env:Path = "$machinePath;$userPath"
 }
 
+function Test-InstalledApplication {
+    param([Parameter(Mandatory)][string]$DisplayNamePattern)
+
+    $uninstallPaths = @(
+        'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*',
+        'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*',
+        'HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*'
+    )
+    foreach ($path in $uninstallPaths) {
+        $match = Get-ItemProperty -Path $path -ErrorAction SilentlyContinue |
+            Where-Object DisplayName -Like $DisplayNamePattern |
+            Select-Object -First 1
+        if ($match) { return $true }
+    }
+    return $false
+}
+
 function Install-PowerShellProfile {
     $documents = [Environment]::GetFolderPath('MyDocuments')
     $commonDirectory = Join-Path $documents 'PowerShell'
@@ -146,6 +163,41 @@ foreach ($app in $config.apps) {
     & $winget.Source install --id $app.id --exact --silent --accept-package-agreements --accept-source-agreements
     if ($LASTEXITCODE -ne 0) {
         Write-Warning "WinGet could not install $($app.name) (exit code $LASTEXITCODE)."
+    }
+}
+
+Write-Step 'Installing verified direct-download applications'
+foreach ($installer in $config.directInstallers) {
+    if (-not $installer.enabled) { continue }
+    if (Test-InstalledApplication -DisplayNamePattern $installer.displayNamePattern) {
+        Write-Host "Already installed: $($installer.name)"
+        continue
+    }
+    if ($WhatIf) {
+        Write-Host "[WhatIf] Download, verify, and install $($installer.name) $($installer.version)"
+        continue
+    }
+
+    $downloadPath = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName() + '.exe')
+    try {
+        Write-Host "Downloading: $($installer.name)"
+        Invoke-WebRequest -UseBasicParsing -Uri $installer.url -OutFile $downloadPath
+        $actualHash = (Get-FileHash -LiteralPath $downloadPath -Algorithm SHA256).Hash
+        if ($actualHash -ne $installer.sha256) {
+            throw "Hash verification failed for $($installer.name). Expected $($installer.sha256); received $actualHash."
+        }
+        $signature = Get-AuthenticodeSignature -LiteralPath $downloadPath
+        if ($signature.Status -ne 'Valid') {
+            throw "Authenticode verification failed for $($installer.name): $($signature.Status)."
+        }
+        Write-Host "Installing: $($installer.name)"
+        $process = Start-Process -FilePath $downloadPath -ArgumentList $installer.arguments -Wait -PassThru
+        if ($process.ExitCode -ne 0) {
+            throw "$($installer.name) installer returned exit code $($process.ExitCode)."
+        }
+    }
+    finally {
+        Remove-Item -LiteralPath $downloadPath -Force -ErrorAction SilentlyContinue
     }
 }
 
