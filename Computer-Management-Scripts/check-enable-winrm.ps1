@@ -1,12 +1,12 @@
-$list2array = @(
-    "computername1",
-		"computername2"
+param(
+    [Parameter(Mandatory = $true)]
+    [string[]]$ComputerName
 )
 
 $offlinecomputers = @()
 
 
-foreach ($item in $list2array){
+foreach ($item in $ComputerName){
     if (Test-Connection -ComputerName $item -Count 1 -Quiet) {
         Write-Host "$item : Online" -ForegroundColor Green
         # check if winrm is enabled using Invoke-Command
