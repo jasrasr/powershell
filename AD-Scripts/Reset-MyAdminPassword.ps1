@@ -38,6 +38,17 @@ function ConvertFrom-SecureStringPlain {
     }
 }
 
+function Test-DomainNetworkReachable {
+    param([string[]]$ProbeAddresses = @('10.1.0.7', '10.1.0.8', '10.7.10.30'))
+    foreach ($addr in $ProbeAddresses) {
+        if (Test-Connection -TargetName $addr -Count 1 -Quiet -ErrorAction SilentlyContinue) {
+            Write-Host "Network check passed (reached $addr)." -ForegroundColor Green
+            return $true
+        }
+    }
+    return $false
+}
+
 function Test-PasswordMeetsCriteria {
     param([string]$Password)
     $Password.Length -ge 12 -and
@@ -73,6 +84,11 @@ function Read-NewPassword {
     Write-Host 'Opening a password generator so you can try again: https://jasr.me/pw' -ForegroundColor Red
     Open-Url 'https://jasr.me/pw'
     return $null
+}
+
+if (-not (Test-DomainNetworkReachable)) {
+    Write-Host 'Cannot reach the corporate network. Connect to VPN (or a Cooper network connection) and try again.' -ForegroundColor Red
+    return
 }
 
 $context = New-Object System.DirectoryServices.AccountManagement.PrincipalContext(
