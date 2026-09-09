@@ -23,7 +23,7 @@ param(
     # ArchiveStatus -eq "None".
     [switch]$All,
 
-    # Restrict -All to a specific SMTP domain, e.g. altronic-llc.com
+    # Restrict -All to a specific SMTP domain, e.g. domain.com
     [string]$DomainFilter,
 
     # Also enable auto-expanding archive (grows 100 GB -> 1.5 TB over time).
@@ -126,12 +126,12 @@ Write-Log "NOTE: Auto-expanding archive provisioning can take up to 30 days to c
 Example usage:
 
   # Single user, archive only
-  .\Enable-MailboxArchive.ps1 -Identity katie.fleming@altronic-llc.com
+  .\Enable-MailboxArchive.ps1 -Identity user@domain.com
 
   # Single user, archive + auto-expanding
-  .\Enable-MailboxArchive.ps1 -Identity katie.fleming@altronic-llc.com -AutoExpanding
+  .\Enable-MailboxArchive.ps1 -Identity user@domain.com -AutoExpanding
 
-  # Every altronic-llc.com mailbox without an archive, dry run first
-  .\Enable-MailboxArchive.ps1 -All -DomainFilter altronic-llc.com -WhatIf
-  .\Enable-MailboxArchive.ps1 -All -DomainFilter altronic-llc.com -AutoExpanding
+  # Every domain.com mailbox without an archive, dry run first
+  .\Enable-MailboxArchive.ps1 -All -DomainFilter domain.com -WhatIf
+  .\Enable-MailboxArchive.ps1 -All -DomainFilter domain.com -AutoExpanding
 #>
