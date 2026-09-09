@@ -1,8 +1,8 @@
 <#
-Filename:    Get-AltronicMailboxSizes.ps1
+Filename:    Get-MailboxSizes.ps1
 Revision:    1.1.0
 Description: Reports primary mailbox size/quota, online archive status, and
-             archive size for every mailbox with an @altronic-llc.com proxy
+             archive size for every mailbox with an @domain.com proxy
              address. Exports to CSV in $PSExports.
 Author:      Jason Lamb with help from Claude Code
 Created:     2026-09-09
@@ -15,10 +15,10 @@ Changelog:
 
 [CmdletBinding()]
 param(
-    [string]$DomainFilter = "altronic-llc.com"
+    [string]$DomainFilter = "domain.com"
 )
 
-$exportPath = Join-Path $PSExports "AltronicMailboxSizes_$(Get-Date -Format 'yyyyMMdd_HHmmss').csv"
+$exportPath = Join-Path $PSExports "$DomainFilterMailboxSizes_$(Get-Date -Format 'yyyyMMdd_HHmmss').csv"
 
 # Module check and import
 foreach ($module in @("ExchangeOnlineManagement")) {
@@ -104,9 +104,9 @@ Write-Host "`nExported to $exportPath"
 <#
 Example usage:
 
-  # Default: all @altronic-llc.com mailboxes
-  .\Get-AltronicMailboxSizes.ps1
+  # Default: all @domain.com mailboxes
+  .\Get-MailboxSizes.ps1
 
   # Different domain
-  .\Get-AltronicMailboxSizes.ps1 -DomainFilter cooperservices.com
+  .\Get-MailboxSizes.ps1 -DomainFilter domain.com
 #>
