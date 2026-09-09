@@ -26,16 +26,16 @@
 
 # showing different button types
 Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("ok - informational - sound 1", "IT Notice", "OK", "Information")
-Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("okcancel - informational - sound 1", "IT Notice", "okcancel", "Information")
-Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("yesno - informational - sound 1", "IT Notice", "yesno", "Information")
-Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("yesnocancel - informational - sound 1", "IT Notice", "yesnocancel", "Information")
+#Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("okcancel - informational - sound 1", "IT Notice", "okcancel", "Information")
+#Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("yesno - informational - sound 1", "IT Notice", "yesno", "Information")
+#Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("yesnocancel - informational - sound 1", "IT Notice", "yesnocancel", "Information")
 
 # showing different message types
-Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("ok - none - no sound", "IT Notice", "OK", "None")
-Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("ok - question - no sound", "IT Notice", "OK", "Question")
-Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("ok - warning - sound 1", "IT Notice", "OK", "Warning")
-Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("ok - error - sound 2", "IT Notice", "OK", "Error")
-Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("ok - asterisk - sound 1", "IT Notice", "OK", "Asterisk")
+#Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("ok - none - no sound", "IT Notice", "OK", "None")
+#Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("ok - question - no sound", "IT Notice", "OK", "Question")
+#Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("ok - warning - sound 1", "IT Notice", "OK", "Warning")
+#Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("ok - error - sound 2", "IT Notice", "OK", "Error")
+#Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("ok - asterisk - sound 1", "IT Notice", "OK", "Asterisk")
 # Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("ok - exclamation - sound 1", "IT Notice", "OK", "Exclamation") # same as WARNING, duplicate alias
 # Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("ok - hand - sound 2", "IT Notice", "OK", "Hand") # same as ERROR, duplicate alias
 # Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show("ok - stop - sound 2 ", "IT Notice", "OK", "Stop") # same as ERROR, duplicate alias

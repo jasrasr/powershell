@@ -131,13 +131,31 @@ try {
                 break currentLoop
             }
 
+            $changePasswordJob = Start-ThreadJob -ScriptBlock {
+                param($u, $old, $new)
+                $u.ChangePassword($old, $new)
+            } -ArgumentList $user, $currentPlain, $newPlain
+
+            for ($remaining = 15; $remaining -gt 0; $remaining--) {
+                if (Wait-Job $changePasswordJob -Timeout 1) { break }
+                Write-Host "`rChanging password, please wait... ${remaining}s" -NoNewline -ForegroundColor Yellow
+            }
+            Write-Host "`r$(' ' * 45)`r" -NoNewline
+            Wait-Job $changePasswordJob | Out-Null
+
             try {
-                $user.ChangePassword($currentPlain, $newPlain)
+                Receive-Job $changePasswordJob -ErrorAction Stop | Out-Null
                 Write-Host "Password changed successfully for $SamAccountName." -ForegroundColor Green
                 $changed = $true
                 break currentLoop
-            } catch [System.DirectoryServices.AccountManagement.PasswordException] {
-                $inner = $_.Exception
+            } catch {
+                $rootEx = $_.Exception.InnerException
+                if (-not $rootEx) { $rootEx = $_.Exception }
+                if ($rootEx -isnot [System.DirectoryServices.AccountManagement.PasswordException]) {
+                    throw $rootEx
+                }
+
+                $inner = $rootEx
                 while ($inner.InnerException) { $inner = $inner.InnerException }
 
                 # 0x80070056 / 0x8007052E: the current password was wrong -- go back and re-enter it, not the new one
@@ -148,6 +166,8 @@ try {
 
                 Write-Warning "Password rejected by the domain: $($inner.Message)"
                 Write-Host 'Pick a different password (it may have been used recently or blocked by policy).'
+            } finally {
+                Remove-Job $changePasswordJob -Force -ErrorAction SilentlyContinue
             }
         }
     }
