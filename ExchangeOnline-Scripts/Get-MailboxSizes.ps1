@@ -18,7 +18,16 @@ param(
     [string]$DomainFilter = "domain.com"
 )
 
-$exportPath = Join-Path $PSExports "$DomainFilterMailboxSizes_$(Get-Date -Format 'yyyyMMdd_HHmmss').csv"
+$exportPath = Join-Path $PSExports "$($DomainFilter)_MailboxSizes_$(Get-Date -Format 'yyyyMMdd_HHmmss').csv"
+
+function Get-BytesFromSizeString {
+    param($SizeValue)
+    if ($null -eq $SizeValue) { return $null }
+    if ($SizeValue.ToString() -match '\(([\d,]+)\s+bytes\)') {
+        return [int64]($matches[1] -replace ',', '')
+    }
+    return $null
+}
 
 # Module check and import
 foreach ($module in @("ExchangeOnlineManagement")) {
@@ -64,7 +73,8 @@ $results = foreach ($mbx in $mailboxes) {
     $stats = Get-MailboxStatistics -Identity $mbx.Identity -ErrorAction SilentlyContinue
 
     $primarySizeGB = if ($stats) {
-        [math]::Round(($stats.TotalItemSize.Value.ToBytes() / 1GB), 2)
+        $bytes = Get-BytesFromSizeString $stats.TotalItemSize.Value
+        if ($null -ne $bytes) { [math]::Round(($bytes / 1GB), 2) } else { $null }
     } else { $null }
 
     $primaryItemCount = if ($stats) { $stats.ItemCount } else { $null }
@@ -77,7 +87,8 @@ $results = foreach ($mbx in $mailboxes) {
     if ($archiveEnabled) {
         $archiveStats = Get-MailboxStatistics -Identity $mbx.Identity -Archive -ErrorAction SilentlyContinue
         if ($archiveStats) {
-            $archiveSizeGB    = [math]::Round(($archiveStats.TotalItemSize.Value.ToBytes() / 1GB), 2)
+            $archiveBytes = Get-BytesFromSizeString $archiveStats.TotalItemSize.Value
+            if ($null -ne $archiveBytes) { $archiveSizeGB = [math]::Round(($archiveBytes / 1GB), 2) }
             $archiveItemCount = $archiveStats.ItemCount
         }
     }
