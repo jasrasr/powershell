@@ -26,6 +26,8 @@ Edit [`setup.json`](./setup.json) to add applications, npm tools, PowerShell mod
 winget search <name>
 ```
 
+If a package exposes multiple installer formats, add an optional `installerType` such as `msix` to prefer that format during WinGet installs.
+
 Set an entry's `enabled` property to `false` to keep it in the catalog without installing or applying it.
 
 Preview the actions without changing the computer:
@@ -46,7 +48,7 @@ To test an unpublished configuration, pass its raw URL:
 - WinGet (included with a current version of Microsoft App Installer)
 - Internet access
 
-The defaults include PowerShell 7, Git, Visual Studio Code, 7-Zip, Chrome, PowerToys, Everything, Greenshot, 3D Clipboard, Node.js/npm, PHP, Chocolatey, Codex CLI, Claude Code, and the Exchange Online, Microsoft Graph, and Teams PowerShell modules. Active Directory RSAT is installed when the command runs in an elevated PowerShell session.
+The defaults include PowerShell 7 (preferring the MSIX package), Git, Visual Studio Code, 7-Zip, Chrome, PowerToys, Everything, Greenshot, 3D Clipboard, Node.js/npm, PHP, Chocolatey, Codex CLI, Claude Code, and the Exchange Online, Microsoft Graph, and Teams PowerShell modules. Active Directory RSAT is installed when the command runs in an elevated PowerShell session.
 
 The profile setup preserves existing content. It adds a marked, replaceable block to the PowerShell 5.1 and PowerShell 7 all-hosts profiles and creates a shared `Profile.Common.ps1` with UTF-8 output and PSReadLine defaults.
 

@@ -173,7 +173,19 @@ foreach ($app in $config.apps) {
     }
 
     Write-Host "Installing: $($app.name)"
-    & $winget.Source install --id $app.id --exact --silent --accept-package-agreements --accept-source-agreements
+    $installArguments = @(
+        'install'
+        '--id'
+        $app.id
+        '--exact'
+        '--silent'
+        '--accept-package-agreements'
+        '--accept-source-agreements'
+    )
+    if ($app.installerType) {
+        $installArguments += @('--installer-type', $app.installerType)
+    }
+    & $winget.Source @installArguments
     if ($LASTEXITCODE -ne 0) {
         Write-Warning "WinGet could not install $($app.name) (exit code $LASTEXITCODE)."
     }
