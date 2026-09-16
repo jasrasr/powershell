@@ -49,6 +49,7 @@ function Update-ProcessPath {
 function Test-InstalledApplication {
     param([Parameter(Mandatory)][string]$DisplayNamePattern)
 
+    $normalizedPattern = ($DisplayNamePattern -replace '[*?]', '').Trim()
     $uninstallPaths = @(
         'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*',
         'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*',
@@ -56,7 +57,19 @@ function Test-InstalledApplication {
     )
     foreach ($path in $uninstallPaths) {
         $match = Get-ItemProperty -Path $path -ErrorAction SilentlyContinue |
-            Where-Object DisplayName -Like $DisplayNamePattern |
+            Where-Object {
+                $_.DisplayName -like $DisplayNamePattern -or (
+                    $normalizedPattern -and @(
+                        $_.DisplayName
+                        $_.DisplayIcon
+                        $_.InstallLocation
+                        $_.UninstallString
+                        $_.QuietUninstallString
+                    ) |
+                    Where-Object { $_ -and $_ -like "*$normalizedPattern*" } |
+                    Select-Object -First 1
+                )
+            } |
             Select-Object -First 1
         if ($match) { return $true }
     }
