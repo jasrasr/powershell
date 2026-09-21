@@ -18,4 +18,5 @@ General purpose workstation management scripts for inventory, configuration, and
 | `rename-computer-remotely-multiple.ps1` | File | PowerShell script |
 | `restart-egnyte.ps1` | File | PowerShell script |
 | `set-ad-group-local-admin.ps1` | File | PowerShell script |
+| `set-timezone.ps1` | File | Interactive Windows time zone selection, including search by standard UTC offset; run as administrator |
 | `setup-clone-git-via-powershell.ps1` | File | PowerShell script |
