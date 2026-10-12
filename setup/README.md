@@ -1,6 +1,6 @@
 # Windows setup bootstrap
 
-Installs a standard set of applications with WinGet and applies user-scoped Windows settings. The script is safe to run repeatedly: installed applications are skipped and registry values are set to the configured value.
+Installs a standard set of applications with WinGet and applies user-scoped Windows settings. The script is safe to run repeatedly: installed applications are skipped unless their `upgrade` property is `true`, and registry values are set to the configured value. PowerShell 7 stable and preview are both installed and upgraded to the latest versions available through WinGet on each run.
 
 ## Public command
 

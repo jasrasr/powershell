@@ -1,14 +1,18 @@
 # Filename: git-update-all.ps1
-# Revision : 1.1.0
+# Revision : 1.1.1
 # Description : Run git-update against every Git repository below a parent folder.
 # Author : Jason Lamb
 # Created Date : 2026-06-13
-# Modified Date : 2026-09-10
+# Modified Date : 2026-09-25
 # Changelog :
 # 1.0.0 initial release
 # 1.1.0 converted to a function (matching git-update.ps1's pattern) so that dot-sourcing
 #       this file from the profile just defines git-update-all instead of running it
 #       immediately against the current directory; auto-loads git-update.ps1 if needed
+# 1.1.1 set GIT_ASK_YESNO=false defensively (git-update.ps1 already sets this and it
+#       persists for the rest of the process, but this keeps the script self-contained
+#       if ever run standalone) so Git for Windows doesn't prompt "Should I try again?
+#       (y/n)" on a locked ref/object directory across any of the discovered repos
 
 function Find-GitRepository {
     param(
@@ -57,6 +61,8 @@ function git-update-all {
         [Parameter(Mandatory = $false)]
         [switch]$Quick
     )
+
+    $env:GIT_ASK_YESNO = 'false'
 
     if (-not (Get-Command -Name git-update -CommandType Function -ErrorAction SilentlyContinue)) {
         . $GitUpdateScript

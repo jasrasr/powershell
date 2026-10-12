@@ -1,8 +1,31 @@
 @echo off
 setlocal enabledelayedexpansion
 
-REM Wrapper for set-timezone.ps1
-REM Auto-downloads the script if not found
+REM ============================================================================
+REM Script: set-timezone.bat
+REM Description: Wrapper launcher for set-timezone.ps1 PowerShell script
+REM Author: Jason Lamb
+REM Created: 2026-09-28
+REM Repository: https://github.com/jasrasr/powershell
+REM ============================================================================
+REM Purpose:
+REM   This batch file serves as a launcher for the set-timezone.ps1 PowerShell
+REM   script. It automatically downloads the script from GitHub if not present,
+REM   then executes it with appropriate permissions and settings.
+REM
+REM Requirements:
+REM   - Windows PowerShell 5.0+ or PowerShell Core
+REM   - Internet connection (for initial download)
+REM   - Administrator privileges (for timezone changes)
+REM
+REM Usage:
+REM   set-timezone.bat [timezone-id]
+REM   Example: set-timezone.bat "Eastern Standard Time"
+REM
+REM Notes:
+REM   For script header templates and available AI models, see:
+REM   ! Templates\header.ps1 and ! Templates\models.md
+REM ============================================================================
 
 set "SCRIPT_DIR=%~dp0"
 set "SCRIPT_FILE=!SCRIPT_DIR!set-timezone.ps1"

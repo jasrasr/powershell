@@ -1,14 +1,17 @@
 # Filename: git-update.ps1
-# Revision : 1.0.1
+# Revision : 1.0.2
 # Description : Smart git pull/add/commit/push. Generates AI commit message from diff via OpenAI.
 #               Use -Quick to skip AI and use a timestamped message instead.
 # Author : Jason Lamb (with help from Claude Code CLI)
 # Created Date : 2026-05-05
-# Modified Date : 2026-06-05
+# Modified Date : 2026-09-25
 # Changelog :
 # 1.0.0 initial release
 # 1.0.1 bail out on pull failure instead of committing/pushing into a diverged state;
 #       switched pull to --rebase --autostash; added push-failure handling
+# 1.0.2 set GIT_ASK_YESNO=false so Git for Windows no longer prompts "Should I try
+#       again? (y/n)" when it can't delete a stale ref/object directory (usually
+#       because OneDrive or antivirus is briefly holding a lock on it)
 
 function git-update {
     param(
@@ -23,6 +26,14 @@ function git-update {
     }
 
     $datetime = Get-Date -Format 'yyyy-MM-dd HH:mm'
+
+    # Git for Windows' mingw compat layer will interactively prompt
+    # "Deletion of directory 'X' failed. Should I try again? (y/n)" when it can't
+    # rmdir a stale ref/loose-object directory (common on OneDrive-synced repos,
+    # where OneDrive briefly locks files it's indexing/uploading). Setting
+    # GIT_ASK_YESNO to a command that always fails ("false") makes git treat every
+    # such prompt as an automatic "no" instead of blocking on stdin.
+    $env:GIT_ASK_YESNO = 'false'
 
     # Pull latest (rebase + autostash so uncommitted local changes don't block the pull)
     Write-Host "Pulling latest changes..." -ForegroundColor Cyan

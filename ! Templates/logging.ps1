@@ -1,12 +1,11 @@
 # Logging template. Rename this file to logging.ps1 if used directly.
-$LogRoot = if ($env:psexports) {
-    $env:psexports
-} else {
-    Join-Path -Path $HOME -ChildPath 'powershell-exports'
-}
-
-if (-not (Test-Path -LiteralPath $LogRoot)) {
-    New-Item -Path $LogRoot -ItemType Directory -Force | Out-Null
+# Preferred log location: $env:psexports, falling back to c:\temp\psexports.
+# Preferred log name: <ScriptName>_<yyyyMMdd_HHmmss>.log
+$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$logDir = $env:psexports
+if (-not $logDir -or -not (Test-Path $logDir)) {
+    $logDir = 'c:\temp\psexports'
+    New-Item -ItemType Directory -Path $logDir -Force | Out-Null
 }
 
 $ScriptBaseName = if ($PSCommandPath) {
@@ -15,7 +14,7 @@ $ScriptBaseName = if ($PSCommandPath) {
     'PowerShellScript'
 }
 
-$LogFile = Join-Path -Path $LogRoot -ChildPath "$ScriptBaseName-$(Get-Date -Format 'yyyyMMdd-HHmmss').log"
+$logExport = Join-Path $logDir "${ScriptBaseName}_$timestamp.log"
 
 function Write-Log {
     param(
@@ -27,5 +26,5 @@ function Write-Log {
     )
 
     $Line = '{0} [{1}] {2}' -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), $Level, $Message
-    $Line | Tee-Object -FilePath $LogFile -Append
+    $Line | Tee-Object -FilePath $logExport -Append
 }

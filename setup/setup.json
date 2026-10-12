@@ -1,6 +1,7 @@
 {
   "apps": [
-    { "name": "PowerShell 7", "id": "Microsoft.PowerShell", "enabled": true },
+    { "name": "PowerShell 7", "id": "Microsoft.PowerShell", "enabled": true, "upgrade": true },
+    { "name": "PowerShell 7 Preview", "id": "Microsoft.PowerShell.Preview", "enabled": true, "upgrade": true },
     { "name": "Git", "id": "Git.Git", "enabled": true },
     { "name": "Visual Studio Code", "id": "Microsoft.VisualStudioCode", "enabled": true },
     { "name": "7-Zip", "id": "7zip.7zip", "enabled": true },

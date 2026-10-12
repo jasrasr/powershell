@@ -21,6 +21,6 @@ New PowerShell scripts should begin with Jason's metadata header:
 
 - `header.ps1` - metadata header, `[CmdletBinding()]`, parameters, and default error handling.
 - `modules.ps1` - required module install/import pattern.
-- `logging.pa1` - logging helper template; rename to `logging.ps1` if used directly.
+- `logging.ps1` - logging helper template. Preferred pattern: log to `$env:psexports` (fallback `c:\temp\psexports`, created if missing) as `<ScriptName>_<yyyyMMdd_HHmmss>.log`, with the path in `$logExport`.
 - `api.ps1` - reusable `Invoke-RestMethod` wrapper.
 - `footer.ps1` - standard try/catch finalization block.

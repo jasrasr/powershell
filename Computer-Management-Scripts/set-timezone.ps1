@@ -1,16 +1,15 @@
 #Requires -Version 5.1
 <#
-.SYNOPSIS
-Prompts for and sets the local Windows time zone.
-.DESCRIPTION
-Offers Eastern, Central, Mountain, Pacific, or installed Windows time zones
-matching a standard (non-daylight-saving) UTC offset. Regional daylight-saving
-rules apply automatically. Use the other-zone option for Arizona or regions
-that do not observe daylight saving time. The account running the script must
-have permission to change the Windows time zone.
-.EXAMPLE
-.\set-timezone.ps1
-Run from PowerShell.
+Filename:       set-timezone.ps1
+Revision:       1.0.0
+Description:    Prompts for and sets the local Windows time zone
+Author:         Jason Lamb
+Created Date:   2026-09-28
+Modified Date:  2026-09-28
+Changelog:
+    v1.0.0 - Initial release. Offers Eastern, Central, Mountain, Pacific,
+             or other installed Windows time zones with automatic daylight
+             saving time rules. Requires administrator privileges.
 #>
 [CmdletBinding(SupportsShouldProcess)]
 param()

@@ -186,20 +186,25 @@ foreach ($app in $config.apps) {
             Select-String -SimpleMatch $app.id
     }
     else { $null }
-    if ($installed) {
+    if ($installed -and -not $app.upgrade) {
         Write-Host "Already installed: $($app.name)"
         continue
     }
 
+    $action = if ($installed) { 'upgrade' } else { 'install' }
     if ($WhatIf) {
-        Write-Host "[WhatIf] Install $($app.name) ($($app.id))"
+        Write-Host "[WhatIf] $action $($app.name) ($($app.id)) to the latest available version"
         continue
     }
 
-    Write-Host "Installing: $($app.name)"
-    & $winget.Source install --id $app.id --exact --silent --accept-package-agreements --accept-source-agreements
-    if ($LASTEXITCODE -ne 0) {
-        Write-Warning "WinGet could not install $($app.name) (exit code $LASTEXITCODE)."
+    Write-Host "$($action): $($app.name)"
+    & $winget.Source $action --id $app.id --exact --source winget --silent --accept-package-agreements --accept-source-agreements
+    if ($action -eq 'upgrade' -and $LASTEXITCODE -eq -1978335189) {
+        # APPINSTALLER_CLI_ERROR_UPDATE_NOT_APPLICABLE: already up to date.
+        Write-Host "Already up to date: $($app.name)"
+    }
+    elseif ($LASTEXITCODE -ne 0) {
+        Write-Warning "WinGet could not $action $($app.name) (exit code $LASTEXITCODE)."
     }
 }
 
