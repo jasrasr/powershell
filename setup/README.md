@@ -51,3 +51,18 @@ The defaults include PowerShell 7, Git, Visual Studio Code, 7-Zip, Chrome, Power
 The profile setup preserves existing content. It adds a marked, replaceable block to the PowerShell 5.1 and PowerShell 7 all-hosts profiles and creates a shared `Profile.Common.ps1` with UTF-8 output and PSReadLine defaults.
 
 3D Clipboard is not distributed through WinGet or Chocolatey, so the official version 1.5.1 installer is downloaded directly. The script verifies its pinned SHA-256 hash and valid Authenticode signature before running it. Dark mode is not changed; hidden files and file extensions are shown.
+
+## Application settings
+
+`vscodeExtensions` lists VS Code extension IDs installed with `code --install-extension` (`code --list-extensions` shows yours).
+
+`appSettings` copies saved config files into place after the installs. Each entry has `name`, `source` (path relative to `setup.json`, e.g. `config/greenshot/Greenshot.ini`), `destination` (environment variables such as `%APPDATA%` are expanded), `backup` (saves an existing file as `<file>.bak`), optional `stopProcess` (process closed before writing, needed for Everything and Greenshot), and `enabled`. A source that cannot be downloaded is skipped with a warning.
+
+Put exported files in [`config/`](./config), one folder per app, commit them, then set the entry to `enabled: true`. Check files for secrets first; the repository is public.
+
+| App | File to export |
+|-----|----------------|
+| Greenshot | `%APPDATA%\Greenshot\Greenshot.ini` |
+| Everything | `%APPDATA%\Everything\Everything.ini` (`Everything-1.5a.ini` for 1.5 alpha) |
+| VS Code | `%APPDATA%\Code\User\settings.json` and `keybindings.json` |
+| 3D Clipboard | Not supported yet; its settings location is unknown. |

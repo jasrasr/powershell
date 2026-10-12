@@ -27,6 +27,15 @@
     { "name": "Codex CLI", "id": "@openai/codex", "enabled": true },
     { "name": "Claude Code", "id": "@anthropic-ai/claude-code", "enabled": true }
   ],
+  "vscodeExtensions": [
+    { "id": "ms-vscode.powershell", "enabled": true }
+  ],
+  "appSettings": [
+    { "name": "Greenshot", "source": "config/greenshot/Greenshot.ini", "destination": "%APPDATA%\\Greenshot\\Greenshot.ini", "backup": true, "stopProcess": "Greenshot", "enabled": false },
+    { "name": "Everything", "source": "config/everything/Everything.ini", "destination": "%APPDATA%\\Everything\\Everything.ini", "backup": true, "stopProcess": "Everything", "enabled": false },
+    { "name": "Visual Studio Code settings", "source": "config/vscode/settings.json", "destination": "%APPDATA%\\Code\\User\\settings.json", "backup": true, "enabled": false },
+    { "name": "Visual Studio Code keybindings", "source": "config/vscode/keybindings.json", "destination": "%APPDATA%\\Code\\User\\keybindings.json", "backup": true, "enabled": false }
+  ],
   "powershellModules": [
     { "name": "ExchangeOnlineManagement", "enabled": true },
     { "name": "Microsoft.Graph", "enabled": true },
