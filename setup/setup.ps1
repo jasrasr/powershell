@@ -153,12 +153,17 @@ $config = Invoke-RestMethod -Uri $ConfigUrl -UseBasicParsing
 
 $winget = Get-Command winget.exe -ErrorAction SilentlyContinue
 if (-not $winget) {
+    $wingetPath = Join-Path $env:LOCALAPPDATA 'Microsoft\WindowsApps\winget.exe'
+    if (Test-Path -LiteralPath $wingetPath) { $winget = Get-Command $wingetPath }
+}
+if (-not $winget) {
     Write-Step 'Bootstrapping WinGet'
     if ($WhatIf) {
         Write-Host '[WhatIf] Install Microsoft.WinGet.Client and repair WinGet'
     }
     else {
-        Install-PackageProvider -Name NuGet -Force | Out-Null
+        try { Install-PackageProvider -Name NuGet -Force -ErrorAction Stop | Out-Null }
+        catch { Write-Warning "NuGet provider install failed ($($_.Exception.Message)); continuing." }
         Install-Module Microsoft.WinGet.Client -Repository PSGallery -Scope CurrentUser -Force -AllowClobber
         Import-Module Microsoft.WinGet.Client
         Repair-WinGetPackageManager -AllUsers:$false
