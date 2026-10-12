@@ -33,7 +33,7 @@ function Should-RunScript {
     param([string]$Key, [string]$Interval)
     $lastRun = if ($scriptState.ContainsKey($Key)) { [DateTime]$scriptState[$Key].LastRun } else { [DateTime]::MinValue }
     switch ($Interval) {
-        'Daily'   { return ($now - $lastRun).TotalHours -ge 24 }
+        'Daily'   { return $lastRun.Date -lt $now.Date }
         'Weekly'  { return ($now - $lastRun).TotalHours -ge 168 }
         'Monthly' { return ($now - $lastRun).TotalDays -ge 30 }
     }
@@ -43,7 +43,7 @@ function Get-TimeRemaining {
     param([string]$Key, [string]$Interval)
     $lastRun = if ($scriptState.ContainsKey($Key)) { [DateTime]$scriptState[$Key].LastRun } else { [DateTime]::MinValue }
     $nextRun = switch ($Interval) {
-        'Daily'   { $lastRun.AddHours(24) }
+        'Daily'   { $lastRun.Date.AddDays(1) }
         'Weekly'  { $lastRun.AddHours(168) }
         'Monthly' { $lastRun.AddDays(30) }
     }
@@ -71,6 +71,33 @@ if (Should-RunScript 'check-choco-updates' 'Daily') {
     Write-Host "  [SKIP] check-choco-updates (Daily) — $(Get-TimeRemaining 'check-choco-updates' 'Daily')" -ForegroundColor DarkGray
 }
 
+# Long-running network scan: launched in its own minimized window so it doesn't block this session.
+# -NoProfile is required, otherwise the new window would load this profile and re-run the scheduler.
+# Gated on a run that actually FINISHED today (script's run log), not on launch time, so a reboot or
+# hung run gets retried by the next session; skipped while a scan window is already open.
+$sharedFolderGrowthScript = "$env:OneDrive\Documents\Github\powershell-private\altronic-scripts\Get-AltronicSharedFolderGrowth.ps1"
+$sharedFolderGrowthRunLog = "$env:OneDrive\powershell-exports\shared-folder-growth\SharedFolderRunLog.csv"
+$sharedFolderGrowthDoneToday = $null
+if (Test-Path -LiteralPath $sharedFolderGrowthRunLog) {
+    $sharedFolderGrowthDoneToday = Import-Csv -LiteralPath $sharedFolderGrowthRunLog |
+        Where-Object { ([datetime]$_.RunEnd).Date -eq $now.Date } | Select-Object -Last 1
+}
+$sharedFolderGrowthRunning = Get-CimInstance Win32_Process -Filter "Name='pwsh.exe'" -ErrorAction SilentlyContinue |
+    Where-Object CommandLine -like '*Get-AltronicSharedFolderGrowth.ps1*' | Select-Object -First 1
+
+if ($sharedFolderGrowthDoneToday) {
+    Write-Host "  [SKIP] shared-folder-growth (Daily) — finished today at $(([datetime]$sharedFolderGrowthDoneToday.RunEnd).ToString('HH:mm')) (took $($sharedFolderGrowthDoneToday.Duration))" -ForegroundColor DarkGray
+} elseif ($sharedFolderGrowthRunning) {
+    Write-Host "  [SKIP] shared-folder-growth (Daily) — already running since $($sharedFolderGrowthRunning.CreationDate.ToString('MM-dd HH:mm')) (PID $($sharedFolderGrowthRunning.ProcessId))" -ForegroundColor Yellow
+} else {
+    Write-Host "  [RAN]  shared-folder-growth (Daily) — started in a separate minimized window" -ForegroundColor Green
+    Start-Process -FilePath 'pwsh.exe' -WindowStyle Minimized -ArgumentList @(
+        '-NoProfile', '-NoExit', '-ExecutionPolicy', 'Bypass', '-File', "`"$sharedFolderGrowthScript`""
+    )
+    $scriptState['shared-folder-growth'] = [PSCustomObject]@{ LastRun = $now.ToString('o'); Interval = 'Daily' }
+    $stateChanged = $true
+}
+
 ####################
 # Weekly scripts
 ####################
@@ -90,6 +117,25 @@ if (Should-RunScript 'download-next-security-now-txt-transcriptions-and-pdf-show
     $stateChanged = $true
 } else {
     Write-Host "  [SKIP] security-now-download (Weekly) — $(Get-TimeRemaining 'download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com' 'Weekly')" -ForegroundColor DarkGray
+}
+
+if (Should-RunScript 'm365-version-update-download' 'Weekly') {
+    Write-Host "  [RAN]  m365-version-update-download (Weekly)" -ForegroundColor Green
+    & 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell\File-Management-Scripts\m365-version-update-download.ps1' -Force
+    $scriptState['m365-version-update-download'] = [PSCustomObject]@{ LastRun = $now.ToString('o'); Interval = 'Weekly' }
+    $stateChanged = $true
+} else {
+    Write-Host "  [SKIP] m365-version-update-download (Weekly) — $(Get-TimeRemaining 'm365-version-update-download' 'Weekly')" -ForegroundColor DarkGray
+}
+
+if ((Should-RunScript 'move-s-it-public-to-g-it' 'Weekly') -and $now.DayOfWeek -eq 'Monday') {
+    Write-Host "  [RAN]  move-s-it-public-to-g-it (Weekly, Monday)" -ForegroundColor Green
+    . 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell\File-Management-Scripts\move-s-it-public-to-g-it.ps1'
+    $scriptState['move-s-it-public-to-g-it'] = [PSCustomObject]@{ LastRun = $now.ToString('o'); Interval = 'Weekly' }
+    $stateChanged = $true
+} else {
+    $dayCheck = if ($now.DayOfWeek -ne 'Monday') { "(runs Monday only)" } else { "" }
+    Write-Host "  [SKIP] move-s-it-public-to-g-it (Weekly) — $(Get-TimeRemaining 'move-s-it-public-to-g-it' 'Weekly') $dayCheck" -ForegroundColor DarkGray
 }
 
 ####################
