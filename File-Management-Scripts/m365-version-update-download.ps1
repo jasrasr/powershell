@@ -1,17 +1,21 @@
-# Revision : 1.4
+# Revision : 1.5.1
 # Description : Check Microsoft 365 Apps "Current Channel" build on MS Learn.
 #               On change: create ODT folder named <version>_<build>, copy setup/config,
 #               run ODT download, then mirror to $clesccm\Microsoft\Office 365\<version>_<build>.
-# Author : Jason Lamb (with help from ChatGPT)
+#               -Force: Download on first run (fresh folder). Cleanup removes builds older than -RetentionDays.
+# Author : Jason Lamb (with help from ChatGPT and Claude)
 # Created : 2025-04-15
-# Modified : 2025-10-02
+# Modified : 2026-10-12
 
 [CmdletBinding()]
 param(
     [string]$Url = 'https://learn.microsoft.com/en-us/officeupdates/update-history-microsoft365-apps-by-date',
     [string]$ChannelToCheck = 'Current Channel',
-    [string]$OutFolder = 'C:\temp\powershell-exports\',
-    [switch]$Quiet
+    [string]$OutFolder = $psexports,
+    [switch]$Quiet,
+    [switch]$Force,
+    [ValidateRange(1, 36500)]
+    [int]$RetentionDays = 90
 )
 
 # Ensure folders exist
@@ -31,6 +35,45 @@ function Write-Log {
     $line = "$stamp [$Level] $Message"
     $line | Tee-Object -FilePath $LogFile -Append | ForEach-Object {
         if (-not $Quiet) { Write-Host $_ }
+    }
+}
+
+function Invoke-Cleanup {
+    param([int]$DaysToKeep, [string]$CurrentFolder)
+    $cutoffDate = (Get-Date).AddDays(-$DaysToKeep)
+    $removed = @()
+
+    Write-Log "Cleanup: Removing builds older than $DaysToKeep days (before $($cutoffDate.ToString('yyyy-MM-dd')))"
+
+    # Cleanup local ODT folder
+    if (Test-Path $OdtRoot) {
+        $localFolders = Get-ChildItem -LiteralPath $OdtRoot -Directory | Where-Object { $_.Name -match '^\d+\.\d+_\d+(?:\.\d+)*$' -and $_.Name -ne $CurrentFolder }
+        foreach ($folder in $localFolders) {
+            if ($folder.LastWriteTime -lt $cutoffDate) {
+                Write-Log "Removing local folder: $($folder.FullName)"
+                Remove-Item -LiteralPath $folder.FullName -Recurse -Force -ErrorAction Stop
+                $removed += $folder.Name
+            }
+        }
+    }
+
+    # Cleanup CCM mirror
+    $officeRoot = Join-Path $clesccm 'Microsoft\Office 365'
+    if (Test-Path $officeRoot) {
+        $ccmFolders = Get-ChildItem -LiteralPath $officeRoot -Directory | Where-Object { $_.Name -match '^\d+\.\d+_\d+(?:\.\d+)*$' -and $_.Name -ne $CurrentFolder }
+        foreach ($folder in $ccmFolders) {
+            if ($folder.LastWriteTime -lt $cutoffDate) {
+                Write-Log "Removing CCM folder: $($folder.FullName)"
+                Remove-Item -LiteralPath $folder.FullName -Recurse -Force -ErrorAction Stop
+                $removed += $folder.Name
+            }
+        }
+    }
+
+    if ($removed.Count -gt 0) {
+        Write-Log "Cleanup complete: Removed $($removed.Count) build(s) - $($removed -join ', ')" 'INFO'
+    } else {
+        Write-Log "Cleanup: No builds older than $DaysToKeep days found"
     }
 }
 
@@ -59,17 +102,19 @@ try {
     Write-Log "Parsed row Channel = $ChannelToCheck , Version = $version , Build = $build ; FolderName = $versionBuild"
 
     # Load previous build
-    $previousBuild = if (Test-Path $StateFile) { (Get-Content $StateFile -ErrorAction SilentlyContinue | Select-Object -First 1).Trim() } else { '' }
+    $previousBuild = if (Test-Path -LiteralPath $StateFile) { ([string](Get-Content -LiteralPath $StateFile -ErrorAction Stop | Select-Object -First 1)).Trim() } else { '' }
 
     if ([string]::IsNullOrWhiteSpace($previousBuild)) {
-        Write-Log "No previous build recorded. Saving $build to $StateFile"
-        $build | Set-Content -Path $StateFile -Encoding ASCII
-        exit 2
+        if (-not $Force) {
+            Write-Log "No previous build recorded. Saving baseline $build; use -Force to download this build."
+            $build | Set-Content -Path $StateFile -Encoding ASCII
+            exit 2
+        }
+        Write-Log "No previous build recorded. -Force flag set, proceeding with download of $build"
     }
 
-    if ($previousBuild -ne $build) {
-        Write-Log "Build changed from $previousBuild to $build 🎉" 'WARN'
-        $build | Set-Content -Path $StateFile -Encoding ASCII
+    if ($Force -or $previousBuild -ne $build) {
+        Write-Log "Downloading build $build (previous: $previousBuild; Force: $Force)"
 
         # === ACTIONS ON CHANGE ===
         $targetFolder = Join-Path $OdtRoot $versionBuild
@@ -86,88 +131,53 @@ try {
         if (-not (Test-Path $srcXml))   { throw "Missing $srcXml . Place configuration.xml in $OdtRoot" }
 
         Write-Log "Copying setup.exe and configuration.xml from $OdtRoot to $targetFolder"
-        Copy-Item $srcSetup $targetFolder -Force
-        Copy-Item $srcXml   $targetFolder -Force
+        Copy-Item $srcSetup $targetFolder -Force -ErrorAction Stop
+        Copy-Item $srcXml   $targetFolder -Force -ErrorAction Stop
 
         # Run ODT download
         $setupExe  = Join-Path $targetFolder 'setup.exe'
         $configXml = 'configuration.xml'
         Write-Log "Running ODT download $setupExe /download $configXml"
-        Push-Location $targetFolder
-        & $setupExe /download $configXml
-        $exit = $LASTEXITCODE
-        Pop-Location
+        Push-Location $targetFolder -ErrorAction Stop
+        try {
+            & $setupExe /download $configXml
+            $exit = $LASTEXITCODE
+        }
+        finally {
+            Pop-Location
+        }
 
         if ($exit -ne 0) {
-            Write-Log "ODT download returned exit code $exit" 'WARN'
+            throw "ODT download failed with exit code $exit"
         } else {
             Write-Log "ODT download completed with exit code 0"
         }
 
-        # === MIRROR TO $clesccm\Microsoft\Office 365\<version>_<build> ===
-        $officeRoot   = Join-Path $clesccm 'Microsoft\Office 365'
+        # Copy downloaded content to the CCM destination before recording success.
+        $officeRoot = Join-Path $clesccm 'Microsoft\Office 365'
         $officeTarget = Join-Path $officeRoot $versionBuild
-
-        if (-not (Test-Path $officeTarget)) {
-            New-Item -Path $officeTarget -ItemType Directory | Out-Null
-        }
-
-        # Verify destination is accessible
-        if (-not (Test-Path $officeTarget)) {
-            Write-Log "Cannot access destination $officeTarget" 'ERROR'
-            throw "Destination path unavailable: $officeTarget"
-        }
-
-        $robocopy = "$env:SystemRoot\System32\robocopy.exe"
-
-        if (-not (Test-Path $officeRoot)) {
-            Write-Log "Creating Office root $officeRoot"
-            New-Item -Path $officeRoot -ItemType Directory -Force | Out-Null
-        }
-
+        New-Item -Path $officeTarget -ItemType Directory -Force -ErrorAction Stop | Out-Null
         Write-Log "Copying to $officeTarget"
-        if (-not (Test-Path $officeTarget)) {
-            New-Item -Path $officeTarget -ItemType Directory | Out-Null
-        }
-
-        $robocopy = "$env:SystemRoot\System32\robocopy.exe"
-        if (Test-Path $robocopy) {
+        $robocopy = Join-Path $env:SystemRoot 'System32\robocopy.exe'
+        if (Test-Path -LiteralPath $robocopy) {
             $rcArgs = @($targetFolder, $officeTarget, '/E', '/R:2', '/W:2', '/NFL', '/NDL', '/NP', '/NJH', '/NJS')
-            Write-Log "Running robocopy $($rcArgs -join ' ')"
             & $robocopy @rcArgs | Out-Null
             $rcExit = $LASTEXITCODE
-            if ($rcExit -ge 8) {
-                Write-Log "Robocopy failed with exit code $rcExit" 'ERROR'
-                throw "Robocopy failure $rcExit to $officeTarget"
-
-            } else {
-                Write-Log "Robocopy completed with exit code $rcExit"
-            }
-
-            # Verify last 5 folders copied successfully
-            $sourceFolders = Get-ChildItem -Path $targetFolder -Directory | Select-Object -Last 5
-            $missingFolders = @()
-            foreach ($folder in $sourceFolders) {
-                $destPath = Join-Path $officeTarget $folder.Name
-                if (-not (Test-Path $destPath)) {
-                    $missingFolders += $folder.Name
-                }
-            }
-            if ($missingFolders.Count -gt 0) {
-                Write-Log "Missing folders at destination: $($missingFolders -join ', ')" 'WARN'
-            } else {
-                Write-Log "Verified: Last 5 folders exist at destination"
-            }
-        } else {
-            Write-Log "Robocopy not found, using Copy-Item fallback"
-            Copy-Item -Path (Join-Path $targetFolder '*') -Destination $officeTarget -Recurse -Force
+            if ($rcExit -ge 8) { throw "Robocopy failed with exit code $rcExit to $officeTarget" }
+            Write-Log "Robocopy completed with exit code $rcExit"
+        }
+        else {
+            Copy-Item -Path (Join-Path $targetFolder '*') -Destination $officeTarget -Recurse -Force -ErrorAction Stop
         }
 
+        $build | Set-Content -LiteralPath $StateFile -Encoding ASCII -ErrorAction Stop
+        Invoke-Cleanup -DaysToKeep $RetentionDays -CurrentFolder $versionBuild
         exit 1
 
     }
     else {
         Write-Log "No change. Still at $previousBuild."
+        Invoke-Cleanup -DaysToKeep $RetentionDays -CurrentFolder $versionBuild
         exit 0
     }
 }
@@ -176,5 +186,3 @@ catch {
     if (-not $Quiet) { Write-Error $_ }
     exit 9
 }
-
-notepad $logfile
