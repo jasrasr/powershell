@@ -191,7 +191,12 @@ foreach ($installer in $config.directInstallers) {
             throw "Authenticode verification failed for $($installer.name): $($signature.Status)."
         }
         Write-Host "Installing: $($installer.name)"
-        $process = Start-Process -FilePath $downloadPath -ArgumentList $installer.arguments -Wait -PassThru
+        $process = Start-Process -FilePath $downloadPath -ArgumentList $installer.arguments -PassThru
+        # Avoid Start-Process -Wait: it also waits for child processes (e.g. an app launched by the installer) and can hang.
+        if (-not $process.WaitForExit(600000)) {
+            Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+            throw "$($installer.name) installer did not finish within 10 minutes and was stopped."
+        }
         if ($process.ExitCode -ne 0) {
             throw "$($installer.name) installer returned exit code $($process.ExitCode)."
         }
