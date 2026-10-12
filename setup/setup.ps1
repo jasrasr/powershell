@@ -225,13 +225,16 @@ foreach ($installer in $config.directInstallers) {
         Write-Host "Installing: $($installer.name)"
         $process = Start-Process -FilePath $downloadPath -ArgumentList $installer.arguments -PassThru
         # Avoid Start-Process -Wait: it also waits for child processes (e.g. an app launched by the installer) and can hang.
-        if (-not $process.WaitForExit(600000)) {
+        if (-not $process.WaitForExit(300000)) {
             Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
-            throw "$($installer.name) installer did not finish within 10 minutes and was stopped."
+            throw "$($installer.name) installer did not finish within 5 minutes and was stopped."
         }
         if ($process.ExitCode -ne 0) {
             throw "$($installer.name) installer returned exit code $($process.ExitCode)."
         }
+    }
+    catch {
+        Write-Warning "$($installer.name) was not installed: $($_.Exception.Message) Continuing with the remaining steps."
     }
     finally {
         Remove-Item -LiteralPath $downloadPath -Force -ErrorAction SilentlyContinue
@@ -316,7 +319,8 @@ foreach ($setting in $config.appSettings) {
     if ($processName -and -not $WhatIf) {
         Get-Process -Name $processName -ErrorAction SilentlyContinue | Stop-Process -Force
     }
-    Install-AppSettings -Setting $setting
+    try { Install-AppSettings -Setting $setting }
+    catch { Write-Warning "Could not apply $($setting.name) settings: $($_.Exception.Message) Continuing." }
 }
 
 if ($config.profile.enabled) {
