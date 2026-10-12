@@ -112,6 +112,38 @@ if (Get-Module -ListAvailable PSReadLine) {
     }
 }
 
+function Install-AppSettings {
+    param([Parameter(Mandatory)]$Setting)
+
+    $destination = [Environment]::ExpandEnvironmentVariables($Setting.destination)
+    if ($WhatIf) {
+        Write-Host "[WhatIf] Apply $($Setting.name) settings from $($Setting.source) to $destination"
+        return
+    }
+
+    $sourceUrl = [Uri]::new([Uri]$ConfigUrl, $Setting.source).AbsoluteUri
+    $temp = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName())
+    try {
+        Invoke-WebRequest -UseBasicParsing -Uri $sourceUrl -OutFile $temp
+    }
+    catch {
+        Write-Warning "Skipping $($Setting.name) settings; could not download $sourceUrl."
+        return
+    }
+
+    try {
+        New-Item -ItemType Directory -Path (Split-Path $destination) -Force | Out-Null
+        if ((Test-Path -LiteralPath $destination) -and $Setting.backup) {
+            Copy-Item -LiteralPath $destination -Destination "$destination.bak" -Force
+        }
+        Copy-Item -LiteralPath $temp -Destination $destination -Force
+        Write-Host "Applied $($Setting.name) settings: $destination"
+    }
+    finally {
+        Remove-Item -LiteralPath $temp -Force -ErrorAction SilentlyContinue
+    }
+}
+
 if (-not $IsWindows -and $PSVersionTable.PSEdition -eq 'Core') {
     throw 'This setup currently supports Windows only.'
 }
@@ -121,12 +153,17 @@ $config = Invoke-RestMethod -Uri $ConfigUrl -UseBasicParsing
 
 $winget = Get-Command winget.exe -ErrorAction SilentlyContinue
 if (-not $winget) {
+    $wingetPath = Join-Path $env:LOCALAPPDATA 'Microsoft\WindowsApps\winget.exe'
+    if (Test-Path -LiteralPath $wingetPath) { $winget = Get-Command $wingetPath }
+}
+if (-not $winget) {
     Write-Step 'Bootstrapping WinGet'
     if ($WhatIf) {
         Write-Host '[WhatIf] Install Microsoft.WinGet.Client and repair WinGet'
     }
     else {
-        Install-PackageProvider -Name NuGet -Force | Out-Null
+        try { Install-PackageProvider -Name NuGet -Force -ErrorAction Stop | Out-Null }
+        catch { Write-Warning "NuGet provider install failed ($($_.Exception.Message)); continuing." }
         Install-Module Microsoft.WinGet.Client -Repository PSGallery -Scope CurrentUser -Force -AllowClobber
         Import-Module Microsoft.WinGet.Client
         Repair-WinGetPackageManager -AllUsers:$false
@@ -191,10 +228,18 @@ foreach ($installer in $config.directInstallers) {
             throw "Authenticode verification failed for $($installer.name): $($signature.Status)."
         }
         Write-Host "Installing: $($installer.name)"
-        $process = Start-Process -FilePath $downloadPath -ArgumentList $installer.arguments -Wait -PassThru
+        $process = Start-Process -FilePath $downloadPath -ArgumentList $installer.arguments -PassThru
+        # Avoid Start-Process -Wait: it also waits for child processes (e.g. an app launched by the installer) and can hang.
+        if (-not $process.WaitForExit(300000)) {
+            Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+            throw "$($installer.name) installer did not finish within 5 minutes and was stopped."
+        }
         if ($process.ExitCode -ne 0) {
             throw "$($installer.name) installer returned exit code $($process.ExitCode)."
         }
+    }
+    catch {
+        Write-Warning "$($installer.name) was not installed: $($_.Exception.Message) Continuing with the remaining steps."
     }
     finally {
         Remove-Item -LiteralPath $downloadPath -Force -ErrorAction SilentlyContinue
@@ -249,6 +294,38 @@ foreach ($capability in $config.windowsCapabilities) {
         if ($state.State -eq 'Installed') { Write-Host "Already installed: $($capability.name)" }
         else { Add-WindowsCapability -Online -Name $capability.id | Out-Null }
     }
+}
+
+Write-Step 'Installing Visual Studio Code extensions'
+$code = Get-Command code.cmd -ErrorAction SilentlyContinue
+if (-not $code) {
+    $codePath = Join-Path $env:LOCALAPPDATA 'Programs\Microsoft VS Code\bin\code.cmd'
+    if (Test-Path -LiteralPath $codePath) { $code = Get-Command $codePath }
+}
+foreach ($extension in $config.vscodeExtensions) {
+    if (-not $extension.enabled) { continue }
+    if ($WhatIf) {
+        Write-Host "[WhatIf] Install VS Code extension $($extension.id)"
+    }
+    elseif (-not $code) {
+        Write-Warning 'VS Code command line is not available; skipping extensions.'
+        break
+    }
+    else {
+        & $code.Source --install-extension $extension.id --force
+        if ($LASTEXITCODE -ne 0) { Write-Warning "Could not install VS Code extension $($extension.id)." }
+    }
+}
+
+Write-Step 'Applying application settings'
+foreach ($setting in $config.appSettings) {
+    if (-not $setting.enabled) { continue }
+    $processName = $setting.stopProcess
+    if ($processName -and -not $WhatIf) {
+        Get-Process -Name $processName -ErrorAction SilentlyContinue | Stop-Process -Force
+    }
+    try { Install-AppSettings -Setting $setting }
+    catch { Write-Warning "Could not apply $($setting.name) settings: $($_.Exception.Message) Continuing." }
 }
 
 if ($config.profile.enabled) {

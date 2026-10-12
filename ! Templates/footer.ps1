@@ -14,3 +14,7 @@ catch {
 
     exit 1
 }
+
+# Examples 
+# . filename.fileext -param value
+# & filename.fileext -param value
