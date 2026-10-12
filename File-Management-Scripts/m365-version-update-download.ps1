@@ -1,8 +1,8 @@
-# Revision : 1.5.1
+# Revision : 1.5.2
 # Description : Check Microsoft 365 Apps "Current Channel" build on MS Learn.
 #               On change: create ODT folder named <version>_<build>, copy setup/config,
-#               run ODT download, then mirror to $clesccm\Microsoft\Office 365\<version>_<build>.
-#               -Force: Download on first run (fresh folder). Cleanup removes builds older than -RetentionDays.
+#               run ODT download and retain builds locally under $onedrivepath\odt.
+#               -Force: Download even if the build is unchanged. Cleanup removes older local builds.
 # Author : Jason Lamb (with help from ChatGPT and Claude)
 # Created : 2025-04-15
 # Modified : 2026-10-12
@@ -51,19 +51,6 @@ function Invoke-Cleanup {
         foreach ($folder in $localFolders) {
             if ($folder.LastWriteTime -lt $cutoffDate) {
                 Write-Log "Removing local folder: $($folder.FullName)"
-                Remove-Item -LiteralPath $folder.FullName -Recurse -Force -ErrorAction Stop
-                $removed += $folder.Name
-            }
-        }
-    }
-
-    # Cleanup CCM mirror
-    $officeRoot = Join-Path $clesccm 'Microsoft\Office 365'
-    if (Test-Path $officeRoot) {
-        $ccmFolders = Get-ChildItem -LiteralPath $officeRoot -Directory | Where-Object { $_.Name -match '^\d+\.\d+_\d+(?:\.\d+)*$' -and $_.Name -ne $CurrentFolder }
-        foreach ($folder in $ccmFolders) {
-            if ($folder.LastWriteTime -lt $cutoffDate) {
-                Write-Log "Removing CCM folder: $($folder.FullName)"
                 Remove-Item -LiteralPath $folder.FullName -Recurse -Force -ErrorAction Stop
                 $removed += $folder.Name
             }
@@ -153,23 +140,7 @@ try {
             Write-Log "ODT download completed with exit code 0"
         }
 
-        # Copy downloaded content to the CCM destination before recording success.
-        $officeRoot = Join-Path $clesccm 'Microsoft\Office 365'
-        $officeTarget = Join-Path $officeRoot $versionBuild
-        New-Item -Path $officeTarget -ItemType Directory -Force -ErrorAction Stop | Out-Null
-        Write-Log "Copying to $officeTarget"
-        $robocopy = Join-Path $env:SystemRoot 'System32\robocopy.exe'
-        if (Test-Path -LiteralPath $robocopy) {
-            $rcArgs = @($targetFolder, $officeTarget, '/E', '/R:2', '/W:2', '/NFL', '/NDL', '/NP', '/NJH', '/NJS')
-            & $robocopy @rcArgs | Out-Null
-            $rcExit = $LASTEXITCODE
-            if ($rcExit -ge 8) { throw "Robocopy failed with exit code $rcExit to $officeTarget" }
-            Write-Log "Robocopy completed with exit code $rcExit"
-        }
-        else {
-            Copy-Item -Path (Join-Path $targetFolder '*') -Destination $officeTarget -Recurse -Force -ErrorAction Stop
-        }
-
+        # Record the build only after the local download succeeds.
         $build | Set-Content -LiteralPath $StateFile -Encoding ASCII -ErrorAction Stop
         Invoke-Cleanup -DaysToKeep $RetentionDays -CurrentFolder $versionBuild
         exit 1
