@@ -2,6 +2,7 @@
   "apps": [
     { "name": "PowerShell 7", "id": "Microsoft.PowerShell", "enabled": true, "upgrade": true },
     { "name": "PowerShell 7 Preview", "id": "Microsoft.PowerShell.Preview", "enabled": true, "upgrade": true },
+    { "name": "Windows Terminal", "id": "Microsoft.WindowsTerminal", "enabled": true },
     { "name": "Git", "id": "Git.Git", "enabled": true },
     { "name": "Visual Studio Code", "id": "Microsoft.VisualStudioCode", "enabled": true },
     { "name": "7-Zip", "id": "7zip.7zip", "enabled": true },
@@ -32,8 +33,11 @@
     { "id": "ms-vscode.powershell", "enabled": true }
   ],
   "appSettings": [
-    { "name": "Greenshot", "source": "config/greenshot/Greenshot.ini", "destination": "%APPDATA%\\Greenshot\\Greenshot.ini", "backup": true, "stopProcess": "Greenshot", "enabled": false },
-    { "name": "Everything", "source": "config/everything/Everything.ini", "destination": "%APPDATA%\\Everything\\Everything.ini", "backup": true, "stopProcess": "Everything", "enabled": false },
+    { "name": "Greenshot", "source": "config/Greenshot.ini", "destination": "%APPDATA%\\Greenshot\\Greenshot.ini", "backup": true, "stopProcess": "Greenshot", "expandPathTokens": true, "enabled": true },
+    { "name": "Everything", "source": "config/Everything.ini", "destination": "%APPDATA%\\Everything\\Everything.ini", "backup": true, "stopProcess": "Everything", "enabled": true },
+    { "name": "Windows Terminal", "source": "config/terminal-settings.json", "destination": "%LOCALAPPDATA%\\Packages\\Microsoft.WindowsTerminal_8wekyb3d8bbwe\\LocalState\\settings.json", "backup": true, "enabled": true },
+    { "name": "3D Clipboard", "source": "config/3dclipboard.reg", "registryImport": true, "stopProcess": "clip", "enabled": true },
+    { "name": "PowerToys", "source": "config/powertoys-settings.zip", "destination": "%LOCALAPPDATA%\\Microsoft\\PowerToys", "extract": true, "expandPathTokens": true, "stopProcess": ["PowerToys", "PowerToys.Settings"], "enabled": true },
     { "name": "Visual Studio Code settings", "source": "config/vscode/settings.json", "destination": "%APPDATA%\\Code\\User\\settings.json", "backup": true, "enabled": false },
     { "name": "Visual Studio Code keybindings", "source": "config/vscode/keybindings.json", "destination": "%APPDATA%\\Code\\User\\keybindings.json", "backup": true, "enabled": false }
   ],
@@ -45,6 +49,8 @@
   "windowsCapabilities": [
     { "name": "Active Directory RSAT tools", "id": "Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0", "enabled": true }
   ],
+  "requireOneDrive": true,
+  "finalPass": { "enabled": true },
   "profile": { "enabled": true },
   "registrySettings": [
     {
@@ -63,6 +69,9 @@
       "type": "DWord",
       "enabled": true
     }
+  ],
+  "postInstallNotes": [
+    "Mouse Without Borders is enabled in PowerToys but its security key is intentionally not stored in this repo. Open PowerToys > Mouse Without Borders and enter (or generate and share) the key from your password manager."
   ],
   "restartExplorer": true
 }

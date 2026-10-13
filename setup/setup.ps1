@@ -9,6 +9,15 @@ param(
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
+# When run as a file beside setup.json (and no -ConfigUrl given), read the config and
+# settings files from that folder instead of GitHub. `irm | iex` has no script path,
+# so it still downloads everything from $ConfigUrl.
+$LocalRoot = $null
+if (-not $PSBoundParameters.ContainsKey('ConfigUrl') -and $PSScriptRoot -and
+    (Test-Path -LiteralPath (Join-Path $PSScriptRoot 'setup.json'))) {
+    $LocalRoot = $PSScriptRoot
+}
+
 function Write-Step {
     param([string]$Message)
     Write-Host "`n==> $Message" -ForegroundColor Cyan
@@ -65,39 +74,29 @@ function Test-InstalledApplication {
 
 function Install-PowerShellProfile {
     $documents = [Environment]::GetFolderPath('MyDocuments')
-    $commonDirectory = Join-Path $documents 'PowerShell'
-    $commonProfile = Join-Path $commonDirectory 'Profile.Common.ps1'
     $profilePaths = @(
         (Join-Path $documents 'PowerShell\profile.ps1'),
         (Join-Path $documents 'WindowsPowerShell\profile.ps1')
     )
     $startMarker = '# >>> jasr.me setup >>>'
     $endMarker = '# <<< jasr.me setup <<<'
+    # The real profile lives in the synced OneDrive file; this block only loads it.
     $managedBlock = @"
 $startMarker
-`$commonProfile = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'PowerShell\Profile.Common.ps1'
-if (Test-Path -LiteralPath `$commonProfile) { . `$commonProfile }
-$endMarker
-"@
-    $commonContent = @'
-# Shared PowerShell profile managed by jasr.me/setup.
-$PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
-if (Get-Module -ListAvailable PSReadLine) {
-    Import-Module PSReadLine
-    Set-PSReadLineOption -EditMode Windows -HistoryNoDuplicates -BellStyle None
-    if ($Host.Name -eq 'ConsoleHost') {
-        Set-PSReadLineOption -PredictionSource History -ErrorAction SilentlyContinue
+if (`$env:OneDriveCommercial) {
+    `$commonpowershellprofilepath = Join-Path `$env:OneDriveCommercial '!commonpowershellprofilepath.ps1'
+    if (Test-Path `$commonpowershellprofilepath) {
+        . `$commonpowershellprofilepath
     }
 }
-'@
+$endMarker
+"@
 
     if ($WhatIf) {
-        Write-Host "[WhatIf] Configure shared profile $commonProfile for PowerShell 5.1 and 7"
+        Write-Host '[WhatIf] Add OneDrive common-profile loader to the PowerShell 5.1 and 7 profiles'
         return
     }
 
-    New-Item -ItemType Directory -Path $commonDirectory -Force | Out-Null
-    Set-Content -LiteralPath $commonProfile -Value $commonContent -Encoding utf8
     foreach ($profilePath in $profilePaths) {
         New-Item -ItemType Directory -Path (Split-Path $profilePath) -Force | Out-Null
         $content = if (Test-Path -LiteralPath $profilePath) { Get-Content -LiteralPath $profilePath -Raw } else { '' }
@@ -112,31 +111,105 @@ if (Get-Module -ListAvailable PSReadLine) {
     }
 }
 
+function Resolve-PicturesFolder {
+    # First existing Pictures folder: OneDrive for Business, then OneDrive, then the user profile.
+    $candidates = @(
+        $(if ($env:OneDriveCommercial) { Join-Path $env:OneDriveCommercial 'Pictures' }),
+        $(if ($env:OneDrive) { Join-Path $env:OneDrive 'Pictures' }),
+        (Join-Path $env:USERPROFILE 'Pictures')
+    )
+    foreach ($candidate in $candidates) {
+        if ($candidate -and (Test-Path -LiteralPath $candidate)) { return $candidate }
+    }
+    # None exist yet: fall back to the profile Pictures folder (created with the Screenshots folder).
+    return (Join-Path $env:USERPROFILE 'Pictures')
+}
+
 function Install-AppSettings {
     param([Parameter(Mandatory)]$Setting)
 
-    $destination = [Environment]::ExpandEnvironmentVariables($Setting.destination)
+    $destination = if ($Setting.destination) { [Environment]::ExpandEnvironmentVariables($Setting.destination) } else { 'registry' }
     if ($WhatIf) {
         Write-Host "[WhatIf] Apply $($Setting.name) settings from $($Setting.source) to $destination"
         return
     }
 
-    $sourceUrl = [Uri]::new([Uri]$ConfigUrl, $Setting.source).AbsoluteUri
     $temp = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName())
     try {
-        Invoke-WebRequest -UseBasicParsing -Uri $sourceUrl -OutFile $temp
+        if ($LocalRoot) {
+            # Local mode: the script was run from its own folder, so use the files beside it.
+            $sourcePath = Join-Path $LocalRoot $Setting.source
+            Copy-Item -LiteralPath $sourcePath -Destination $temp -Force -ErrorAction Stop
+        }
+        else {
+            $sourceUrl = [Uri]::new([Uri]$ConfigUrl, $Setting.source).AbsoluteUri
+            Invoke-WebRequest -UseBasicParsing -Uri $sourceUrl -OutFile $temp
+        }
     }
     catch {
-        Write-Warning "Skipping $($Setting.name) settings; could not download $sourceUrl."
+        Write-Warning "Skipping $($Setting.name) settings; could not read $($Setting.source)."
         return
     }
 
     try {
+        if ($Setting.registryImport) {
+            # .reg file imported into HKCU (e.g. 3D Clipboard).
+            $regPath = "$temp.reg"
+            Move-Item -LiteralPath $temp -Destination $regPath -Force
+            $temp = $regPath
+            & reg.exe import $regPath 2>&1 | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "reg.exe import returned exit code $LASTEXITCODE." }
+            Write-Host "Applied $($Setting.name) settings: registry"
+            return
+        }
+
+        if ($Setting.extract) {
+            # Zip of settings files extracted into the destination folder (e.g. PowerToys).
+            $zipPath = "$temp.zip"
+            Move-Item -LiteralPath $temp -Destination $zipPath -Force
+            $temp = $zipPath
+            New-Item -ItemType Directory -Path $destination -Force | Out-Null
+            Expand-Archive -LiteralPath $zipPath -DestinationPath $destination -Force
+            if ($Setting.expandPathTokens) {
+                # Extracted files are JSON: insert this machine's profile path with backslashes escaped.
+                $jsonProfile = $env:USERPROFILE.Replace('\', '\\')
+                Get-ChildItem -LiteralPath $destination -Recurse -File -Filter *.json |
+                    Where-Object { Select-String -LiteralPath $_.FullName -Pattern '%USERPROFILE%' -SimpleMatch -Quiet } |
+                    ForEach-Object {
+                        $json = [IO.File]::ReadAllText($_.FullName).Replace('%USERPROFILE%', $jsonProfile)
+                        [IO.File]::WriteAllText($_.FullName, $json, [Text.UTF8Encoding]::new($false))
+                    }
+            }
+            Write-Host "Applied $($Setting.name) settings: $destination"
+            return
+        }
+
         New-Item -ItemType Directory -Path (Split-Path $destination) -Force | Out-Null
         if ((Test-Path -LiteralPath $destination) -and $Setting.backup) {
             Copy-Item -LiteralPath $destination -Destination "$destination.bak" -Force
         }
-        Copy-Item -LiteralPath $temp -Destination $destination -Force
+        if ($Setting.expandPathTokens) {
+            # Replace path tokens with this machine's locations. %MYPICTURES% follows
+            # folder redirection (e.g. OneDrive known folder move).
+            $text = Get-Content -LiteralPath $temp -Raw
+            $picturesFolder = Resolve-PicturesFolder
+            $tokens = [ordered]@{
+                '%SCREENSHOTS%'  = Join-Path $picturesFolder 'Screenshots'
+                '%MYPICTURES%'   = $picturesFolder
+                '%USERPROFILE%'  = $env:USERPROFILE
+                '%LOCALAPPDATA%' = $env:LOCALAPPDATA
+                '%APPDATA%'      = $env:APPDATA
+            }
+            foreach ($token in $tokens.Keys) { $text = $text.Replace($token, $tokens[$token]) }
+            if ($text.Contains($tokens['%SCREENSHOTS%']) -and -not (Test-Path -LiteralPath $tokens['%SCREENSHOTS%'])) {
+                New-Item -ItemType Directory -Path $tokens['%SCREENSHOTS%'] -Force | Out-Null
+                Write-Host "Created screenshots folder: $($tokens['%SCREENSHOTS%'])"
+            }
+            [IO.File]::WriteAllText($destination, $text, [Text.UTF8Encoding]::new($false))
+        }
+        else {
+            Copy-Item -LiteralPath $temp -Destination $destination -Force
+        }
         Write-Host "Applied $($Setting.name) settings: $destination"
     }
     finally {
@@ -149,7 +222,28 @@ if (-not $IsWindows -and $PSVersionTable.PSEdition -eq 'Core') {
 }
 
 Write-Step 'Loading setup configuration'
-$config = Invoke-RestMethod -Uri $ConfigUrl -UseBasicParsing
+if ($LocalRoot) {
+    Write-Host "Using local configuration: $LocalRoot"
+    $config = Get-Content -LiteralPath (Join-Path $LocalRoot 'setup.json') -Raw | ConvertFrom-Json
+}
+else {
+    $config = Invoke-RestMethod -Uri $ConfigUrl -UseBasicParsing
+}
+
+if ($config.requireOneDrive) {
+    Write-Step 'Checking OneDrive'
+    $oneDriveRoot = $env:OneDriveCommercial
+    if (-not $oneDriveRoot -or -not (Test-Path -LiteralPath $oneDriveRoot)) {
+        $message = 'OneDrive for Business is not signed in. Sign in to OneDrive, let it finish syncing, then run setup again.'
+        if ($WhatIf) { Write-Warning $message } else { throw $message }
+    }
+    elseif (-not (Test-Path -LiteralPath (Join-Path $oneDriveRoot '!commonpowershellprofilepath.ps1'))) {
+        Write-Warning 'OneDrive is signed in but !commonpowershellprofilepath.ps1 has not synced yet; the PowerShell profile will load it once it appears.'
+    }
+    else {
+        Write-Host "OneDrive ready: $oneDriveRoot"
+    }
+}
 
 $winget = Get-Command winget.exe -ErrorAction SilentlyContinue
 if (-not $winget) {
@@ -202,6 +296,10 @@ foreach ($app in $config.apps) {
     if ($action -eq 'upgrade' -and $LASTEXITCODE -eq -1978335189) {
         # APPINSTALLER_CLI_ERROR_UPDATE_NOT_APPLICABLE: already up to date.
         Write-Host "Already up to date: $($app.name)"
+    }
+    elseif ($action -eq 'upgrade' -and $LASTEXITCODE -eq -1978335090) {
+        # Installed package type (e.g. MSI vs MSIX) differs from the one WinGet offers.
+        Write-Warning "$($app.name) cannot be upgraded in place because the install technology differs. From a different shell, run: winget uninstall --id $($app.id); winget install --id $($app.id) --source winget"
     }
     elseif ($LASTEXITCODE -ne 0) {
         Write-Warning "WinGet could not $action $($app.name) (exit code $LASTEXITCODE)."
@@ -278,9 +376,12 @@ foreach ($module in $config.powershellModules) {
     if ($WhatIf) {
         Write-Host "[WhatIf] Install/update PowerShell module $($module.name)"
     }
+    elseif ((Get-Module -ListAvailable -Name $module.name) -and -not $module.upgrade) {
+        Write-Host "Already installed: $($module.name)"
+    }
     else {
         Write-Host "Installing/updating module: $($module.name)"
-        Install-Module -Name $module.name -Repository PSGallery -Scope CurrentUser -Force -AllowClobber -AcceptLicense
+        Install-Module -Name $module.name -Repository PSGallery -Scope CurrentUser -Force -AllowClobber -AcceptLicense -WarningAction SilentlyContinue
     }
 }
 
@@ -354,5 +455,98 @@ if ($config.restartExplorer) {
     }
 }
 
+if ($config.finalPass.enabled) {
+    Write-Step 'Final pass: updating PowerShell and modules'
+
+    # Re-check apps flagged for upgrade (PowerShell stable and preview) now that everything else is installed.
+    foreach ($app in $config.apps) {
+        if (-not $app.enabled -or -not $app.upgrade) { continue }
+        if ($WhatIf) {
+            Write-Host "[WhatIf] Final upgrade check: $($app.name)"
+            continue
+        }
+        & $winget.Source upgrade --id $app.id --exact --source winget --silent --accept-package-agreements --accept-source-agreements | Out-Null
+        switch ($LASTEXITCODE) {
+            0 { Write-Host "Upgraded: $($app.name)" }
+            -1978335189 { Write-Host "Up to date: $($app.name)" }
+            -1978335090 { Write-Warning "$($app.name) needs an uninstall and reinstall (install technology differs); see the earlier warning." }
+            default { Write-Warning "Could not confirm the latest $($app.name) (exit code $LASTEXITCODE)." }
+        }
+    }
+
+    # Modules are installed and updated in fresh processes so nothing is loaded (and locked) by this session.
+    $moduleScript = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName() + '.ps1')
+    $moduleNames = (@($config.powershellModules | Where-Object enabled | ForEach-Object name)) -join ','
+    $moduleHosts = @()
+    $pwshCommand = Get-Command pwsh.exe -ErrorAction SilentlyContinue
+    if (-not $pwshCommand -and (Test-Path -LiteralPath "$env:ProgramFiles\PowerShell\7\pwsh.exe")) {
+        $pwshCommand = Get-Command "$env:ProgramFiles\PowerShell\7\pwsh.exe"
+    }
+    if ($pwshCommand) { $moduleHosts += @{ Name = 'PowerShell 7'; Path = $pwshCommand.Source } }
+    $moduleHosts += @{ Name = 'Windows PowerShell 5.1'; Path = (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe') }
+
+    foreach ($moduleHost in $moduleHosts) {
+        if ($WhatIf) {
+            Write-Host "[WhatIf] Install missing and update installed modules in $($moduleHost.Name)"
+            continue
+        }
+        Set-Content -LiteralPath $moduleScript -Encoding utf8 -Value @'
+param([string]$Names)
+$ProgressPreference = 'SilentlyContinue'
+foreach ($name in ($Names -split ',' | Where-Object { $_ })) {
+    if (-not (Get-Module -ListAvailable -Name $name)) {
+        try { Install-Module -Name $name -Repository PSGallery -Scope CurrentUser -Force -AllowClobber -AcceptLicense -WarningAction SilentlyContinue -ErrorAction Stop; Write-Host "Installed: $name" }
+        catch { Write-Warning "Could not install $name : $($_.Exception.Message)" }
+    }
+}
+foreach ($module in (Get-InstalledModule -ErrorAction SilentlyContinue)) {
+    try { Update-Module -Name $module.Name -Force -AcceptLicense -WarningAction SilentlyContinue -ErrorAction Stop; Write-Host "Checked: $($module.Name)" }
+    catch { Write-Warning "Could not update $($module.Name): $($_.Exception.Message)" }
+}
+'@
+        Write-Host "Modules in $($moduleHost.Name)"
+        & $moduleHost.Path -NoProfile -ExecutionPolicy Bypass -File $moduleScript -Names $moduleNames
+    }
+    Remove-Item -LiteralPath $moduleScript -Force -ErrorAction SilentlyContinue
+
+    if (-not $WhatIf) {
+        # Second check: confirm everything the config asked for is actually present.
+        Write-Step 'Verification'
+        $missing = [Collections.Generic.List[string]]::new()
+        foreach ($app in $config.apps) {
+            if (-not $app.enabled) { continue }
+            $found = & $winget.Source list --id $app.id --exact --accept-source-agreements 2>$null | Select-String -SimpleMatch $app.id
+            if (-not $found) { $missing.Add("App: $($app.name)") }
+        }
+        foreach ($installer in $config.directInstallers) {
+            if ($installer.enabled -and -not (Test-InstalledApplication -DisplayNamePattern $installer.displayNamePattern)) { $missing.Add("App: $($installer.name)") }
+        }
+        if ($npm) {
+            $globalPackages = & $npm.Source ls --global --depth=0 2>$null | Out-String
+            foreach ($package in $config.npmPackages) {
+                if ($package.enabled -and $globalPackages -notmatch [regex]::Escape($package.id)) { $missing.Add("npm: $($package.name)") }
+            }
+        }
+        foreach ($module in $config.powershellModules) {
+            if ($module.enabled -and -not (Get-Module -ListAvailable -Name $module.name)) { $missing.Add("Module: $($module.name)") }
+        }
+        foreach ($setting in $config.appSettings) {
+            if ($setting.enabled -and $setting.destination -and -not (Test-Path -LiteralPath ([Environment]::ExpandEnvironmentVariables($setting.destination)))) {
+                $missing.Add("Settings: $($setting.name)")
+            }
+        }
+        if ($missing.Count -eq 0) {
+            Write-Host 'Everything in the configuration is installed and applied.' -ForegroundColor Green
+        }
+        else {
+            Write-Warning 'These items are missing; run setup again or check the messages above:'
+            $missing | ForEach-Object { Write-Warning "  $_" }
+        }
+    }
+}
+
 Write-Step 'Setup complete'
 Write-Host 'Some application or Windows changes may require signing out or restarting.'
+foreach ($note in $config.postInstallNotes) {
+    Write-Host "REMINDER: $note" -ForegroundColor Yellow
+}

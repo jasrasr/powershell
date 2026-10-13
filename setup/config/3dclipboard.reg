@@ -1,0 +1,45 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CURRENT_USER\Software\Vince Valenti\3D Clipboard]
+"ClearClipboard"=dword:00000001
+"MaxItems"=dword:00000024
+"NormalHotkey"=dword:00000643
+"AutoPasteHotkey"=dword:00000656
+"EditHotkey"=dword:00000645
+"SaveOnExit"=dword:00000001
+"AutoSave"=dword:00000001
+"AutoSaveFreq"=dword:0000001e
+"RememberImages"=dword:00000000
+"SaveImagesToFile"=dword:00000000
+"MaxImageSize"=dword:00001400
+"ShowItemSize"=dword:00000001
+"AutoUpdate"=dword:00000001
+"UpdateFreq"=dword:00000007
+"OnWhenEditing"=dword:00000000
+"WhatsNew"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Vince Valenti\3D Clipboard\Actions]
+
+[HKEY_CURRENT_USER\Software\Vince Valenti\3D Clipboard\Actions\Lower Case]
+"Language"="{B54F3741-5B07-11CF-A4B0-00AA004A55E8}"
+"Script"="Clipboard.Value = LCase(Clipboard.Value)"
+
+[HKEY_CURRENT_USER\Software\Vince Valenti\3D Clipboard\Actions\Open URL]
+"Language"="{B54F3741-5B07-11CF-A4B0-00AA004A55E8}"
+"Script"="Set wShell = CreateObject(\"Shell.Application\")
+
+wShell.Open Clipboard.Value"
+
+[HKEY_CURRENT_USER\Software\Vince Valenti\3D Clipboard\Actions\Trim]
+"Language"="{B54F3741-5B07-11CF-A4B0-00AA004A55E8}"
+"Script"="Clipboard.Value = Trim(Clipboard.Value)"
+
+[HKEY_CURRENT_USER\Software\Vince Valenti\3D Clipboard\Actions\Upper Case]
+"Language"="{B54F3741-5B07-11CF-A4B0-00AA004A55E8}"
+"Script"="Clipboard.Value = UCase(Clipboard.Value)"
+
+[HKEY_CURRENT_USER\Software\Vince Valenti\3D Clipboard\AutoPasteBehaviors]
+"ConsoleWindowClass"=dword:00000002
+"PuTTY"=dword:00000001
+"Van Dyke Technologies - SecureCRT"=dword:00000001
+"VanDyke Software - SecureCRT"=dword:00000001
