@@ -203,6 +203,10 @@ foreach ($app in $config.apps) {
         # APPINSTALLER_CLI_ERROR_UPDATE_NOT_APPLICABLE: already up to date.
         Write-Host "Already up to date: $($app.name)"
     }
+    elseif ($action -eq 'upgrade' -and $LASTEXITCODE -eq -1978335090) {
+        # APPINSTALLER_CLI_ERROR_UPGRADE_VERSION_NOT_NEWER-style technology mismatch (e.g. MSI vs MSIX): cannot upgrade in place.
+        Write-Warning "$($app.name): installed package uses a different install technology than the newer version; skipping upgrade. Uninstall it (winget uninstall --id $($app.id)) and rerun setup to move to the newer package."
+    }
     elseif ($LASTEXITCODE -ne 0) {
         Write-Warning "WinGet could not $action $($app.name) (exit code $LASTEXITCODE)."
     }
