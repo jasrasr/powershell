@@ -1,6 +1,6 @@
 # Filename: git-update-all.ps1
 # Revision : 1.1.1
-# Description : Run git-update against every Git repository below a parent folder.
+# Description : Run git-update against the approved GitHub repository allowlist.
 #               Uses the dedicated GIT_UPDATE_OPENAI_API_KEY environment variable
 #               through git-update.ps1 when generating commit messages.
 # Author : Jason Lamb
@@ -74,7 +74,28 @@ function git-update-all {
         throw "git-update function was not loaded from '$GitUpdateScript'."
     }
 
-    $repositories = @(Find-GitRepository -Path $ParentPath)
+    $repositoryPaths = @(
+        'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\jasrasr.github.io'
+        'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\jl-wp-plugins-pack'
+        'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\jl-wp-theme-dark'
+        'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\justjason-fyi'
+        'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell'
+        'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell-private'
+        'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\website'
+    )
+
+    $repositories = @(
+        foreach ($repositoryPath in $repositoryPaths) {
+            if (Test-Path -LiteralPath $repositoryPath -PathType Container) {
+                [pscustomobject]@{
+                    Name = Split-Path -Leaf $repositoryPath
+                    Path = $repositoryPath
+                }
+            } else {
+                Write-Host "Skipping unavailable repository: $repositoryPath" -ForegroundColor Yellow
+            }
+        }
+    )
 
     if ($repositories.Count -eq 0) {
         Write-Host "No Git repositories found under '$ParentPath'." -ForegroundColor Yellow
