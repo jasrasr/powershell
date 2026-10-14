@@ -1,6 +1,8 @@
 # Filename: git-update-all.ps1
 # Revision : 1.1.1
 # Description : Run git-update against every Git repository below a parent folder.
+#               Uses the dedicated GIT_UPDATE_OPENAI_API_KEY environment variable
+#               through git-update.ps1 when generating commit messages.
 # Author : Jason Lamb
 # Created Date : 2026-06-13
 # Modified Date : 2026-09-25

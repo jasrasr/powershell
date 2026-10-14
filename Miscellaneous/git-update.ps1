@@ -2,6 +2,7 @@
 # Revision : 1.0.2
 # Description : Smart git pull/add/commit/push. Generates AI commit message from diff via OpenAI.
 #               Use -Quick to skip AI and use a timestamped message instead.
+#               Uses the dedicated GIT_UPDATE_OPENAI_API_KEY environment variable.
 # Author : Jason Lamb (with help from Claude Code CLI)
 # Created Date : 2026-05-05
 # Modified Date : 2026-09-25
@@ -64,8 +65,8 @@ function git-update {
         $commitMessage = "updated several files $datetime"
         Write-Host "Quick mode: using timestamped message." -ForegroundColor Cyan
     } else {
-        if (-not $env:OPENAI_API_KEY) {
-            Write-Host "OPENAI_API_KEY not set. Falling back to timestamped message." -ForegroundColor Yellow
+        if (-not $env:GIT_UPDATE_OPENAI_API_KEY) {
+            Write-Host "GIT_UPDATE_OPENAI_API_KEY not set. Falling back to timestamped message." -ForegroundColor Yellow
             $commitMessage = "updated several files $datetime"
         } else {
             Write-Host "Generating AI commit message from diff..." -ForegroundColor Cyan
@@ -95,7 +96,7 @@ function git-update {
             try {
                 $response = Invoke-RestMethod `
                     -Uri "https://api.openai.com/v1/chat/completions" `
-                    -Headers @{ Authorization = "Bearer $env:OPENAI_API_KEY" } `
+                    -Headers @{ Authorization = "Bearer $env:GIT_UPDATE_OPENAI_API_KEY" } `
                     -Method Post `
                     -ContentType "application/json" `
                     -Body $body
