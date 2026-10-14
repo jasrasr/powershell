@@ -3,7 +3,8 @@
 [CmdletBinding()]
 param(
     [string]$ConfigUrl = 'https://raw.githubusercontent.com/jasrasr/powershell/main/setup/setup.json',
-    [switch]$WhatIf
+    [switch]$WhatIf,
+    [switch]$SkipConnect
 )
 
 $ErrorActionPreference = 'Stop'
@@ -541,6 +542,40 @@ foreach ($module in (Get-InstalledModule -ErrorAction SilentlyContinue)) {
         else {
             Write-Warning 'These items are missing; run setup again or check the messages above:'
             $missing | ForEach-Object { Write-Warning "  $_" }
+        }
+    }
+}
+
+$connectModules = @($config.powershellModules | Where-Object { $_.enabled -and $_.connect })
+if ($connectModules) {
+    Write-Step 'Importing and connecting PowerShell modules'
+    if ($WhatIf) {
+        $connectModules | ForEach-Object { Write-Host "[WhatIf] Import $($_.import) and run $($_.connect) (left connected)" }
+    }
+    elseif ($SkipConnect -or -not [Environment]::UserInteractive) {
+        Write-Host 'Skipping module connections (-SkipConnect or a non-interactive session).'
+    }
+    else {
+        # Sign-in is interactive in the browser; no credentials are passed through this script.
+        # Connections are intentionally never closed (no Disconnect-* calls). They last as long as
+        # this PowerShell session does: run `. .\setup.ps1` or `irm | iex` in your own window to keep them.
+        foreach ($module in $connectModules) {
+            try {
+                $importName = if ($module.import) { $module.import } else { $module.name }
+                Import-Module -Name $importName -ErrorAction Stop
+                $arguments = @{}
+                if ($module.connectArguments) {
+                    foreach ($property in $module.connectArguments.PSObject.Properties) { $arguments[$property.Name] = $property.Value }
+                }
+                Write-Host "Connecting: $($module.connect)"
+                & $module.connect @arguments | Out-Null
+            }
+            catch {
+                Write-Warning "Could not import or connect $($module.name): $($_.Exception.Message) Continuing."
+            }
+        }
+        if ($PSCommandPath -and -not $MyInvocation.Line.StartsWith('.')) {
+            Write-Warning 'setup.ps1 ran as its own process, so these connections end when it exits. Dot-source it (. .\setup.ps1) or use irm | iex to keep them open.'
         }
     }
 }

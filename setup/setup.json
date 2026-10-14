@@ -4,6 +4,7 @@
     { "name": "PowerShell 7 Preview", "id": "Microsoft.PowerShell.Preview", "enabled": true, "upgrade": true },
     { "name": "Windows Terminal", "id": "Microsoft.WindowsTerminal", "enabled": true },
     { "name": "Git", "id": "Git.Git", "enabled": true },
+    { "name": "GitHub CLI", "id": "GitHub.cli", "enabled": true },
     { "name": "Visual Studio Code", "id": "Microsoft.VisualStudioCode", "enabled": true },
     { "name": "7-Zip", "id": "7zip.7zip", "enabled": true },
     { "name": "Google Chrome", "id": "Google.Chrome", "enabled": true },
@@ -42,9 +43,9 @@
     { "name": "Visual Studio Code keybindings", "source": "config/vscode/keybindings.json", "destination": "%APPDATA%\\Code\\User\\keybindings.json", "backup": true, "enabled": false }
   ],
   "powershellModules": [
-    { "name": "ExchangeOnlineManagement", "enabled": true },
-    { "name": "Microsoft.Graph", "enabled": true },
-    { "name": "MicrosoftTeams", "enabled": true }
+    { "name": "ExchangeOnlineManagement", "enabled": true, "import": "ExchangeOnlineManagement", "connect": "Connect-ExchangeOnline", "connectArguments": { "ShowBanner": false } },
+    { "name": "Microsoft.Graph", "enabled": true, "import": "Microsoft.Graph.Authentication", "connect": "Connect-MgGraph", "connectArguments": { "NoWelcome": true } },
+    { "name": "MicrosoftTeams", "enabled": true, "import": "MicrosoftTeams", "connect": "Connect-MicrosoftTeams" }
   ],
   "windowsCapabilities": [
     { "name": "Active Directory RSAT tools", "id": "Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0", "enabled": true }
