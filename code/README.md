@@ -1,31 +1,66 @@
 # code
 
 ## Purpose
-Scratchpad of code snippets, notebooks, or experiments that support the rest of the repo.
 
-## Directory listing
-| Name | Type | Description |
-| --- | --- | --- |
-| `README.md` | File | Markdown documentation |
-| `remote.ps1` | File | PowerShell script |
+This folder contains the client-side PowerShell script used to collect basic
+computer information and submit it to the `jasr.me` receiver.
 
-# Example
+## Files
 
-PS> irm https://raw.githubusercontent.com/jasrasr/powershell/refs/heads/main/code/remote.ps1 | iex
-or
-PS> irm https://jasr.me/remote | iex
+| Name | Description |
+| --- | --- |
+| `README.md` | Documentation for the data submission script. |
+| `remote.ps1` | Collects system information and submits it over HTTPS. |
 
-Running the remote PowerShell script...
+## How `remote.ps1` works
 
- NPM(K)    PM(M)      WS(M)     CPU(s)      Id  SI ProcessName
- ------    -----      -----     ------      --  -- -----------
-      9     1.89       3.26       0.00   11288   0 AggregatorHost
-      9     2.30       5.98       0.00    4160   0 amdfendrsr
-     20    12.41       9.69       0.53   29284   1 AppActions
-     29    46.05       9.66       0.27   19444   1 ApplicationFrameHost
-     15    21.68      25.33      65.48   24940   0 audiodg
-Gathering system information...
-Hostname: COMPUTERNAME
-OS Version: 10.0.26200
-Logged-in User: first.last
-remote1.ps1 has been saved to C:\temp\remote1.ps1. You can inspect and run it manually if needed.
+The script collects:
+
+- Public IP address
+- Private IPv4 address
+- Windows OS version
+- Computer hostname
+- Logged-in username
+
+It sends the data as JSON using an authenticated `POST` request to:
+
+```text
+https://jasr.me/code/receive.php
+```
+
+The request includes the `X-API-Key` header. The key must match the value in
+the server-side `private/config.php` file located in the
+`updated-security-rev1` deployment package.
+
+## Running the script
+
+Run locally from PowerShell:
+
+```powershell
+.\code\remote.ps1
+```
+
+The server stores accepted submissions in its protected `private` folder.
+The `view.php` page also requires the same API key and should not be made
+publicly accessible.
+
+## Remote execution
+
+The script can be downloaded and run from PowerShell with:
+
+```powershell
+irm https://raw.githubusercontent.com/jasrasr/powershell/main/code/remote.ps1 | iex
+```
+
+Only run this command when the script and receiver are trusted, because it
+executes downloaded code and submits local system information.
+
+## Security notes
+
+- Use HTTPS for the receiver and all supporting services.
+- Do not commit the API key to a public repository. The current client script
+  contains the key because it must authenticate directly to the receiver;
+  rotate it if the repository is public or the key is exposed.
+- Do not expose `private/config.php`, logs, or collected data through the web
+  server.
+- The old HTTP-based `remote1.ps1` downloader is no longer used.
