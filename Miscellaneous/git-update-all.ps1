@@ -1,5 +1,5 @@
 # Filename: git-update-all.ps1
-# Revision : 1.1.1
+# Revision : 1.1.2
 # Description : Run git-update against the approved GitHub repository allowlist.
 #               Uses the dedicated GIT_UPDATE_OPENAI_API_KEY environment variable
 #               through git-update.ps1 when generating commit messages.
@@ -15,6 +15,7 @@
 #       persists for the rest of the process, but this keeps the script self-contained
 #       if ever run standalone) so Git for Windows doesn't prompt "Should I try again?
 #       (y/n)" on a locked ref/object directory across any of the discovered repos
+# 1.1.2 git-update now pushes each repository explicitly to origin/main
 
 function Find-GitRepository {
     param(

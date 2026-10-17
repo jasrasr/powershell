@@ -1,5 +1,5 @@
 # Filename: git-update.ps1
-# Revision : 1.0.2
+# Revision : 1.0.3
 # Description : Smart git pull/add/commit/push. Generates AI commit message from diff via OpenAI.
 #               Use -Quick to skip AI and use a timestamped message instead.
 #               Uses the dedicated GIT_UPDATE_OPENAI_API_KEY environment variable.
@@ -13,6 +13,7 @@
 # 1.0.2 set GIT_ASK_YESNO=false so Git for Windows no longer prompts "Should I try
 #       again? (y/n)" when it can't delete a stale ref/object directory (usually
 #       because OneDrive or antivirus is briefly holding a lock on it)
+# 1.0.3 push explicitly to origin/main
 
 function git-update {
     param(
@@ -120,7 +121,7 @@ function git-update {
 
     # Push
     Write-Host "Pushing..." -ForegroundColor Cyan
-    git push
+    git push origin main
     if ($LASTEXITCODE -ne 0) {
         Write-Host "Push failed. Local commit is preserved." -ForegroundColor Red
         Write-Host "Run git-update again, or resolve manually with git pull --rebase / git push." -ForegroundColor Yellow
