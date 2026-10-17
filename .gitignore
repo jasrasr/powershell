@@ -9,3 +9,8 @@ HEIC-Convert-To-JPG.zip
 .env
 *.apikey
 config.local.json
+
+# Local AI assistant memory and instructions (kept out of this public repo)
+/.ai/
+/CLAUDE.md
+/AGENTS.md
