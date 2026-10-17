@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:jasr.me)",
+      "Bash(git fetch *)",
+      "Bash(pwsh *)",
+      "Artifact"
+    ]
+  }
+}

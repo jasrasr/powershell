@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"Get-ChildItem 'C:\\\\Users\\\\Jason.Lamb\\\\OneDrive - Cooper Machinery Services\\\\Pictures\\\\Screenshots' -Filter '*.png' | Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty FullName\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Jason.Lamb\\\\OneDrive - Cooper Machinery Services\\\\Documents\\\\Github\" -Recurse -Filter \"monitor-folders-new.ps1\")",
+      "Bash(Select-Object FullName, Length, LastWriteTime)",
+      "Bash(powershell *)"
+    ]
+  }
+}

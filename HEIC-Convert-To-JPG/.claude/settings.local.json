@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pwsh \"C:\\\\Users\\\\Jason.Lamb\\\\OneDrive - Cooper Machinery Services\\\\Documents\\\\Github\\\\powershell\\\\HEIC-Convert-To-JPG\\\\HEICconvert2JPG-GUI-1.ps1\")",
+      "Bash(Remove-Item \"C:\\\\Users\\\\Jason.Lamb\\\\OneDrive - Cooper Machinery Services\\\\Documents\\\\Github\\\\powershell\\\\HEIC-Convert-To-JPG\\\\HEICconvert2JPG-GUI-1.ps1\")",
+      "Bash(pwsh -Command \"Remove-Item 'C:\\\\Users\\\\Jason.Lamb\\\\OneDrive - Cooper Machinery Services\\\\Documents\\\\Github\\\\powershell\\\\HEIC-Convert-To-JPG\\\\HEICconvert2JPG-GUI-1.ps1'\")",
+      "Bash(powershell *)",
+      "Bash(mkdir Testing)",
+      "Bash(git mv *)",
+      "Bash(git fetch *)",
+      "Bash(git stash *)",
+      "Bash(git checkout *)"
+    ]
+  }
+}
