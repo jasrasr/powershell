@@ -48,7 +48,7 @@ $report = [pscustomobject]@{
     GeneratedOn    = Get-Date
     ComputerName   = $env:COMPUTERNAME
     Uptime         = (Get-CimInstance -ClassName Win32_OperatingSystem).LastBootUpTime
-    CpuLoadPercent = (Get-Counter '\\Processor(_Total)\\% Processor Time').CounterSamples.CookedValue
+    CpuLoadPercent = (Get-Counter '\Processor(_Total)\% Processor Time').CounterSamples.CookedValue
     MemoryStatus   = Get-CimInstance -ClassName Win32_OperatingSystem |
                         Select-Object @{n='TotalVisibleMemoryGB';e={[math]::Round($_.TotalVisibleMemorySize/1MB,2)}},
                                       @{n='FreePhysicalMemoryGB';e={[math]::Round($_.FreePhysicalMemory/1MB,2)}}
