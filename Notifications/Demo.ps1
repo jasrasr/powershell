@@ -1,4 +1,5 @@
 # Notification System Demo
+# Run with: .\Notifications\Demo.ps1 (PowerShell 7.0+)
 # Author: Jason Lamb (@jasrasr) (with help from GitHub Copilot)
 # Created: 7/8/25
 # Description: Demonstrates the notification system with read/unread status
