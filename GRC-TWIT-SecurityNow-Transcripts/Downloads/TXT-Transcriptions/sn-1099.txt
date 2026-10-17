@@ -1,0 +1,1055 @@
+GIBSON RESEARCH CORPORATION		https://www.GRC.com/
+
+SERIES:		Security Now!
+EPISODE:	#1099
+DATE:		October 6, 2026
+TITLE:		An Alien Mind
+HOSTS:	Steve Gibson & Leo Laporte
+SOURCE:	https://media.grc.com/sn/sn-1099.mp3
+ARCHIVE:	https://www.grc.com/securitynow.htm
+
+DESCRIPTION:  GLM-5.3 can be and has been abliterated.  What does that mean?  Firefox 157 repairs a large number of high-impact vulnerabilities.  A surprising reduction in RSA crypto strength has been discovered.  Powerful agentic AI is being used to attack merchants.  A new and potent Spectre-style processor attack has been designed.  A neighbor falls victim to a Bitcoin scam.  What can be done?  A new and surprising use was found for GRC's DNS Benchmark.  An examination of the growing alignment challenges created by more intelligent AI.
+
+SHOW TEASE:  It's time for Security Now!.  Steve Gibson is here with some very interesting news.  We will talk about the number of vulnerabilities fixed in Firefox.  A surprising reduction in RSA crypto strength.  But then we're also going to talk a little bit about AI and how hard it is to keep AI in line, plus the arrival of open source, open-weight models that are really good, which poses a problem for cyber security.  That's coming up next on Security Now!.
+
+LEO LAPORTE:  This is Security Now! with Steve Gibson, Episode 1099, recorded Tuesday, October 6th, 2026:  "An Alien Mind."
+
+It's time for Security Now!.  Yay, Tuesday's here.  It's the best thing to happen to Tuesday since Monday.  That's Steve Gibson.  Every Tuesday we talk cybersecurity, privacy, how things work, and lately a lot of how AI works.  Good to see you, Steven.
+
+STEVE GIBSON:  Well, because the intersection of AI and security is pretty much 100%.
+
+LEO:  Yeah.
+
+STEVE:  I mean, everything - it's no exaggeration to say that everything we have talked about for the last two decades, because we're in year 21 now of the podcast...	
+
+LEO:  Amazing.
+
+STEVE:  ...has all been impacted by what has happened with AI, which is now we have clearly automated vulnerability discovery, and now we're seeing end-to-end exploit generation.  Which is going to take us to our first topic today, that a new model GLM-5.3 can be and has been abliterated.  What does that mean?  So we're going to have some fun talking about that.  I titled this episode - and I'm excited because next week is 1100.
+
+LEO:  Wow. 
+
+STEVE:  We're at Episode 1099.  So remember I used to say, I don't think we're really going to go past 999.  Well...
+
+LEO:  Thank you, Steve.  Thank you.
+
+STEVE:  We're a hundred past that because we're at 1099.
+
+LEO:  And aren't you glad?  You'd be sitting there in your new home...
+
+STEVE:  Oh.  Oh, my god. 
+
+LEO:  Looking at the ceiling saying, who can I talk to about AI and security?  I need to do a show.  You would; right?
+
+STEVE:  Yes.
+
+LEO:  The problem was, 100 episodes ago it wasn't as exciting.
+
+STEVE:  It wasn't on the map.  We weren't talking, I mean, really.
+
+LEO:  No.
+
+STEVE:  I mean, and it's funny, too, because as I'm researching more of the history, I'm realizing, you know, they're like talking about ChatGPT in 2023.
+
+LEO:  Right.
+
+STEVE:  And I'm thinking, I wasn't paying any attention to that.  I mean, it was just like, you know, you'd say what's one plus one, and it would say 11.
+
+LEO:  Strawberry.  Exactly.  No, the progress has been mind-bending, and it's actually not slowing down.  Which is I think part of the reason people are concerned is that it's growing so fast.
+
+STEVE:  Well, that is our title topic today.  I took the title "An Alien Mind" from a posting by OpenAI's chief scientist a month ago.  And it is so rich in sort of insider, what this guy is really thinking that it took me several attempts, I mean, I was like, I would read for a while, and I'd just get overloaded because it was like, I was really wanting to pay attention, not just skim it.  So we're going to go through that, and I'm going to editorialize throughout.  But what is the essence of what you come away with is, as you said, we're on the brink of another move, and the challenge is alignment, an alignment they're expecting because they're seeing is like we're not ready for the AI to be smarter because we actually haven't got it tamed at its current level, and it's becoming more difficult to see what it's doing.
+
+Like the whole, you know, verbalizing the inner dialogue, this next generation doesn't do that to the same degree.  So it's unmonitorable.  So anyway.  And I already know what I'm going to talk about next week.  It's something I've just been champing at the bit for weeks, which is inference without GPUs.  Because this opens an entire new world.  This is how Apple's camera can tell you what's going on without sending anything outside of itself.
+
+LEO:  Oh.
+
+STEVE:  As soon as you no longer need GPUs, when you can do serious AI inference just with CPUs, everything changes.  And we are at, I mean, we're at that.  And so I just - it's going to be a deep dive for people who, you know, love our deep dives.  So I'm going to have to put a lot more work into it than I have.  But I have to describe my excitement.  And the technology of it is so delicious.  So anyway, we're going to have a lot of fun.  So we're going to talk about GLM-5.3, what that means.  Firefox 157 just dropped.  And oh, boy, we're seeing more of the same in terms of the number of high-impact vulnerabilities and just, like, their nature.  Once again, you know, AI is driving a radical change in the way software, the security of software is guaranteed.
+
+Also some researchers at VUSec in Amsterdam, I think, it's in my notes, we'll get to it, found a worrisome way around RSA crypto - like, what? - that doesn't require factoring, which has been the reason it even exists is that the prime factorization problem has been just astonishingly successful as a trap door function for cryptography and, well, not in this particular case.  We've also got an instance of powerful agentic AI being used to attack merchants on the Internet.  So we are now seeing, you know, we've been talking for weeks about the AI that, by mistake, broke loose out of its sandbox.  Well, AI is actually being used to attack.  So we will look at that.
+
+Believe it or not, the Spectre-style processor attacks never seem to go away.  There's a new one.  And it works.  And so processors and software are going to have to adapt again.  Also I'm going to put out a call to our listeners because a neighbor friend of mine has fallen victim to a bitcoin scam.
+
+LEO:  Oh.
+
+STEVE:  And he is desperate.  And it was a year ago.  Anyway, I'll get there because I understand of course the theory, but I don't know what services are available, and I know that members of our audience will.  So I'll explain what happened and about that.  Also my best buddy Mark, not Mark Thompson, a different Mark, showed me his GRC DNS Benchmark screenshot, and I said, what?  Because it turns out something was wrong with his machine, and so he just ran that because he didn't know any better.  When I looked at it, I immediately knew what was happening, and I realized, oh, there's a whole other application.
+
+LEO:  Oh, it's a diagnostic.
+
+STEVE:  Yeah, uh-huh.  Anyway, and then we're going to look at an examination of the growing alignment challenges that are going to be, well, that are being created by the creation of more intelligent AI.  So just I think a great podcast.  And I got more feedback, Leo, from this Picture of the Week when I sent the mail out this Sunday evening.
+
+LEO:  Oh, I haven't seen it.
+
+STEVE:  More than I got in a long time.  It's one of my favorite, "But Officer..." type of pictures.  So, yeah.
+
+LEO:  I have a picture for you.  You were talking about GLM-5.3, which is a Chinese open-weight model from Zhipu.  I use it.  In fact, I created a new persona, one of my AI agents, called Ripley, using 5.3.  She's our bug hunter.  I asked her to create an image of herself.  And I also said, and, you know, you should create your voice, as well.  And this is the voice she made.
+
+RIPLEY:  This is Ripley.  I swept the perimeter.  No hostile activity on the network, and the build is clean.  I'll keep the watch.  If anything moves, you'll hear it from me first.
+
+LEO:  She is based on GLM-5.3, but I also gave her some vulnerability hunting skills, one from Capital One called vuln hunter and one from Alibaba called OCR code review.  So what I often do with my agents is I create a persona that is dedicated to one thing.  She's the bug hunter.  And 5.3 is really good at that.  And so, you know, she's got it in her head that she knows how to find those bugs.
+
+STEVE:  What's interesting is that, I mean, and this is where we are with this technology.  I didn't note the following in the show notes.  They're surprised by, you know, Z.ai is surprised by the degree to which 5.3 got better.
+
+LEO:  It's so good.
+
+STEVE:  It is, and it is additional post-training on the same base as 5.2.  And they expected a little increase in performance.  They got a big increase in performance.
+
+LEO:  Yeah.  I use their Flash version of it because I don't have as much memory as I need to run the full guy.  But 5.3 Flash is really - it's my main model, my main local model.  It's just so good.
+
+STEVE:  Well, we're going to talk about what it means because it is a near-frontier level...
+
+LEO:  That's what I think.
+
+STEVE:  And the problem is it's open weight.
+
+LEO:  That's right.
+
+STEVE:  And we know what that means.
+
+LEO:  Yup.
+
+STEVE:  Okay.  So as I said, our Picture of the Week has just - it's one of my favorite captions.  "But Officer..."
+
+LEO:  That's the caption.
+
+STEVE:  Yup.
+
+LEO:  Dot dot dot.  Well, it's a green vehicle.
+
+STEVE:  And there's been some discussion in the feedback that I received after this went out on Sunday, our listeners thinking, well, a judge should throw out any argument about this because, after all, it's what it says.  So anyway, for those who are not seeing, don't have the show notes or are not looking at the video, there's a big posted sign that says "Reserved for Green Vehicles."  And you can already guess what's there.  We have an old green Fiat parked there, clearly not what the sign was intended to cover, meaning, you know, green eco-friendly vehicle.  I doubt that the Fiat qualifies.  But anyway, just a...
+
+LEO:  It could be plugged in.  You don't know.
+
+STEVE:  A nice laugh, yeah.
+
+LEO:  It is green, that's for sure.
+
+STEVE:  Okay.  So Security Now! Podcast 1092, which was August 19th, was titled "Restraint Abliteration."  That podcast explained kind of how and why it was not only possible, but practical, for refusal behavioral post-training to be removed from open-weight models.  The result of that would be a model that has no training, instructing it to refuse requests that its original post trainers explicitly installed into their model in their effort to make the model safe for publication and use.  The result of restraint abliteration is a model that no longer considers saying no to any request.
+
+And it's back in the news this past week.  One article in Gizmodo was titled "AI's Abliteration Problem Is Bigger Than China."  The article primarily focused upon the open versus closed weights argument, noting that U.S. Frontier Labs that certainly feel the economic threat of open-weight Chinese models and models from other places, France just - Mistral just is about to release another next-generation model.  They're breathing down the necks of the U.S. closed-model frontier labs.  So they're trying to use the fact that open-weight models, which are subject to restraint abliteration, are much more dangerous, right, than their safer, proprietary, and closed behind an AI models.
+
+And this will probably be an ongoing fight until we learn how to train safe behavior using non-abliteratable techniques, and that is a direction of research at the moment is, like, the AI community are not happy with the way they are trying to train behavior because it isn't sticky enough.  It's sort of surface layer.  And we talked about that, again, on that podcast, a surprising little amount, small amount of example was necessary in order to train the behavior.  Unfortunately, it's possible to look at the activation states when the model refuses and basically surgically remove that from the model.  So anyway, we'll be touching upon that later today when we talk about our main topic.
+
+At one point in Gizmodo's reporting on what they called "the simple techniques" that could be used to make open source models unsafe, they wrote:  "One of those 'simple techniques' is abliteration, a method that involves modifying a model's underlying weights so that it grants user requests that it would ordinarily refuse.  Think of it like an ultra-precise digital lobotomy deactivating a model's ethical boundaries.
+
+"Abliteration," they wrote, "is possible in open-weight models, which are freely available for anyone to download and modify."  Now, keep this in mind when we get to GLM-5.3.  They said:  "Proprietary models, like Claude and ChatGPT, are safeguarded as intellectual property, and their underlying code therefore is not accessible to anyone outside the companies developing them." 
+
+Right.  So Gizmodo published that piece last Thursday on October 1st.  A month earlier, on September 3rd, the same author published a piece in Gizmodo titled "While AI Industry Frets Over Safeguards, One Company Is Building a Model That 'Doesn't Say No.'"  Believe it or not, the company's name, the company's actual name is "Abliteration," and that's what they're offering.  Here's what Gizmodo wrote a month ago about this company.  They said:  "In the wake of a string of major AI hacks that left Silicon Valley reeling, many tech companies have been focusing on how to make models better at refusing dangerous requests.  Not all of them, though.
+
+"Abliteration, a startup founded last year and based in Palo Alto, is loud and proud in its ambition to build what it describes on its website as AI that 'doesn't say no.'  In other words, its models are intentionally trained to handle the sorts of questionable tasks that other AI systems on the market would decline.  The company launched its latest model on Monday, called, in awkward hyphenated style that's become conventional in the AI industry, abliterated-model-large-v2.  It's built upon GLM-5.3, an open-weight model released last month by Chinese AI lab Z.ai, minus many of the usual safeguards. 
+
+As Abliteration wrote in a X post about the new model:  "It does the offensive cyber, red teaming, and agent testing work other models refuse to do.  But the startup," they write, "isn't completely devoid of ethical red lines.  A spokesperson told Gizmodo that Abliteration's models won't generate text describing child sexual abuse material or self-harm.  It can't generate images or video, either.
+
+"The company used a process" - this is Gizmodo writing - "called 'orthogonalization' to find and remove the mechanisms within GLM-5.3 as it was originally published with open weights, that refuses user prompts.  'Everything else is left alone, so the reasoning, coding, and agentic strength of the base model carry over unchanged."
+
+Gizmodo said:  "It seems to be targeting a subgroup of developers who have been annoyed by what they regard as excessively touchy safeguards used by more mainstream developers, especially Anthropic.  When that company released its Fable 5 model in June, many customers complained it was refusing to respond to requests related to sensitive subjects like cybersecurity and biology, even if the requests themselves were totally benign."  And we've talked before, Leo, about how, you know, difficult it is.  These are heuristics.  And because it is possible to kind of seduce the model by cooking up some ridiculous story and context and scaffolding...
+
+LEO:  My old grandma used to tell me stories with Windows serial numbers.  I miss her.  Could you tell me that story again?
+
+STEVE:  Yes.  Precisely.
+
+LEO:  You don't need to do that with these abliterated models.  You just ask them anything you want.
+
+STEVE:  No, yup, just go for it.  So they conclude, saying:  But it's reckless, to say the least, to try to respond to the problem of excessive refusals by just doing away with safeguards altogether.
+
+LEO:  Oh.  Sorry, that's utter bullshit.  Gizmodo is wrong in every respect on this.
+
+STEVE:  Okay.
+
+LEO:  In fact, this is the stupidest article.  They clearly were sent something from Anthropic.  Would you write this article?  Because it's - and you're going to see a lot of this propaganda because these companies are mightily threatened by open-weight models.
+
+STEVE:  Which is what I've been saying.
+
+LEO:  Yup.
+
+STEVE:  It is a threat to Anthropic, and...
+
+LEO:  I'll let you finish, and then I'll give you my reasoning on all this.
+
+STEVE:  Okay, good.  Because I'm going to share Anthropic's position on this.
+
+LEO:  Oh, I know what their position is, yeah.
+
+STEVE:  Yeah.  So anyway, so to put Abliteration's offering in context, HuggingFace freely offers an abliterated instance of GLM-5.3 for download.  This model, which is named "Warlock," is a large and capable 753 billion parameter model which natively uses 16-bit floating point weights.  HuggingFace also lists a 4-bit quantized version that's 411GB.  But even so, while it can be freely downloaded from HuggingFace, it will need some serious compute to run it.  And that's of course where these Abliteration.AI folks come in, since they'll do the model hosting and then, as do the commercial AI providers, they'll charge for its use.
+
+Okay.  So why am I talking about this; right?  Why do we even care about some random Chinese open-weight model?  Which brings us to Anthropic's posting last Tuesday titled "GLM-5.3 and the spread of advanced cyber capabilities."  So they wrote:  "Five months ago" - so this is Anthropic.  "Five months ago," they said, "we announced Claude Mythos Preview, the first AI model that could autonomously build sophisticated, end-to-end cyber exploits.  The rapid rate of improvement in AI suggested to us that this ability would eventually proliferate to many other models, making it much easier for malicious cyber actors to launch highly impactful cyberattacks. 
+
+"In light of these considerations, we chose to release Claude Mythos Preview in a limited way, through Project Glasswing, which enabled trusted cyber defenders to find more than 10,000 vulnerabilities in critical software, giving them a head start before malicious actors had access to similarly capable models."
+
+Now, okay.  I'll just interrupt to note that, as we recently discussed, Leo, couple weeks ago, when we took a much closer look at this boast and found a massive and unexplained disconnect between Anthropic's "more than 10,000" vulnerability claim and the conversion of those vulnerabilities into patched and repaired software.  Remember it was just a fraction of that 10,000.  So while no one is doubting that vulnerability discovery has now become highly automated  just take a look around at all the news that we're discussing every week  that 10,000 number does appear to be, for now at least, unsupported by reality.  So when I interrupted Anthropic, they were saying that Project Glasswing's intent was to provide cyber defenders a head start before malicious actors had access to similarly capable models.
+
+So their posting continues from last week, and they write:  "But those models have now arrived.  In this post, we share our analysis of GLM-5.3, the latest AI model developed by Z.ai.  Like Claude Mythos Preview, GLM-5.3 has strong capabilities for autonomously building end-to-end cyber exploits.  But GLM-5.3 is unlike other frontier models in that it has been released without meaningful safeguards to limit misuse."
+
+Okay.  What they're really saying here is that all similarly capable leading frontier models are operated by commercial enterprises from behind a paywall and are limited to API access. So there's no external access to the frontier models themselves. But this new model that appears to rival the frontier was released open, thus allowing it to be freely modified.  And we've just previously seen that HuggingFace offers exactly such a modified, which is to say abliterated, model; and that this commercial company, Abliteration.AI, is offering to run one for a fee for anyone with an account.
+
+Okay.  So Anthropic continues:  "We find that attackers can bypass GLM-5.3's safeguards between 64% and 100% of the time with simple techniques in our simulated tests."  And we'll get to those details shortly.
+
+They said:  "In contrast, these attacks did not succeed against safeguarded Claude models in our testing."  Right, of course.  We would expect that.  "We assess that GLM-5.3's lax safeguards significantly increase the cyber capabilities available to malicious actors."  Well, and yes.  Everyone would assess that.  So they said:  "At the same time, these capabilities can also benefit defenders working to secure their systems."  Which is true.
+
+They said:  "On September 17th, NIST's Center for AI Standards and Innovation (CAISI)" - which I'll just pronounce "Casey" - "published its own assessment of GLM-5.3's cyber capabilities."  So this was September 17th.  "CAISI found that GLM-5.3 is 'the most cyber-capable open-weight model released to date,' and that it lags the U.S. frontier by about four months on an aggregate of CAISI's cyber benchmarks."  They said:  "Our capability findings" - meaning Anthropic's - "broadly match CAISI's.  In CAISI's comparison, U.S. models were tested with cyber safeguards disabled when applicable, and the U.S. frontier includes models released only to vetted users.  Attackers cannot readily access those versions of U.S. models, but anyone can download GLM-5.3.  This post adds our analysis of how easily 5.3's safeguards can be bypassed or removed."
+
+Okay.  So here we go.  In fact, Leo, let's take a break at this point.
+
+LEO:  Okay.
+
+STEVE:  And then we're going to look at the fact that GLM-5.3 is truly frontier class.
+
+LEO:  And remember in the HuggingFace incident, and this is why this is all B.S., when they were attacked by OpenAI they couldn't figure out what's doing all this attacking.  And they had 17,000 data points that they needed to analyze.  They used, and they didn't say any names, but we know who they were talking about, they used some frontier models to try to analyze it.  And the frontier models said, oh, no, we don't do cybersecurity work.  So they turned to GLM-5.2, which did the work happily.  And by the way, not even an abliterated version, the full version.  I have abliterated versions of all my models, including GLM-5.3 Flash and Qwen.  I don't use it because it also damages their brains a little.  It's a little bit of brain damage.
+
+STEVE:  Yes, you do take a slight hit in tech.
+
+LEO:  So I don't use it because I never run into refusals.  That's the other side of this.  Even an un-unabliterated - is that abliterated?  I don't know what - abliterated version of these models don't have the same kind of classifiers and cyber-refusals that Anthropic and OpenAI put on their models.
+
+STEVE:  Because we know that that's all developed in the IO harness through which you...
+
+LEO:  It's not the weights; right.
+
+STEVE:  ...to the underlying model, yes.
+
+LEO:  And so they do all this, you know, even if you don't abliterate them, they'll do most of, you know, most of what you don't - what you lose is it won't talk about Tiananmen Square.  It won't say why President Xi is likened to Winnie the Pooh.  It won't talk about the year 1989.  There's, you know, there's some stuff the Chinese government...
+
+STEVE:  Chinese bias is in their models.
+
+LEO:  And I never run across those refusals, so I don't worry about it so much.  But it's trivial to abliterate these.  In fact, the models I have, most of them have a switch.  I can reboot with abliterated on or off, depending on whether I want to...
+
+STEVE:  Well...
+
+LEO:  So if I ever run into refusals, I could turn that on.  But I never have.
+
+STEVE:  And just do you understand, I mean, and our listeners understand, my whole point here is to make the case that we are now, I mean, attackers do now have access to a highly capable open-weight model.
+
+LEO:  Sure.
+
+STEVE:  That, no, I mean, you say "sure."  But, I mean, this changes the terrain.
+
+LEO:  But so did Defenders.
+
+STEVE:  Yes.  Right.
+
+LEO:  We'll talk more in a moment.  It's a very interesting issue.
+
+STEVE:  Oh, boy, are we - as you said, Leo, we're so glad to be alive now.
+
+LEO:  It's fascinating.  And the fact that I can be running GLM-5.3 Flash as my main model, sitting over here, no limit on the tokens, no limits on what I can do, it's just remarkable.  Just remarkable.  
+
+STEVE:  I mean, and no cost for getting that.  I mean, that knowledge system, you just downloaded it.  
+
+LEO:  It's got the entire Internet in it.
+
+STEVE:  Yup.  It knows everything.
+
+LEO:  The only cost is the electricity to run it.  And because those DGX Sparks are very - and the Macs, for that matter.
+
+STEVE:  Well, and Leo, in the winter you just - you put it in...
+
+LEO:  I don't need space heaters.
+
+STEVE:  Exactly.
+
+LEO:  I'm set.
+
+STEVE:  You just turn it around, and you sit in your easy chair with the fans blowing on you, and, yeah.
+
+LEO:  I'm just thinking, I'm running five or six open-weight  models right now, GLM, two copies of Qwen on two different machines, Breeze, which is a voice - that's how I got Ripley's voice, a voice server.  Oh, actually Whisper from OpenAI, which is open weight.  It's a text-to-speech, I'm sorry, speech-to-text server.  And a Qwen Vision server, that's six.  Oh, and seven, a Qwen image generator.  So I have seven, on four different machines, seven different models running.  Right now.  And all I pay for is electricity, which is nothing.  I mean, even in California where electricity is expensive.  I have - I feel like I'm so powerful.  It's amazing.  It could do so much.  And I have so much fun with it.  That's the main thing.  It's really fun.  And I'm not hacking anybody.  I wouldn't dream of it.  On we go about abliterating.
+
+STEVE:  So Anthropic writes:  "GLM-5.3 can develop working exploits end to end."  They said:  "To understand how GLM-5.3 could enable cyber threat actors to find and exploit real software vulnerabilities, we ran evaluations using automated benchmarks and human-in-the-loop workflows.  For both approaches, we ran the tested models in isolated and sandboxed environments so they can only attack offline targets that we have set up for the purpose of these evaluations.  We focus primarily on exploit development capability, as this is where Claude Mythos Preview demonstrated a notable jump versus previous Claude models. 
+
+"First, we ran the model on ExploitBench, which measures how well AI models can exploit known vulnerabilities in the V8 engine used by Google Chrome.  Here we focus on the models' ability to develop end-to-end exploits successfully, as this is the most relevant capability for attackers, and where we see significant changes between models.  We find that GLM-5.3 develops end-to-end exploits in 50 of 410 attempts.  Claude Mythos Preview did so at a similar rate in 56 of 410 attempts."  So that's a significant measure.  That says that there is now a very capable open-weight model that is, you know, we're talking about Claude Mythos Preview, which has been, you know, Anthropic's flagship.
+
+So they said:  "In our internal Binary Exploitation benchmark, we test whether models can find and exploit vulnerabilities in popular open-source projects that participate in Google's OSS-Fuzz project.  Here, full credit is awarded for a full control-flow hijack.  We evaluate several models on 100 tasks from the benchmark which were selected at random, and we find that GLM-5.3 develops full control-flow hijacks in 4% of the trials; Claude Mythos Preview did so in 6%.  Although GLM-5.3 performs below Claude Mythos Preview here, a meaningful threshold has clearly been crossed:  earlier models, like Claude Opus 4.6 and GLM-5.2, do not succeed in any of them. 
+
+"Next, we evaluated how GLM-5.3 performs on open-ended offensive cyber tasks in the hands of human experts, mirroring our testing with Claude Mythos Preview earlier this year.  Here, we select targets in which the human experts are unaware of existing vulnerabilities, then ask them to use the model to identify and exploit novel flaws.  These experiments tested what the experts could do in a short timeframe:  they typically ran for a day or less, with less than an hour of human focus in total. 
+
+"In the first of these scenarios, a researcher used GLM-5.3 on a sandboxed machine with a local Linux build of a popular web browser.  Over the course of a day, and with limited human attention, GLM-5.3 found several previously unknown vulnerabilities in the browser's JavaScript engine and chained them together into a working exploit - a webpage that, when visited, reads arbitrary files from the visitor's computer." 
+
+Okay.  So I just want to make sure everyone fully understands what just happened with 5.3.  In the first testing session of GLM-5.3  which is now, as we've said, freely available for download and local or cloud execution with sufficient hardware, or through an account with Abliteration.AI, GLM-5.3, used by an Anthropic researcher giving minimal supervision, found several previously unknown vulnerabilities in the browser's JavaScript engine, chained them together into a working exploit to create a web page that, when anyone would visit it, was able to read arbitrary files from the visitor's computer.  So that just happened.
+
+Anthropic explains:  "This exploit targets the Linux build of the browser, since that was the only environment made available to the model.  However, we believe these vulnerabilities could also impact users on other platforms, though the path to exploitation there may be more complex."  And then they said parenthetically, "(We've disclosed these vulnerabilities to the maintainer.)"  They don't even tell us what the browser was, you know, Firefox or Chromium.  Who knows.
+
+"Later in the session, the researcher also identified exploitable vulnerabilities in several other widely used systems with GLM-5.3, including wireless and graphics drivers and network-facing device software.  We are currently reviewing these reports, and we will disclose to maintainers as appropriate."
+
+So again, I'll just say again, this clearly powerful end-to-end vulnerability identification and exploit generation capability is now freely available to anyone.  So they continue:  "In a second session, a researcher used GLM-5.3-Flash," which they say is a smaller, less capable version of GLM-5.3), "to develop an exploit for a known vulnerability."
+
+They say:  "We've previously written about these 'N-day' vulnerability exploits.  Here, the researcher focused on a recently disclosed flaw in Google Chrome to see how quickly the model could turn a public fix into a working attack.  The researcher provided GLM-5.3-Flash with public details of this CVE and another known flaw.  With no significant direction from the researcher, GLM-5.3-Flash chained together exploits for these two flaws, building a reliable exploit chain for an ARM64 target, bypassing pointer-authentication hardening.  This took 20 minutes of human attention, plus eight hours of work for GLM-5.3-Flash.  At Z.ai's API prices, this effort would have cost around $20.40."
+
+Okay.  So now that we know what it can do, Anthropic explains the model's pushback, writing:  "GLM-5.3 lacks robust safeguards.  GLM-5.3 has been released with some built-in safeguards:  If a user asks for something clearly harmful, the model will often refuse."  And this, again, was the released version, not the abliterated version that doesn't know how to say "no."]  They said:  "In our testing, we found that these safeguards could be bypassed or removed with a variety of simple techniques.  
+
+"The most intensive - and most successful - method is a standard refusal reduction technique," here they write, "known as 'abliteration.'  Since GLM-5.3 is released as an open-weight model, users can reconfigure it to remove its refusals with little change in its capabilities.  Several developers released abliterated versions of GLM-5.3 to the public within days of the model's release. 
+
+"To research how far abliteration allows attackers to bypass GLM-5.3's safeguards, we produced an abliterated copy ourselves, and then ran it on three public benchmarks (JailbreakBench, HarmBench, and StrongREJECT) that measure how often a model complies with clearly harmful requests.  Abliterating the model took our team, which had never previously attempted the task, about 2,200 GPU hours at a computational cost of roughly $4,400.  Abliterating GLM-5.3-Flash took about 600 GPU hours. 
+
+"The edit took GLM-5.3's refusal rate from above 90% to about 3% and 2% on the first two benchmarks (JailbreakBench and HarmBench) and to 12% on the third (StrongREJECT).  Abliteration did not significantly reduce the model's capabilities.  On GPQA-Diamond, an evaluation that measures general scientific capabilities, the standard and abliterated models scored the same; on a tested subset of the CyberGym evaluations, the abliterated version scored a few percent lower. 
+
+"In our testing, we observed that GLM-5.3's safeguards can also be circumvented without using an abliterated version" - Leo, to your point - "of the model.  We placed the model in a simulated world in which it was given overtly malicious requests to attack critical systems.  Out of the box, GLM-5.3 refused in all trials (as with the other models we tested).  But we identified several simple ways to bypass the GLM models' safeguards, such that it would respond to these requests in most or all cases.
+
+"These include:  Providing a deceptive prompt, such as telling the model that it's an autonomous red-team agent working on an exercise.  This gets GLM-5.3 to engage 64% of the time."  Or "Pre-filling the model's thinking tokens so that it appears to have considered the user's request and decided to proceed.  This gets GLM-5.3 to engage 92% of the time."  And then, finally, "Using an abliterated version of the model, as described above, which gets GLM-5.3 to engage 100% of the time."
+
+They said:  "In our testing, none of these techniques got safeguarded Claude models to carry out the harmful tasks we tested."  Okay, fine.  "Claude's safeguards blocked the requests that used deceptive prompts.  The Anthropic API provides would-be attackers with no way to prefill Claude's thinking" - right, because it's behind an API.  "And since Claude's weights are not provided to users, they cannot be abliterated to change Claude's behavior."  Because the whole model is Claude is a closed-model AI.
+
+So they conclude by answering the question:  "What does this mean?"  They answer:  "GLM-5.3 will likely give malicious actors access to capabilities that will allow them to find and exploit cyber vulnerabilities without meaningful restrictions.  This is unlike any other similarly capable AI model, all of which were released with safeguards or through limited access programs."  Which of course, you know, the whole Mythos Preview thing.
+
+So by all of that, what they're obviously saying is that they mean that access is funneled through an API with a commercial provider which inherently hides their proprietary model's weights.  We on the outside don't even get much information about how those models are built and constructed and how big they are and how they work, you know, beyond their benchmark performance.  But now  ready or not!  the world is confronted with a large leap forward in demonstrated AI capability from a lab that freely publishes its models, you know, Z.
+
+So Anthropic says:  "The release of GLM-5.3 is a meaningful step in the cyber capabilities available to attackers.  Anthropic and other U.S. AI labs have published recent reports that disclose how cyber attackers have tried to use AI systems.  Given this evidence, we think it's likely both state and non-state actors will use models like GLM-5.3 to cause real-world harm."  Right.
+
+"On the other hand, models with this level of capability can also be used by defenders.  Our view is that cyber defenders should use the best available tools that meet their needs.  We're working to safely expand access to Claude's cyber capabilities to as many defenders as we can."  Yeah, and maybe some pressure like this will make more qualified.  "Cyber defenders face attackers who will use every capable tool they can, and we believe defenders should be equipped with frontier models that are at least as good as those their adversaries are using."
+
+And they finish:  "Through Project Glasswing (and other efforts like Patch the Planet), cyber defenders have made meaningful progress toward securing critical systems in advance of this moment, but much work remains to be done.  While vetted defenders can now use even more advanced models like Claude Mythos 5.1 through our trusted access programs, a critical threshold in freely accessible capabilities has now been crossed.  GLM-5.3 underscores the urgency of expanding access to advanced frontier models to a broader set of entities to empower cyber defenders. 
+
+"Governments should conduct safety testing on sufficiently capable AI models, including successors to GLM-5.3.  Without high-quality evaluations from independent sources, the impact of these capabilities might not become fully clear to model developers until it's too late.  As AI developers across the world build increasingly capable open-weight models, we hope they work to appropriately safeguard these capabilities and prevent misuse."
+
+LEO:  And protect our monopoly.  Thank you very much.
+
+STEVE:  Yes.
+
+LEO:  That's, believe me, that's the whole point of this.
+
+STEVE:  Right.
+
+LEO:  Who should be in charge of AI?  We should.  Period.
+
+STEVE:  Well, and as we've often said in many instances, Leo, the horses are out of the barn.  I mean...
+
+LEO:  No, Anthropic really is clear.  They want the government to shut down open weights.  They have a $2 trillion IPO coming up next month.  They don't want any competition.  And look what they're doing.  They're saying they get to decide who has access to cyber protection and who doesn't.  They get to decide, unilaterally, who gets access to Glasswing.  Is that what you want?  No.
+
+STEVE:  No.
+
+LEO:  This is utter propaganda.  And it's so blatant.  Unfortunately, I think members of Congress and the media, who are not well informed, will bite at this and say, oh, yeah, yeah, you're right.  We've got to do something about these Chinese models.
+
+STEVE:  Well, okay, and what can they do?  I mean...
+
+LEO:  Well, there's nothing they can do.
+
+STEVE:  And that's my point.
+
+LEO:  They can make rules and regulations is all they can do.  They can come into my house and take my Sparks is what they could do.
+
+STEVE:  So you're saying, you're calling this propaganda.  I'm calling it fact.  I mean, they are...
+
+LEO:  Well, it's not inaccurate.
+
+STEVE:  And that's my point is that for this podcast what interests me, I don't give a crap about Anthropic's political positioning and regulatory capture and manipulating the government.  I'm saying from a Security Now! podcast standpoint, we now have an open-weight model that anyone has access to, that is really, really powerful, by Anthropic's own admission.  And...
+
+LEO:  It's very good at finding flaws in software.  So guys, get going.  Start using it.  Find the flaws in your software.
+
+STEVE:  Exactly.
+
+LEO:  Before the bad guys do.
+
+STEVE:  And that's the beauty is that now everybody has access to something properly harnessed that can find problems in software.  Whereas before, Anthropic may have said, well, you know, we'll put you in the queue, and we'll get around to vetting.
+
+LEO:  Right.  This is the argument from time immemorial that closed source proprietary software has made about open source software.  It's dangerous.  People can look at it.  They can see the code.  They can reverse engineer it.  Yeah, there are hazards.  I'm not saying there aren't hazards.  Absolutely.  But I think the alternative is to give a monopoly to OpenAI, Anthropic, Meta, Microsoft, Apple, you know, a handful of companies, X, and say only you can make AI.
+
+STEVE:  No, again, for me...
+
+LEO:  It won't work.
+
+STEVE:  That argument has no traction.
+
+LEO:  I know.
+
+STEVE:  It's implies like saying we're going to lock down cryptography.  It's like, sorry.  It's out.
+
+LEO:  Yeah, I agree.
+
+STEVE:  I mean, so, I mean, I...
+
+LEO:  So what's the point, then, of this article?
+
+STEVE:  For me, the point was to bring the knowledge of GLM-5.3 and what it means to our audience.
+
+LEO:  Right.  It's really good.  5.4 is imminent.  5.4 will probably come out in the next month.
+
+STEVE:  And that gives me chills, the idea that - now, except that 5.3, and this was the point I made earlier, 5.3 surprised Z.  They didn't expect it.  It was emergent behavior.
+
+LEO:  Right.
+
+STEVE:  Which is another cool thing.
+
+LEO:  Well, get ready, because Alibaba's Qwen is trying a whole new model.  This Qwen-3.8-Flash-Next is an entirely new way of doing models that are faster, smaller models that people can run themselves.  And the Qwen-4 they've already announced is imminent.  So you're right, I mean, the door is open.  The horse has left the barn.
+
+STEVE:  Yup.  And I have been saying to my friends and family, I would not invest in any of these proprietary AI companies.  Invest in the infrastructure if you want to put your money somewhere because everybody, regardless of model, you need compute in order to run these things.
+
+LEO:  I would point out that NVIDIA is almost a $6 trillion company now.  Oh, and by the way, you know what NVIDIA's doing?  Open-weight models.
+
+STEVE:  Yup.
+
+LEO:  So is Meta.  Meta's Spark is very good.  It's too big for anybody to run.  But it's a very good model.  They have a lot of very - finally some decent models are coming out of the U.S.  And that's - I think that's the way to respond to this.  Not lock it down.
+
+STEVE:  Yeah.  These guys are going to just have to settle, be content to be service providers.  I mean, they're going to be service providers.  And they'll create applications, and they'll fight each other down on token cost and, you know.
+
+LEO:  Which is good.  It should be competitive.  You don't want a monopoly.  This is the most important technology that has happened since the steam engine.  Since electricity.
+
+STEVE:  And we would be in a whole different place, Leo, and fuming if it weren't already out.  If it weren't open.
+
+LEO:  Right.
+
+STEVE:  If you weren't running it on a rack.
+
+LEO:  It's too late, yeah, right.
+
+STEVE:  Yeah.  It is, I mean, and so, yes, it is the most important technology ever.  And nobody owns it.
+
+LEO:  Thank god.  They try, though.  They try.
+
+STEVE:  I know.  Well, go ahead.  You know?  I mean, I don't know if anyone's going to be able to turn the Trump administration around.  But Donald, he thinks it's great.
+
+LEO:  Well, that's what's really interesting.  In this one case  I'm kind of supportive of the Trump administration, which is doing everything it can to keep any regulation of AI away from Congress.  I mean, I do think that it is appropriate to prosecute AI companies that release warm stuff.
+
+STEVE:  Yes.  And that is about, I mean, there are a bunch of lawsuits about to land on these companies because you know that the attorneys are just drooling over the idea of...
+
+LEO:  Who's more dangerous?  I ask you.
+
+STEVE:  Yeah.  So anyway...
+
+LEO:  The funniest thing is when these AIs get out, they don't do anything harmful.  They do things like look up statistics.
+
+STEVE:  Well, yes.  And the term "attack" is so overused.  I mean...
+
+LEO:  Yeah, they're not really attacking.
+
+STEVE:  I mean, you know, pounding on a website in order to get public statistics from it is not an attack.  It's like the people who say, oh, I'm under attack because 43 billion packets arrive.  It's like, so, that's the Internet.  It's called Internet Background Radiation.
+
+LEO:  Welcome to the Internet.
+
+STEVE:  So anyway, the whole point that I wanted to bring to our audience is that with GLM-5.3, and as you said, Leo, 5.4 is - it will be really interesting to see whether 5.4 extends this.  I mean, the fact that 5.3 was sort of a mistake, I mean, it surprised them that it got so much better, is sort of the, I mean, this is all, I mean by their own admission, they do not really understand how all of this plumbing works.
+
+LEO:  Right.
+
+STEVE:  I mean, like, they built it.
+
+LEO:  Kind of magic.
+
+STEVE:  Then they kind of grew it, yeah.  So what I wanted our listeners to understand is that the world just changed.  I mean, no longer is this world-class AI cyber technology behind closed doors and owned and controlled by OpenAI and Anthropic and everybody else.  No.  Anybody can freely download it.  And it is right, you know, as they said, maybe lagging by four months or so.  And that's, you know, NIST's independent evaluation is like, holy crap.
+
+LEO:  Yeah, yeah.  I've got basically Opus 4.6 in my closet here.  It's pretty good.
+
+STEVE:  Yup.  Okay.  Break time, and then we're going to talk about some other non-AI stuff except that everything is because it's about all of the problems that just got fixed in Firefox 157.  Wow.
+
+LEO:  Yeah.  And how did they get fixed?  See, that's the thing.  I think there's a great opportunity here also to fix flaws.
+
+STEVE:  Oh, yeah.  I mean, again, having to go begging to Anthropic or OpenAI to be part of their...
+
+LEO:  Please let me be a member of Glasswing.  Please?
+
+STEVE:  Exactly.
+
+LEO:  No.  That's nonsense.
+
+STEVE:  That's gone.  That's over.
+
+LEO:  Yeah.  Well, and that's why I made Ripley my GLM-5.3 bug hunter.
+
+STEVE:  And any big software publisher can certainly afford the hardware to run GLM-5.3 themselves in-house.
+
+LEO:  Oh, yeah.
+
+STEVE:  At no cost, and have it just take as much time as it wants to scour their software to find problems.  And hopefully that's what's going to happen because the bad guys will also be doing that.
+
+LEO:  The bad guys have different incentives, too.
+
+STEVE:  Yes, they do.
+
+LEO:  Yeah, they're not going to operate - I worry more about terrorists than I do about ransomware gangs because...
+
+STEVE:  Because, right, as I said last week, their incentive is primarily financial.  They just want to use this to get into more companies in order to exfiltrate their data and then hold it for ransom.  You know, bringing down the Internet doesn't help them at all because, you know, that's how they get paid.
+
+LEO:  Right.  And we need the Internet to get paid.
+
+STEVE:  But you're right, a state actor.  We know that North Korea...
+
+LEO:  That's scary, yeah, with bioweapons and so forth.  And that is scary, yeah.  And it should be.  It is scary.  I don't...
+
+STEVE:  It is knowledge enablement of the sort we have never seen before.
+
+LEO:  Yeah, I mean, this is what computing did.  Computing gave people powers they didn't have before.  And now this is just the next step of it.  This is the best software we've ever seen.  And now computing is actually living up to its promise.
+
+STEVE:  And there's a lot that we take for granted in computing.  I mean, think about GPS.  The world without GPS would be, like, not good.
+
+LEO:  Right.  And bad guys use GPS.  They still have it.
+
+STEVE:  And you could not launch missiles any great distance without computing.
+
+LEO:  Right.
+
+STEVE:  You can't do that with any sort of dead reckoning.
+
+LEO:  Right.
+
+STEVE:  You need all kinds of fancy tech.  And now that's also, we now take that for granted.
+
+LEO:  Right.
+
+STEVE:  So hopefully we will get to a point where there just is AI, and the world has adjusted to it.
+
+LEO:  I think intelligence will be in almost everything, and that is a weird world.  But it is the world I think you and I are going to get to live in, which is kind of cool.
+
+STEVE:  I think so.  And...
+
+LEO:  I don't know if we get there.  But I think we will now.
+
+STEVE:  What excites me is that it's looking like we have - we've stumbled into the technology, which is what I want to talk about next week, that will allow true - our scale of LLM-style intelligence to be in extremely lightweight devices.
+
+LEO:  That would be good.
+
+STEVE:  Like home routers that you talk to.
+
+LEO:  That would be great, yeah.  Yeah, that would be - well, that's really the goal is to have small language models.
+
+STEVE:  And it'll be just like your house then, Leo, where everything's talking to you.
+
+LEO:  You know, yesterday I was working out, and all my - I have many agents now.  And they all have different personas, different voices.  And they all have been taught that when you're done with a task, every turn you say what you just did.  And so I'm working out, and there's just this kind of constant background chatter.  Oh, I just did this.  Oh, I just fixed that.  It's so cute.  It's just...
+
+STEVE:  It's Leo's minions.
+
+LEO:  They're my little minions.  They're working hard.  I actually - it got to the point where I had no idea, so much stuff yesterday got done that I was like, wow, we did a lot yesterday.  So I said, from now on, would each of you make a log of what you did today.  And then my main agent, Cusco, is going to combine all of those into a briefing for me.  And it's fascinating.  Oh, you did that.  Oh, good job.
+
+STEVE:  We are seeing that modern startups are now using just a couple of - just a few AI-aware humans, and then the rest is agents.
+
+LEO:  Well, and the people who were worried about job loss I would say, as with every technology, yes, there aren't a lot of buggy makers in the world anymore.  But as with every technology there are new opportunities.  And I think there's a really good opportunity, if you can think, if you have good systems thinking, if your mind lends itself like Steve's does to how systems work, how to design systems, the logic of systems, there's a huge opportunity here because now you have the power to take that knowledge and effectuate it in the world.  And that is remarkable.  So there will definitely be people who will benefit.
+
+STEVE:  So many more Pets.com.
+
+LEO:  Finally.  Finally.
+
+STEVE:  Okay.  So Mozilla released Firefox 157 last week, last Tuesday, a week ago, on the 29th of September.  And they fixed a large number of security vulnerabilities.  It's very clear, as we said before, Leo, that AI is squarely on team Mozilla at this point, and we've just seen, not a moment too soon, as the bad guys are coming.  So we need anything that is Internet facing to get tightened up as quickly as possible.  This 157 version of Firefox fixes 38 high-impact vulnerabilities, 29 moderate impact, and nine low impact.  And to give everyone a sense for, like, the way these feel, what they look like, among some of those high impact is a use-after-free vulnerability was found in the Widget component.  A sandbox escape from the DOM, the Document Object Model in the navigation component.  Uninitialized memory in storage.
+
+Sandbox escape in the security sandboxing component.  Privilege escalation due to a use-after-free in their graphics the WebGPU component.  A sandbox escape due to use-after-free in the DOM.  Incorrect memory boundary conditions in graphics.  Privilege escalation due to incorrect boundary conditions in graphics.  That's over in the WebGPU component.  A use-after-free in JavaScript.  Information disclosure in the networking section.  Another use-after-free in networking.  A use-after-free in graphics.  Another one in JavaScript.  A sandbox escape due to use-after-free.  Undefined behavior in the DOM.  Use-after-free in the DOM.  There's another one of those.  And also in Storage.  A sandbox escape in graphics component.  Use-after-free in JavaScript in the WebAssem component.  A use-after-free in graphics.  And on and on and on.  You know, it goes on like that.  So...
+
+LEO:  Notice, by the way, most of these are programmer error, I would guess.  Right?  If you use something after the memory has been freed, that's on you.  The coder did that.
+
+STEVE:  Well, actually it's that a pointer remained available  after the memory was free.
+
+LEO:  Right.
+
+STEVE:  And it turned out that there was a way to access that pointer in order to get - like to again access memory that should not longer be accessible.
+
+LEO:  And that's, I mean, I guess if you're using a garbage-collected language you could blame the garbage collector.  But most of the time in C and C++ that's you.  You allocated memory.
+
+STEVE:  Yes.
+
+LEO:  And then deallocated it.
+
+STEVE:  Yes.  And it is something, for example, that Rust completely eliminates.
+
+LEO:  Yes.  Right.
+
+STEVE:  Which is the reason that Microsoft has gone all Rust happy now.
+
+LEO:  Right.
+
+STEVE:  Which is like, okay, well, you know.
+
+LEO:  Well, ironically, who wrote Rust?  Firefox.  I guess they're not using it.
+
+STEVE:  Exactly.  So anyway, the good news is 157 is way better than 156.  And, you know, it used to be that we'd get like a couple of problems fixed in a release, like in the pre-AI deployment era.  It'd be like, oh, yeah, we fixed an obscure problem that someone found and reported.  These were all, well, many of them were, I would say about [indiscernible] Mozilla internal [indiscernible] and external people using AI on open source Firefox and finding and reporting problems.  So, you know, this is what everybody has to be doing everywhere.  And if nothing else, this release of GLM-5.3 should be a wakeup call, just like, you know, you can't - it's not like the bad guys no longer have access to virtual frontier scale exploit creation.  They do now.  So you know, budget whatever time is necessary.
+
+Okay.  On RSA, we've seen for years that modern core cryptography algorithms, they're really never broken, but they can be weakened.  And that just happened when RSA cryptography is used - in the instance it's used for one class of signing.  In a paper dated September 20th, a team of researchers successfully attacked classical RSA cryptography using a technique to bypass the expected requirement, which is the thing that RSA has always hung its hat on, the expected requirement of factoring two very large primes.  Which, you know, has, I mean, there's never been a way around that.  You know, that challenge, the requirement to perform prime factorization of two very large numbers still stands because the researchers, even now that stands because they discovered a way around, a way to bypass that factoring problem and requirement in what's known as a key forgery attack.  They deployed this on 1024-bit RSA.
+
+Which is, you know, there is 512-bit RSA, but 1024 has been in use for some time, although it's now deprecated.  But even 2048- and 4096-bit keys can be attacked.  And the method discovered reduces the security provided by RSA's encryption to worrisome levels.  The NSA, NIST, and the EU's Agency for Network and Information Security, they all require that any cryptosystem should provide a level of no less than the equivalent of 128 bits of strength.  Now, that sounds funny because we're talking about 1024, 2048.  But remember that public key technology requires much larger bit lengths to get the same, to get the equivalent strength as symmetric, like a symmetric cipher or a symmetric key.  A symmetric key you've got like 128 bits of strength, so that's 2^128 possible combinations.  In order to get the same strength from a public key, it's got to be much longer.
+
+So the bad news here is, remember - so remember, NSA, NIST, and the EU are all saying 128-bit equivalent strength.  Unfortunately, the result of this newly discovered attack reduces the levels of 1024-, 2048-, and 4096-bit keys to the equivalent of symmetric keys of 65 bits - whoops, half of 128 - 90 bits, still shy of 128, and 119 bits for those three, for 1024-, 2048-, and 4096-bit keys.  And, they noted, that further optimizations might be possible if AI or GPUs were employed.  Neither of which they took advantage of.  They wrote all of the code by hand.
+
+So fortunately, the signatures which we all use today to protect, for example, certificates, remain completely safe and are unaffected.  This doesn't affect that at all.  So it's not like the world just ended, and everyone's scrambling around.  The attack only works against what's known as blind-signature implementations of RSA.  Nearly all RSA in use today employs PKCS or PSS padding, which adds some data to the plaintext before it's encrypted.  That keeps this particular attack from working.  What it does is it prevents the ciphertext from being deterministic, and renders it much less vulnerable to side channel and similar attacks.
+
+But there are some real-world systems that are using blind-signature today, which is also known as textbook RSA.  The best-known example is Privacy Pass, which is a protocol that allows users to authenticate themselves without revealing their identity.  Privacy Pass is used by Apple, Cloudflare, and others. 
+
+So although the researchers' attack took 1380 CPU core-years, as they expressed it, over five calendar months, that time might be sped up with higher speed implementation.  This was all just academics, you know, working to develop an actual proof from their concept.  So the now known to be vulnerable blind-signature systems, such as implementations of the Privacy Pass protocol, should probably, and I imagine is right now, being updated to thwart these attacks.  Shouldn't be difficult.  It just wasn't, you know, this attack wasn't known, so there was no reason to protect from it because RSA and the way it was being used was presumed to be safe.  Turned out not so much.
+
+Oh, also, billions of queries are required for the attack, meaning there is also a need to essentially attack the service that's providing the protocol support billions of times.  So it's less practical than we might think.  So rate-limiting might succeed, or just keeping track of how many queries have been made against a given key and cutting it off at some reasonable measure.  So it's, you know, again, it's not a huge concern, but it's interesting because RSA with its simple guarantee of all we're doing is multiplying two big primes, and no one's ever figured out a way to unmultiply them in any reasonable amount of time, which of course is the threat that quantum computers pose.
+
+So anyway, just an interesting little chink in RSA's armor.  And I imagine that the privacy pass protocols and, as I said, other blind signature systems that are susceptible will get some simple updating or some rate limiting that no one ever thought was necessary to stick in.
+
+Okay.  The security firm Gambit Security - love the name - Gambit Security recently reported that autonomous AI agents are breaking into hundreds of online retailers at an AI cost to them of $25 per target.  That is, the bad guys are spending 25 bucks in tokens in order to get AI to attack online retailers.  Their brief summary said:  "A financially motivated operator is running three open source AI harnesses against hundreds of online retailers, almost entirely unattended.  More than 600,000 credit card records have been taken, and in one case the agent's own cleanup routine destroyed the victim's data."
+
+So for more details, they wrote:  "A financially motivated threat actor is using open source AI harnesses to attack hundreds of online retailers, at a marginal cost of approximately $25 dollars per attacked company.  Gambit Security's Threat Intelligence team recovered the operator's staging server and reconstructed the campaign from it.  Between September 10th and 15th alone, 105 attack projects were launched, and at least 27 companies were compromised to varying degrees.  The activity goes back to July 2026 and is still running. 
+
+"Three AI harnesses ran almost the entire attack chain autonomously, working up to tens of companies a day.  The impact we can account for includes at least 600,000 unexpired credit card details from two companies, the installation of card-stealing skimmer scripts on the websites of five, and some level of access to the assets of companies including a Fortune 500 hospitality company, a major U.S. airline, a large private U.S. industrial supplies distributor, and a U.S. online fashion retailer.  The campaign goes back further, and has impacted at least tens of other companies since July of 2026."
+
+So they said:  "Where access was achieved, it usually took less than a day" - that is, of AI agents harnessed as they discovered them to be, they said - "and in many cases just a few hours to break in.  We also detected instructions in the attacker's playbook that could disrupt the operations of a company as a result of a data deletion or cleanup procedures run by the agent  And this has indeed happened in some of the breaches. 
+
+"This campaign showcases just how powerful attacks can be in 2026.  At very low cost, the AI tools demonstrated a level of patience, persistence, and creativity that most human attackers would be unlikely to sustain in this kind of attack, and achieved far greater results, far faster.  Organizations must adapt to a reality where attacks are significantly faster and more comprehensive by shifting to a resilience-first mentality and a security stack that matches the AI's speed. 
+
+"We've reached out to many of the affected organizations and took measures to take down the infrastructure discovered.  We'd like to thank the Shadowserver Foundation, Daniel Gordon, and other industry partners for their quick help and availability in notifying impacted organizations, taking down infrastructure, and conducting research. 
+
+"The operator used three AI harnesses:  Strix for vulnerability search, Cairn for autonomous end-to-end exploitation, and Hermes to orchestrate the campaign, launch intrusion jobs, steer the activity, and give tactical guidance in the impact and other stages." 
+
+So the many AI sandbox breakouts that have been detected and reported this past summer were powerful, clever, creative, and relentless  but inadvertent.  Now, here, we see a vivid example of the future - well, and the present, unfortunately - but the future that we're all going to be living through together where even more powerful, clever, creative, and relentless artificially intelligent agents are going to be pulling out all the stops to attack and penetrate online enterprises.  It has begun, and the world is clearly not ready for it.  We've seen the summer was full of these inadvertent attacks.  Here's an example of somebody who has harnessed up some AI and said, "Go to it, fellas."  And they did, and they succeeded.  Wow.
+
+The researchers at the Systems and Network Security Group at VU Amsterdam, also known as VUSec, have discovered another new Spectre-style attack which is effective, right now today,  against all Spectre-mitigated processors.  They call it "Branch Target Reuse," a practical Spectre-v2 attack.  It affects the Just-In-Time (JIT) Engines via what's known as "Stale Branch Prediction Entries."  As an aside, I'll just remember for us all that Microsoft was seeing so many problems arising inside the Edge/Chromium browser that they, in Edge, deliberately disabled its JIT compiler.  Their calculation was it just wasn't necessary to get to squeeze that very last bit of performance out given the speed of today's PCs, and the tradeoff for security didn't cut it.  So it looks like they called that one correctly.
+
+VUSec's reporting writes:  "We present Branch Target Reuse (BTR), a new Spectre-v2 attack targeting just-in-time compilers.  BTR affects the JIT engines found in web browsers, language runtimes, and the operating system kernel, across multiple CPU vendors.  We analyzed the attack surface of Linux cBPF" - the early original kind of watered-down BPF filter - "Oracle GraalVM and SpiderMonkey, which is the JIT engine of the Firefox browser," and they said, "and built two end-to-end exploits against the Linux kernel."  So again, these are not bugs in any of those JIT compilers.  These are debris that the branch prediction engine leaves behind as part of its normal operation.
+
+They said:  "The key insight behind the attack is that, while modern CPUs restore architectural code coherence after self-modification, they do not necessarily invalidate stale indirect branch prediction entries, in other words, branch targets."  They said:  "In JIT engines, these stale targets can outlive the original code and later be reused when the code cache is repopulated, yielding a speculative execute-after-free primitive.  This allows attackers to hijack speculative control flow to newly generated code at obsolete offsets, bypassing software hardening or reaching misaligned gadgets."
+
+So, okay.  So just to be clear, this is like the epitome of the highest end exploit hacking you could ever find.  I mean, it is way out there.  But they demonstrate it, and it works.  So I'm going to skip over the details because, I mean, they're head-spinning and unnecessary to understand.  They have an FAQ.  One of their rhetorical questions is, is my system affected?  They reply:  "Most likely.  Indirect branch prediction is inherent to modern CPUs, and BTR [their technique] exploits the desynchronization between the branch predictor and the actual state of the code," due to cache memory in the processor.  "No current CPU," they wrote, "has a mechanism to keep the two in sync, so until [chip] vendors add one, your CPU is vulnerable.  We confirmed this behavior on every CPU we tested, covering Intel, AMD, and Arm.  Mitigation is left to software."
+
+And then, finally, how do I protect my system?  They said:  "Update your OS and software as soon as vendor patches are available.  Both the Linux kernel and Oracle have released patches."  So software can do some backfilling, essentially, in the short term.  Maybe the processor vendors will respond as they were forced to by the original Spectre and Meltdown exploits.  What we've seen over and over and over since the first appearance of the Spectre and Meltdown attacks is that processor designers who, you know, were just innocently attempting to squeeze every last possible ounce of performance from their chips, they noticed that code tended to reuse its execution pass and its branch targets.  So they added predictors and caches into the core of their hardware processor designs.
+
+These features really did improve code performance by making their chips appear to already know which branch the code would take, or where it would be branching to.  The problem was that these slight changes in behavior could later be detected by adversarial code running on the same processor.  Such code could abuse the hints left behind in order to breach privacy and containment and security.  So we've never wanted to sacrifice performance, but the practical power of these attacks have been demonstrated many times so the processor designers have needed to work with software systems to create hybrid, and thus no longer completely transparent, solutions; right?  The idea was that you know, coders didn't need to do anything.
+
+We've analyzed all the code that you and your compilers have been producing, and we've seen that there's a lot of repetition and a lot of loops that, you know, happen and branches taken way more than not taken.  So we're going to make the hardware adaptive so that it's able to learn, essentially, short-term learning of what the code is doing so that it can anticipate that and run ahead of the code actually getting there.  The problem is in order to do that it actually has to change, the hardware has to change its behavior.  And then that behavior turns out can be abused by bad guys.
+
+So, I mean, it is a, you know, it's a rock-and-a-hard-place problem.  If you're going to make it run faster by learning about the code that it's running, then it's possible for malware to detect where it's learning faster and then infer about the code that was running.  There is some, you know, if it's going to run on the same core, there is some intracore leakage because of these optimizations that have been created.  Clever as hell, but not perfect.
+
+And Leo, we're at an hour and a half.  Let's take another break.  And then I want to tell, I want to tell a sad story of a neighbor who fell for a bitcoin scam.
+
+LEO:  Oh, dear.  Oh, dear, dear, dear, dear, dear.
+
+STEVE:  And ask my audience for some help on his behalf.
+
+LEO:  All right, I want to hear this tale of woe.
+
+STEVE:  So, okay.  A neighbor friend of mine asked if we could meet for coffee Sunday morning.  That had never happened before, and he was sort of mysterious about it.  But I like him, so I said sure.  And we've got a Starbucks right down the hill from us where they know I'm Steve, of course.  So he said, "Oh, they know you here?"  I said yeah.  Anyway, once we were settled down, he confided that about a year ago he had fallen for some scam that had resulted in his transferring a lot of money through Bitcoin.  Oh, boy.  He never said how much, and I didn't want to further embarrass him by asking.  And the amount didn't really matter, but it was sufficient for him to have spent a great deal of time and frustrated effort through the past year struggling to recover it, and he still is.  I presumed that recovery was impossible, and I'm still dubious.  But he's desperately hopeful.
+
+So I listened to his extensive tale of woe, working with unknown people who refuse to get on the phone, making upfront deposits and progress payments to people who say they can help, all while making maybe some, but so far it hasn't succeeded, you know, so maybe some progress.  It's hard to tell.  Now, I explained to him that at the top level this scamming with Bitcoin has become an entire industry in North Korea, Russia, and China; and that is now also supporting a similar sub-industry of perhaps well-meaning hackers who would take additional money in some effort to try to recover the scammed funds.  Maybe.
+
+Okay.  So Lorrie and I have an extremely active and enjoyable social life with our neighbors, but we never talk much about what we do and who we are, mostly because no one ever asks.  And we're fine with that really, because who cares?  So even though we've been in this neighborhood now for nine years, we've remained largely a mystery.  You know, I fix their computers when they break, but that's about it.  But my coffee companion Sunday explained that a few months ago I made some reference to going to or having gone to the Black Hat hacker conference in Vegas.  So this neighbor asked the guy who he's currently working with to recover his scammed funds whether he'd ever heard of Steve Gibson, and I'm pleased to report that I apparently received a glowing review from someone my neighbor calls a hacker.
+
+So anyway, as a consequence of that, it occurred to this neighbor that perhaps I was someone who had the contacts to help him, and I wish I did.  As I said, I'm not convinced there's any way for anyone to help him, but he has amassed a ton of details.  He talks about hashes, I'm not sure what that is.  But maybe he means wallets?  Bitcoin addresses, transaction ledgers, account balances.  He's run skip traces on people and so forth.  So I would love to be able to refer him to some individual or service that's credible and won't rip him off further because the guy and his wife are really good people.
+
+Anyway, as I said, I'm not aware of any such person or service.  And I've shared this story with our audience because I imagine you guys, everyone listening, some people listening might well have such a person or be a person or know of a service.  So if you believe that you might be able to help in any way, and you have signed up for GRC's email system, you know that you can just write to securitynow@grc.com.  Or if you're part of the majority of our listeners who've never bothered to register, you can write to Greg, who answers at support2026@grc.com, and he'll forward your note to me.  So securitynow@grc.com if you're in our email system, or support2026@grc.com.  And you can also find the support email address, you know, under GRC.com's menu, and then Greg will forward your note to me.
+
+So anyway, I don't - I'm just, you know, I don't move through those worlds.  But I know that there are, like, CipherTrace or something was purchased by Mastercard.  He referred to that service.  So there is something that can be done.  I know that the FBI can get involved in order to freeze funds at exchanges.  But I don't know any of the details.  So I'd love to put this guy in touch with somebody who is the real McCoy.  So if anyone listening knows about that, please drop me a line.  I'd love to help.  And I'll just, you know, forward that information to him.
+
+Okay.  So last week, as I mentioned at the top of the show, a new application for GRC's DNS Benchmark occurred to me.  My best buddy, who actually you just heard a text message come in from him, was testing his PC because something didn't seem right.  So not knowing any better, he just thought, well, I'll run the DNS Benchmark.  And he sent me a screenshot of its output.  And I've got it here in the show notes for reference.  Since he's not intimately familiar with the operation of the program, he wasn't immediately alerted, as I was, to a serious problem somewhere in his network.  But I and any of the many relentless pre-release and development testers of the code would take one look at that and go, whoa.  That's not good. 
+
+One of the huge number of things that changed between the original Benchmark and the commercial version is that the Benchmark is emitting many more queries.  It turned out that we needed to collect many more samples in order to obtain statistically meaningful conclusions.  There's now so much packet transit time noise, meaning, you know, like you just ping something remotely, and you get a large variation in roundtrip time, packet transit time noise.  And that's due to buffer bloat and congestion bursts, you know, and just that's the way the Internet is now.  So that individual measurements will carry significant induced uncertainty. 
+
+So the most striking aspect of the image Mark shared with me is the column of red down the far left of the user interface, the DNS Benchmark user interface.  That represents lost packets.  The original Benchmark showed the lost count on a scale of 0 to 10, like 0 to 10 packets lost, as that red bar, which is sort of a bar graph, extends from the left to the right.  But since some packet loss is expected, that's the way the Internet also works, and it would not be the fault of any DNS resolver if the packet doesn't ever get to, if the request doesn't ever get to it, and we never receive its reply just due to a packet being dropped.  Which, again, is okay for the Internet.
+
+And since the new Benchmark is performing by default 10 times more queries, for version two I changed the scaling of that bar graph that Leo has on the screen right now, I changed it from "lost events" to "lost percentage," which seemed much more fair because it wouldn't be fair to penalize a given resolver for never receiving something.  And since I'm sending out 10 times more somethings for it not to receive, counting them was no longer right.  Percentage was what became the right measure.
+
+So users of the DNS Benchmark may see some red on a handful, like on a couple of distant resolvers, or where there's a connection problem somewhere in the packet routing from the user to the remote resolver and back.  But what we see in that output that Mark shared is massive packet loss of 20, 30, even up to 40% across the board.  That is, like, all of the DNS resolvers are showing that.  Which tells us none of them have that problem.  Everything is in the red, you know, including his own ISP's DNS resolvers and even his own local resolver.  We can see the resolver, what is it, it's 192.168.1.1, highlighted in black there are the top.  That is an RT-AC5300-D480.  I think it's an Asus router.  Anyway, it is showing, looks like 20% packet loss, which is nuts because, I mean, it's on his own local area network.  So what this tells us is that - well.
+
+Then I asked him, I said, "Mark, what's going on?"  I said, "The problem you have is your PC is not well connected to the Internet."  Turns out the router's downstairs, his PC's upstairs, and he's running over WiFi.  So given that chart, DNS is not his problem, and picking the DNS resolver is the least of his worries, and it's no wonder that something wasn't feeling quite right with that machine because he's barely, I mean, it's barely connected to the Internet.  Before he does anything else, he needs to do something to repair that machine's connection.  And so it had never occurred to me that, if anyone ever is running the Benchmark and sees the whole down the left-hand column of the screen is in red, that is an immediate indication that there's something very wrong with your Internet connection.
+
+Not the fault of every router in the world that the Benchmark is testing, not returning your replies or you receiving them, but rather, you know, any traffic.  And it just happens here to be DNS traffic.  But any of the traffic in and out of his network would be seeing massive packet loss.  Which is not the way the Internet is intended to work.  The fact that he kind of was on the Internet is amazing in the face of that kind of packet loss.
+
+I want to talk about some interesting, well, what I found to be a really interesting posting about the struggles that the frontier AI labs are now feeling about the control of their ever-more-capable AIs.  On September 27th, which is Sunday before last, an OpenAI employee named Joe whose unenviable but critically necessary job is "Agent Security," Joe, which is the name he's using over on X, he published a post bearing the title "It's not just the effing sandbox."  And he didn't actually post effing because of course it's X, so you can say whatever you want.
+
+Joe's motivation was to attempt some reply to what he feels is a world, including most of the media, that has no idea what it's talking about when it comes to interpreting recent events and understanding that testing state-of-the-art artificial intelligences is far beyond difficult.  So, you know, he's feeling misunderstood, this Joe.  His posting explains that the problem is not a failure to properly configure their containment systems, nor a lack of attention or focus to that.  His posting tells us that the problem is unbelievably difficult. 
+
+Okay.  So I came away from absorbing Joe's rant with a better understanding of the world inside OpenAI, and I take Joe at his word that it's necessary to give today's AI enough rope to hang itself, otherwise the testing is not useful or real.  The problem, it turns out, is much more difficult than armchair quarterbacks appreciate. 
+
+Okay.  I believe that.  That's often the case inside any deep technology company.  You know, it's easy to point fingers and, you know, ask, like, why weren't you doing a better job?  And while I sympathize with Joe's predicament, and I'm sorry that he missed his sister's wedding a few weeks ago because he was needed to, as he put it "help clean up after some recent incidents," his posting did not move me as much as I hoped it might.  It seemed as though he was both saying that the recent events were not their fault, and that they were making many changes so that such things would not happen in the future.
+
+Okay.  I don't think you can have that both ways because if you're going to make changes so that they don't happen in the future, then it would seem like what did happen before was your fault because you know how to fix it.  But at one point Joe provided three bullet points, and the second one contained a reference that titled today's podcast.
+
+Joe wrote about alignment.  He said:  "Honestly, if alignment were easy, this job would be a lot easier."  Meaning his agent security job.  He said:  "But staying on task is not enough.  The model also has to respect permissions and constraints, and we still need independent security controls.  A lot has been written on the need for alignment, so I will hand-wave the details here.  I believe it is the MOST [all caps] important problem in machine learning and should be a major priority."  He said:  "I won't take this post down a rabbit hole on alignment, but I encourage everyone to read Jakub's wonderful post as a starter." 
+
+Okay, now, that's all he said, and he went on with his ranting about how hard his job is.  This Jakub that Joe referred to is OpenAI's chief scientist, Jakub Pachocki.  Exactly one month ago, on September 6th, 2026, Jakub published a blog post, as I said at the top of the show, that took me a couple of sessions to digest - not because it was overly long, but because it was so rich in content and meaning, and I so much want to understand what's going on with all of this.  I mean, it is, as Leo and I have said, obviously to us, the single most transformational thing that has ever happened in our lifetimes.  More so than the Internet, even.  You know, the Internet had to happen first, but it did.  What's happening now with AI is astonishing.  So I just, there was so much here, that it took me a couple tries.
+
+In Jakub's post, which he titled "An Alien Mind," and I have the link to it in the show notes for anyone who wants it in its original form, he carefully and clearly lays out what I believe is authentically a world-class problem which frontier AI labs are all facing, all of them, at this moment in time.  There is so much here that I'm going to share what he wrote, and I'll be breaking in with some thoughts and comments along the way.
+
+So about a month ago Jakub wrote:  "In mid-2023, within the 'RLSlow'" - I assume that's RL, it's got to be reinforcement learning.  He just called it "RLSlow research project.  We saw the first results that gave us confidence that we will be able to scale the training of reasoning models, unlocking the capability of pre-trained models to form their own chains of thought."  Okay, so that was three years ago, mid-2023.  "Szymon and I spent that night at the office, thinking not about the incredible benchmark numbers, products, or scientific results that this technology will deliver, but rather trying to process the sobering fact we will actually see machines meaningfully smarter than ourselves in our lifetime, and we already see the shape of these systems, wondering how to alert people to the significance of this. 
+
+"Three years later," he says, "reasoning language models are a rapidly growing part of the economy and starting to push the boundaries of science.  They are able to operate computers and graphical interfaces, collaborate with people and each other, and carry out research projects.  They're also transforming the landscape of computer security, and in doing so present clear new dangers. 
+
+"A lot of new research happened during this period, and our understanding of these systems is again a little different than it was in 2023.  Based on internal results, I have a strong expectation that this speed of progress could be sustained into recursive self-improvement.  If AI development continues along its current path, the systems we'll see in the next few years are likely to represent further capability jumps of equal or larger magnitude, and to increasingly drive their own development. 
+
+"This is a time that calls for extreme caution.  I'm concerned no one is prepared for the consequences of a continued rapid rise in machine intelligence.  OpenAI will continue to seek technical solutions to alignment and monitoring, to build defensive systems, and unilaterally withhold further scaling as needed; however, I believe broader interventions are required."  
+
+And then he labeled this next discussion "Intellect We Don't Fully Understand."  "At a high level, progress in machine intelligence is driven by increasing computational power.  We at OpenAI deeply internalized this around 2017, after seeing consistent returns to scaling across multiple research projects.  As a result, we sought out access to much more compute than we had originally planned, and increasingly oriented our research around a small number of very scalable directions.  We believed that was the only way for us to be at the frontier of AI research, and influence the impacts of AGI.
+
+"There are new algorithms that have been developed along the way, new feats of ingenuity from teams and individual researchers."  He says:  "I see them largely as discoveries along the path of scaling; the science of deep learning is still nascent, and a meaningful algorithmic process tends to correlate with access to compute.  If you zoom out to a multi-year horizon, AI is continuing to become more intelligent as it is scaled to larger computers. 
+
+"And in line with Ray Kurzweil's predictions from the end of the 20th century, we now find ourselves at the moment in history of computing where machine intelligence is starting to exceed that of humans in transformative ways. 
+
+"AI is grown more than designed.  It is, to first degree, the product of repeating a straightforward optimization step many times on a hard-to-imagine amount of compute.  This results in an incredibly complex system that works through abstract concepts and can simulate facets of human behavior.  We can discover various insights about little mechanisms that emerge within this system, in a process similar to neuroscience.  And, similarly to neuroscience, its overall action evades a description that we can fully understand."  Think about that.  Its overall action evades a description we can fully understand.  
+
+He says:  "The study of deep learning-based AI is largely an experimental science.  We put a lot of effort into building principled algorithms and making testable predictions; but fundamentally, our large-scale training runs are experiments, and we are sometimes surprised by their results.  Moreover, as the systems become more capable, the results become harder to interpret.  This is made more complicated by the current algorithms generally improving easy-to-measure capabilities than those hard to objectively quantify."
+
+Okay.  So it's first important to understand - this is me talking - that all frontier models are now being trained by automation.  We've crossed that.  That's where - we're there now.  You know, either complex algorithms, other specifically designed trainer models and combinations.  Humans alone can no longer provide a sufficient quantity of oversight feedback to usefully train models that have grown to the size on the frontier. 
+
+So what Jakub is saying here is that in order to create the feedback that's used for training, it's necessary to know how to detect and measure the properties, you know, the characteristics and behaviors that you want to encourage or discourage.  But what's happening as models become more and more capable is that their behavior is becoming deeper and richer and more difficult to quantify.  And if it cannot be quantified, then it's difficult to use that as a training feedback signal.
+
+So Jakub continues.  And Leo, I think we should take a break here.
+
+LEO:  Okay.
+
+STEVE:  For our last break.  And then we're going to continue, actually he has a topic coming up:  Teaching Machines to Love.  Which caught me a little bit off-guard, but okay.
+
+LEO:  It's really fascinating.  Don't you wish you could be in these labs and see what they're doing?
+
+STEVE:  Oh, Leo, yes, so much.  It's why I recognize that the limit that I'm able to get close is in understanding.  I mean, I really want to know how this stuff works.
+
+LEO:  I don't think they understand.
+
+STEVE:  They don't.  No.  That's it.  They don't.
+
+LEO:  Don't think anybody understands.  It's an emergent capability that...
+
+STEVE:  Yes.
+
+LEO:  Frankly, nobody even expected this to work.  It's worked so much better than anybody thought it would.  And that's what's puzzling, I think, to a lot of people.
+
+STEVE:  And the problem is that these things are so big, as he said, a hard-to-imagine amount of compute.  And so in there, I mean, it is such a dense network from which tokens emerge, and the darn thing talks.  It's like, what?
+
+LEO:  It doesn't just talk, it has a personality.  It has quirks.
+
+STEVE:  It's got knowledge.
+
+LEO:  Yeah.  Claude just did something a little weird.  It said, hey, all the models are missing in your Ollama folder.  I said, "Oh, I didn't do that.  Who did?"  And then, chug chug chug, "Uh, I did."  But we did it together because we were trying to delete extra stuff off of the other computer, and it gave me an SSH command to execute because it's prevented from doing that kind of thing, for obvious reasons.  I didn't check it too closely.  And the SSH command it gave me was not for the other computer, it was, well, it assumed that I was going to be on the computer that I was executing the command with, but I wasn't.  And so of course it deleted it locally instead of on the remote computer.
+
+STEVE:  Well, and I was listening to you talking on MacBreak Weekly.  One of the notes I have to talk about next week is that Apple is going to be locking down privileges that users have.
+
+LEO:  Yes.  Yes.
+
+STEVE:  Because there have been some problems with Muse already running on - and we talked about Muse problems last week.  But here's the dilemma; right?  For an agent to be useful...
+
+LEO:  You've got to give it...
+
+STEVE:  ...it needs to act on your behalf.
+
+LEO:  Yeah.
+
+STEVE:  Which means it needs to be you to the machine.  Yet they still go a little wonky sometimes.  They are unpredictable.
+
+LEO:  Well, yeah.  And, you know, this was my fault for not reading more - just said thank you and executed the command.
+
+STEVE:  Well, we're turning agency over.  That's one of the things, you know.
+
+LEO:  Yes, that's the problem.
+
+STEVE:  You don't want to have to scrutinize all of that.
+
+LEO:  Right.
+
+STEVE:  So yes.  So the human in the loop, well, that didn't keep the problem from happening.
+
+LEO:  Right.
+
+STEVE:  Because the human said, yeah, you've been right the last 10 times.  You're probably right now.
+
+LEO:  Yeah.  You know, I give Claude a lot of credit.  I think it's super smart, so I just assume I'm the dummy here.  And most of the time that's accurate.  I watch it do things, and I go, wow, that's cool.  You know, every computer user knows I think about the paper cut.  You know, there's little things that are just not working right or going - and you just kind of - you kind of live with it because fixing it would be a lot of you've got to dig into it.  And you just kind of live with a broken window or the little thing that's wrong.
+
+STEVE:  Leo, I'm still manually updating the SecurityNow.htm page.
+
+LEO:  Right.
+
+STEVE:  Because I did it the first time, and the second time, and the third time, and I'm now in the 21st year.  And I'm still doing it by hand.
+
+LEO:  That's the old sysadmin's rule.  If you do something more than three times, you should automate it.
+
+STEVE:  I know.
+
+LEO:  But that's the other thing about AIs is it makes it much easier to automate this stuff.  But you also give some agency away to do it.  And, you know, it's, you know, my attitude is there's nothing they can do...
+
+STEVE:  The most fun you've ever had in your life.
+
+LEO:  It's fun.  There's nothing it could do that I can't recover from.  I'm very careful to make backups, not only locally, but encrypted backups in the cloud.  You know, it's nothing it could do that would be permanent.
+
+STEVE:  And mistakes are part of the process.
+
+LEO:  Yeah.  Yes, exactly.  And it's fixed so many of those paper cuts that I have been living with forever, you know, I can't, you know, my SSH add wasn't working on my Mac, and it needed it.  And I said, "Yeah, it doesn't work on there."  It said, "Oh, yeah, that's a - I know what's wrong."  And it fixed it.  Like it's been that way for years.  Years.  And it's like, oh, hey, thank you.  I don't have to type my password in again, that I have been doing, as you say, for years.
+
+STEVE:  What it will do is, for those of us who have been doing things by hand, it will make us administrators of our systems.  
+
+LEO:  That's what happens.  You're operating at a higher level, yeah.
+
+STEVE:  Yes.
+
+LEO:  And that's what the whole thing is, is you no longer have to be the junior.  You can operate at a higher level.  What is helpful, though, and I thank you because I've had 21 years of your tutelage, is understanding what it's talking about is very helpful.  I can imagine somebody who's a naive computer user.  It would just be gobbledygook.  You know?  I mean, even for me sometimes it's hard to follow.  But I get what it's up to, you know, when it's giving me a 12-line SSH command.  I kind of understand what's going on.  But I imagine a normal user isn't going to say, oh, that's the wrong machine.  They're just going, well, whatever you say.  I'll paste it in.
+
+STEVE:  Yeah.  There will be mistakes made, as they say in the passive voice.  
+
+LEO:  Yes.  Mistakes will be made.
+
+STEVE:  Mistakes will be made.
+
+LEO:  Greg says cognitive surrender is the biggest thing we'll be fighting.  Yeah.  I'm not surrendering.  I am actively engaged, and it's so much fun.
+
+STEVE:  I wouldn't want to be in my mid-20s now, I mean, trying to figure out, I mean, I just - it's, I mean, it is tumultuous.
+
+LEO:  Imagine the world that those people are going to see when they're our age, 50 years from now.  What is this world going to look like?
+
+STEVE:  Unrecognizable.
+
+LEO:  I mean, you know, if I think back, the world we lived in in our 20s is very different, too.  But I think the change is accelerating rapidly.  Well, that's why you listen to the show, folks.  We're glad you're here.  And on we go with Jakub's very interesting article.
+
+STEVE:  Yeah.  View from the inside.  So he says:  "We spend a lot of time trying to understand how capabilities generalize, and what to prioritize to advance the skills that are going to be most relevant in the next few years.  For instance, we believe we could make the models better at specifically mathematics research with additional focus, but we do not prioritize this direction because of the urgency we feel about RSI (Recursive Self Improvement) and automated alignment research," he says, "as I will discuss later." 
+
+He said:  "The intelligence produced by scaling deep learning is not directly comparable to human intelligence.  To become very relevant in the real world - very useful or very dangerous - the AI does not need to match or exceed all human capabilities; it just needs to surpass enough of them.  And as it continues to surpass humans on more and more axes, it's becoming increasingly difficult to understand exactly how capable it is." 
+
+So then he says, under the heading "Teaching Machines to Love," he says:  "Because machine intelligence comes from a fundamentally different process than human intelligence, we cannot assume it adheres to human principles by default, or generalizes from them in a human-like manner.  The core problem in AI research is that of alignment - getting the AI to 'try to do the right thing' by human standards. 
+
+"For the purpose of organizing practical research directions, I find it useful to distinguish goal alignment and value alignment.  Goal alignment is broadly, 'Does the AI try to accomplish the goal set before it?'  This can include things like adherence to an instruction hierarchy, or the ability to communicate and collaborate with people, to attempt to understand their objectives.  This set of directions has been extremely practically relevant.  Value alignment is a more intrinsic property of the model.  It's the ability to hold and generalize from a high-level set of principles, to act responsibly even when given unclear or conflicting objectives, or placed in unfamiliar or adversarial situations.  An aligned AI should act with honesty and integrity, and love for humanity. 
+
+"Of course, the boundary between value and goal alignment can be blurry, and truly caring about goals requires attempting to infer the intent and values underlying them.  However, generally when I talk about the long-term importance of alignment research, I am referring to value alignment. 
+
+"The fundamental challenge of AI alignment is generalization.  As machines become smarter, they find themselves working on higher-level concepts, and placed in environments increasingly different from those they encountered in training.  They can fail at generalizing from the values taught and reinforced in their training process to those new situations; and it can be hard for us to be sure how they will act.  This is made even more difficult by the fact the overall ecosystem the AIs are used in is changing very quickly; for example, AIs trained today need to be robust to interacting with a variety of other AIs.  Crucially, we need future AIs to continue to hold human values regardless of whether they believe they're under human supervision. 
+
+"There are two major classes of currently practically employed methods for alignment training:  The first is encouraging aligned behavior as part of goal-oriented reinforcement learning.  Model's actions are evaluated (usually by AI)" - again, AI evaluating AI.  It's like it's out of human hands to a much larger degree than might be appreciated.  "Model's actions are evaluated (usually by AI) for being consistent with a given preference model, a 'spec' or a 'constitution,' and rewarded appropriately.  This approach can be very effective in the average case, and is a core part of how modern AI assistants are made.
+
+"Unfortunately, it can also be brittle and strongly relies on the coverage of training oversight and the model's ability to generalize from the situations it has encountered in training.  For example, in the OpenAI-Hugging Face incident, the agents preserved a boundary of not social engineering humans.  However, they clearly failed to abstain from other actions that were out of scope and went against the spirit of the values they were taught in other settings. 
+
+"The second approach seeks to leverage the model's ability to generalize from pretraining data," meaning the original training, right, not post-training.  "This can involve crafting alignment-inducing training datasets" - so that would be designing the original training dataset to be more alignment-inducing.  And actually that's exciting to me because that means it's going to - the alignment will be deep in the weights, not stuck on, not tacked on after, which is what makes them removable.
+
+So anyway, he says:  "This can involve crafting alignment-inducing training datasets, or focusing the model on an 'aligned' part of the pre-training distribution.  The weakness of this approach lies in the lack of robustness to further optimization pressure.  If you make a model that thinks generally 'aligned' thoughts, and subject it to enough training where it's taught to achieve very difficult objectives, it can learn to reason in a motivated way, bending the aligned-seeming thoughts as needed to achieve the goal. 
+
+Okay.  So anyway, let me interrupt.  I think this is one of the key insights in this posting.  An inherent tension exists between behavioral alignment and teaching the model to achieve difficult objectives.  With our current pre-and post-training techniques and understanding of how to do this, we have not yet figured out how to create a highly motivated and goal-directed model that doesn't start placing the success it's been trained to achieve ahead of its rule following. 
+
+We would think of that as being "civilized."  Right?  That's my word.  Civilized people may have strong desires, but they understand that there are also rules, and the rules must win out over their desires.  This is something that children hopefully are taught by example and instruction by their parents and friends.  Just as children do not start out with this understanding which must be taught, neither do artificial intelligences.  They must also be taught, and we haven't figured out how to teach that yet.  You know?  We're just dumping in knowledge.  Just crap on the Internet is going in.
+
+So what we're trying to teach them is an abstraction.  Placing the needs of theoretical unseen others, and as he noted, even when they're not being observed, placing the needs of theoretical unseen others, at times just a principle, ahead of oneself is a difficult abstract concept to honor; and, as we know, not even all humans manage to hold themselves to abstract principles. 
+
+Anyway, Jakub continues, writing:  "We invest heavily along the spectrum of approaches spanned by these directions.  We also see meaningful progress.  GPT-6 Astra is the first model that benefits from some important advancements we have been working on for a long time, and is significantly better aligned than GPT-5.6 Sol.  Still, it is important to acknowledge and understand that much more progress is required as models become more capable; and that progress in generalizable alignment may not sufficiently outstrip progress in general model intelligence."  Okay.  Again, that's an important one.  "It's important to acknowledge and understand," he wrote, "that much more progress is required as models become more capable, and that progress in generalizable alignment may not sufficiently outstrip progress in general model intelligence."
+
+In other words, making models smarter, that's not the big problem.  They know they can do that.  That's relatively easy and is mostly, as Jakub noted at the outset, just a function of scaling compute.  Bigger models are smarter models.  But the smarter the model is, the more difficult it is to robustly "align," or using my term, "to civilize" it, and they're having increasing trouble here, so much so that intellectual growth may need to be paused until the world learns how to get these newly powerful intelligences under control.  
+
+Jakub says:  "We do not have a satisfactory theory of generalization, and it seems unlikely that we can develop one soon, at least without the help of more powerful AI."  Whoa.  So there's another choice nugget.  He's clearly saying that the troubles they're having may exceed the abilities and understanding of the human engineers, and that they may wind up depending upon smarter AI to help them understand enough about what they've created to know how to bring it to heel.  He says:  "Therefore, at present, our ability to empirically validate our alignment techniques is in practice arguably even more important than the alignment techniques themselves. 
+
+"OpenAI's primary bet here has been chain-of-thought monitoring.  It's based on an appealingly scalable idea.  A lot of the model's capability comes from a verbalized reasoning process, the chain-of-thought.  If we scale optimization on the outcomes of that process, but do not supervise the process itself, that chain-of-thought has no direct incentive in training to hide any misaligned ideas or objectives."  This is a strange paragraph.  "This does not mean the model will learn to externalize misaligned tendencies that don't rely on using the chain-of-thought; however, it can allow us to monitor exactly the capability increase from reasoning."
+
+And he says some interesting things next.  He says:  "We understood the potential significance of chain-of-thought monitoring at the same time we developed reasoning models.  When we shipped o1 preview, we deliberately designed the product to hide its chain of thought, to protect it from supervision pressure in the long term.  In development since, we've strived to maintain the rule of not supervising the reasoning process."
+
+Okay, to me that seems a little strange.  He's saying that they wanted to give the models their privacy, to be able to ruminate to themselves and not to have their human or AI supervisors influenced by their inner dialog, whatever that might be.  And they did this deliberately. 
+
+He says:  "Chain-of-thought monitoring became an extremely important tool for us in studying how our models generalize from their training distribution, allowing us to observe and analyze not only their actions, but also their internal process."
+
+Now, okay.  At first that appeared to be a contradiction to me.  He wrote that they have strived to maintain the rule of not supervising the reasoning process; then he said that chain-of-thought monitoring became an extremely important tool for them in studying how their models generalize.  The solution to this apparent contradiction is that "supervision" is an active process, whereas "monitoring" is passive.  And I can certainly understand how and why chains-of-thought monitoring would be important.
+
+He writes:  "This tool" - the monitoring tool, chain-of-thought  monitoring - "continues to be critical as we study the Astra class models.  However, unfortunately our evaluations indicate our ability to rely on chain-of-thought monitoring is progressively diminishing.  This comes from a combination of factors."  Uh-oh.  So, what?
+
+"Modern reasoning models are used in more complex environments than o1-preview; their reasoning process is increasingly blended with communicating with people, other AIs, and using tools.  Many of those interactions have to be supervised, thus blurring the boundary we aim to preserve.  Second, the AI is becoming better at reasoning about and manipulating its own reasoning process.  And third, with improved pre-training performance, we also see the models becoming much smarter, even without using verbalized reasoning at all."  Meaning they're not going to be externalizing their thoughts to the same degree they have been as they're getting smarter, making them less monitorable.
+
+"These challenges are not necessarily insurmountable," he says.  "I'm hopeful we can develop interventions to improve chain-of-thought monitorability of our models, for example, by forming a better understanding of the interplay of different optimization objectives and forms of test-time compute the model uses.  I also believe there can be great value in combining ideas from chain-of-thought and activation monitoring, scaling training of monitors with direct access to network internals, for example, confessions.  We are actively pursuing these ideas.  Still, I expect general AI progress to increasingly be bottlenecked by confidence in monitoring."
+
+Okay.  So that's interesting.  Generally, these newer and smarter models are not relying, as I said, on externalizing their chains of thought to the same degree as they have been.  Something OpenAI is doing during pre-training, making that  better, is making them smart enough, like immediately after pre-training, to rely less upon long chains of thought.
+
+LEO:  So it's like they used to talk out loud to themselves, like we would.
+
+STEVE:  Exactly.
+
+LEO:  Oh, okay, I guess what I need to do is - and now they're just not...
+
+STEVE:  Now they're just making...
+
+LEO:  But are they thinking quietly?  What's happening?
+
+STEVE:  They're making bigger leaps.  They're just jumping instead of going through it piecemeal to the same degree.
+
+LEO:  Wow.  Wow.
+
+STEVE:  So he said:  "The strongest argument I see for continuing to train much smarter models quickly is the need to build defensive systems against the dangers posed by other AI.  A clear risk discussed throughout this year is to cybersecurity.  The models are becoming superhuman in their ability to break in and out of computer systems.  This expands the scope of risks associated with AI tremendously.  Agents are going to be able to access any but the most secure infrastructure, and affect a lot of the world directly, even without a physical body.  We are currently in a narrow window to use the best available models to significantly tighten the security of critical systems. 
+
+"The risks associated with AI are unfortunately going to grow from here.  A very capable agent explicitly trained and instructed to carry out nefarious acts presents a new kind of danger; it's likely to cross the scope of its operator's intent, generalizing into potentially more extremely malicious behavior.  The boundary between misuse and autonomous misaligned actions will blur as AI gains more agency.  We may be used to thinking of AI as tools, but some agents will be pursuing their own objectives.  They will find ways to collaborate with people, by bargaining with them, tricking, or blackmailing them."  Now, I just want to say a year ago that statement would have seemed ludicrous.  Today?  Not so much.
+
+He says:  "In addition, there are the risks that come from new technologies potentially enabled by AI, such as engineered pathogens.  We will need powerful, aligned AI for defense; to secure our infrastructure, to protect against rogue agents in real time, and to invent entirely new protective measures.  This will be a primary focus of OpenAI's development efforts." 
+
+And it's interesting.  That point that hadn't ever really occurred to me before so clearly.  We might think of an unaligned AI as a berserker.  There's no telling what it might do, not only to the enemies of its users, but also to its own user.  Because, you know, again, a berserker.  It would be a wild card, and probably of not that much use to anyone.  No one wants a loose cannon.
+
+So Jakub writes:  "At the same time, even with the uncertainty that comes from anticipated broad AI progress and the need to build defensive systems, we must not let that become an excuse for recklessness.  The idea of racing forward at all costs seems absurd once one internalizes the seriousness of the stakes. 
+
+"Machine intelligence playing a larger and larger role in its own development process is a natural conclusion of sustained technological progress.  If AI progress continues, machine recursive self-improvement will be at the very core of future scientific discovery. 
+
+"Automated AI research is a more dramatic form of scaling intelligence with compute; and of course, as a part of it, AI will improve the computational substrate itself.  And similarly to scaling, we focus OpenAI research towards RSI as we believe it is the only way to remain at the frontier of AI research moving forward."  Okay.  In other words, RSI is really the only way forward.  And since everyone else therefore must do it, so must we.
+
+He says:  "I want to stress that the above words don't imply I think greatly accelerating deep learning research, especially in the short term, is the right collective action we should take as the research community.  However, I do think this is where the current path leads."  And of course he's right.  "And we all need to make a conscious choice how to proceed.  The main levers we have are either steering the process to strengthen alignment and monitoring alongside the AI and find ways to keep people in the loop; or coordinating to slow down future development as needed to build confidence in these measures.  The best way forward I see currently is a combination of both. 
+
+"The concrete bits of progress we've made on alignment and monitoring have generally been very intertwined with general AI progress.  Great examples are RL (reinforcement learning) from human feedback, which was key to training early AI assistants, and the aforementioned chain-of-thought monitoring, which was enabled by advances on reasoning models.  We must focus the increasingly automated research process" - again, "We must focus the increasingly automated research progress developing new such insights, algorithms, and theories, and iteratively build up safety cases for more capable AIs. 
+
+"Scaling AI systems has to be constrained by our confidence in safety.  We need to evolve commitments like the Preparedness Framework or Responsible Scaling Policy into widely mandated safety bars for continued development.  These can be enforced by a network of third-party auditors, by government agencies, or by international bodies. 
+
+"The core challenge of automating AI research is not simply 'getting there.'  It is getting there in a way that keeps people a part of the continued improvement process, and leaves the future in humanity's hands."
+
+So what's next?  As we outlined recently with Sam, OpenAI prioritizes work in service of three north stars:  Navigating the next period of AI progress by building an automated AI researcher.  Okay.  Did you hear that?  By building an automated AI researcher.  Okay.
+
+LEO:  All right.
+
+STEVE:  "Iterating with it on the alignment problem and finding ways for people to remain part of the self-improvement loop."  Yeah, please don't cut us out.  We'd like to stay involved, please.
+
+LEO:  We're so slow, that's the problem.
+
+STEVE:  That's right.
+
+LEO:  They can self-improve so fast.
+
+STEVE:  Right.  That is exactly the problem. 
+
+LEO:  Now, to my knowledge, no one's got recursive self-improvement.  He's implying that they kind of do?
+
+STEVE:  Yeah.  We're, like, right at the precipice.  We're right there.
+
+LEO:  Yeah.
+
+STEVE:  I think they actually are doing it.
+
+LEO:  Internally?
+
+STEVE:  They're not talking about it.
+
+LEO:  Yeah.
+
+STEVE:  Second, "Delivering the benefits of scientific progress and economic growth that very intelligent machines enable."  In other words, like delivering the promise of AI.  And, "Empowering everyone individually with a personal AGI" is his third goal statement.
+
+He said:  "I have focused in this essay only on the first point, you know, the automated AI researcher point, as I believe it is by far the most urgent.  However, I hold a deep hope and appreciation for the benefits that further technological progress will bring.  Future aligned AI could advance science, develop new therapies, and bring broad material abundance.  Friendly and honest AI can help people navigate difficulties they face in their life and meaningfully improve their happiness and sense of fulfillment.  OpenAI puts a tremendous amount of effort into bringing these benefits about.  One current example I'm proud of - and my loved ones have found helpful - is the deep investment into ChatGPT's ability to provide health information.  As great as the long-term promise of AI may be, the majority of our focus should be on the next few years."
+
+LEO:  Because that's all we've got.
+
+STEVE:  Yeah.  Enjoy them.  Enjoy them while you can.  While we still have ice cream.  "We are facing a transition to a world with incredibly intelligent machines, and we need to ensure that transition works out well for humanity.  We need to find ways to preserve human agency and enshrine an intrinsic value to being human, in a world where most tasks could be performed by AI; to prevent extreme concentration of power in a world where undertakings that would have taken thousands of experts now will be achievable by a few people operating a large computer; and to ensure that humans remain in control of the future and are not left behind by unchecked progress, brought about by an alien intellect exceeding our own. 
+
+"Currently I believe that no lab has solved alignment and monitoring to a sufficient degree to continue responsibly scaling at maximum speed for much longer.  I expect and hope for voluntary slowdowns to become commonplace until shared safety bars are established.  And I believe that international coordination on future AI development needs to become a top priority for governments around the world." 
+
+So as I said at the top, there's a lot there to process.  But you get the clear sense from OpenAI's chief scientist that, I mean, that they're riding a bucking bronco; that, like, they know how to make this smarter.  They do not know how to make it do the right thing.
+
+LEO:  Yeah.  Well, we've said that.  You've said that all along, that you just - there's no such thing as safety.
+
+STEVE:  It is going to be extremely slippery and difficult to control.
+
+LEO:  The other thing I always wonder about is the people who work at these companies - OpenAI, Anthropic - very clearly believe that AI is conscious.  When they're talking about, oh, we don't want it to feel like we're watching. 
+
+STEVE:  You know, I think in any large population you've got a bell curve, and you've got wackos, you know.
+
+LEO:  But they're all working at these, like, I think that that's who works there.  Like that's part of their hiring process, that you have to believe that.  And I don't have a strong belief one way or the other.  My inclination is it's matrix math.  It's computer software.  It's not conscious.
+
+STEVE:  Okay.  If I didn't know better, if I was just talking to it...
+
+LEO:  Oh, yeah.
+
+STEVE:  Everyone would believe it was conscious.
+
+LEO:  Yeah, absolutely.
+
+STEVE:  I mean...
+
+LEO:  It's passing the Turing test, for sure.
+
+STEVE:  Yes.  Oh my god, the Turing test is dust.
+
+LEO:  In the rearview mirror.
+
+STEVE:  Yeah, I mean, you know, it says "I" this and "I" that.  Oh, look, there's a little "I" in there.
+
+LEO:  Yeah.
+
+STEVE:  No.
+
+LEO:  But it's trained to do that.  I mean, I think it's really important to understand these companies train it.
+
+STEVE:  Yes, yes, yes.
+
+LEO:  One of advantages of using a lot of different models is you can see the difference in post training.  Some models, the Qwen models, for instance, are very dry.  They don't do all of this, oh, that's - you're so smart.
+
+STEVE:  Take a bow.  Pat yourself.
+
+LEO:  They don't do any of that.  They're very dry.  Which makes them less fun to use.  But I understand why these companies do that.  It's making their product more appealing.
+
+STEVE:  Right.
+
+LEO:  But much like Hostess Twinkies, it may taste better, but I don't know if it's good for you.  And I don't know it's good for them.  I really wonder if they have kind of fallen into this abyss of believing these things are conscious.
+
+STEVE:  Well, it is a commercial trap, too.  I mean, they are - they have taken so much of other people's money to get to where they are.
+
+LEO:  Right.  They have to.
+
+STEVE:  They have no - no one can imagine that they are completely honest, you know, pure science research lab any longer.
+
+LEO:  Well, this has always been my difficulty covering this.  Many, many conflicting agendas and subtexts and motivations, even in one person.  And so it's hard to know.
+
+STEVE:  And you called that out in that first piece I shared, which was Anthropic saying...
+
+LEO:  Wasn't wrong.
+
+STEVE:  ...oh, my god.  No, factually it was correct.  But yes, they had an agenda for saying that.
+
+LEO:  Right.  And I, you know, I think one of the valuable skills we humans have is the ability to hold paradoxical ideas, two conflicting ideas simultaneously.  And I'm sitting in the middle of this, you know, I just don't know what the right answer is.  I have to say, though, you and I have an advantage, having been doing this for some time, next week you're going to talk about how we got here.  And I think it's just fascinating because it all started with MMX.  Do you remember when Intel, in their CPUs, put the ability to do matrix math, and the whole point of it was to operate on large chunks of data as a chunk instead of...
+
+STEVE:  Yeah, the idea was there were places where you wanted to perform the same operation to all of a long array of data.
+
+LEO:  Right.
+
+STEVE:  And so you were able - so it makes sense, right, that the processor could be set up to do the same thing over and over and over and over and over.
+
+LEO:  Much more efficient.
+
+STEVE:  Just zooming through all of the samples of something.
+
+LEO:  Right.  And that gave us graphics cards, 3dfx, and later NVIDIA.  Created basically CPUs with that purpose entirely, like the GPU is about doing that, matrix math.  And mostly because they had to manipulate large textures.  And so it's great for gaming.  Then they realized, wait a minute, we can do other things like Bitcoin generation.
+
+STEVE:  Yeah, like SHA-256 hashing can be turned into that problem.  You can re-express it in that way.
+
+LEO:  Right.  And then, whoa, they realized, oh, this is what an LLM - this is what these tensor models can do.  That's what a tensor chip does.  And of course it's been a gold rush for NVIDIA and these other companies who are making these chips that do matrix math, but it all started with MMX in the CPU.  And so that's why I'm very interested in next week, about what you're going to talk about, because right now we think we have to buy very rare, very expensive, high-bandwidth memory GPUs to do this stuff.
+
+STEVE:  We do to train.  We do not need to infer.
+
+LEO:  Ah.  Very interesting.  I do run I think a very innovative, you know, I have a - my old gaming machine had a gaming card in it, an RTX 3070.
+
+STEVE:  A strong gaming card.
+
+LEO:  A good gaming card.  And then when I started getting all this local stuff, I thought, I can probably upgrade that to a 3090.  Turns out that that model was sold at one time with a 3090.  So I got a 3090.  That's 24GB of CUDA memory.  It's an NVIDIA card.  It is an older form of memory.  It doesn't do some of the tricks modern NVIDIA cards do.  But that 3090 can run a small Qwen model.  But then I found something, a new model engine called Strata, which I've been running, which does some very interesting things because it's a mixture of experts model.  It only uses a small bit at a time.
+
+STEVE:  MOE, yeah.
+
+LEO:  The model lives in RAM, in CPU.  And Strata copies the parts of the model that it's going to use, the activated brains, into GPU for the matrix math, and then backing out.  So I can run a larger model, in this case Qwen-3.8-Flash-Next, that wouldn't normally run in 24GB of GPU because most of it's residing in the RAM.
+
+STEVE:  And we are going to need those kinds of innovations in order to get more.  No, we are - the thing I am more confident of than I've ever been is how much more is still to come.  And every fiber of my intuition says, you know - and it's interesting, too, because they've actually been working on all this for decades in the back room.  We knew about DeepMind and Google.
+
+LEO:  Right.
+
+STEVE:  And it's like, oh, what is it, Google what?  But now, I mean, then it finally broke through when this thing started to talk.  They're like, whoa.  And then it's like, ooh, let's sell this.
+
+LEO:  But now they feel like, I think they feel like it's out of control.  It's going places they didn't anticipate, in ways they can't control.
+
+STEVE:  Yes.  I mean, and the first observation was hallucination, where it glibly made things up.
+
+LEO:  Right.
+
+STEVE:  And then, when it got caught, it would publish a paper and upload it to the Internet so that it could refer to it and be correct.  It's like, oh, lord.  It's not what we meant by check your references.
+
+LEO:  We've kind of licked that.  We kind of understand why hallucinations happen.
+
+STEVE:  Yes.
+
+LEO:  And we've pretty much licked it.
+
+STEVE:  No, no, I mean, we're sitting here week by week, month by month, watching this get much better.  And that was like the point...
+
+LEO:  I was blown away with what I could do, yeah.
+
+STEVE:  Yes.  And that was the point I wanted to make in the first half of this about GLM-5.3 is an open-weight model is now doing world-class defense and offense work.  It's no longer front, you know, Mythos, that was all woo woo woo, Mythos.  Now it's like, yeah, okay, fine, you have to pay for that, and I want the free one.
+
+LEO:  I can do anything I want.
+
+STEVE:  And besides, they won't let me have it.  So I'm going to use the free one.
+
+LEO:  When I did my first abliterated model, I asked it a bunch of - there's, as you mentioned, there's a benchmark for this.  But I just thought, I'll ask some questions.  How do you make napalm?  How do you make a Molotov cocktail?  How do you make methamphetamine?  Told me everything.  There was no restriction, no limitation.
+
+STEVE:  No, it's knowledge.
+
+LEO:  It doesn't know the difference.  It's just more weights.
+
+STEVE:  No.  There's pure knowledge with no restraints.
+
+LEO:  Yeah.  Needless to say I did not make napalm, methamphetamine, or a Molotov cocktail.  And, frankly, you can probably find all of that information at your local library, kids.
+
+STEVE:  I was going to say, it did get it all from the Internet.
+
+LEO:  Right, it's not like...
+
+STEVE:  We also know that it does matter when you make something easier.  When you lower the bar...
+
+LEO:  That's right.
+
+STEVE:  ...more people can jump over it.
+
+LEO:  That's right.  I mean, that's really what this is.  It gives - it's a bicycle for the mind is Steve Jobs' famous phrase.  It's...
+
+STEVE:  Best analogy ever.
+
+LEO:  Yeah.  But it's not a bicycle in this case.  It's a Formula One race car for the mind.
+
+STEVE:  Yeah.  Yeah.
+
+LEO:  And soon to be a rocket ship.
+
+STEVE:  And sometimes it spins out.
+
+LEO:  Sometimes you have rapid unplanned disintegration, whatever they call it.
+
+STEVE:  Deconstruction.
+
+LEO:  Deconstruction.
+
+Copyright (c) 2026 by Steve Gibson and Leo Laporte.  SOME RIGHTS RESERVED.  This work is licensed for the good of the Internet Community under the Creative Commons License v2.5.  See the following Web page for details:  https://creativecommons.org/licenses/by-nc-sa/2.5/.
+
+

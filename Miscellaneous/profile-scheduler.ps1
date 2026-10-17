@@ -1,15 +1,17 @@
 # Filename: profile-scheduler.ps1
-# Revision : 2.1.0
+# Revision : 2.2.1
 # Description : Runs scripts on per-script intervals based on each script's own last run time
 # Author : Jason Lamb (with help from Claude Code)
 # Created Date : 2026-04-01
-# Modified Date : 2026-05-14
+# Modified Date : 2026-10-16
 # Changelog :
 # 1.0.0 initial release
 # 1.1.0 added per-script last run tracking to state JSON
 # 1.1.1 added Security Now transcript/PDF downloader to weekly tasks
 # 2.0.0 switched from shared block timestamps to per-script interval tracking
 # 2.1.0 added run/skip status output with time-remaining at session start
+# 2.2.0 added daily sort-scans-by-date for PackingSlips-Panels and PackingSlips-Production
+# 2.2.1 sort-scans-by-date now called once via Scans\IT\sort-scans-all-folders.ps1 (runs the Panels and Production scripts)
 
 $schedulerStatePath = "$psexports\profile-scheduler-state.json"
 
@@ -69,6 +71,25 @@ if (Should-RunScript 'check-choco-updates' 'Daily') {
     $stateChanged = $true
 } else {
     Write-Host "  [SKIP] check-choco-updates (Daily) — $(Get-TimeRemaining 'check-choco-updates' 'Daily')" -ForegroundColor DarkGray
+}
+
+if (Should-RunScript 'sort-scans-by-date' 'Daily') {
+    # IT runner calls the Panels and Production sort scripts back to back
+    $sortScansScript = '\\altfs01v\Teams\Scans\IT\sort-scans-all-folders.ps1'
+    if (Test-Path -LiteralPath $sortScansScript) {
+        Write-Host "  [RAN]  sort-scans-by-date (Daily)" -ForegroundColor Green
+        try {
+            & $sortScansScript
+            $scriptState['sort-scans-by-date'] = [PSCustomObject]@{ LastRun = $now.ToString('o'); Interval = 'Daily' }
+            $stateChanged = $true
+        } catch {
+            Write-Warning "sort-scans-by-date failed: $_"
+        }
+    } else {
+        Write-Host "  [SKIP] sort-scans-by-date (Daily) — script not reachable, will retry next session" -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "  [SKIP] sort-scans-by-date (Daily) — $(Get-TimeRemaining 'sort-scans-by-date' 'Daily')" -ForegroundColor DarkGray
 }
 
 # Long-running network scan: launched in its own minimized window so it doesn't block this session.

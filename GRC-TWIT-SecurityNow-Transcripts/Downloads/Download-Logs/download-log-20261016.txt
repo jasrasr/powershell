@@ -1,0 +1,29 @@
+[2026-10-16 14:50:20] Resumed from JSON : TXT 1099, PDF 1100, JPG 1100
+[2026-10-16 14:50:20] Checking TXT : sn-1099.txt
+[2026-10-16 14:50:21] Downloaded TXT : sn-1099.txt
+[2026-10-16 14:50:21] Checking TXT : sn-1100.txt
+[2026-10-16 14:50:22] Missing TXT : sn-1100.txt
+[2026-10-16 14:50:22] Checking TXT : sn-1101.txt
+[2026-10-16 14:50:22] Missing TXT : sn-1101.txt
+[2026-10-16 14:50:22] Stopping TXT download after 2 consecutive failures at episode 1101
+[2026-10-16 14:50:22] Checking PDF : sn-1100-notes.pdf
+[2026-10-16 14:50:23] Downloaded PDF : sn-1100-notes.pdf
+[2026-10-16 14:50:23] Checking PDF : sn-1101-notes.pdf
+[2026-10-16 14:50:24] Missing PDF : sn-1101-notes.pdf
+[2026-10-16 14:50:24] Checking PDF : sn-1102-notes.pdf
+[2026-10-16 14:50:24] Missing PDF : sn-1102-notes.pdf
+[2026-10-16 14:50:24] Stopping PDF download after 2 consecutive failures at episode 1102
+[2026-10-16 14:50:24] Checking JPG : 1100.jpg
+[2026-10-16 14:50:25] Downloaded JPG : 1100.jpg
+[2026-10-16 14:50:25] Checking JPG : 1101.jpg
+[2026-10-16 14:50:26] Missing JPG : 1101.jpg
+[2026-10-16 14:50:26] Checking JPG : 1102.jpg
+[2026-10-16 14:50:26] Missing JPG : 1102.jpg
+[2026-10-16 14:50:26] Stopping JPG download after 2 consecutive failures at episode 1102
+[2026-10-16 14:50:26] Downloaded TXT : 1
+[2026-10-16 14:50:26] Downloaded PDF : 1
+[2026-10-16 14:50:26] Downloaded JPG : 1
+[2026-10-16 14:50:26] Saved JSON state : TXT 1099, PDF 1100, JPG 1100
+[2026-10-16 14:50:26] Run complete
+[2026-10-16 14:50:26] ~~~
+
