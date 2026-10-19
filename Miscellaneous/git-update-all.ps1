@@ -35,6 +35,10 @@ function Find-GitRepository {
 # Standalone (dot-source) version, kept for reference and for use without a module.
 # The maintained version is in the GitUpdate module: Modules\GitUpdate\README.md, or
 # https://github.com/jasrasr/powershell/tree/main/Modules/GitUpdate
+#
+# REQUIRES: git-update.ps1 (Miscellaneous\git-update.ps1, same folder as this script).
+# git-update-all runs no git commands itself; it calls the git-update function defined
+# in that file, and fails if the file is missing (or pass -GitUpdateScript <path>).
 
 <#
 .SYNOPSIS
@@ -71,10 +75,11 @@ https://github.com/jasrasr/powershell/tree/main/Modules/GitUpdate
 
 .NOTES
 Filename : git-update-all.ps1
-Revision : 1.1.4
+Revision : 1.1.5
 Author   : Jason Lamb
 Created  : 2026-06-13
 Modified : 2026-10-19
+Requires : git-update.ps1 (Miscellaneous\git-update.ps1, same folder; or pass -GitUpdateScript)
 Usage    : Dot-source this file (for example from the PowerShell profile), then call git-update-all.
 Changelog:
   1.0.0 initial release
@@ -88,6 +93,7 @@ Changelog:
   1.1.2 git-update now pushes each repository explicitly to origin/main
   1.1.3 converted header and usage examples to comment-based help (Get-Help git-update-all)
   1.1.4 added a comment and .LINK pointing to the GitUpdate module (no code change)
+  1.1.5 header now states the requirement on git-update.ps1 (comment and NOTES; no code change)
 #>
 function git-update-all {
     param(
