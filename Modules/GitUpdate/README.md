@@ -4,8 +4,8 @@ PowerShell module for keeping Git repositories in sync with one command.
 
 | Command | What it does |
 |---|---|
-| `git-update` | In the current repo: pull (rebase + autostash), stage all, commit, push to `origin/main`. Writes the commit message with OpenAI from the staged diff, or uses a timestamped message with `-Quick`. |
-| `git-update-all` | Runs `git-update` in every repository on an allowlist under `$githubpath`. Prints a total of the AI model and tokens used at the end. |
+| [`git-update`](Public/git-update.ps1) | In the current repo: pull (rebase + autostash), stage all, commit, push to `origin/main`. Writes the commit message with OpenAI from the staged diff, or uses a timestamped message with `-Quick`. |
+| [`git-update-all`](Public/git-update-all.ps1) | Runs `git-update` in every repository on an allowlist under `$githubpath`. Prints a total of the AI model and tokens used at the end. |
 | `Get-GitUpdateVersion` | Shows the module version and each function's revision. `-ReleaseNotes` shows the release history. |
 
 Works in Windows PowerShell 5.1 and PowerShell 7.
@@ -21,6 +21,8 @@ Modules\GitUpdate\
   Public\Get-GitUpdateVersion.ps1
   README.md
 ```
+
+Source files: [`Public/git-update.ps1`](Public/git-update.ps1) and [`Public/git-update-all.ps1`](Public/git-update-all.ps1). Each of them has a comment at the top that links back to this README.
 
 `git-update-all` depends on `git-update`: it runs no git commands and makes no OpenAI calls itself. If `git-update` is missing, `git-update-all` fails for every repository.
 
@@ -78,4 +80,4 @@ Adding a new command: create `Public\<Name>.ps1` with comment-based help (`.SYNO
 
 ## Related
 
-The standalone scripts `Miscellaneous\git-update.ps1` and `Miscellaneous\git-update-all.ps1` in this repo are the original dot-source versions. They are kept for reference and for anyone who does not want a module. They are separate from this module and are not updated with it.
+The standalone scripts [`Miscellaneous/git-update.ps1`](../../Miscellaneous/git-update.ps1) and [`Miscellaneous/git-update-all.ps1`](../../Miscellaneous/git-update-all.ps1) in this repo are the original dot-source versions. They are kept for reference and for anyone who does not want a module. They are separate from this module and are not updated with it.

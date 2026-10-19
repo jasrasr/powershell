@@ -1,3 +1,7 @@
+# Part of the GitUpdate module. See README.md one folder up (..\README.md, or
+# https://github.com/jasrasr/powershell/blob/main/Modules/GitUpdate/README.md)
+# for the layout, usage, and release routine.
+
 <#
 .SYNOPSIS
 Runs git-update against the approved GitHub repository allowlist.
@@ -45,7 +49,7 @@ git-update
 
 .NOTES
 Filename : Public\git-update-all.ps1 (part of the GitUpdate module)
-Revision : 1.4.0
+Revision : 1.4.1
 Author   : Jason Lamb
 Created  : 2026-06-13
 Modified : 2026-10-19
@@ -72,6 +76,7 @@ Changelog:
   1.3.3 help now states the dependency on git-update (description and Requires line in NOTES)
   1.4.0 collects the model and token usage git-update records for each repository
         ($script:GitUpdateLastAiUsage) and prints a one-line AI usage total at the end
+  1.4.1 added a comment at the top linking back to the module README (no code change)
 #>
 function git-update-all {
     param(

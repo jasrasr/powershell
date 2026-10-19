@@ -1,3 +1,7 @@
+# Part of the GitUpdate module. See README.md one folder up (..\README.md, or
+# https://github.com/jasrasr/powershell/blob/main/Modules/GitUpdate/README.md)
+# for the layout, usage, and release routine.
+
 <#
 .SYNOPSIS
 Smart git pull/add/commit/push for the current repository.
@@ -34,7 +38,7 @@ https://platform.openai.com/docs/api-reference/chat
 
 .NOTES
 Filename : Public\git-update.ps1 (part of the GitUpdate module)
-Revision : 1.1.0
+Revision : 1.1.1
 Author   : Jason Lamb (with help from Claude Code CLI)
 Created  : 2026-05-05
 Modified : 2026-10-19
@@ -54,6 +58,7 @@ Changelog:
   1.1.0 shows the model and token usage (prompt/completion/total) reported by OpenAI after an
         AI-generated message; stores them in $script:GitUpdateLastAiUsage so git-update-all
         can total them
+  1.1.1 added a comment at the top linking back to the module README (no code change)
 #>
 function git-update {
     param(
