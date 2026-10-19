@@ -1,21 +1,43 @@
-# Filename: git-update.ps1
-# Revision : 1.0.4
-# Description : Smart git pull/add/commit/push. Generates AI commit message from diff via OpenAI.
-#               Use -Quick to skip AI and use a timestamped message instead.
-#               Uses the dedicated GIT_UPDATE_OPENAI_API_KEY environment variable.
-# Author : Jason Lamb (with help from Claude Code CLI)
-# Created Date : 2026-05-05
-# Modified Date : 2026-10-19
-# Changelog :
-# 1.0.0 initial release
-# 1.0.1 bail out on pull failure instead of committing/pushing into a diverged state;
-#       switched pull to --rebase --autostash; added push-failure handling
-# 1.0.2 set GIT_ASK_YESNO=false so Git for Windows no longer prompts "Should I try
-#       again? (y/n)" when it can't delete a stale ref/object directory (usually
-#       because OneDrive or antivirus is briefly holding a lock on it)
-# 1.0.3 push explicitly to origin/main
-# 1.0.4 suppress CRLF-to-LF warnings on git add (core.safecrlf=false for that call only)
+<#
+.SYNOPSIS
+Smart git pull/add/commit/push for the current repository.
 
+.DESCRIPTION
+Pulls with rebase and autostash, stages all changes, generates a commit message,
+commits, and pushes to origin/main. The commit message is generated from the staged
+diff via OpenAI (gpt-4o-mini) using the GIT_UPDATE_OPENAI_API_KEY environment
+variable. If the key is missing, the API call fails, or -Quick is used, a timestamped
+message is used instead. Stops without committing or pushing if the pull fails.
+
+.PARAMETER Quick
+Skip AI and use a timestamped commit message.
+
+.EXAMPLE
+git-update
+Run from inside a git repository to pull, commit with an AI-generated message, and push.
+
+.EXAMPLE
+git-update -Quick
+Same, but use a timestamped commit message instead of calling OpenAI.
+
+.NOTES
+Filename : git-update.ps1
+Revision : 1.0.5
+Author   : Jason Lamb (with help from Claude Code CLI)
+Created  : 2026-05-05
+Modified : 2026-10-19
+Usage    : Dot-source this file (for example from the PowerShell profile), then call git-update.
+Changelog:
+  1.0.0 initial release
+  1.0.1 bail out on pull failure instead of committing/pushing into a diverged state;
+        switched pull to --rebase --autostash; added push-failure handling
+  1.0.2 set GIT_ASK_YESNO=false so Git for Windows no longer prompts "Should I try
+        again? (y/n)" when it can't delete a stale ref/object directory (usually
+        because OneDrive or antivirus is briefly holding a lock on it)
+  1.0.3 push explicitly to origin/main
+  1.0.4 suppress CRLF-to-LF warnings on git add (core.safecrlf=false for that call only)
+  1.0.5 converted header and usage examples to comment-based help (Get-Help git-update)
+#>
 function git-update {
     param(
         [switch]$Quick
@@ -133,8 +155,3 @@ function git-update {
 
     Write-Host "Done." -ForegroundColor Green
 }
-
-# Example Usage:
-#   .\git-update.ps1             # dot-source then call: git-update
-#   git-update                   # after dot-sourcing via profile
-#   git-update -Quick            # skip AI, use timestamped message
