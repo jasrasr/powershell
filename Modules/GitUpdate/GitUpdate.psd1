@@ -1,6 +1,6 @@
 @{
     RootModule            = 'GitUpdate.psm1'
-    ModuleVersion         = '1.3.1'
+    ModuleVersion         = '1.4.0'
     GUID                  = 'b6f0c1f4-5a1e-4c7e-9a3d-2f8e6d1c4a57'
     Author                = 'Jason Lamb'
     CompanyName           = 'Cooper Machinery Services'
@@ -18,6 +18,7 @@
             # Newest first. List the file revisions shipped in each module version;
             # details live in each Public\*.ps1 file's .NOTES changelog.
             ReleaseNotes = @'
+1.4.0 (2026-10-19) git-update 1.2.0, git-update-all 1.4.2, Get-GitUpdateVersion 1.0.1. git-update can read the OpenAI key from an already-unlocked Bitwarden session when GIT_UPDATE_OPENAI_API_KEY is not set (item from GIT_UPDATE_BW_ITEM, default 'OpenAI - git-update'); never unlocks the vault or prints the key.
 1.3.1 (2026-10-19) git-update 1.1.1, git-update-all 1.4.1, Get-GitUpdateVersion 1.0.1. README links to the function files; each function file links back to the README (comments only).
 1.3.0 (2026-10-19) git-update 1.1.0, git-update-all 1.4.0, Get-GitUpdateVersion 1.0.1. git-update shows the model and token usage for AI commit messages; git-update-all prints a usage total at the end.
 1.2.2 (2026-10-19) git-update 1.0.7, git-update-all 1.3.3, Get-GitUpdateVersion 1.0.1. git-update-all help now states its dependency on git-update.

@@ -9,9 +9,15 @@ Smart git pull/add/commit/push for the current repository.
 .DESCRIPTION
 Pulls with rebase and autostash, stages all changes, generates a commit message,
 commits, and pushes to origin/main. The commit message is generated from the staged
-diff via OpenAI (gpt-4o-mini) using the GIT_UPDATE_OPENAI_API_KEY environment
-variable. If the key is missing, the API call fails, or -Quick is used, a timestamped
-message is used instead. Stops without committing or pushing if the pull fails.
+diff via OpenAI (gpt-4o-mini). If the key is missing, the API call fails, or -Quick is
+used, a timestamped message is used instead. Stops without committing or pushing if the
+pull fails.
+
+The OpenAI key comes from the GIT_UPDATE_OPENAI_API_KEY environment variable. If that is
+not set and the Bitwarden CLI (bw) is installed and already unlocked in the current
+session (BW_SESSION set), the key is read from the Bitwarden item named by
+GIT_UPDATE_BW_ITEM (default 'OpenAI - git-update'). The function never unlocks Bitwarden,
+never prompts for a password, and never prints the key.
 
 After an AI-generated message, shows the model OpenAI reports it used and the prompt,
 completion, and total token counts for the call.
@@ -38,7 +44,7 @@ https://platform.openai.com/docs/api-reference/chat
 
 .NOTES
 Filename : Public\git-update.ps1 (part of the GitUpdate module)
-Revision : 1.1.1
+Revision : 1.2.0
 Author   : Jason Lamb (with help from Claude Code CLI)
 Created  : 2026-05-05
 Modified : 2026-10-19
@@ -59,6 +65,10 @@ Changelog:
         AI-generated message; stores them in $script:GitUpdateLastAiUsage so git-update-all
         can total them
   1.1.1 added a comment at the top linking back to the module README (no code change)
+  1.2.0 optional Bitwarden fallback for the OpenAI key: if GIT_UPDATE_OPENAI_API_KEY is not
+        set and bw is installed with BW_SESSION set, reads the key with `bw get password`
+        (item from GIT_UPDATE_BW_ITEM, default 'OpenAI - git-update') into a local variable;
+        never unlocks the vault or prompts; falls back to a timestamped message if unavailable
 #>
 function git-update {
     param(
@@ -116,8 +126,23 @@ function git-update {
         $commitMessage = "updated several files $datetime"
         Write-Host "Quick mode: using timestamped message." -ForegroundColor Cyan
     } else {
-        if (-not $env:GIT_UPDATE_OPENAI_API_KEY) {
-            Write-Host "GIT_UPDATE_OPENAI_API_KEY not set. Falling back to timestamped message." -ForegroundColor Yellow
+        # API key: environment variable first, then Bitwarden if the CLI is installed and already
+        # unlocked (BW_SESSION set). The key is held only in a local variable and never printed.
+        $apiKey = $env:GIT_UPDATE_OPENAI_API_KEY
+        if (-not $apiKey -and $env:BW_SESSION -and (Get-Command bw -CommandType Application -ErrorAction SilentlyContinue)) {
+            $bwItem = if ($env:GIT_UPDATE_BW_ITEM) { $env:GIT_UPDATE_BW_ITEM } else { 'OpenAI - git-update' }
+            $bwOutput = & bw get password $bwItem --nointeraction 2>$null
+            if ($LASTEXITCODE -eq 0 -and $bwOutput) {
+                $apiKey = ($bwOutput | Select-Object -First 1).ToString().Trim()
+                Write-Host "Using OpenAI key from Bitwarden item '$bwItem'." -ForegroundColor DarkGray
+            } else {
+                Write-Host "Bitwarden lookup failed (vault locked, or item '$bwItem' not found)." -ForegroundColor Yellow
+            }
+            $bwOutput = $null
+        }
+
+        if (-not $apiKey) {
+            Write-Host "No OpenAI API key available (GIT_UPDATE_OPENAI_API_KEY not set, Bitwarden not unlocked). Falling back to timestamped message." -ForegroundColor Yellow
             $commitMessage = "updated several files $datetime"
         } else {
             Write-Host "Generating AI commit message from diff..." -ForegroundColor Cyan
@@ -147,7 +172,7 @@ function git-update {
             try {
                 $response = Invoke-RestMethod `
                     -Uri "https://api.openai.com/v1/chat/completions" `
-                    -Headers @{ Authorization = "Bearer $env:GIT_UPDATE_OPENAI_API_KEY" } `
+                    -Headers @{ Authorization = "Bearer $apiKey" } `
                     -Method Post `
                     -ContentType "application/json" `
                     -Body $body
@@ -170,6 +195,7 @@ function git-update {
                 Write-Host "OpenAI call failed: $_. Falling back to timestamped message." -ForegroundColor Yellow
                 $commitMessage = "updated several files $datetime"
             }
+            $apiKey = $null
         }
     }
 

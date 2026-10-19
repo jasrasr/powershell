@@ -30,7 +30,19 @@ Source files: [`Public/git-update.ps1`](Public/git-update.ps1) and [`Public/git-
 
 - Git on the PATH, and repositories whose default branch is `main` with an `origin` remote (`git-update` pushes to `origin/main`).
 - `$githubpath` defined in the PowerShell profile: the folder that contains your repositories. `git-update-all` uses it as the default `-ParentPath`.
-- Optional, for AI commit messages: the `GIT_UPDATE_OPENAI_API_KEY` environment variable. Without it, or with `-Quick`, a timestamped message is used. Set the key at User scope and keep it out of scripts, the profile, and Git. Never paste it into chat or commit it.
+- Optional, for AI commit messages: an OpenAI API key, from either source below. Without a key, or with `-Quick`, a timestamped message is used. Keep the key out of scripts, the profile, and Git. Never paste it into chat or commit it.
+  1. The `GIT_UPDATE_OPENAI_API_KEY` environment variable (set at User scope).
+  2. Bitwarden, if the variable is not set: the [Bitwarden CLI](https://bitwarden.com/help/cli/) (`bw`) installed, and unlocked in the current terminal (`BW_SESSION` set). `git-update` reads the key with `bw get password` from the item named by `GIT_UPDATE_BW_ITEM` (default `OpenAI - git-update`) into a local variable. It never unlocks the vault, never prompts, and never prints the key. If `bw` is missing or locked, it falls back to the timestamped message.
+
+  To use Bitwarden, unlock it only in your own terminal, then run `git-update`:
+
+  ```powershell
+  $env:BW_SESSION = bw unlock --raw
+  git-update
+  bw lock
+  ```
+
+  Do not unlock the vault in a terminal that an AI coding tool can run commands in, and do not set `BW_SESSION` in the profile or at User scope. Whether Bitwarden is approved for storing company API keys is a decision for Cooper IT / InfoSec.
 
 ## Loading the module
 
