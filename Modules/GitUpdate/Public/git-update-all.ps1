@@ -12,6 +12,9 @@ Depends on git-update (same module): git-update-all does not run any git command
 call OpenAI itself. Every pull, commit, push, and commit-message step is done by
 git-update, so git-update-all fails for every repository if git-update is missing.
 
+When AI commit messages are used, each repository's model and token usage is shown by
+git-update, and a one-line total (calls, models, tokens) is shown at the end.
+
 -ParentPath defaults to the global $githubpath variable, which is expected to be
 defined in the PowerShell profile. If neither is available, or the folder does not
 exist, an info message is shown and nothing is run.
@@ -42,7 +45,7 @@ git-update
 
 .NOTES
 Filename : Public\git-update-all.ps1 (part of the GitUpdate module)
-Revision : 1.3.3
+Revision : 1.4.0
 Author   : Jason Lamb
 Created  : 2026-06-13
 Modified : 2026-10-19
@@ -67,6 +70,8 @@ Changelog:
   1.3.1 added .LINK entries (repository, git-update) to the help
   1.3.2 first .LINK now points to the GitUpdate module folder on GitHub (used by Get-Help -Online)
   1.3.3 help now states the dependency on git-update (description and Requires line in NOTES)
+  1.4.0 collects the model and token usage git-update records for each repository
+        ($script:GitUpdateLastAiUsage) and prints a one-line AI usage total at the end
 #>
 function git-update-all {
     param(
@@ -122,6 +127,7 @@ function git-update-all {
     Write-Host "Found $($repositories.Count) of $($repositoryNames.Count) allowlisted Git repositories under '$ParentPath'." -ForegroundColor Cyan
 
     $originalLocation = (Get-Location).ProviderPath
+    $aiUsage = @()
 
     try {
         foreach ($repository in $repositories) {
@@ -135,6 +141,10 @@ function git-update-all {
                     git-update -Quick
                 } else {
                     git-update
+                }
+
+                if ($script:GitUpdateLastAiUsage) {
+                    $aiUsage += $script:GitUpdateLastAiUsage
                 }
             }
             catch {
@@ -150,5 +160,17 @@ function git-update-all {
     }
 
     Write-Host ""
+    if ($aiUsage.Count -gt 0) {
+        $models           = ($aiUsage.Model | Sort-Object -Unique) -join ', '
+        $promptTokens     = ($aiUsage | Measure-Object -Property PromptTokens -Sum).Sum
+        $completionTokens = ($aiUsage | Measure-Object -Property CompletionTokens -Sum).Sum
+        $totalTokens      = ($aiUsage | Measure-Object -Property TotalTokens -Sum).Sum
+        Write-Host "AI usage: $($aiUsage.Count) call(s) | Model: $models | Tokens: $promptTokens prompt + $completionTokens completion = $totalTokens total" -ForegroundColor Cyan
+    } elseif ($Quick) {
+        Write-Host "AI usage: none (-Quick)." -ForegroundColor DarkGray
+    } else {
+        Write-Host "AI usage: no OpenAI calls were made." -ForegroundColor DarkGray
+    }
+
     Write-Host "Finished running git-update for allowlisted repositories." -ForegroundColor Green
 }

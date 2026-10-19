@@ -9,6 +9,9 @@ diff via OpenAI (gpt-4o-mini) using the GIT_UPDATE_OPENAI_API_KEY environment
 variable. If the key is missing, the API call fails, or -Quick is used, a timestamped
 message is used instead. Stops without committing or pushing if the pull fails.
 
+After an AI-generated message, shows the model OpenAI reports it used and the prompt,
+completion, and total token counts for the call.
+
 .PARAMETER Quick
 Skip AI and use a timestamped commit message.
 
@@ -31,7 +34,7 @@ https://platform.openai.com/docs/api-reference/chat
 
 .NOTES
 Filename : Public\git-update.ps1 (part of the GitUpdate module)
-Revision : 1.0.7
+Revision : 1.1.0
 Author   : Jason Lamb (with help from Claude Code CLI)
 Created  : 2026-05-05
 Modified : 2026-10-19
@@ -48,11 +51,17 @@ Changelog:
         copied unchanged into the GitUpdate module
   1.0.6 added .LINK entries (repository, git-update-all, OpenAI chat API) to the help
   1.0.7 first .LINK now points to the GitUpdate module folder on GitHub (used by Get-Help -Online)
+  1.1.0 shows the model and token usage (prompt/completion/total) reported by OpenAI after an
+        AI-generated message; stores them in $script:GitUpdateLastAiUsage so git-update-all
+        can total them
 #>
 function git-update {
     param(
         [switch]$Quick
     )
+
+    # Cleared on every run; set below only when an AI message was generated (read by git-update-all)
+    $script:GitUpdateLastAiUsage = $null
 
     # Validate current directory is a git repo (use -Force to catch hidden .git folder)
     $gitDir = Get-ChildItem -Path (Get-Location).Path -Force -Filter '.git' -Directory -ErrorAction SilentlyContinue
@@ -140,6 +149,18 @@ function git-update {
 
                 $commitMessage = $response.choices[0].message.content.Trim()
                 Write-Host "AI message: $commitMessage" -ForegroundColor Green
+
+                # Model and token usage as reported by OpenAI
+                $usage = $response.usage
+                if ($usage) {
+                    $script:GitUpdateLastAiUsage = [pscustomobject]@{
+                        Model            = $response.model
+                        PromptTokens     = [int]$usage.prompt_tokens
+                        CompletionTokens = [int]$usage.completion_tokens
+                        TotalTokens      = [int]$usage.total_tokens
+                    }
+                    Write-Host "Model: $($response.model) | Tokens: $($usage.prompt_tokens) prompt + $($usage.completion_tokens) completion = $($usage.total_tokens) total" -ForegroundColor DarkGray
+                }
             } catch {
                 Write-Host "OpenAI call failed: $_. Falling back to timestamped message." -ForegroundColor Yellow
                 $commitMessage = "updated several files $datetime"
