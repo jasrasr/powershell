@@ -1,11 +1,11 @@
 # Filename: git-update.ps1
-# Revision : 1.0.3
+# Revision : 1.0.4
 # Description : Smart git pull/add/commit/push. Generates AI commit message from diff via OpenAI.
 #               Use -Quick to skip AI and use a timestamped message instead.
 #               Uses the dedicated GIT_UPDATE_OPENAI_API_KEY environment variable.
 # Author : Jason Lamb (with help from Claude Code CLI)
 # Created Date : 2026-05-05
-# Modified Date : 2026-09-25
+# Modified Date : 2026-10-19
 # Changelog :
 # 1.0.0 initial release
 # 1.0.1 bail out on pull failure instead of committing/pushing into a diverged state;
@@ -14,6 +14,7 @@
 #       again? (y/n)" when it can't delete a stale ref/object directory (usually
 #       because OneDrive or antivirus is briefly holding a lock on it)
 # 1.0.3 push explicitly to origin/main
+# 1.0.4 suppress CRLF-to-LF warnings on git add (core.safecrlf=false for that call only)
 
 function git-update {
     param(
@@ -52,7 +53,9 @@ function git-update {
 
     # Stage all changes
     Write-Host "Staging all changes..." -ForegroundColor Cyan
-    git add -A
+    # core.safecrlf=false hides the "CRLF will be replaced by LF" warning for working
+    # files that are still CRLF on disk; .gitattributes already stores them as LF.
+    git -c core.safecrlf=false add -A
 
     # Check if anything is staged
     git diff --cached --quiet
