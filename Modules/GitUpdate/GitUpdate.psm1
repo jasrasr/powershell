@@ -8,4 +8,4 @@ foreach ($file in $publicFiles) {
     . $file.FullName
 }
 
-Export-ModuleMember -Function 'git-update', 'git-update-all'
+Export-ModuleMember -Function 'git-update', 'git-update-all', 'Get-GitUpdateVersion'
