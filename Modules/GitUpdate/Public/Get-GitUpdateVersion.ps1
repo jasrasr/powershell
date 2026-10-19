@@ -19,7 +19,7 @@ Get-GitUpdateVersion -ReleaseNotes
 Show the module's release notes, newest first.
 
 .LINK
-https://github.com/jasrasr/powershell
+https://github.com/jasrasr/powershell/tree/main/Modules/GitUpdate
 
 .LINK
 git-update
@@ -29,12 +29,13 @@ git-update-all
 
 .NOTES
 Filename : Public\Get-GitUpdateVersion.ps1 (part of the GitUpdate module)
-Revision : 1.0.0
+Revision : 1.0.1
 Author   : Jason Lamb
 Created  : 2026-10-19
 Modified : 2026-10-19
 Changelog:
   1.0.0 initial release
+  1.0.1 first .LINK now points to the GitUpdate module folder on GitHub (used by Get-Help -Online)
 #>
 function Get-GitUpdateVersion {
     [CmdletBinding()]

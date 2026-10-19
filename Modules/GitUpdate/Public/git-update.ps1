@@ -21,7 +21,7 @@ git-update -Quick
 Same, but use a timestamped commit message instead of calling OpenAI.
 
 .LINK
-https://github.com/jasrasr/powershell
+https://github.com/jasrasr/powershell/tree/main/Modules/GitUpdate
 
 .LINK
 git-update-all
@@ -31,7 +31,7 @@ https://platform.openai.com/docs/api-reference/chat
 
 .NOTES
 Filename : Public\git-update.ps1 (part of the GitUpdate module)
-Revision : 1.0.6
+Revision : 1.0.7
 Author   : Jason Lamb (with help from Claude Code CLI)
 Created  : 2026-05-05
 Modified : 2026-10-19
@@ -47,6 +47,7 @@ Changelog:
   1.0.5 converted header and usage examples to comment-based help (Get-Help git-update);
         copied unchanged into the GitUpdate module
   1.0.6 added .LINK entries (repository, git-update-all, OpenAI chat API) to the help
+  1.0.7 first .LINK now points to the GitUpdate module folder on GitHub (used by Get-Help -Online)
 #>
 function git-update {
     param(
