@@ -1,3 +1,7 @@
+# Standalone (dot-source) version, kept for reference and for use without a module.
+# The maintained version is in the GitUpdate module: Modules\GitUpdate\README.md, or
+# https://github.com/jasrasr/powershell/tree/main/Modules/GitUpdate
+
 <#
 .SYNOPSIS
 Smart git pull/add/commit/push for the current repository.
@@ -20,9 +24,12 @@ Run from inside a git repository to pull, commit with an AI-generated message, a
 git-update -Quick
 Same, but use a timestamped commit message instead of calling OpenAI.
 
+.LINK
+https://github.com/jasrasr/powershell/tree/main/Modules/GitUpdate
+
 .NOTES
 Filename : git-update.ps1
-Revision : 1.0.5
+Revision : 1.0.6
 Author   : Jason Lamb (with help from Claude Code CLI)
 Created  : 2026-05-05
 Modified : 2026-10-19
@@ -37,6 +44,7 @@ Changelog:
   1.0.3 push explicitly to origin/main
   1.0.4 suppress CRLF-to-LF warnings on git add (core.safecrlf=false for that call only)
   1.0.5 converted header and usage examples to comment-based help (Get-Help git-update)
+  1.0.6 added a comment and .LINK pointing to the GitUpdate module (no code change)
 #>
 function git-update {
     param(

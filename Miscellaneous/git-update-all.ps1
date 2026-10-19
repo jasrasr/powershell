@@ -32,6 +32,10 @@ function Find-GitRepository {
         }
 }
 
+# Standalone (dot-source) version, kept for reference and for use without a module.
+# The maintained version is in the GitUpdate module: Modules\GitUpdate\README.md, or
+# https://github.com/jasrasr/powershell/tree/main/Modules/GitUpdate
+
 <#
 .SYNOPSIS
 Runs git-update against the approved GitHub repository allowlist.
@@ -62,9 +66,12 @@ Run git-update in every repository on the allowlist.
 git-update-all -Quick
 Same, but with timestamped commit messages instead of AI-generated ones.
 
+.LINK
+https://github.com/jasrasr/powershell/tree/main/Modules/GitUpdate
+
 .NOTES
 Filename : git-update-all.ps1
-Revision : 1.1.3
+Revision : 1.1.4
 Author   : Jason Lamb
 Created  : 2026-06-13
 Modified : 2026-10-19
@@ -80,6 +87,7 @@ Changelog:
         (y/n)" on a locked ref/object directory across any of the discovered repos
   1.1.2 git-update now pushes each repository explicitly to origin/main
   1.1.3 converted header and usage examples to comment-based help (Get-Help git-update-all)
+  1.1.4 added a comment and .LINK pointing to the GitUpdate module (no code change)
 #>
 function git-update-all {
     param(
