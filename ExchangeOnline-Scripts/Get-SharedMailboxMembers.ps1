@@ -1,10 +1,11 @@
 # Filename: Get-SharedMailboxMembers.ps1
-# Revision : 1.5.0
+# Revision : 1.6.0
 # Description : Retrieves member lists and external sending status for specified shared mailboxes (or all shared mailboxes if none specified) from Exchange Online
 # Author : Jason Lamb (with help from Claude Code CLI)
 # Created Date : 2026-08-03
 # Modified Date : 2026-10-23
 # Changelog :
+# 1.6.0 prompt for mailbox(es) when -Mailboxes is omitted in an interactive session; blank input means all shared mailboxes
 # 1.5.0 removed hardcoded mailbox list; discovers all shared mailboxes when -Mailboxes is not supplied
 # 1.4.0 added ExternalSendingEnabled reporting (RequireSenderAuthenticationEnabled), removed IsInherited
 # 1.3.0 added -AdminUPN parameter to connect/reconnect as a specific admin account
@@ -52,7 +53,15 @@ try {
     exit 1
 }
 
-# If no mailboxes were specified, discover all shared mailboxes in the tenant
+# If no mailboxes were specified, prompt (interactive sessions only); blank means all shared mailboxes
+if (-not $Mailboxes -and [Environment]::UserInteractive -and -not [Console]::IsInputRedirected) {
+    $answer = Read-Host "Enter mailbox(es), comma-separated, or press Enter for all shared mailboxes"
+    if ($answer) {
+        $Mailboxes = $answer -split '[,;]' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+    }
+}
+
+# If still no mailboxes, discover all shared mailboxes in the tenant
 if (-not $Mailboxes) {
     Write-Host "No -Mailboxes specified, discovering all shared mailboxes..." -ForegroundColor Cyan
     try {
@@ -127,6 +136,6 @@ $results | Export-Csv -Path $exportPath -NoTypeInformation
 Write-Host "Results exported to: $exportPath" -ForegroundColor Green
 
 # Example Usage:
-#   .\Get-SharedMailboxMembers.ps1                  (all shared mailboxes in the tenant)
+#   .\Get-SharedMailboxMembers.ps1                  (prompts; Enter = all shared mailboxes, non-interactive = all)
 #   .\Get-SharedMailboxMembers.ps1 -Mailboxes @("panelsales@altronic-llc.com", "exports@altronic-llc.com")
 #   .\Get-SharedMailboxMembers.ps1 -AdminUPN admin@cooperservices.com
