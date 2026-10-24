@@ -1,9 +1,9 @@
 # Filename: profile-scheduler.ps1
-# Revision : 2.2.1
+# Revision : 2.2.2
 # Description : Runs scripts on per-script intervals based on each script's own last run time
 # Author : Jason Lamb (with help from Claude Code)
 # Created Date : 2026-04-01
-# Modified Date : 2026-10-16
+# Modified Date : 2026-10-22
 # Changelog :
 # 1.0.0 initial release
 # 1.1.0 added per-script last run tracking to state JSON
@@ -12,6 +12,7 @@
 # 2.1.0 added run/skip status output with time-remaining at session start
 # 2.2.0 added daily sort-scans-by-date for PackingSlips-Panels and PackingSlips-Production
 # 2.2.1 sort-scans-by-date now called once via Scans\IT\sort-scans-all-folders.ps1 (runs the Panels and Production scripts)
+# 2.2.2 shared-folder-growth: a scan window older than 4 hours no longer blocks the daily run (warns instead)
 
 $schedulerStatePath = "$psexports\profile-scheduler-state.json"
 
@@ -103,8 +104,15 @@ if (Test-Path -LiteralPath $sharedFolderGrowthRunLog) {
     $sharedFolderGrowthDoneToday = Import-Csv -LiteralPath $sharedFolderGrowthRunLog |
         Where-Object { ([datetime]$_.RunEnd).Date -eq $now.Date } | Select-Object -Last 1
 }
-$sharedFolderGrowthRunning = Get-CimInstance Win32_Process -Filter "Name='pwsh.exe'" -ErrorAction SilentlyContinue |
-    Where-Object CommandLine -like '*Get-AltronicSharedFolderGrowth.ps1*' | Select-Object -First 1
+# A normal run takes ~40 minutes; a window older than this is a failed/hung one left open by -NoExit and is ignored.
+$sharedFolderGrowthMaxAgeHours = 4
+$sharedFolderGrowthWindows = @(Get-CimInstance Win32_Process -Filter "Name='pwsh.exe'" -ErrorAction SilentlyContinue |
+    Where-Object CommandLine -like '*Get-AltronicSharedFolderGrowth.ps1*')
+$sharedFolderGrowthRunning = $sharedFolderGrowthWindows |
+    Where-Object { ($now - $_.CreationDate).TotalHours -lt $sharedFolderGrowthMaxAgeHours } | Select-Object -First 1
+foreach ($staleWindow in ($sharedFolderGrowthWindows | Where-Object { ($now - $_.CreationDate).TotalHours -ge $sharedFolderGrowthMaxAgeHours })) {
+    Write-Host "  [WARN] stale shared-folder-growth window ignored (started $($staleWindow.CreationDate.ToString('MM-dd HH:mm')), PID $($staleWindow.ProcessId)) - close it" -ForegroundColor Yellow
+}
 
 if ($sharedFolderGrowthDoneToday) {
     Write-Host "  [SKIP] shared-folder-growth (Daily) — finished today at $(([datetime]$sharedFolderGrowthDoneToday.RunEnd).ToString('HH:mm')) (took $($sharedFolderGrowthDoneToday.Duration))" -ForegroundColor DarkGray
