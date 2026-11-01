@@ -31,10 +31,38 @@ if (Test-Path $schedulerStatePath) {
 
 $now = Get-Date
 $stateChanged = $false
+$easternTimeZone = [TimeZoneInfo]::FindSystemTimeZoneById('Eastern Standard Time')
+
+function ConvertFrom-SchedulerTimestamp {
+    param([string]$Value)
+
+    # Existing state files use ISO 8601. New state files use a local Eastern timestamp.
+    if ($Value -match '^(?<Stamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) (?:EDT|EST)$') {
+        return [datetime]::ParseExact($Matches.Stamp, 'yyyy-MM-dd HH:mm:ss', [cultureinfo]::InvariantCulture)
+    }
+    return [datetime]$Value
+}
+
+function Format-SchedulerTimestamp {
+    param([datetime]$Value)
+
+    $easternTime = [TimeZoneInfo]::ConvertTime($Value, $easternTimeZone)
+    $abbreviation = if ($easternTimeZone.IsDaylightSavingTime($easternTime)) { 'EDT' } else { 'EST' }
+    return '{0} {1}' -f $easternTime.ToString('yyyy-MM-dd HH:mm:ss'), $abbreviation
+}
+
+# Migrate existing entries on the next scheduler run without changing their run dates.
+foreach ($entry in $scriptState.Values) {
+    $formatted = Format-SchedulerTimestamp (ConvertFrom-SchedulerTimestamp $entry.LastRun)
+    if ($entry.LastRun -ne $formatted) {
+        $entry.LastRun = $formatted
+        $stateChanged = $true
+    }
+}
 
 function Should-RunScript {
     param([string]$Key, [string]$Interval)
-    $lastRun = if ($scriptState.ContainsKey($Key)) { [DateTime]$scriptState[$Key].LastRun } else { [DateTime]::MinValue }
+    $lastRun = if ($scriptState.ContainsKey($Key)) { ConvertFrom-SchedulerTimestamp $scriptState[$Key].LastRun } else { [DateTime]::MinValue }
     switch ($Interval) {
         'Daily'   { return $lastRun.Date -lt $now.Date }
         'Weekly'  { return ($now - $lastRun).TotalHours -ge 168 }
@@ -44,7 +72,7 @@ function Should-RunScript {
 
 function Get-TimeRemaining {
     param([string]$Key, [string]$Interval)
-    $lastRun = if ($scriptState.ContainsKey($Key)) { [DateTime]$scriptState[$Key].LastRun } else { [DateTime]::MinValue }
+    $lastRun = if ($scriptState.ContainsKey($Key)) { ConvertFrom-SchedulerTimestamp $scriptState[$Key].LastRun } else { [DateTime]::MinValue }
     $nextRun = switch ($Interval) {
         'Daily'   { $lastRun.Date.AddDays(1) }
         'Weekly'  { $lastRun.AddHours(168) }
@@ -68,7 +96,7 @@ Write-Host "`nScheduler:" -ForegroundColor Cyan
 if (Should-RunScript 'check-choco-updates' 'Daily') {
     Write-Host "  [RAN]  check-choco-updates (Daily)" -ForegroundColor Green
     . 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell\Miscellaneous\check-choco-updates.ps1'
-    $scriptState['check-choco-updates'] = [PSCustomObject]@{ LastRun = $now.ToString('o'); Interval = 'Daily' }
+    $scriptState['check-choco-updates'] = [PSCustomObject]@{ LastRun = Format-SchedulerTimestamp $now; Interval = 'Daily' }
     $stateChanged = $true
 } else {
     Write-Host "  [SKIP] check-choco-updates (Daily) — $(Get-TimeRemaining 'check-choco-updates' 'Daily')" -ForegroundColor DarkGray
@@ -81,7 +109,7 @@ if (Should-RunScript 'sort-scans-by-date' 'Daily') {
         Write-Host "  [RAN]  sort-scans-by-date (Daily)" -ForegroundColor Green
         try {
             & $sortScansScript
-            $scriptState['sort-scans-by-date'] = [PSCustomObject]@{ LastRun = $now.ToString('o'); Interval = 'Daily' }
+            $scriptState['sort-scans-by-date'] = [PSCustomObject]@{ LastRun = Format-SchedulerTimestamp $now; Interval = 'Daily' }
             $stateChanged = $true
         } catch {
             Write-Warning "sort-scans-by-date failed: $_"
@@ -123,7 +151,7 @@ if ($sharedFolderGrowthDoneToday) {
     Start-Process -FilePath 'pwsh.exe' -WindowStyle Minimized -ArgumentList @(
         '-NoProfile', '-NoExit', '-ExecutionPolicy', 'Bypass', '-File', "`"$sharedFolderGrowthScript`""
     )
-    $scriptState['shared-folder-growth'] = [PSCustomObject]@{ LastRun = $now.ToString('o'); Interval = 'Daily' }
+    $scriptState['shared-folder-growth'] = [PSCustomObject]@{ LastRun = Format-SchedulerTimestamp $now; Interval = 'Daily' }
     $stateChanged = $true
 }
 
@@ -133,7 +161,7 @@ if ($sharedFolderGrowthDoneToday) {
 if (Should-RunScript 'check-powershell-update' 'Weekly') {
     Write-Host "  [RAN]  check-powershell-update (Weekly)" -ForegroundColor Green
     . 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell\Miscellaneous\check-powershell-update.ps1'
-    $scriptState['check-powershell-update'] = [PSCustomObject]@{ LastRun = $now.ToString('o'); Interval = 'Weekly' }
+    $scriptState['check-powershell-update'] = [PSCustomObject]@{ LastRun = Format-SchedulerTimestamp $now; Interval = 'Weekly' }
     $stateChanged = $true
 } else {
     Write-Host "  [SKIP] check-powershell-update (Weekly) — $(Get-TimeRemaining 'check-powershell-update' 'Weekly')" -ForegroundColor DarkGray
@@ -142,7 +170,7 @@ if (Should-RunScript 'check-powershell-update' 'Weekly') {
 if (Should-RunScript 'download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com' 'Weekly') {
     Write-Host "  [RAN]  security-now-download (Weekly)" -ForegroundColor Green
     . 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell\GRC-TWIT-SecurityNow-Transcripts\download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com.ps1'
-    $scriptState['download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com'] = [PSCustomObject]@{ LastRun = $now.ToString('o'); Interval = 'Weekly' }
+    $scriptState['download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com'] = [PSCustomObject]@{ LastRun = Format-SchedulerTimestamp $now; Interval = 'Weekly' }
     $stateChanged = $true
 } else {
     Write-Host "  [SKIP] security-now-download (Weekly) — $(Get-TimeRemaining 'download-next-security-now-txt-transcriptions-and-pdf-show-notes-from-grc_com' 'Weekly')" -ForegroundColor DarkGray
@@ -151,7 +179,7 @@ if (Should-RunScript 'download-next-security-now-txt-transcriptions-and-pdf-show
 if (Should-RunScript 'm365-version-update-download' 'Weekly') {
     Write-Host "  [RAN]  m365-version-update-download (Weekly)" -ForegroundColor Green
     & 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell\File-Management-Scripts\m365-version-update-download.ps1' -Force
-    $scriptState['m365-version-update-download'] = [PSCustomObject]@{ LastRun = $now.ToString('o'); Interval = 'Weekly' }
+    $scriptState['m365-version-update-download'] = [PSCustomObject]@{ LastRun = Format-SchedulerTimestamp $now; Interval = 'Weekly' }
     $stateChanged = $true
 } else {
     Write-Host "  [SKIP] m365-version-update-download (Weekly) — $(Get-TimeRemaining 'm365-version-update-download' 'Weekly')" -ForegroundColor DarkGray
@@ -160,7 +188,7 @@ if (Should-RunScript 'm365-version-update-download' 'Weekly') {
 if ((Should-RunScript 'move-s-it-public-to-g-it' 'Weekly') -and $now.DayOfWeek -eq 'Monday') {
     Write-Host "  [RAN]  move-s-it-public-to-g-it (Weekly, Monday)" -ForegroundColor Green
     . 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell\File-Management-Scripts\move-s-it-public-to-g-it.ps1'
-    $scriptState['move-s-it-public-to-g-it'] = [PSCustomObject]@{ LastRun = $now.ToString('o'); Interval = 'Weekly' }
+    $scriptState['move-s-it-public-to-g-it'] = [PSCustomObject]@{ LastRun = Format-SchedulerTimestamp $now; Interval = 'Weekly' }
     $stateChanged = $true
 } else {
     $dayCheck = if ($now.DayOfWeek -ne 'Monday') { "(runs Monday only)" } else { "" }
