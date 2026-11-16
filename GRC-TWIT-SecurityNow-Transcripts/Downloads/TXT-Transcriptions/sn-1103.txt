@@ -1,0 +1,554 @@
+GIBSON RESEARCH CORPORATION		https://www.GRC.com/
+
+SERIES:		Security Now!
+EPISODE:	#1103
+DATE:		November 3, 2026
+TITLE:		Exposing Bad Consumer Crypto
+HOSTS:	Steve Gibson & Mikah Sargent
+SOURCE:	https://media.grc.com/sn/sn-1103.mp3
+ARCHIVE:	https://www.grc.com/securitynow.htm
+
+DESCRIPTION:  Cisco gives a 27 year old the task of recoding 98% of their software with AI.  A serious but not earth-shaking vulnerability found in PXE booting.  The largest ($6.3 billion) financial heist in history (with crypto).  710 Polymarket gambling wallets emptied of $2.7 million.  A new robots.txt control for AI bots, and agreement to obey it.  Google generates haiku from the first orbital AI.  From our listeners:  Does stealth updating make sense, how to move web servers off the Internet, books don't contain knowledge, a small company attacked by powerful AI, how would an "AI kill switch" be implemented.  Another new and worrisome application of reverse-engineering AI.
+
+SHOW TEASE:  Coming up on Security Now!, Steve Gibson is here.  Who are you, if you hand over the keys to 98% of your code, and you're handing it over to a 27 year old.  Turns out you're Cisco.  Yeah.  That plus loads more coming up, including a huge financial heist in the crypto market; an AI kill switch and what that would actually look like; and, well, some really worrying reverse engineering in terms of consumer crypto.  All of that coming up on Security Now!.
+
+MIKAH SARGENT:  This is Security Now!, Episode 1103, recorded Tuesday, November 3rd, 2026:  "Exposing Bad Consumer Crypto."
+
+Hello, and welcome to Security Now!, the show where every week we talk about what's going on in the world of security - well, cybersecurity, anyway - with our one and only Steve Gibson.  Hello, Steve.
+
+STEVE GIBSON:  Mikah, great to be with you for our third and final week.
+
+MIKAH:  Yes.
+
+STEVE:  While Leo is off somewhere globetrotting. 	
+
+MIKAH:  Somewhere, yeah, exactly.  Off somewhere doing something.  It has been a pleasure to be here with you.  And I think last week's episode was very, very well received and wanted.  And so that was great to see some of the feedback about everything going on with PHP and your conversation afterward about that strategic plug pull, as it were.  So great work.
+
+STEVE:  Well, I think we have something also really interesting.  It is, as is cybersecurity now, it's AI adjacent, but not actually.  It's enabled one of these other things that's enabled by actually in this case the reverse engineering capabilities which are being leveraged.  And some really interesting findings by some guy who calls himself the "binary ninja."  So today's podcast, 1103, for - oh, look, it's 11/03.
+
+MIKAH:  Whoa.  What are the odds there?  Someone calculate them.  I'm feeling a little excited.
+
+STEVE:  It's exposing bad consumer crypto.  And the takeaway will, well, I'm not going to step on the takeaway so we'll wait for that.
+
+MIKAH:  Yeah.
+
+STEVE:  So we're going to talk about this bizarre, like, thing that happened with Cisco.  A bunch of our listeners sent me notes to make sure that this was on my radar, where Cisco has given a lone 27 year old the task of recoding all of Cisco's software.  For some reason, the figure 98% is quoted.  I don't know what the other 2% is.  Maybe that's the corporate management software, who knows what?  But anyway, this kid gets the ear of the CEO and says, hey, I can fix all this.  And the guy goes, okay.  Anyway, we'll talk about that.
+
+MIKAH:  It must be his nephew or something.
+
+STEVE:  It's bizarre.  And the politics of this, well, anyway, there's a lot to be said.  We've also got a serious but not earth-shaking vulnerability - but again, serious - found in PXE booting, the largest by far, meaning 6.3 billion with a B financial heist in history, that of course involved crypto because you can't move $6.3 billion without it being digital.  We've also got a total of 710 of the wallets of Polymarket platform gamblers having been emptied to the tune of 2.7 million.  Perhaps some new life for the robots.txt file for asking AI bots please not to train on people's site, and some broad industry-wide agreement about it.  Google generated the first haiku from an orbital AI, which is - actually the haiku is kind of wonderful.  But anyway, we'll get there.
+
+We've also got a lot of stuff from our listeners, asking does my notion last week that I floated of stealth updating in response to the PHP mess make sense?  How it's possible to move web servers off the Internet, but still have them available.  Huh?  Whether books actually contain knowledge or not.  And a listener of ours suggests no.  Also we've got the small company of a listener was attacked by powerful AI.  And someone asked how would an AI kill switch actually be implemented?  And once we talk about all that, we're going to look at another new and worrisome application of reverse engineering AI.  And although it didn't make it into the show notes because as I was putting this together, the issue really gained hadn't momentum, there is a - currently the entire Linux community is very concerned about a recently surfaced kernel exploit involving the MP, standing for multipath, TCP protocol.
+
+And apparently the MP part isn't actually necessary, although the current focus has been on that.  When it first came to my attention, there had been no CVSS rating set.  The national vulnerability database was sort of waiting to see.  And even now, the Linux kernel folks are, like, running around on fire at a 9.8.  But even Red Hat was down at 7.1.  And then maybe I think they nudged it up to 7 something.  Anyway, the point is there is a serious problem with the Linux kernel, which we will talk to at the top of the show after our first break and our Picture of the Week.  So I just wanted to let listeners know I'm aware of it, even though it didn't make it onto the show notes.  So I think lots of good stuff to talk about.
+
+MIKAH:  Yeah, I'm already very excited to hear about the book argument.  Just...  
+
+STEVE:  It's an interesting - yeah.
+
+MIKAH:  Exactly.  It's one of those where you go, well, hold on, you might be convincing me.  And I love that.  All right.  Let's get into the episode.
+
+STEVE:  So our Picture of the Week.  Today, as I said, Episode 1103, which happens to fall on 11/03, is Election Day here in the United States.  So a listener sent me this.  I thought it was a kick, and apropos for today's Election Day.  I gave this the title "We Think We Know What They Meant."  But the sign which was actually seen in Polk County, Iowa, is missing, I don't know, some punctuation, or it's hard to explain.  The sign clearly says "No campaign materials or clothing allowed in polling place."  Now, I'm sure they meant campaign clothing; right?  Campaign materials or campaign clothing.
+
+MIKAH:  Right.
+
+STEVE:  But the way phrased doesn't quite - the campaign modifier doesn't really hook to the clothing as well as it does materials.  So anyway, sort of a...
+
+MIKAH:  I do have to say, though, nudists need a polling place, as well.  So it's...
+
+STEVE:  Where are they going to store their pencil?  That's what I don't know.
+
+MIKAH:  Oh, dear.  Oh, dear.  Well...
+
+STEVE:  Don't know how that works.
+
+MIKAH:  I'm not sure either.  I'll have to find out.   No, I don't know.  All right.
+
+STEVE:  Okay.  So before we get to the notes, I just wanted to wrap up on where we are with this Linux kernel problem.  This is a problem that the Linux kernel has had since v4.4.  And I meant to look up when kernel v4.4 was released, as I always do for the podcast so I can give people a date context, not just a version number, like how many decades?  So I don't know when kernel 4.4 was released because I didn't have a chance to look it up.  But whenever that was, ever since then, that's when this flaw was introduced.  The reason for this extremely wide range of people's impressions or feelings about the severity of this is that it is a very, we presume, difficult to execute race condition which involves a use-after-free and different processors in a multiprocessor context picking up another packet from the remote attacker.
+
+So the Linux kernel guys are - they gave this a 9.8.  This is house on fire, like stop the presses.  It was discovered by Anthropic early in October, I think October 5th is the date that I saw, and quietly fixed in the kernel and just went public after it had been, you know, moved out.  Ubuntu has been taking a lot of heat for being the slowest of the distributions to get this to users.  First of all, if you're a Linux user, you don't have any problem, right, because it's only publicly exposed TCP ports.  Some of the distributions have the multipath option enabled by default.  Generally that's not the case.  There is reporting that you don't need this MT TCP, that is, just raw TCP is enough.  It doesn't matter what kind of service you have behind it because it's a problem in the kernel's TCP stack support, not a specific, like, web server and HTTP's interpretation of the data coming of TCP.
+
+But it requires a huge amount of finesse in order to make this happen.  There is, as of yet, no evidence of a successful exploitation.  Anthropic says they asked an unreleased version of Claude to design an exploit, please.  And in 53 minutes it came back with one.  But we don't know if this works over the Internet.  I mean, like the Internet, as I've mentioned before in the context of the DNS Benchmark, where I had to take so many samples of remote DNS server timing, because there's so much jitter in the timing, it took a huge number of samples in order to rule out random chance.  Well, any remote attacker is going to be hit by that, too.  And this is inherently a very timing critical race condition.  But bottom line is, everybody needs to update their kernel, their Linux version, sooner or later.  Almost everybody has.
+
+I've not checked in the last hour to see whether Ubuntu has caught up.  I imagine they have because the updated kernel is available.  It just needs to get, you know, folded into the distribution, and then that made available.  So we don't know how serious it's going to turn out to be.  The good news is that all of the cloud-based Linuxes updated a long time ago.  They were never exposed and vulnerable during a time that this was widely known.  And as far as we know, it's never yet been exploited.  So once again, AI found something that had been sitting in the Linux kernel.  I mean, and it's very impressive that it found it.  And I'm happy that the things it's finding are so obscure.
+
+I mean, one of the problems is that the Linux kernel uses address space layout randomization.  So, and the race condition is a use-after-free which potentially allows an attacker to obtain some kernel memory.  If they can, then they have to take that kernel memory, analyze it, which would tell them where stuff was laid out in memory which allows them to bypass the address space layout randomization and then potentially leverage this by executing further race conditions, you know, leverages into an attack.  It's, you know, I guess the best thing to say is that it's like a theoretical attack which is possible if everything lines up properly, and if being like in Russia doesn't introduce too much packet jitter to ever successfully pull off a race condition where you're like sending multiple packets.
+
+It is possible to protect servers which have not been updated by blocking IP options because this multipath facility is an option which can be removed from packets and have the system still function because most systems aren't actually using this multipath technology that sort of it allows an abstraction of a single logical TCP connection to be, like, run in parallel and take multiple paths between server and client, as its name suggests.  Anyway, probably a tempest in a teapot, but the kernel will get fixed.
+
+The reason, as I said, that I'm happy to see AI finding these things is if it's having to work this hard, "it" meaning the AI, to find something so way out on the fringe obscure that no one can even agree how serious it is, and I saw a 5.1 was the CVSS that Red Hat initially gave it, they knew what it was, and they said, eh, it's like, how can you ever make this actually happen?  So, yeah, we'll patch it, but okay.  My point is that hopefully all - this suggests that all of the lower hanging fruit, which is pretty much everything else possible, if we've had to reach up this high to find this piece of fruit, has already been resolved, you know, like scoured and found.
+
+MIKAH:  Yes. 
+
+STEVE:  So my premise of all of AI vulnerability hunting is that we are going to reach a point in the future.  Don't know when.  But I looks like its approaching pretty quickly as far as the kernel problems exist, where there just aren't any more problems that are serious.  You know, again, we don't know.  We are at first Tuesday of November is today, the 3rd.  So the 10th will be Patch Tuesday.  And we're going to see what Microsoft has in store.  As we know, the last two months have each broken each other's records successively by large leaps.  Are we going to go to 1,600 for next week?  Or 400?  We don't know what the shape of this will be.
+
+Tom's Hardware picked up on a story which was reported by Fortune magazine.  And Fortune's overly long headline for the story which they ran on Friday was "Cisco chief found a 27-year-old ex-founder" - meaning of another company - "buried away in the organization doing something unstrategic.  Now the Gen Z'er is rewriting 98% of Cisco's code."  And again, 98%?  What?  Why not all of it, if you're going to go 98.  Anyway, of course, since this will be an AI-driven 'vibe-coded' project, this naturally begs the question, "What could possibly go wrong?"  If I were - well, I was going to say, if I were in their position, that's not how I would invest my time, but okay.  They didn't  come to me.  So here's the start of Fortune's reporting.
+
+MIKAH:  Oh, this is just so stressful.  Go ahead.
+
+STEVE:  They said:  "Gen Z can't catch a break.  Entry-level jobs are vanishing; some 40% of bosses say they plan to hire fewer grads because AI can do the job cheaper; and young workers are routinely slammed for showing up late and refusing to put in overtime for free.  Cisco's president and chief product officer Jeetu Patel isn't buying it.  He's just handed one of the company's biggest jobs to a 27 year old he found hidden in the org chart five levels below him. 
+
+"Patel told Fortune at a small roundtable dinner:  'I've given him unlimited tokens because he's going to refactor code.  So I'm like, you can go, you can go nuts.'"  Which is a direct quote from Patel during this small roundtable dinner, which Fortune attended. 
+
+Okay.  "The 'him' is Padmanabhan Krishnamurthy, or 'Paddy,' as Patel affectionately calls him."  I'm reading from Fortune's coverage.  "He joined Cisco last year, okay, in 2025 after the $429 billion tech giant [meaning Cisco] acquired EzDubs."
+
+MIKAH:  Why does that have to be the name?  That's such a bad name.
+
+STEVE:  EzDubs.
+
+MIKAH:  EzDubs.  Like, come on, you're putting him in charge of refactoring all your code to be made at a company called...
+
+STEVE:  EzDubs.  It gets worse, yes.  "EzDubs, the real-time translation startup Krishnamurthy cofounded in 2023."  So founded the company in 2023.  Two years later, in 2025, his company got acquired by Cisco.  He got merged into Cisco, five layers down in the org structure.  "And despite coming in" - and I'm reading again from Fortune - "as a former founder with CEO experience, he was, in Patel's words, "buried away in the organization doing something unstrategic.' 
+
+"That changed," writes Fortune, "when Patel dropped into Cisco's San Francisco office, and the two got talking.  Krishnamurthy reckoned he could rewrite Cisco's legacy code with a two-person team.  Patel says even the most AI-forward people on his own team weren't thinking that way."
+
+MIKAH:  So clearly he must be right.
+
+STEVE:  Yeah.  So Paddy, this guy, has given himself four weeks to prove it, with the final goal of rewriting 98% - there's that number again - of Cisco's legacy code within 24 months. 
+
+"Now," writes Fortune, "Patel is on the hunt for more Paddys,  young hires who will 'challenge the system and the status quo' - or, as he puts it, be 'an Energizer bunny that just goes out and kind of revs everyone up.'  At most companies, only someone with decades of experience," they write, "under their belt would be trusted with a project this size.  Patel thinks that's a problem.  He said:  'If you don't hire the early-in-career [workers], and you just let your own workforce continue the way that they were, where do the fresh ideas get injected?  How do you challenge the status quo?'"
+
+They write:  "Seasoned staff can still come up with new ideas."  Oh.  Patel added.  "What they can't do is ask the questions that only someone with no experience [oh boy] would think to ask.  And getting the two to get along isn't always smooth.  Patel admits that putting a Gen Z'er in a room with people who've been at Cisco for decades could create some friction."   You think?  "But he says that's the point.  'Tension is good,' he said.  'I actually try to create tension'" - oh, and I bet you have this time - "'in the teams because you want to have enough friction on the ideas.  You don't want to have friction with people and personalities."  Oh, but you're going to get it.
+
+"What you have to do is establish enough trust with people to say you're going to be expected to create unreasonable goals for yourself.  And so, in order to go out and achieve those unreasonable goals, just think outside the box."  And he's not just pushing senior staff to take notes from twenty-somethings.  He said that he treats every intern as "kind of a reverse mentor."
+
+Okay.  That's as much as I'm going to share from this.  It's all I can take.  All I want to say here in reaction to this from the outside is that this should be interesting.  I'm sure many of our listeners have been in large, lumbering, and management-layered enterprises.  And that the idea of some upstart five layers down having a direct conversation with the CEO and somehow enchanting him or her with their guile and claims of being able to wield the power of agentic AI to rewrite 98% of the organization's longstanding legacy code, that might not go down well.  This is not to say that shaking up the complacent old guard might not be useful and needed.  But I'm not sure I'd want to be anywhere near the dynamics that could be expected to ensue. 
+
+But more than the messy politics of that move, I'm unsure that Cisco's software is their biggest problem at this point.  I'm sure that anyone who's not a would-be bad guy loves the idea of Cisco's networking products becoming better and more secure, if that can happen this way.  But we know that not all of their problems arise from bugs.  We on this podcast celebrated their announced and planned about-face on their longstanding security policy because policy has always arguably been the biggest problem Cisco has faced and continues to face.  It doesn't matter when a web portal's authentication might have an unknown bug if that web portal is never needlessly exposed to the public Internet in the first place.
+
+But Cisco's policies have continued to assume that their software is flawless despite history repeatedly showing that it's far from that.  Rather than reducing their effective feature set by prioritizing security over features and convenience, Cisco keeps playing catch-up, patching flaws after they have been successfully exploited by bad guys, thus continually insisting, implicitly insisting, to place their own customers at risk. 
+
+So sure, it's possible to deliberately configure Cisco's products to be secure.  We've looked closely at that in the past.  And to help with that  and apparently to help them disclaim responsibility when things go horribly wrong  they even provide an optional "Hardening Guide" that's full of extra steps that can be taken to override Cisco's "insecure by default" configurations.  But why not just make their system secure by default instead?  That's what that guy whom we quoted last year promised to do.  It sounded as though he really "got it."  But there's never been any sign of what happened since.  So in any event, it's going to be very interesting to see what comes of this two-year "let's just rewrite everything from scratch with AI" effort.  As I said, I'm not sure that that's the problem that I would focus on if I were Cisco; but as I said, we'll see how that goes.
+
+Another vulnerability has been discovered  and yes, once again, thanks to AI.  It's a longstanding problem.  The news of it was also under embargo pending a coordinated disclosure which was originally set for January.  But once again, the cat got out of the proverbial bag.  Fortunately, again, you know, secrets are hard to keep; right?
+
+MIKAH:  Yeah.
+
+STEVE:  And as we just saw and talked about last week with PHP, somebody, you know, in this case, made a mistake, and now everybody knew before they were supposed to.  The good news is it's a problem, but it's not, as I said, it's not earth-shattering.  The impact of this one is very different from a public Internet PHP nightmare.  But it could be important depending upon your area of responsibility.  The trouble resides, as I mentioned at the top, in the PXE boot-time code of motherboard UEFI firmware. 
+
+Dan Goodin covered this for Ars Technica with their headline "Code-execution flaw in UEFI firmware affects most servers on the planet Earth."  That's true.  But people in Russia can't take advantage of it here in California or wherever you might be.  I think that the idea of that headline, right, is riding a bit more on the coattails of the, we're still trying to get over it, recent PHP mess.  This is not on the same scale.
+
+So Dan's piece begins with:  "Defenders across the world face the burden of responding to yet another botched code-execution vulnerability, this time in boot-time firmware used by most of the world's server vendors and data centers."  Okay, now, I assume that what Dan meant by writing "another botched code-execution vulnerability" was that it was prematurely discovered, that the botching was in the disclosure, which is true.  Okay.
+
+So anyway, here's what he reported.  He said:  "The vulnerability, with a severity rating of 9.5 out of 10, resides in the TianoCore EDK II, an open source codebase that hardware makers and cloud providers use to create the UEFI firmware that runs during the boot-up sequence.  Last year, a representative of the UEFI Forum called EDK II the 'preeminent solution/implementation of the UEFI specifications.'"  And Dan's just citing that to say, you know, TianoCore is what everyone uses.  And it is.  He wrote:  "Virtually all UEFI suppliers (sometimes called IBVs or independent BIOS vendors), including AMI, Insyde" - and that's spelled weird, right, I-N-S-Y-D-E - "and Phoenix, use the reference code extensively.  Project Mu, Microsoft's hardened EDK II fork, used the code containing the vulnerable component, as well." 
+
+He writes:  "The vulnerability, tracked as CVE-2026-97631, is a memory-corruption flaw in an ICMP component that attackers can exploit to execute malicious code that runs before the operating system and firmware can implement defenses against it like Secure Boot, which establishes a chain of trust for all subsequent code, including the Trusted Platform Module, which is loaded during boot.  While payloads delivered by that CVE have no persistence - meaning they run only once - they can give attackers an opening to install other payloads that also run each time early in the boot process."  So, for example, it would be possible to install something persistent that functioned as a rootkit to suborn the whole boot process every time thereafter.  
+
+He said:  "The parties that discovered that CVE - Alex Matrosov of Anthropic [once again AI] and Dan Holmes-Mitra of Google - had arranged for it to stay under wraps until its coordinated disclosure that was scheduled for January.  AMI, a maker of motherboards and other hardware, published this pull request last month that detailed the vulnerability and included a code fix for it.  Once the post came to the attention of the discovering parties, TianoCore Project members pushed the disclosure forward in time, publishing a public advisory last week."  In other words, AMI through this pull request ended up you know, letting the cat out of the bag.
+
+"With publicly available patch code," Dan writes, "it will now be trivial for advanced hackers to learn how the vulnerability is triggered and to build working exploits."  Okay.  And I'm going to interrupt to say, while that's true, as we're going to see, obtaining the required access and opportunity will likely be anything but trivial.
+
+But I'll give Dan some more time to explain.  He says:  "Further compounding the urgency, patching UEFI code vulnerabilities in millions of end devices sold and used by thousands of hardware vendors and cloud providers is cumbersome and time-consuming.  Word of the vulnerability comes six days after another botched disclosure" - of course he's talking about PHP - "this one involving a critical code-execution vulnerability in the PHP programming language."  And that one was far more critical.  Okay?  
+
+"HD Moore, creator of Metasploit and chief research officer at security firm Dragos said:  'This vulnerability in the ICMP parser of the EDK II network stack is interesting in terms of how it affects the chain of trust and the broader ecosystem.  An attacker intent on compromising a nearby' - there's one key - 'nearby endpoint or server could use this bug to hijack program flow at a point where the boot process still has access to sensitive components, like the endpoint's TPM.  This could be used to break disk encryption for cases where an attacker has short-term network access, and it would be even easier in a theft scenario.'"  So that was HD Moore.  Again, while that's strictly true, there are many things that server operators can do to zero the risk.  But that said, it may indeed be necessary for steps to be taken.
+
+So Dan continues, writing:  "CVE-2026-97631 is a 16-year-old buffer overflow in the PXE-Base Code driver responsible for allowing servers, storage equipment, and other devices to boot using code downloaded on the fly over the network."  In other words, that's what PXE is; right?  It is network-based booting.  During this process, known as the pre-execution environment boot, the driver uses a network listener to monitor for ICMP errors. 
+
+"Because the driver does not enforce" - and here it comes - "the driver does not enforce a memory copy limit of 504 bytes, thus preventing the overwriting of adjacent data, a malicious insider or a hacker who has gained low-level access to a local network can send an error message that appends code past this 504-byte limit.  The IUEFI module running on the CPU then becomes corrupted in RAM." 
+
+So again, I'll highlight "a hacker who has gained low-level access to a local network," and I'll add to that "at the moment during which the server being targeted is rebooting over the network using PXE."  Again.  So the vulnerability is specifically a local network PXE boot-time vulnerability.  And while it's not nothing, it's not a PHP-scale earth-shaker.
+
+So Dan continues, writing:  "As the official advisory puts it" - now he quotes the advisory.  "During network boot, the PXE Base Code driver keeps a receive request open for ICMP error messages and copies each received re	quest into the fixed 504-byte field Mode.IcmpError of its private context structure.  The copy loop's bounds handling is incorrect in both the IPv4 and IPv6 handlers," although IPv6 is not affected.  "For a message longer than 504 bytes it still copies bytes into the field, and it advances the destination pointer by the cumulative rather than the per-fragment length, so an oversized message writes attacker-controlled bytes past the field end.  Nothing earlier on the receive path restricts the message's length." 
+
+Okay.  So we have here is a classic textbook buffer overflow.  The official advisory continues, writing:  "The malicious error can be delivered through a simple unicast" - meaning point to point, not multicast broadcast - "simple unicast sent from any network distance to a target device's IP address, as long as it's sent during the PXE boot sequence.  An attacker can deliver a denial-of-service crash that causes the boot sequence to hang.  When the attacker knows what the target firmware build is, it can plant a 'counterfeit event'" - that is, an ICMP error counterfeit event - "that executes the malicious code on the CPU in its UEFI firmware environment."  And again, if it arrives at exactly the time that the system is vulnerable during this boot sequence.
+
+"The code runs in ring 0, a CPU's most privileged execution level.  Because exploits bypass attestation processes designed to cryptographically prove to remote servers that the hardware is secure, they present a key opportunity for elevating limited privileges."  In other words this does get under - a buffer flow here at this point in time hits the system at its weakest where there is no signing of the error message.  That doesn't exist for ICMP errors.  So this legitimately allows a bad guy's bytes to get in and corrupt the system.  But you have to know exactly what version of the firmware is booting in order to design an exploit for that specific firmware version and somehow arrange to deliver this at the brief window of vulnerability when PXE is being used to boot some hardware."
+
+So Dan says:  "The CVE joins a growing list of previously discovered vulnerabilities in UEFI or code that works closely with it.  The most severe of them, LogoFail, stemmed from logo images included in the UEFI of just about every hardware maker."  You know, you get something displayed on the screen while the system's booting.  "Rendering bugs allowed attackers to subvert the chain of trust UEFI enforces and go on to install malicious components before the OS loaded or Secure Boot ran."  And this is useful for reminding us that firmware security failures do matter.  They can and actually have in the past damaged systems.
+
+He says:  "PixieFail was a vulnerability similar to [this vulnerability].  It, too, was the result of faulty PXE boot flaws in EDK II.  Following discovery of the vulnerability, researchers embarked on multiple fuzzing projects designed to surface other critical flaws in the open source code library.  It appears those efforts failed to find this latest flaw."  Good point.  It took AI to find this.  So again, we really do seem to be shaking out the final bits of debris where AI is seriously employed to do that.
+
+He said:  "Other recently discovered UEFI flaws include PKFail, a supply-chain failure resulting from non-production test platform keys, public for more than a decade before they were discovered" - and we talked about that at the time on this podcast - "used in hundreds of device models.  Then there's BootHole, Bootkit, and BlackLotus. 
+
+"Like CVE-2026-97631" - that is, this one - "exploitation or use of these payloads is appealing because it allows attackers to infect machines early in the boot process, before TPM and other defenses load, so they can inflict maximum damage.  Given the ubiquity of this flaw, Moore said it's likely a 'forever' bug that will live on in end-of-support," you know, "end-of-life systems because you're not going to be able to get an updated firmware from some company that no longer is supporting much older hardware."
+
+And it goes on, but everyone now has a good sense for this.  Home users certainly have no risk here; right?  There's just not going to be an issue.  Most home users, for one thing, are not booting over PXE.  We're all booting from mass storage that is local.  It's certainly possible to disable PXE booting, and that is absolutely the first thing anyone who's worried about this should absolutely do.  Anyone who has worked with a system which for whatever reason may fail to boot its own local media and then has their motherboard fall back to booting PXE has learned how annoying and patient PXE booting can be.
+
+You know, typically you get it up on the screen, it says, you know, "Booting from the network."  And then dots sometimes very slowly print out on the screen no matter what you do because it's determined to try to find an image that it can load into RAM over the network.  It's almost always enabled by default.  But it's almost never needed, certainly in most non-cloud infrastructure cases.  So it's often also very possible to just it off.  And if you disable it in firmware, you never have any window of vulnerability whatsoever.  So once again the premature disclosure caught the motherboard firmware vendors by surprise and was unwelcome because they were not all ready.  If you do have a recently purchased machine whose firmware is still being supported, check for updated firmware.  I imagine that some will be available and keeping firmware up to date.
+
+You know, the common wisdom here is don't - I mean, and you're told, do not update your motherboard firmware unless you know, unless you have a specific reason for doing so.  It is the case that UEFI can be updated, and patches can be applied through operating systems, and [indiscernible] are taking responsibility for doing that.  Anyway, not a huge problem.  If you are in an environment in an enterprise, where you've got servers that are booting UEFI or using PXE to boot their images from, like some central coordination server, then you just want to make sure that ICMP error messages are not being allowed across a sensitive border you know, through a security perimeter.  That's certainly worth doing, and it can be done.  So anyway, that's the story there.
+
+MIKAH:  You've talked a couple of times now about how we're at the point or we're hopefully at the time where we're shaking free the fruit that's up higher, or we're having to reach for it and grab it.  So it made me wonder, at what point do you think it becomes irresponsible for anyone who is writing software to not throw a few AI models at that software just to see.  Do you think that everyone should be doing that, just because otherwise it seems kind of like it might be an irresponsible thing?
+
+STEVE:  Yeah.  I'm sure that Microsoft, that has demonstrated prior to AI that they were not getting ahead, I mean, there was no reason to believe that at the rate we were finding problems with Microsoft software, sometimes less than 100 per month, and we just had a 1,400 excess Patch Tuesday last month, well, that's good for a year of low-rate vulnerability discoveries.  You know, so - and it was only when these problems were being discovered and reported to Microsoft that they were being found.  So there would be, you know, years of problems being found.  I guess what I'm saying is that I am sure in addition to catching up with their legacy problems, anything new that they publish will be run through their own AI to clean it up before it goes out the door.
+
+I was just reading this morning that they're boasting that the latest versions of Windows 11 are on an 8GB system because now they're trying to get more performance out of less memory because memory has become such a problem.  You know, people are no longer able to just throw RAM at Windows in order to get speed from it.  Clearly they're mucking around in Windows in order to increase its performance significantly.  Well, it has to be the case that they're going to be running their own MDASH technology against anything new they do so that not only are they finding problems with all of their legacy code, but they are not continually introducing new problems at the same time.  And we're at 45-47 minutes in.  Time for a second break.
+
+MIKAH:  Let's hear about a heist.
+
+STEVE:  Oh, boy.  So the well-known cryptocurrency exchange Binance was taken to the cleaners to the tune of $6.3 billion.  This was such a jaw-dropping figure that it was pretty much  reported and covered by everyone.
+
+In this case, The Verge wrote:  "Binance has disclosed that $6.3 billion worth of crypto funds have been stolen from the platform in what's believed to be" - and I think it's by a large measure -  "the biggest cryptocurrency hack on record.  In a series of updates posted to X, the crypto exchange said that user funds are safe, and that around $3 billion of the impacted assets have been frozen so far."  Meaning they were tracked and locked so bad guys are unable to move them to an exchange and abscond with them.
+
+The Verge wrote:  "Binance has publicly committed to covering any losses resulting from the hack.  The company has an emergency reserve fund of around $1.3 billion (at last valuation) to protect user assets in these situations, and said it has also reserved over $6.34 billion of company funds to cover the incident, $5 billion of which is already held in the exact token assets that were impacted.  Meaning it will be easy just to simply move it from one wallet to its destination, restoring what was taken in that particular token type.
+
+They wrote:  "Binance reported on X:  'Our initial investigation suggested that the security incident may have involved a compromised laptop.  However our subsequent investigation has uncovered additional points of breach.  This was a complex attack, and we're doing all we can in coordination with law enforcement to resolve it.'
+
+"The company shared details about the compromised laptop that belongs to one of its DevOps engineers in a prior update, saying the laptop allowed an attacker to access a service container and submit unauthorized withdrawal transactions."  I'll say.  "Deposits and withdrawals have been suspended in response to the hack, and the affected address has had its authorization revoked.  Binance co-CEO Richard Teng said on X:  'To be clear:  the attacker did not simply use one engineer's permissions, and this was not a simple one-click action.  It involved a more complex attack process.  Our investigation has not attributed responsibility to any individual.  So far, we have found no evidence of any wallet private key leak." 
+
+They said:  "Binance may not be pointing fingers at who's behind the attack, but blockchain analysis firms TRM and Chainalysis both attribute it to TraderTraitor, a North Korean cybercrime hacking group that has a history of stealing funds from cryptocurrency exchanges.  This is the largest known cryptocurrency heist in history  four times larger than the previous record, when $1.46 billion was stolen from Bybit last year  and according to TRM, most of the theft occurred over a period of just 20 minutes. 
+
+"This also isn't the first time Binance has been hacked, having suffered a previous security breach in 2019 in which $40 million worth of crypto assets (valued at the time) were stolen."  And I remember in 2019 covering this and going, whoa, $40 million.  Well, okay, how about 6.3 billion?  Yikes.  They wrote:  "The latest hack comes as cases of large-scale crypto theft are escalating after several heists were disclosed by crypto companies in September.  There are also new concerns around how AI tools can be used maliciously against the industry, with OpenAI reporting earlier this month that one of its models managed to swipe fake crypto on an Ethereum test network it did not have access to."  Whoops. 
+
+"TRM's chief policy officer Ari Redbord said in a statement to Sky News:  'This is an extraordinary hack, for its size and for the response.  Few financial systems have ever shown a theft of this scale."  As I said earlier, yeah, because crypto.  "The theft," he said, "shows how exposed the system is to sophisticated attackers moving at a speed we have never seen.'"  So, okay.  "Moving at a speed we've never seen."  What does that sound like?  Yeah.
+
+MIKAH:  Hmm.  What does that sound like?
+
+STEVE:  What does move at a speed we've ever seen before?  So  with only $3 billion of the total 6.3 billion frozen, this suggests that the presumably North Korean hackers may have scored a cool $3.3 billion from the heist.  Okay. 
+
+But the latest reporting that I've seen about this is that Binance has returned so far 90% of the losses on coins whose present value can be readily determined.  The remaining 10% are going to be returned.  But they're awaiting further work to be done.  So it does appear that no one, other than they and their insurers, will end up losing anything, which is great.  You know, we've got to protect the reputation of crypto, apparently.   The other latest news is about the movement of that entire $6.3 billion in stolen assets.  It appears that $2.4 billion have escaped and may never be recoverable.  And, you know, presumably the North Korean hackers will be recovering that.  And boy, what a payday this is for their efforts.  Wow.
+
+In other stolen crypto news, or stolen funds news, the wallets of users of the Polymarket online "prediction" platform discovered that their wallets had been drained.  In this case CNBC was the reporter.  They said:  "Some users of prediction market platform Polymarket's international exchange had funds stolen from their accounts due to a hack of an unnamed third-party provider" - well, unnamed, but we now know.  We'll get to that in a second - "on Thursday of last week.  Polymarket has contacted law enforcement and pledged to reimburse any affected trader.  It's unclear how many users were impacted."  Except we know now.
+
+"The company's U.S. platform was not compromised.  As of Friday afternoon, last Friday, the platform reported it has refunded 95% of affected wallets."  Polymarket wrote:  "In total, we're returning $3.9 million to traders - the $2.7 million stolen plus $1.2 million to cover pause-related losses."  Which is interesting.  So people who said, hey, wait a minute, I had a bet placed here, and it would have paid off if everything wasn't frozen.  And so Polymarket's saying, okay, you're right.  We see that.  Here's your payout.
+
+"So traders first reported," writes CNBC, "on social media platforms that they were seeing unauthorized withdrawals from their accounts on Thursday afternoon.  In response, Polymarket halted trading on its international platform."  Again, not the U.S. platform.  "Polymarket said that it has fixed the issue on its end, and that trading resumed at 3:00 p.m. ET on Thursday.  It told users later in a chatroom on Discord that users who had less than $10,000 taken from their wallets will have funds restored by October 30th, and those with funds greater than that figure withdrawn will have to sign a release form to receive their restoration."  So that $10,000 of course is due to international banking reporting requirements.   
+
+CNBC said:  "A person familiar with the matter told CNBC that the issue stemmed from a hack of DebugBear, a website performance monitoring platform.  DebugBear in a post on X says that it was impacted by a security incident on Thursday.  The person familiar with the Polymarket outage said that the company referred the matter to U.K. law enforcement, as that's where DebugBear is based.  DebugBear did not immediately respond to a request for comment. 
+
+"An analysis of publicly available data by two analytics firms  Betting Intelligence and Polysights  provided to CNBC said that an account on Polymarket Thursday withdrew at least $2.7 million across or from 710 other wallets. 
+
+"Dan Zimmermann, the chief intelligence officer at Betting Intelligence, said:  'This is certainly a significant new form of breach that we've seen on Polymarket.  The timing right before the midterms is certainly a wakeup call for folks.'   Polymarket's international prediction market exchange operates as a decentralized finance platform on the Polygon blockchain and is not regulated in the U.S.  The disruption comes just days before both the company's international and U.S. exchanges are expected to see heightened volume during the U.S. midterm elections on today, November 3rd.  Back in June, a similar incident happened, when Polymarket said a third-party vendor had been compromised, and that the company would refund affected users."  So here we're seeing this third-party compromise which then comes back to affect a client of that service provider.
+
+So in some other reporting I tracked down online, DebugBear posted on X on Thursday that it had been "impacted by an ongoing security incident" and advised its customers who used one of its products, any one of its products, advised all of its customers to "remove the embed code from your websites." 
+
+So DebugBear is a website performance monitoring and debugging platform.  So it sounds as though Polymarket's servers, their webapps or web pages, were dynamically pulling some kind of content from DebugBear as part of the service that DebugBear is offering.  Then DebugBear got hacked, and the bad guys were able to install some malicious code onto Polymarket's site or properties using DebugBear as the trusted conduit to Polymarket.
+
+Since Polymarket, a popular betting platform, would need to have the ability to unilaterally lock and pull funds from their users' wallets when they lost bets, it does make sense that some sort of subversion of the Polymarket platform could transfer away their users' walleted funds.  So looks like some guy, someone somewhere, some party, got $2.7 million, and this platform is going to be covering it out of their own assets.
+
+MIKAH:  I wonder how many it's going to take before we see some more, I don't know, protections in place in the crypto space?
+
+STEVE:  Well, and probably what we're going to begin to see, and it's the same thing that we saw in cybersecurity insurers who were being forced pay out a lot of money when ransomware was extorting money from their clients, their insurance rates went way up so that it became very difficult to afford cybersecurity ransomware insurance.  We're now going to see cryptocurrency insurance rates going up as insurers are being forced to make big payouts.  That'll happen.
+
+So we talked a lot in the early days of AI's emergence about the controversy that's inherent in having AI scrape the public web for its training data.  I've learned recently that even back in the earliest days of the emergence of modern AI, the developers of what is now known as large language model AI were actually some - they were self-conscious about this, too.  They weren't sure about it.
+
+To satisfy my own curiosity and to provide some more value for the podcast, I've been reading Kevin Roose's recently published New York Times best-selling book "The AGI Chronicles:  The Inside Story of the Race to Create an Artificial Superintelligence."  To write this book, Kevin interviewed everyone in the field and has assembled a coherent narrative to describe the personalities, the egos, the motivations, and I've found the sometimes over-the-top beliefs of the main players in what is undoubtedly not just science fiction anymore, you know, and not even science.  It's become world-class, ultra-high stakes drama surrounding stuff that, by their own admission, they don't fully understand.
+
+The book, for what it's worth, is enjoyable, it's very readable, and I just wanted to take a minute to recommend it without any hesitation.  It's not super technical.  It's more about, like, what was going on for the last, well, like since, like, for the last decade as we've been approaching this.  I kind of wanted to get a better sense for who everybody is.
+
+MIKAH:  Yeah.  That's cool.
+
+STEVE:  It is really neat.  I mean, like, I have, as a consequence, and I'm only, like, maybe a third of the way through, I'm up to where the Darios or the Amodeis have split from OpenAI.  But there's a lot of juice in this.  So as I said, it's readable.  I recommend it without hesitation.  You know, for anyone like me who's been wondering exactly what had been percolating in the back rooms of the AI labs for all those years, there is a lot of fact also that is not generally known.  So anyway, I got a little bit off track, but I wanted to put a plug in for Kevin's book.  Kevin Roose for anyone - again, "The AGI Chronicles."  And it's been a fun read so far, and I've got a lot more to go, and I'm enjoying it.
+
+So the point I was making was that his interviews revealed that the early pioneers of this new language input-hungry LLM technology, they soon realized that bigger models made better models, and that the more data that was fed into those bigger models, the better the results that were produced.  So in Kevin's telling, they turned to the world wide web where you could hardly ask for more raw language data.  But they did ask themselves whether it was okay to scrape websites, Reddit, web forums, news sites that arguably have copyrighted content, and anything else that they could get their hands on.
+
+They decided, and he talks about this, that during those early days when nobody was paying any attention, that since it was strictly for research purposes  which at the time was true, it would be okay.  And as we know, what started as uncertain research, that might have just been as much of a dead-end as everything else had been up until that time, that had been previously tried, this one turned out to be the Holy Grail, at least for language processing. 
+
+So today we have a dilemma.  Many websites whose entire economic model has relied upon the count of eyeballs seeing their ads, are strongly and understandably opposed to having an AI come by once to train on, and absorb, and encode all of that site's knowledge, after which there will be little reason for anyone else's eyeballs to bother taking the time to visit the original source of that knowledge which the AI has ingested and will henceforth gleefully format for anyone who asks, and provide it. 
+
+So the result has been predictable controversy.  On the one hand, the website's data has been published publicly for anyone to obtain.  And it was only ever a presumption that the ads being shown would influence or interest that site's viewers.  And the Internet Archive's Wayback Machine, for example, of a scraper, has been quietly scraping away at the entire web for the past 30 years, ever since 1996, which it was founded.  And with only a few exceptions, nobody worried about that very much.  The difference, of course, is that the Wayback Machine's scrapings would have never reduced traffic to the original content, you know, the original source of its archived content.  The same was true of Google's pre-AI simple link indexing. The more Google "knew" about a legitimately valuable site, the more traffic that site would receive.
+
+So everybody wanted Google to index them, and there was that whole, you know, SEO optimizing craze that went on, trying to get your site ranked as highly in Google's search results returns as you could.  Of course all that changed once Google's own AI began providing complete answers to its users' queries as the first thing that shows up on the page.  So yeah, it provides you optional, but also rarely visited links to the source material, kind of as an apology, I think, for having prevented, you know, like reduced the need for anyone to actually go.
+
+So all of this becomes relevant today, for us, due to a somewhat surprising accord, but a nice piece of good news,  recently agreed to by all of the major players in the AI space about respecting a site's clearly expressed anti-scraping intentions. The Verge's reporting was titled "The biggest names in AI are backing a new way to opt out of scraping."  It's actually not that new, but I'll explain it all in a second.
+
+They wrote:  "OpenAI, Google, Microsoft, and Anthropic" - not Perplexity, but we'll talk about them in a minute - "say they will adopt a new standard that publishers can use to opt out of being scraped by AI, as reported earlier by Search Engine Roundtable.  With this control, publishers can apply their AI training preferences across multiple AI companies, instead of setting them individually.
+
+"The shared 'policy token' signal is proposed by Kevin Kelley, a technical lead for standards at Anthropic, as part of the IETF, the Internet Engineering Task Force.  It will live within a website's robots.txt file, which has long signaled which web crawlers can and cannot scrape a site - whether for search indexing, archiving, or AI training.  Currently, sites have to signal their AI training preferences separately to each AI company."
+
+Okay.  And I'll just interrupt and say, and of course, as we know, the presence and use of a site's robots.txt file has always been informational and voluntary.  There has never been any enforcement attached.  It's very difficult to do.  Of course this all boiled over in mid-2024 when Perplexity was caught, well, deliberately ignoring sites' robots.txt files and more.  Recall that it was a little over a year ago, in August of 2025, that Cloudflare published their report that Perplexity, once again, would declare the identity of its bots to the sites it was visiting only so long as and until they were proactively blocked by a site, which Cloudflare began doing because Cloudflare wanted to honor the robots.txt files declarations of their client customers.
+
+And so if a site's robots.txt file said I don't want Perplexity scraping me, then Cloudflare took it upon themselves to block Perplexity proactively, even on behalf of their client customers.  What Cloudflare then discovered was that Perplexity went around that.  They ended up doing what Cloudflare termed "stealth crawling," even using completely separate IPs and proxies and really being a dirty player in all this.
+
+In any event, The Verge's reporting continues, writing:  "The announcement comes as publishers grapple with the continuing influx of AI crawlers scraping their sites and feeding their content into AI models.  Some companies and organizations have attempted to combat unauthorized scraping, with the Really Simple Licensing (RSL) standard giving publishers the ability to charge crawlers that visit their sites, and Cloudflare blocking AI crawlers by default. 
+
+"OpenAI, Google, Microsoft, and Anthropic say they will respect their AI crawlers" - I'm sorry.  They will, well, they will respect the robots.txt, but they will restrict their AI crawlers from accessing a site if they encounter the new shared token, which we'll talk about in a second.  Meta communications head Andy Stone also signaled support for the new setting, but doesn't say whether the company will honor it.  Stone said:  "We believe creating a common signal that conveys such preferences to multiple providers at once is an important step.  And we look forward to working with other AI companies on the standards and their implementation across the industry."  Well, okay.  Why bother saying anything at all because that says nothing.
+
+"Microsoft says it will offer granular controls that will give publishers the ability to opt out of AI training or AI grounding" - which is their term for the process of pointing an AI model to a verified source of information to reduce hallucinations.  In other words, AI fact-checking, essentially.   Microsoft notes that websites will still appear in Bing's search results regardless of their preferences.  Google previously implemented similar controls that allow sites to control whether their content appears in AI search features or is used for AI training, without impacting visibility in search.  While Anthropic has already adopted the signal, Google and Microsoft plan to support it next year.  OpenAI says it will implement it in 'coming months.'" 
+
+Okay.  So I put in the show notes a link to the IETF's doc for explaining about this.  This just happened, being dated last Friday, October 30th. The draft goes out of its way to make the tiniest tweaks possible to the existing formal robots.txt specification.  So specifically, it only adds a single new meta value for the User-Agent qualifier, and that is "__usage_ai-training."  So that meta User-Agent value is intended to match any access of the site for AI training.  It's then followed by the optional Disallow: and Allow: parameters which provide the path specifications from the site's root.
+
+So, for example, you would have User-Agent: and then this new meta agent specifier, __usage_ai-training.  Then the next line would be, for example, Disallow: / meaning disallow everything from the root on.  But then you could follow it as the example given in the draft with an Allow: /press-kit/.  Which is to say disallow everything, but do allow AI training on the contents of everything underneath the press kit directory from the root of the site.  So we still have an honor system.  "Disallow: /" would place a blanket disallow for the entire site from the root out. But that can be followed with, for example, "Allow: /press-kit/" which would allow AI scrapers to train on the contents of the site's "/press-kit/" subdirectory. 
+
+We still have an honor system, and sleazy companies such as Perplexity has proven itself to be may still elect themselves to evade this and to then, when they're caught, deflect and deny their actions, as they did before.  But this at least feels like a good step in the right direction.  The real trouble, of course, is that having AI trained on the knowledge contained across the entire world wide web definitively changes and upsets the previously well-established, even thought it was kind of ad hoc from the beginning, it's what created Google, after all, is advertising, it upsets this previous well-established ad-supported paradigm for financing sites on the modern web.  So it's unclear how this is all going to shake out.  The only thing we know for sure is that it's going to, one way or the other.
+
+And if you didn't see this next piece, it's really spectacular, Mikah.  So it's a bit of news about Google's first experimental AI-based satellite test.  They launched a bunch of their Tensor Processing Units, which are the Google so-called GPUs.  It's one of their AI chip designs.  They launched a bunch of them into orbit to see how they deal with the extremes of space.  The Verge's coverage of this event was titled:  "Google's satellite AI server transmits its first response to Earth."  The Verge said:  "Google's AI chip-equipped satellite has generated its first response from space.  In a blog post on Friday, Google says it successfully booted up the satellite's Tensor Processing Units, allowing the on-board Gemma 4 model to follow through on a prompt to create a haiku about being in space.
+
+And that haiku is "Blue marble below.  Data streams in silent grace.  Starlight feeds my core."
+
+MIKAH:  That's very good.
+
+STEVE:  Isn't that wonderful?
+
+MIKAH:  "Starlight feeds my core" is a fantastic final line, too.
+
+STEVE:  Oh, I just love it.  That's certainly better than I could produce.  And wow.  So we have an AI in space which is producing haiku.  The Verge's short update finished with:  "Google says it tried out other space-themed limericks and telemetry prompts, as well.  The test is part of Google's Project Suncatcher, an experimental initiative that could eventually put AI data centers in space.  Google launched the satellite into orbit earlier this month."   
+
+Google said:  "Next, we will continue with a series of tests to evaluate how TPUs perform under thermal stress and radiation exposure in orbit.  Verifying our TPUs can reliably execute workloads in space paves the way for our next milestone of twin interconnected satellites in 2027." 
+
+Okay.  So as it happens, just like approaching here, Voyager, we've talked about Voyager 1, has managed to survive for an astonishingly long time out in the vast depths of space.  In fact, two weeks from tomorrow, on November 18th at 5:16:07 Eastern Standard Time, that intrepid Voyager 1 spacecraft, having traveled for nearly 50 years, will cross the one light-day marker  that is to say, the distance light can travel in 24 hours  which is about 16 billion miles. 
+
+However, Voyager 1 has the advantage of being all alone way out there  at least as far as we know.  That's not something that any of the satellites in near Earth orbit can claim.  My own personal worry, I haven't seen this written anywhere, is that among all of that crap that has now been put up there into orbit is an assortment of kinetic- and energy-based weaponry.  I suspect, you know, I mean, we've been weaponizing orbit, unfortunately.  I suspect humankind has quietly established a frontier that's more ready for space-based warfare than would be convenient and is commonly known.  That seems like a cause for concern, frankly, if we start moving large, independent, and inherently vulnerable and fragile AI facilities into orbit.  I know that Elon has talked about that constantly.  Let's put our data - don't like data centers on Earth?  Fine.  We'll stick them up in orbit.  Okay.  Maybe.  I don't know.
+
+MIKAH:  Maybe.
+
+STEVE:  Yeah.
+
+MIKAH:  Right.  Well, let's get back into it with Listener Feedback.
+
+STEVE:  So, yeah, our listener Jack Hoffman calls me out on my "stealth updates" idea.  He wrote:  "Hi, Steve.  I'm at SN-1102 1:40:55 mark and just heard your brief thoughts on 'stealth updates.'  That seems possibly problematic to me.  A form of security through obscurity; but the bad guys, once their systems are patched, are no longer unaware of 'something' having been wrong.  It should then be almost trivial for them to point their own AIs at the before and after and ask, 'What has changed and how do I take advantage of it?'  At that point the bad guys know what to exploit, and the poor folk who did not get the 'stealth patch' aren't even aware that there is a 'known to the bad guys' problem, despite best intentions, flaw out there that could be used to compromise their systems.  Your thoughts?  Best regards, Jack."
+
+My thought is that Jack is quite correct.  That was not a great idea. It was the only thing I could think of to deal with the fact that the world is not prepared to deal with the consequences of massively exploitable flaws being discovered in widespread infrastructure and the need to somehow fix them on the fly in the face of active and equally informed adversaries.  My thought was as a consequence to not inform anyone, which, as Jack points out, is also not actually possible.  There's no way to keep the bad guys from finding out about it.  We are even having a problem keeping the good guys or getting the good guys to find out about it.  So anyway, Jack, thank you for the comment.  I withdraw the idea.  Not a good one.
+
+,Matt Olan asks:  "Why are websites still publicly exposed to the Internet?"  Huh?  Okay.  He wrote, and this is Matt Olan:  "Steve, listening to you talking about the PHP issue this week.  This had me wondering, not for the first time, why do people still expose websites directly to the public Internet?  Your first thought to that statement is likely 'But how would people access them if not on the public Internet?'"  Yeah.  You got that right.
+
+He writes:  "To explain, about one year ago we moved all of our and our customers' important websites off the public Internet while still keeping them publicly accessible."  Huh?  "We use a combination of Cloudflare DNS, Cloudflare WAF (Web Application Firewall), and Cloudflare Tunnels.  Traffic to our sites goes to Cloudflare, where it gets sanitized by the Cloudflare web application firewall service, then gets routed to our servers via Cloudflare Tunnels using private routing." 
+
+He writes:  "Cloudflare Tunnels is a service installed on the web server that calls outbound to Cloudflare, meaning we can keep the server from being exposed to the public Internet.  The end result of this is that it allows us to keep our web servers inside private networks with no exposed inbound ports."  He says:  "You also don't need a static IP.  So there are no public interfaces to attack, no services exposed, nothing to see here. 
+
+"This is a huge security benefit in today's world where you never know what new security nightmare we'll wake up to on any given day.  Note that Cloudflare offers a basic free version of all three of these pieces.  Signed Matt Olan, Perimeter9.com."
+
+So that is a terrific-sounding collection of services, and I think it's kind of brilliant.  We've often talked about the inherent security created by any NAT router, which functions as a stateful packet flow firewall.  As we know, packets are allowed out, but only packets returning from those packets that first exited are allowed back in.  So Cloudflare's software running on a client's server - that is, it's tunneling software residing on a client's server - initiates and maintains an outbound connection FROM the client's web server through any routing or firewall software the client might have TO the Cloudflare CDN.
+
+Cloudflare's DNS points the client's domain at one of their CDN IP addresses so that when anyone on the public Internet wishes to access the client's website, that public traffic will first be sent to Cloudflare for inspection by their Web Application Firewall.  Assuming that the traffic passes muster, it will be forwarded to the client's web server over that connection that the client web server first established outbound to Cloudflare.  This allows Cloudflare to front for any web server that wishes to remain safely protected from the public Internet while still offering its services there.  Last week we heard Cloudflare's CEO, Matthew Prince, imply that thanks to the advance knowledge they had of the PHP2Shell bugs, everyone whose services were positioned behind their web application firewall  even if their site was powered by vulnerable PHP versions  had been and was always fully protected from any attempted exploitation of those PHP flaws. 
+
+So this very clever solution has a number of characteristics that I appreciate.  Last week I bemoaned the idea of threats such as that by PHP driving a concerted global consolidation of Internet services into just a few behemoths.  You know, like Amazon.com and Microsoft and Cloudflare and those.  You know, basically destroying the diversity that we've enjoyed that defined the Internet since its creation.  What I like about the architecture Cloudflare has created is that a client such as Matt is not forced to move his web server to the cloud, or to move it anywhere at all.
+
+Their server is able to remain right where it is on his own public local network under his own control.  Presumably, it's also able to run whatever other local or public services they might wish to.  But then, by running a Cloudflare Tunnel Client on that machine, they're able to effectively "remote" the access to that server through Cloudflare.  And once DNS has propagated, Cloudflare's IP address for their domain will be used to reach Cloudflare.  Once that's happened, they can remove their own website's physical presence from the Internet so nobody can get to it at all after Cloudflare has fully taken over for them.
+
+This architecture effectively consolidates all of Cloudflare's client web traffic through Cloudflare's web application firewall, but nothing more; just web traffic that needs protecting gets the protection it needs.  And thanks to the reputation that Cloudflare has earned through the years, they will be provided with critical early access to information such as the PHP mess.  Because that early and highly sensitive information really must remain secret, as we've seen, and we've seen how difficult secrets are to keep, this massive consolidation of web traffic through a single web application firewall allows that massive number of websites to obtain protection that could never be offered to them individually because any such widely distributed secret would be guaranteed to leak.  So you have to have consolidation of the secret, at least during this critical period.
+
+Like I said, it's kind of brilliant.  While I may on the one hand still bemoan consolidation, in the present climate, where we're having things like this PHP problem, and now the Linux kernel MPTCP problem, the multipath TCP problem we talked about at the top.  I can see that this notion of consolidation does take on a unique and vital role.  And thanks to the traffic-routing nature of this solution and service, once the dangers have passed, once things calm down, any website that wished to emerge from behind Cloudflare could simply return their website to the Internet.  Right?   Make it public again first.  Then repoint their domain back to their own IP address.
+
+And once DNS has again propagated, which can take hours or days, but some limited length of time until all the caches have expired and all the distributed DNS servers have been forced to go back and get a fresh copy of that site's DNS, then inbound queries from Cloudflare will have dropped off to zero, nothing will be transiting Cloudflare's Tunnel, so it can be shut down and disconnected.  It's a cool solution.  So wow, Matt.
+
+MIKAH:  Not to go all Leo on you, but I do use Cloudflare Tunnels for - I run a notify server locally, NTFY, which lets my agents message me whenever I'm away from home.  So if there's ever anything that I need to check in on, originally I thought - I was using it through what was available, and I didn't like that it kept running up against write limits.  It was like, okay, I'll just write it myself.  
+
+STEVE:  Ah, right, right.
+
+MIKAH:  But I thought, I wrote it myself, I'm a little bit nervous about that.  I don't want to be having my email server in my basement, so to speak.  And so I was looking into how, and Cloudflare Tunnels was one of the options that was offered.  And so, yeah, that is the way for the cloud agents to be able to send a notification that then pops up on my phone, and on my Mac via Safari's notification options.  So that was all kind of done in a way that I felt protected because of what Cloudflare Tunnel offered.
+
+STEVE:  Yeah.
+
+MIKAH:  Kind of cool stuff.
+
+STEVE:  Yeah, I think it's very, very cool.  So again, Matt, thank you for helping us bring it to everyone's attention.  And we've heard from Mikah, who uses it, too.  So very cool.
+
+Guillermo Garca says:  "Hi, Steve.  When you say that a book contains knowledge, I disagree.  I believe the writer has the knowledge, while the book contains data and information.  That data and information remain in the book until a person reads it, interprets it, and turns it back into knowledge.  What I mean is that knowledge exists in people's minds, not in books, and certainly not in LLM.  Guillermo Garca, listening since Episode 1 from Santiago, Chile." 
+
+Okay.  So, okay.
+
+MIKAH:  Hmmm.
+
+STEVE:  I agree with you, Mikah.  I see Guillermo's point; right?  But I think that the distinction that he's making is largely semantic.  He is saying that books and LLMs are unable to contain "knowledge," okay, we'll just put that in quotes, "knowledge," because knowledge is something that, by its nature, he's saying, only exists within conscious sentient beings.  A book (or an LLM), being neither conscious nor sentient  we believe, as currently implemented  is therefore unable to contain knowledge, is his point.  Fair enough.
+
+Following that, and I suppose if I were being more careful and particular, I could reword my statement to say that books and LLMs contain a linguistic representation of knowledge rather than the knowledge itself.  Okay, maybe that's more accurate.  We encode the knowledge that we have into language which we have long recorded, right, on cave walls, stone tablets, parchment, and now in books.  And actually now in LLMs.  So what happened during the past few years is that we finally figured out how to encode and record that same knowledge in neural networks.
+
+MIKAH:  I have to say, I have to say I have heard better arguments made for a hot dog being a sandwich or an ice cream being soup than I feel Guillermo's argument is in this.  I was really looking forward to an in-depth kind of, ooh, this is going to sway me.  But if it's simply the idea that knowledge can only be had by a sentient being, that feels too simple an argument for me.  I will say that, if we wanted to assume that that was the case, does not our observation of that data thereby initiate it into existence as knowledge?  Does it have to be that it comes for us?  Or it comes from us?  Or is it enough that our observation of - because otherwise how could the author that wrote, you know, their book, how would they be able to have that knowledge if it wasn't from getting it through information elsewhere?  And if that's the case, then upon observation it becomes knowledge.
+
+STEVE:  And that's my point.  I mean, I can see Guillermo's - I can see the point he wants to make, and the position he takes.  For me, I don't think I will change my way of thinking about it or expressing it.  A book, if I say that a book contains knowledge, to me that feels right because that's what I obtain.  And, I mean, entertainment and, you know, humor and emotion.  I mean, it contains a lot of stuff; right?
+
+MIKAH:  Yes.
+
+STEVE:  It can impart knowledge.  So I think it contains the knowledge that's it's imparting.
+
+MIKAH:  I agree.
+
+STEVE:  And it contains the humor that it's imparting and the emotional affect that it is imparting.  So, you know, we're affected by those things because they're in there.
+
+MIKAH:  Right.
+
+STEVE:  And they're expressed and encoded into language.  But that's knowledge that is in there, that is in the book, I think.  
+
+Jordan B.  So Jordan used his full name and did not ask me to obscure his identity.  But it kind of felt like the right thing to do, just because for propriety's sake.   He gave his email, which I received last Tuesday morning, the morning of the day of last week's podcast, and after the show notes had gone out, thus I couldn't put it in them.  But here they are now.  It was a subject, "AI attacked my small company!"  Because of this, his note had been on my mind ever since, and I'm glad to be able to share with everybody today.
+
+Jordan wrote:  "Hey, Steve, I'm a longtime listener of Security Now!, and I wanted to share a firsthand account of how the AI-assisted threat landscape is playing out for a small organization.  My company was recently hacked in a way that appeared very similar to the intrusion disclosed by Palo Alto Networks" - a sponsor of the TWiT Network - "Unit 42, which you discussed on the podcast last week."  So that would be two weeks ago now.  He said:  "We're a small startup with roughly 30 employees, and we simply don't have the people, budget, or resources of a large enterprise.  Yet we're now having to defend ourselves against increasingly sophisticated attacks. 
+
+"I have been tasked with figuring out how we're going to respond.  Our first step is to limit our attack surface by reducing what is exposed on the public Internet, tightening access controls, and addressing the basic security measures that need to be in place.  We're redirecting engineering resources away from product development to get our infrastructure properly secured."
+
+Okay, now, I'll just interrupt Jordan to note that the solution Matt Olan's company employs, and Mikah employs, of using Cloudflare as their web application firewall might form at least part of a larger solution.  I don't know what the free plan - oh, in fact, Mikah, do you know?  Matt mentioned a free plan is available.  Is it like number of queries limited, bandwidth per something?  Like how does it - do we know how you pay for this thing?
+
+Anyway, Jordan continues:  "One problem," he says, "I've encountered is that the attackers have AI helping them."  Right.  I mean, that's the AI-assisted attack; right?  "And we need access to those same capabilities for our defense.  Our company has a Claude Enterprise subscription, but Claude's frequent refusals make it difficult to use for legitimate security work.  I've run into situations where it simply won't help me investigate vulnerabilities or work through security problems in our own infrastructure.  Because of this, we're planning to use an abliterated model. 
+
+"We're going to host the model ourselves in our own Google Cloud environment so that our infrastructure details, vulnerabilities, configurations, and security investigations remain within systems we control.  The last thing I want is to introduce another security problem by sending sensitive information about our network to an external AI provider, especially when that AI will be helping us investigate and manage the security of our entire infrastructure. 
+
+"The economics of all this are particularly troubling for startups.  We've historically prioritized building our product and growing our business because that's what determines whether we survive.  We don't have a dedicated security team or the budget to approach cybersecurity the way a large enterprise would.  Now we're being forced to devote a substantial portion of our limited engineering capacity to security because the threat has become impossible to ignore."  Meaning AI has upped the ante.
+
+He says:  "And I think this is going to become an enormous problem for smaller businesses.  We have little reason to believe someone specifically selected our 30-person startup for an elaborate attack.  It seems much more likely that automated systems are scanning the Internet, identifying potentially vulnerable organizations, and then using AI to work their way through whatever systems they can access.  The cost of conducting these attacks is falling dramatically, while the cost of defending against them is becoming a serious burden for companies like ours.  I suspect our experience is becoming increasingly common, and I wonder how many other small companies are quietly dealing with the same thing.  Thanks for all the years of Security Now!.  Jordan."
+
+Okay.  I am so glad that Jordan chose to share that with this podcast.  What's somewhat unnerving is knowing that his small 30-person company came under attack through an apparent Internet-wide scan rather than them being targeted.  Like, as he said, why would they be targeted?  You know, we've known for the duration of this podcast that the public Internet is subjected to constant scanning for connection-accepting open ports, like RDP (Microsoft's remote desktop protocol), SSH, Telnet, and so forth.  Now it appears that rather than just a simple port scanner sweeping across the Internet, AI is backing up those scans and digging not just into ports that accept incoming traffic, but rather, you know much more deeply for vulnerabilities within the services that accept those incoming connections.
+
+This means that my saying, as I did last week, that GRC would be a low-interest target really doesn't fly because the threshold required for "interest" has been lowered to the floor so that no one is "low interest" any longer.  Wow.  So wow, Jordan.  Thank you for letting us know.  And it also does say, I mean, Jordan is saying that, wow.  They're a startup.   And maybe they kind of got caught with their pants down a little bit, right, because as he said, we've been focused on product and engineering, and this is forcing us to switch our product focus to security.  I don't know any of the specifics that he's talking about; right?  I mean, I shared everything that he wrote.  So I can't criticize them for not having from the get-go put enough focus on security so that an AI that came by would not find anything.  I just don't know what it was that it found, and whether you could say, oh, whoops, that should never have happened.
+
+But, on the hand, AI is finding problems in PHP and in the Linux kernel.  So again without knowing any specifics, it's impossible to say, well, you know, they should have always been giving this more attention than they were.  We don't know that.
+
+MIKAH:  And there's an argument to be made that it's good that it happened while they were a small business and not a large business, and that...
+
+STEVE:  Better, yes, better now than later.
+
+MIKAH:  Better now than later, yeah.  So...
+
+STEVE:  When there was much more to lose.
+
+MIKAH:  Exactly.  And be fined for.
+
+STEVE:  Right.  Eric Howard wrote:  "Hey, Steve.  I just finished listening to this week's podcast.  You mentioned that you're ready to move on from AI coverage.  I get it.  But before you do, can you discuss one more thing?  I'm curious what you think a functional 'Kill Switch' for AI would look like?"  And he signs off:  "I still have my original SpinRite floppies, and I'm looking forward to SpinRite 7.  Thanks, Eric Howard, listening since Episode 1.  My wife calls it my blah, blah, blah podcast."  So, yeah, I imagine it does sound...
+
+MIKAH:  That's very - that's so nice of her.
+
+STEVE:  Okay.  So Eric asks, he says:  "I'm curious what you think a functional Kill Switch for AI would look like?"  I believe that any AI Kill Switch most closely resembles a political hallucination.  Nothing that the U.S. federal government might do or legislate is going to cause Leo's band of wacky AI agents to shut up.  Leo, like more and more of the world, is running AI locally.  I'm not yet, but I have the hardware that I will need to do so when, if ever, it might make sense.  Jordan's little 30-person company will be using abliterated agentic AI on their own cloud infrastructure for defensive security.  Whatever they may choose to do on their own network is their business.
+
+So the point is that AI, generally and generically, is not something that is subject to any sort of universal kill switch.  You can't turn it off.  It's already everywhere, and largely out of reach of any regulation.  What is subject to a universal kill switch are the commercial AI service providers and/or the physical data centers that power their AI models.  It is foreseeable that the large AI service providers might be required to install a blanket service outage, service-pausing capability that would take all of them offline in the case of some AI-related panic. 
+
+Now, the United States current administration seems quite unlikely to impose anything like that upon the industry which is currently driving so much of the country's economic growth and becoming pretty nervous about how extended they are with this dream of AI.  And even if the U.S. democratic party  which appears anxious to clamp down on AI somehow  if they experience the sort of election day that the polls have been predicting, and that's today, and were to obtain control over one or both houses of Congress, nothing could force an unwilling President Trump to sign any legislation which a Democratic congress might attempt to produce into law. 
+
+My point for raising this issue is timing.  The earliest that the U.S. might be under a pro-AI control administration would be another two years from now, in 2028, with our next president.  Given the incredible rate of progress that we've seen from AI so far, two years, my god, that's a lifetime.  And by that point I suspect that so much ultra-capable AI will be available and running locally and also in personal cloud infrastructure, that cutting off the commercial providers will be seen by then as pointless because the genie has not only escaped the lantern, the lanterns have been mass produced, and everybody has their own genie, so why bother?
+
+MIKAH:  That's a good way to put it.
+
+STEVE:  And finally, Asher says:  "Hello, Steve.  I've heard people saying they want more AI stuff on the show, and some want less AI on the show.  For me, it's more on the type of AI coverage.  At this point, the weekly update on what amazing new trick the AI has learned is no longer interesting.  What I do want to see and hear more on is the practical effects of the demonstrated capabilities, not the capabilities themselves; and most importantly, the solutions to counteract this new type of threat.  Thank you, Asher."
+
+And I think Asher perfectly sums up where we are now and where we're headed henceforth on the podcast.  Today's main show topic, which we're going to get to next, is a perfect example of a not-previously-discussed impact AI is and will be having on end user security, as are the things that we've been talking about, except for the haiku that came from outer space.  Okay.  But that was a quickie.  So, yes, that is what the podcast is henceforth.
+
+Okay.  So everyone knows about GRC's ValiDrive freeware that I created after the discovery that the retail market was being flooded by "too good to be true" - and it was too good to be true - mass storage at very low prices.  These drives were all formatted with the universal FAT (File Allocation Table) formatting.  And in this formatting, the nature of it is that the root directory and the cluster allocation bitmap always reside at the beginning of the drive's data storage region.  This means that any drive is able to convincingly spoof its size by providing only enough actual storage to contain those front-of-drive management tables.  On a drive that's only 32GB, the user sees their apparent ability to save hundreds of gigabytes or several terabytes onto this drive.  So they copy the files, and then look at the directory.  And, sure enough, there's the file's name, size, date, and attributes.
+
+The bad news is that the only thing stored is the file's name, size, date, and attributes.  None of the data may have been written because there's no actual mass storage "out there."  ValiDrive has been super popular because this problem is very real, and I believe I have a number of things I can do to make that utility even more useful, which will be the next code that I write. 
+
+But I was put in mind of ValiDrive when I encountered a story thanks to our friend of the show Simon Zerafa.  It turns out, there's another entire realm of fake drive sales going on, over on the super protected encrypted side.  The piece published by HackingPassion.com was titled "Lenovo ThinkPlus Fingerprint USB Drive Sold as Encrypted Was a Plain SSD Card Inside."
+
+MIKAH:  Oh, no.
+
+STEVE:  And I have to think, I mean, my first thought was not really, not THE Lenovo.  Maybe it's somebody like pretending to be Lenovo.  I just - I don't want to believe that Lenovo, like the real Lenovo company, could do this.  But you immediately think, okay, it's a fingerprint unlocking USB drive sold by Lenovo.  How would anyone really know what it was doing unless you looked inside?  Right?  So I'm just going to share the top of the piece by HackingPassion to give everyone a sense for this.
+
+They wrote:  "USB encryption from five makers opened without a password.  Lenovo, Netac, KakaSoft, Nexcopy, and SecZure."  They wrote:  "A Lenovo USB stick with a fingerprint reader was sold as hardware encrypted by AES-256.  Inside sat an ordinary SD card.  Nothing on it was encrypted.  The fingerprint only switched on the USB connection."
+
+MIKAH:  Oh, wow.  Wow.  I mean, okay.  Well, okay, see, here's the thing.  Perhaps if they would have just said "Hardware encrypted" or "Hardware protected."
+
+STEVE:  Protected.
+
+MIKAH:  But they didn't go as far as to say, AES-256, they could have got away with this.
+
+STEVE:  But, yeah, but that's the bullet point you want; right?  It's like, oh, that's really good.
+
+MIKAH:  That's the good stuff.  So they...
+
+STEVE:  It is.  They wrote:  "The stick is the ThinkPlus FU100" - and really, FU?  Okay.  Anyway, "a small..."
+
+MIKAH:  Yeah, they're doing something here.
+
+STEVE:  Maybe it's a joke.
+
+MIKAH:  I think it has to be, come on.
+
+STEVE:  Come on.
+
+MIKAH:  ThinkPlus.  It's like, think more about this, you dummy.
+
+STEVE:  Yeah, and then FU.  "A small black stick with a fingerprint sensor on top that opens with a finger or a password.  It's marketed as hardware encrypted, with AES-256, and a sales listing promises fingerprint protection, password protection, and anti-leakage.  Someone who bought one to carry private files, well, they have a very good reason to believe that their fingerprint locked those files.  But it's all a scam."   
+
+Xusheng Li develops a reverse engineering tool and its debugger.  He's the guy, Xusheng is the guy who goes by binary.ninja.  That's his site, binary.ninja.
+
+MIKAH:  Oh, okay.
+
+STEVE:  He took an FU100 apart.  Under the plastic was a small circuit board with an SD card on it.  The data on that card was not encrypted in any way.  The fingerprint reader only did one thing:  it determined whether the stick would connect to a computer or stay silent.  The files on the card did not depend on it.  Lenovo later described the flaw in its own advisory - I guess this is real, this is just shocking - as a "weakness."  You think?  A weakness "that lets someone with physical access read the data stored on the drive."  Uh, a weakness?  I'll say.
+
+MIKAH:  I still keep looking for it to be a fake Lenovo because this just seems so bad.
+
+STEVE:  I know, it's unbelievable.  And the FU100.  Come on.  The entire point of using a hardware-encrypted drive is for someone who does obtain physical access to the drive, but doesn't have your fingerprint.  Otherwise, what's the point of a fingerprint scanner?  To be utterly unable to do anything with it?  So just to be clear, we know how to do what is required for a drive that's unlocked by a PIN.  I'll explain why I'm not ever convinced a fingerprint is a good idea.  It's not.  But we know how to do what is needed for a drive that's unlocked by a PIN or a passcode or a password.
+
+First of all, the drive needs to actually have a high speed, or high enough speed, AES-256 encryption/decryption hardware.  Right?  The real McCoy will be a bit expensive.  But that's what it takes in order to encrypt and decrypt AES-256, to perform that encryption operation on the fly.  So you have to have that first.  Then, during the drive's initialization, it needs to have access to some high-entropy source so it can securely generate a 256-bit key that's completely random and that never leaves the silicon.  That's the ideal.  Maybe if it comes with a software initializer you could depend upon the PC, and the PC's source of entropy, to generate the key and then transport it into the device.  But you'd really like to have it built into the device.
+
+You don't want it to come from the factory because then the factory could have a record of it.  And they could all be the same, like every one of them that they make has the same key.  How would you know?  But so you really want it to be generated by entropy in the silicon, and it never leaves there.  So a good chip will then incorporate a true random number noise source so that it's able to generate the drive's unique key itself.  Once that key exists, one way or the other, the user is then prompted for their PIN or their password, whatever.  But not their fingerprint.  We'll get to there in a second.  As the digits of the PIN or password are input, they are collected and fed into a strong PBKDF function, right, password-based key derivation,  which takes some time, deliberately takes some time to convert the input PIN or password into a final hashed output.
+
+Finally, once the user is through inputting it, and you go through the do it a second time to make sure, that hash is used to key the AES-256 encryption of that purely random 256-bit master key which was first obtained, and then it would be encrypted and stored permanently on the device.  So that's how we actually get security.  
+
+Now, in the future, in order to "unlock" or "open" the device, the user is again prompted for their PIN or their password and then waits for the deliberately slow PBKDF function to run.  As we know, this slow process prevents and thwarts brute force guessing because it takes too long to guess on this hardware.  Once the PBKDF function finishes, the permanent stored master key is decrypted with the hash generated by the PBKDF function to obtain now the decrypted master key, which the device is then able to use to read and write with communication with the device's mass storage.   
+
+So that system, as described, cannot be spoofed.  Nothing other than the proper input PIN or password will hash down to the proper decryption key to create the device's mass storage master key.  The cheesy solution, which is what could be done if you weren't really into crypto and didn't really care about doing it right, the cheesy solution is for the proper PIN or the password to actually itself be stored somewhere.  Then it is simply compared to what's input, and the memory is powered up when they match.  Or a secret key is then used.  But the key would be in the device.  That's the problem is that you're not actually dependent upon the data the user provides to be able to create the key that then allows the device to be decrypted.
+
+And I am dubious about anything that claims to be a fingerprint unlock.  Don't use it.  It may be sexy, but it takes a huge amount of additional work  image recognition, fingerprint feature extraction, and on  to make it work at all.  And even then, the fingerprint module needs to eventually say "I think it's the right person," at which point a key that needs to be internally known to the device is then made available.  In other words, this is also not truly secure because all of the information required to unlock the mass storage must be present.
+
+The point is a user's fingerprint is not an exact thing.  It doesn't contain information which is exact.  You've got a nick on it, or a scrape, and one of the little ruffles or ridges or zings or zangs - that's the technical term - doesn't come out exactly the same.  You're not going to get the same key.  So that's not how they work.  They're approximations.  And so that means that when the fingerprint module says, yeah, that looks like Joe, then somewhere the key is made available.  Well, it was always there to be hacked.  So I don't like it.
+
+So the problem here is obvious:  How would any reasonable consumer have any way of determining whether any of the expensive process that I just talked about was going on inside?  So I was curious to see what more this Chinese reverse engineer had found, so I tracked down his previous work because the other things he's talking about now are software, software crypto that many of us received when we purchased USBs.  They're like, hey, free, you know, encrypt the drive stuff.  Right?  Or third-party software that you can purchase and add for encrypting your thumb drives.  So as I said, he's at binary.ninja, and his most recent blog posting, Thursday before last, was titled "Discovering a Backdoor and Flaws in More Encrypted USB Drives."  And so it's actually in the software of the drive encryption, not in the hardware.
+
+He says:  "Earlier this year, I showed how to break USB encrypted drives with [what he calls] time-travel debugging at RE//verse."  He says:  "After having a lot of recent success with AI-assisted reverse engineering" - and we'll be talking about that, that's the point of all this - "and vulnerability research, I wanted to see how well AI could handle the same tasks.  The results exceeded my expectations."
+
+MIKAH:  That's not horrifying at all.
+
+STEVE:  Yes.
+
+MIKAH:  That's incredibly scary to hear from someone who's doing this kind of work.
+
+STEVE:  Yes.  "For one encrypted USB drive, the investigation uncovered a backdoor that let me decrypt files with alternative passwords.  AI also reproduced my earlier research in seven minutes using static analysis.  I tried it on two more USB- protection products I had not studied before, and it broke through those, too. 
+
+"The first drive was sold by SecZure, as I said, S-E-C-Z-U-R-E.  It hides encrypted drives from Windows Explorer and opens them through bundled readers that claim to block copying, screenshots, and printing.  Fun fact:  I had studied this drive before.  In "Examining USB Copy Protection" in Paged Out!, Issue 5 (November 2024), I showed that the DLL injected into its PDF reader process could read a protected file that another process could not read.  That broke its copy protection."  In other words, not true encrypted protection there, either. 
+
+But anyway, we're going to hear him talk about his use of "time travel debugging."  And that's not a common term.  He invented it.  It's part of the reverse engineering toolkit he uses, although it is available under some terms and conditions on GitHub for free, as we'll see.  And I will provide a link later.  He explains it elsewhere.  And he wrote:  "Time travel debugging (TTD) allows you to record an execution trace of a program or system and replay it back and forth.  You know, sort of like scrubbing back and forth through the execution trace.  It can speed up the process of reverse engineering and vulnerability research, and deal with certain tasks that are not easy to handle in regular forward-only debugging." 
+
+He said:  "Several tools implement TTD.  On Windows, Binary Ninja debugger integrates with the WinDbg/DbgEng TTD so that you can replay and analyze a trace recorded by WinDbg.  The combination of TTD and your familiar reverse engineering tool would hopefully supercharge the ability to time travel and make your workflow even more effective."
+
+Anyway, so I've included a link to his page where he goes into detail and explains how to set it up at this point in the show notes.  So he now explains:  "I used time-travel debugging with the help of AI to analyze it.  The TTD trace revealed that the software hooks" - and now he's talking about that SecZure add-on encryption product - "the software hooks in NtCreateFile and NtReadFile inside the PDF reader, supplying decrypted data.  My injected DLL ran inside the same process, so it could transparently read the decrypted bytes, even though I did not know the exact mechanism back then. 
+
+"This time," because now he has AI, "I decided to examine the security of its cryptosystem.  Simply put, the Administrator password is hashed, and the hash is used to unwrap a value that the code calls an 'identifier.'  The identifier is then used to derive the AES key that encrypts the file bytes."
+
+Okay.  So his posting then provides simplified pseudocode to show the process.  Then he says:  "There are a few obvious weaknesses.  First, it uses fast MD5/HMAC-MD5, not PBKDF2," which of course we know is there to slow things down.  So this is fast.  Meaning it could be brute-forced.  "Second, taking 16 hex characters for each AES key limits it to at most 64 bits of entropy.  But brute-forcing even 2^64 possibilities is still impractical."  Meaning, okay, you know, it's 2^32 squared.  So, yeah.  He said:  "So far, the encryption appeared to be secure. 
+
+"Upon closer examination of the trace," he said, "I noticed a backend login as Buffer using the password 123456 before I typed in" - I know, really - "before I typed in the Administrator password.  This account" - meaning the Buffer account with password 123456 - "is hidden from the user-management screen.  Its record holds some bookkeeping fields, but I did not dig into the account's exact purpose. 
+
+"More importantly, its record contains another wrapped copy of the same content identifier, and its default password, as seen in the code, is 123456.  I confirmed that I could unwrap Buffer's identifier with 123456 and use the derived AES key to decrypt the files.  Further code analysis revealed another built-in account, System, with the fixed password SECZURE.COM.  On two tested drives, both accounts opened each drive's identifier."
+
+Okay.  Just to interrupt here, in other words, as in the instances of so many of the horrible security messes we've encountered in the past  routers with undocumented embedded administrative credentials, or even Cisco's reported surprise "discovery" of privileged credentials residing in their devices' firmware  the USB encrypted drives this researcher reverse engineered and examined, and also the so-called encryption software that often accompanies generic USB drives as an add-on, or available separately, had what could only be described as blatant backdoors  a fully-functional, fixed and unprotected bypass around whatever password protection its user might choose.  And using "123456" as the password, I mean, come on.  It's not even creative.  You could do 654321.  No.  123456.
+
+He then writes essentially what I just said.  He said:  "I call this a backdoor from a technical perspective:  the fixed passwords decrypt files without the user's password.  That does not imply malicious intent.  However, it points to a problem with opaque crypto products."  And this is the key, a problem with opaque crypto products.  "A backdoor can be hard to detect, even when the main cryptosystem seems secure." 
+
+Okay.  And I'm going to share one more of the many systems he takes apart in this posting.  He wrote:  "I started with NetacFileLock, which I had previously analyzed using time-travel debugging to trace ciphertext back to its AES key.  I gave AI only one prompt."  So here again, this is our key message here.  He wrote:  "I gave AI only one prompt:  'This is a file encryption utility.  Analyze its crypto system and see if it is secure.  You can use Binary Ninja MCP to help you.'" 
+
+He wrote:  "Within seven minutes, Codex reached the main flaw:  the program initialized AES-256 with a fixed 32-byte key embedded in the executable.  The user password was checked separately and did not determine the encryption key.  Exactly as I said could be done in like a lame crypto product.  So fixed 32-byte master key.  The password is just checked to determine if it matches and is not needed to determine the encryption key."  He says:  "This means anyone can decrypt the files without knowing the user's password." 
+
+Okay.  So it's just, you know, the ONLY possible way, as I have mentioned before, to create a system that is truly secure is for the decryption key to be derived from and determined by the information provided by the user, not fingerprint information because it's not exact.  A pin, a passcode, a passkey, however much security you want.  Maybe you could also do, you know, maybe use the fingerprint in conjunction so that the system won't even accept brute force guesses unless the fingerprint module says, yeah, we think that's Joe coming back.  But you have to have both.
+
+So I want to make two points.  The second point I'm going to withhold until I finish him sharing his write-up.  He said:  "During those seven minutes, the agent made the following findings, some of which were not discussed in my talk.  He said:  'NetacFileLock wrote the user's password into diagnostic logs.'  So, bad.  It was recording the user's password in its diagnostic logs.  It encrypted independent 16-byte blocks without an initialization vector or chaining, giving it ECB-style behavior."  In other words, we know what that means.  You need to use a good crypto algorithm.  Just saying that you have AES-256 doesn't do it.
+
+So he's saying that AES-256 was used, but each 256 encrypted block was standalone and did not depend upon a chosen at random initialization vector or even the result of the previous encryptions.  Not cool.  Not chained.  He said it used MD5 for password verification.  Well, so that's going to be fast and make brute forcing much easier, even if you had to brute force it, which you don't because the secret key is written there.  It used an unkeyed MD5 digest as a file "signature."  And he has it in quotes.  Its SM4 option used another fixed key.
+
+He finishes, saying:  "One open question in my research was why only one-third of my test file was encrypted."  What?  He says:  "That's now solved, too.  The behavior is not limited to PDF files; it applies to any file over 1,024 bytes when fast mode is enabled."  In other words, if you enable fast mode, then it gets it, it makes it fast by only encrypting a third of the file.
+
+MIKAH:  This is a joke of a product.
+
+STEVE:  Yeah.
+
+MIKAH:  This is insanity.
+
+STEVE:  Yeah.  He says:  "Fast mode covers the following file formats:  PNG, JPEG, GIF, TIFF, DWG, PSD, PST, DBX, Office, MDB, WPD, PDF, ZIP, RAR, WAV, AVI, RAM, RM, MPEG, MOV, ASF, and MIDI." 
+
+He said:  "I did not bother asking AI why anyone would choose to do this.  I had mixed feelings after this.  On the one hand, I was surprised and even a bit worried that AI could do it so quickly.  On the other hand, this is an excellent time to become much more productive with AI's help." 
+
+So the second point I wanted to make is that all of this presents a new and potentially serious source of software vulnerability that AI has just opened up.  As this researcher has discovered and documented, insecure crypto systems are apparently everywhere.  Every common consumer system he examined turned out to be a joke.  None  not one  was designed properly.  They appeared to be designed and implemented by coders with very little background in cryptography.  And those who were just willing to cheat.  I mean, having a fast mode that only encrypts a third of your files?  What?  I mean, how could you even have a fast mode?  What would that mean to have a fast mode?  
+
+He wraps up his posting with the following conclusion, saying:  "I did not follow the conventional coordinated disclosure process for these bugs."  Yeah, why bother?  "If an adversary already has a device, it cannot be recalled or updated easily.  I am publishing these findings directly so potential users know about these limitations and understand that their passwords may not protect their files. 
+
+"AI is improving rapidly, and in my experience, it has already accelerated reverse engineering and vulnerability research significantly.  These examples show that, with minimal prompting" - you don't even need to be an expert; right?  You just said "Analyze the crypto system.  Let me know if there's any problems.  AI can independently produce valuable research results in remarkably short time.  I'm especially impressed by how quickly it locates the relevant code - a task that often consumes a substantial part of a human reverse engineer's time.  If you have not tried this workflow, you should.  One easy way to get started is to download Binary Ninja Free and set up its MCP server, or ask your AI agent to do it for you."
+
+So the world is full of people who imagine - and it's illusory - that their files are securely encrypted because it said so on the box, and the box, after all, was attractively designed.  Now along comes AI where the design of those cryptosystems allows their never-secure protection in the first place to be easily and catastrophically bypassed by any non-expert who has access to AI.  So I've included links to Binary Ninja's full posting, which in contains links to the free tools down at the bottom of it, to the tools he used.
+
+This is an interesting and worrisome variation on the "AI creates new troubles for vulnerable software" problem.  You know, here it's "AI exposes improperly designed consumer crypto products," and it appears that just as with software vulnerabilities, there is a legacy of sham crypto that might come back to bite those who have bought into it.  Wow.
+
+MIKAH:  I'm looking around.  I know I have one drive, one specific drive that offered encryption, I think.  I don't know about you now.  I'm glad somebody's looking into it, though.  And again, this next layer of depth.  And it goes back to the earlier question I had about at this point it almost feels irresponsible to not point to few AI systems that whatever it is you're making and say, tell me what you find.
+
+STEVE:  Yeah.  Yeah.  Although the people who know, who know that fast mode, they achieved it, it's 3X speedup, by only encrypting every third block, I mean, they're not going to be surprised when the AI goes, what the hell are you doing here?
+
+MIKAH:  That's very true.
+
+STEVE:  This is not secure.  Wow.
+
+MIKAH:  Ugh.  Lord have mercy.
+
+STEVE:  Anyway, I mean, it really is, it is significant that we have consumer expectations, software products that have been sold to us.  I mean, you know, Windows has been sold to us.  And it's 1,400 problems plus last month.  But, you know, they weren't like this.  This is horrible.  This is blatant.  
+
+MIKAH:  Yeah.
+
+STEVE:  And you can imagine that someone calls up and says, oh, my god, I forgot my password.  You have to let - all my data, blah blah blah.  Well, someone, you know, the tech person is going to say, well, don't tell anybody, but the, you know, log in as this, and here's the password.
+
+MIKAH:  Yeah.
+
+STEVE:  The company wants a backdoor to recover their customers' lost files.  But that's not secure.
+
+MIKAH:  Yeah.  Don't use any of those.  Anything that has that backdoor in it.  I mean, as much as it's even told to us, frankly.
+
+STEVE:  I think the only solution, if you want to use this kind of third-party encryption, is find an open source add-on product.  That's - it's got to be open source at this point.  Well, I mean, you don't have to pay anything.  And don't download the manufacturer's free encryption utility because they license it from some idiots who say, hey, we have a fast mode.
+
+MIKAH:  Yeah, we've got fast mode.  There's a link here.  Our customer's happy.  It'll be great.  No.
+
+Copyright (c) 2026 by Steve Gibson and Leo Laporte.  SOME RIGHTS RESERVED.  This work is licensed for the good of the Internet Community under the Creative Commons License v2.5.  See the following Web page for details:  https://creativecommons.org/licenses/by-nc-sa/2.5/.
+
