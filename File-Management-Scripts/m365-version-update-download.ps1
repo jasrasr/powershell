@@ -1,11 +1,12 @@
-# Revision : 1.5.2
+# Revision : 1.6.0
 # Description : Check Microsoft 365 Apps "Current Channel" build on MS Learn.
 #               On change: create ODT folder named <version>_<build>, copy setup/config,
 #               run ODT download and retain builds locally under $onedrivepath\odt.
 #               -Force: Download even if the build is unchanged. Cleanup removes older local builds.
 # Author : Jason Lamb (with help from ChatGPT and Claude)
 # Created : 2025-04-15
-# Modified : 2026-10-12
+# Modified : 2026-11-17
+#               Live progress bar during ODT download, scaled to the average size of recent builds.
 
 [CmdletBinding()]
 param(
@@ -36,6 +37,27 @@ function Write-Log {
     $line | Tee-Object -FilePath $LogFile -Append | ForEach-Object {
         if (-not $Quiet) { Write-Host $_ }
     }
+}
+
+function Get-FolderBytes {
+    param([string]$Path)
+    $sum = (Get-ChildItem -LiteralPath $Path -Recurse -File -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum
+    if ($sum) { [long]$sum } else { 0L }
+}
+
+function Get-OdtBaselineBytes {
+    # Average size of the last few completed build folders; ignores the current build
+    # and any folder under 50% of the median (failed or partial downloads).
+    param([string]$Root, [string]$CurrentFolder, [int]$Count = 6)
+    $sizes = @(Get-ChildItem -LiteralPath $Root -Directory -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -match '^\d+_\d+(?:\.\d+)+$' -and $_.Name -ne $CurrentFolder } |
+        Sort-Object LastWriteTime -Descending | Select-Object -First $Count |
+        ForEach-Object { Get-FolderBytes $_.FullName } | Where-Object { $_ -gt 0 })
+    if ($sizes.Count -eq 0) { return $null }
+    $sorted = $sizes | Sort-Object
+    $median = $sorted[[int][math]::Floor($sorted.Count / 2)]
+    $good = @($sizes | Where-Object { $_ -ge 0.5 * $median })
+    [long](($good | Measure-Object -Average).Average)
 }
 
 function Invoke-Cleanup {
@@ -125,14 +147,41 @@ try {
         $setupExe  = Join-Path $targetFolder 'setup.exe'
         $configXml = 'configuration.xml'
         Write-Log "Running ODT download $setupExe /download $configXml"
-        Push-Location $targetFolder -ErrorAction Stop
-        try {
-            & $setupExe /download $configXml
-            $exit = $LASTEXITCODE
+        # Baseline for the progress bar: average size of recent completed downloads
+        $baselineBytes = Get-OdtBaselineBytes -Root $OdtRoot -CurrentFolder $versionBuild
+        if ($baselineBytes) {
+            Write-Log ("Progress baseline: {0:N2} GB (average of recent completed builds)" -f ($baselineBytes / 1GB))
+        } else {
+            Write-Log "No prior builds to use as a progress baseline; showing size only"
         }
-        finally {
-            Pop-Location
+
+        $proc = Start-Process -FilePath $setupExe -ArgumentList '/download', $configXml `
+            -WorkingDirectory $targetFolder -NoNewWindow -PassThru -ErrorAction Stop
+        $null = $proc.Handle   # cache handle so ExitCode is readable after exit
+
+        $startBytes = Get-FolderBytes $targetFolder
+        $startTime  = Get-Date
+        $lastLogPct = -1
+        while (-not $proc.HasExited) {
+            $bytes   = Get-FolderBytes $targetFolder
+            $elapsed = ((Get-Date) - $startTime).TotalSeconds
+            $mbps    = if ($elapsed -gt 0) { [math]::Max(0, ($bytes - $startBytes)) / 1MB / $elapsed } else { 0 }
+            $status  = "{0:N2} GB downloaded, {1:N1} MB/s" -f ($bytes / 1GB), $mbps
+            if ($baselineBytes) {
+                # Cap at 99 until setup.exe exits; the baseline is only an estimate
+                $pct = [math]::Min(99, [int][math]::Floor(100 * $bytes / $baselineBytes))
+                $status += " (of ~{0:N2} GB estimated)" -f ($baselineBytes / 1GB)
+                if (-not $Quiet) { Write-Progress -Activity "ODT download $build" -Status $status -PercentComplete $pct }
+                if ($pct -ge $lastLogPct + 10) { Write-Log "Progress ~$pct% - $status"; $lastLogPct = $pct - ($pct % 10) }
+            } else {
+                if (-not $Quiet) { Write-Progress -Activity "ODT download $build" -Status $status }
+            }
+            Start-Sleep -Seconds 2
         }
+        $proc.WaitForExit()
+        $exit = $proc.ExitCode
+        if (-not $Quiet) { Write-Progress -Activity "ODT download $build" -Completed }
+        Write-Log ("ODT finished: {0:N2} GB on disk in {1:N0} s" -f ((Get-FolderBytes $targetFolder) / 1GB), ((Get-Date) - $startTime).TotalSeconds)
 
         if ($exit -ne 0) {
             throw "ODT download failed with exit code $exit"
