@@ -1,4 +1,4 @@
-# Revision : 1.6.0
+# Revision : 1.6.1
 # Description : Check Microsoft 365 Apps "Current Channel" build on MS Learn.
 #               On change: create ODT folder named <version>_<build>, copy setup/config,
 #               run ODT download and retain builds locally under $onedrivepath\odt.
