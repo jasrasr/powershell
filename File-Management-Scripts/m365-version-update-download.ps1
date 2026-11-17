@@ -162,10 +162,11 @@ try {
         $startBytes = Get-FolderBytes $targetFolder
         $startTime  = Get-Date
         $lastLogPct = -1
+        try {
         while (-not $proc.HasExited) {
             $bytes   = Get-FolderBytes $targetFolder
             $elapsed = ((Get-Date) - $startTime).TotalSeconds
-            $mbps    = if ($elapsed -gt 0) { [math]::Max(0, ($bytes - $startBytes)) / 1MB / $elapsed } else { 0 }
+            $mbps    = if ($elapsed -gt 0) { [math]::Max(0L, [long]($bytes - $startBytes)) / 1MB / $elapsed } else { 0 }
             $status  = "{0:N2} GB downloaded, {1:N1} MB/s" -f ($bytes / 1GB), $mbps
             if ($baselineBytes) {
                 # Cap at 99 until setup.exe exits; the baseline is only an estimate
@@ -177,6 +178,11 @@ try {
                 if (-not $Quiet) { Write-Progress -Activity "ODT download $build" -Status $status }
             }
             Start-Sleep -Seconds 2
+        }
+        }
+        finally {
+            # If the monitor loop threw or was interrupted, don't leave setup.exe running orphaned
+            if (-not $proc.HasExited) { Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue }
         }
         $proc.WaitForExit()
         $exit = $proc.ExitCode
