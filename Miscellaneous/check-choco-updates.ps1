@@ -1,6 +1,6 @@
 # check-choco-updates.ps1
 # Monitors Chocolatey package updates and shows Windows notification
-# Revision 1.0 | Author: Jason Lamb with help from Claude
+# Revision 1.0.1 (removed -ActivatedAction, toast failure no longer throws) | Author: Jason Lamb with help from Claude
 
 param(
     [string]$LogPath = "$psexports\choco-updates.log"
@@ -25,9 +25,15 @@ if ($outdated) {
     $message = ($packages | ForEach-Object { "$($_.Package): $($_.CurrentVersion) → $($_.AvailableVersion)" }) -join "`n"
     
     # Show Windows notification popup
-    $action = { Start-Process pwsh -ArgumentList "-NoExit -Command `"choco upgrade all`"" }
-    New-BurntToastNotification -Text $title, $message -SnoozeAndDismiss -ExpirationTime (Get-Date).AddHours(1) -ActivatedAction $action
-    
+    # -ActivatedAction removed: BurntToast 1.1.0 throws "Failed to register notification activator" with it.
+    # A notification failure must never break the caller (profile scheduler), so fall back to console output.
+    try {
+        New-BurntToastNotification -Text $title, "$message`nRun: choco upgrade all" -SnoozeAndDismiss -ExpirationTime (Get-Date).AddHours(1) -ErrorAction Stop
+    } catch {
+        Write-Warning "Toast notification failed: $($_.Exception.Message)"
+        Write-Host "$title`n$message`nRun: choco upgrade all" -ForegroundColor Yellow
+    }
+
 } else {
     Add-Content -Path $LogPath -Value "$timestamp - No outdated packages`n"
 }

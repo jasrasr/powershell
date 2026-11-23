@@ -1,9 +1,9 @@
 # Filename: profile-scheduler.ps1
-# Revision : 2.2.2
+# Revision : 2.3.0
 # Description : Runs scripts on per-script intervals based on each script's own last run time
 # Author : Jason Lamb (with help from Claude Code)
 # Created Date : 2026-04-01
-# Modified Date : 2026-10-22
+# Modified Date : 2026-11-23
 # Changelog :
 # 1.0.0 initial release
 # 1.1.0 added per-script last run tracking to state JSON
@@ -13,6 +13,7 @@
 # 2.2.0 added daily sort-scans-by-date for PackingSlips-Panels and PackingSlips-Production
 # 2.2.1 sort-scans-by-date now called once via Scans\IT\sort-scans-all-folders.ps1 (runs the Panels and Production scripts)
 # 2.2.2 shared-folder-growth: a scan window older than 4 hours no longer blocks the daily run (warns instead)
+# 2.3.0 move-s-it-public-to-g-it uses new 'Monday' interval: due every Monday after 12:00 AM if not yet run that day (was 168-hour rolling window)
 
 $schedulerStatePath = "$psexports\profile-scheduler-state.json"
 
@@ -66,6 +67,8 @@ function Should-RunScript {
     switch ($Interval) {
         'Daily'   { return $lastRun.Date -lt $now.Date }
         'Weekly'  { return ($now - $lastRun).TotalHours -ge 168 }
+        # Calendar-based: due on any Monday once the last run is before today's 12:00 AM
+        'Monday'  { return ($now.DayOfWeek -eq [DayOfWeek]::Monday) -and ($lastRun -lt $now.Date) }
         'Monthly' { return ($now - $lastRun).TotalDays -ge 30 }
     }
 }
@@ -76,6 +79,12 @@ function Get-TimeRemaining {
     $nextRun = switch ($Interval) {
         'Daily'   { $lastRun.Date.AddDays(1) }
         'Weekly'  { $lastRun.AddHours(168) }
+        'Monday'  {
+            # Next Monday 12:00 AM after today (only shown when not currently due)
+            $daysAhead = (8 - [int]$now.DayOfWeek) % 7
+            if ($daysAhead -eq 0) { $daysAhead = 7 }
+            $now.Date.AddDays($daysAhead)
+        }
         'Monthly' { $lastRun.AddDays(30) }
     }
     $remaining = $nextRun - $now
@@ -187,14 +196,13 @@ if (Should-RunScript 'm365-version-update-download' 'Weekly') {
     Write-Host "  [SKIP] m365-version-update-download (Weekly) — $(Get-TimeRemaining 'm365-version-update-download' 'Weekly')" -ForegroundColor DarkGray
 }
 
-if ((Should-RunScript 'move-s-it-public-to-g-it' 'Weekly') -and $now.DayOfWeek -eq 'Monday') {
+if (Should-RunScript 'move-s-it-public-to-g-it' 'Monday') {
     Write-Host "  [RAN]  move-s-it-public-to-g-it (Weekly, Monday)" -ForegroundColor Green
     . 'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell\File-Management-Scripts\move-s-it-public-to-g-it.ps1'
-    $scriptState['move-s-it-public-to-g-it'] = [PSCustomObject]@{ LastRun = Format-SchedulerTimestamp $now; Interval = 'Weekly' }
+    $scriptState['move-s-it-public-to-g-it'] = [PSCustomObject]@{ LastRun = Format-SchedulerTimestamp $now; Interval = 'Monday' }
     $stateChanged = $true
 } else {
-    $dayCheck = if ($now.DayOfWeek -ne 'Monday') { "(runs Monday only)" } else { "" }
-    Write-Host "  [SKIP] move-s-it-public-to-g-it (Weekly) — $(Get-TimeRemaining 'move-s-it-public-to-g-it' 'Weekly') $dayCheck" -ForegroundColor DarkGray
+    Write-Host "  [SKIP] move-s-it-public-to-g-it (Monday) — next Monday: $(Get-TimeRemaining 'move-s-it-public-to-g-it' 'Monday')" -ForegroundColor DarkGray
 }
 
 ####################

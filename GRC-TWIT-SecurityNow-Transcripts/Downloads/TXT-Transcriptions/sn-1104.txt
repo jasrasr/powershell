@@ -1,0 +1,720 @@
+GIBSON RESEARCH CORPORATION		https://www.GRC.com/
+
+SERIES:		Security Now!
+EPISODE:	#1104
+DATE:		November 10, 2026
+TITLE:		The Hole in OpenSSH
+HOSTS:	Steve Gibson & Leo Laporte
+SOURCE:	https://media.grc.com/sn/sn-1104.mp3
+ARCHIVE:	https://www.grc.com/securitynow.htm
+
+DESCRIPTION:  A surprising announcement regarding SpinRite.  What is being "AI-pilled" and how does it happen.  OpenAI just released GPT-6 Cyber.  What does that mean?  An irresponsible hacker published 30+ N-Able zero-days.  700 French refrigerators hacked.  What's next?  Lots of listener feedback about the Cloudflare tunneling solution, Voyager 1, true hardware drive encryption, the random number 4, and the amount of debris in orbit.  Then we look at a 10-year-old serious SSH authentication bug (that's kind of wonderful).
+
+SHOW TEASE:  It's time for Security Now!.  Yes, I'm back.  Steve Gibson is here, and there is a lot to talk about.  An interesting discovery Steve made that might help 6.2 version of SpinRite come a little bit faster.  What is "AI-pilled"?  And is Steve AI-pilled?  Plus 700 French refrigerators hacked.  Is that a terrorist attack?  Yes, as it turns out.  That and a whole lot more, this week on Security Now!.
+
+LEO LAPORTE:  This is Security Now! with Steve Gibson, Episode 1104, recorded Tuesday, November 10th, 2026:  "The Hole in OpenSSH."
+
+It's time for Security Now!.  Hello, everybody.  Yes, it's Tuesday once again.  And yes, I am back from traipsing all around the world.  And thanks to Mikah Sargent for filling in for me in the last three weeks, and Steve Gibson for putting up with me being gone.
+
+STEVE GIBSON:  You're back, but your voice is still somewhere over the Pacific.
+
+LEO:  I've got a bad cold, as one does.  Last two cruises I got COVID.  This time I just got a cold.  So I figure I'm ahead now.
+
+STEVE:  I would think you are, yes.
+
+LEO:  Anyway, I missed you.  And as I'm reading all the tech news on the boat, I'm thinking, man, there was a lot to talk about.
+
+STEVE:  Oh, boy.  We were not short of news.  And we've got a lot of stuff to talk about today.  There is a delicious bug which has been found.  And everyone will see what I mean by "delicious."  First of all, I was just going to talk about this in the regular "what's new in the past week."  But when I got into the details of how this happened, it's like, oh, this has to be the topic for today because it is so wonderful.  You know, bad.  Really bad. 
+
+LEO:  Bad.  Bad bug.
+
+STEVE:  But oh, so good.
+
+LEO:  But tasty.  Okay.
+
+STEVE:  Anyway, I'm going to open with the fact that I have a surprising announcement regarding SpinRite.
+
+LEO:  What?
+
+STEVE:  It was difficult for me.  All of our 21,000-plus listeners who subscribe to the show notes know that they didn't get their show when they normally do, like sometimes days ahead.  I finally got it sent at midnight last night.
+
+LEO:  Oh, wow.
+
+STEVE:  Because I've been so distracted by something that happened which I just have to share with everybody because it's amazing.  Also we're going to talk about what it means.  I'm going to start off-topic, and so I'm going to stay with that a little bit longer and talk about what it means to be AI-pilled.
+
+LEO:  Oh, that's me, I'm AI-pilled for sure.
+
+STEVE:  Yeah, yeah, I know.  Because I've been reading Kevin Roose's book, and it's so fun to get a look behind the scenes.  So as of midnight last night, I knew about OpenAI's release of GPT-6 Cyber.  But of course Anthropic was, like, right there with, you know, bumping Fable and Mythos from 5.1 to 5.2.  So we're going to talk about what that means, that is, specifically what OpenAI has done with GPT-6 up from 5.6 I think is where they were before they switched.
+
+We've got an interesting story of an irresponsible hacker who published more than 30 zero-days affecting one company called N-able.  And they're off the 'Net because of the trouble that this guy, this I have to say "jerk" caused, not only not giving them any notice because he felt like they snubbed him in the past, but then refusing to take down all of the exploits that he published on GitHub after they said, okay, we're sorry, we hear you, could you please take those down.  Anyway, more details there.
+
+Of course we've got the 700 French refrigerator hack story, and what's next?  Lots of listener feedback about the Cloudflare Tunneling solution that I shared thanks to a listener of ours last week.  Where Voyager 1 is, and what milestone it's approaching.  A little bit more on true hardware drive encryption following what we learned last week.  And also of course the random number 4.  And an actual enumeration of the amount of debris in orbit, following a comment that I made about how much space junk there is and the nature of it.  And then, as I said, we're going to take a look at a 10-year-old serious SSH authentication bug, which is also kind of wonderful.
+
+LEO:  It's kind of one of the amazing things about this era of AI discoveries is that many of these are very old.  They've been around forever, 10 years undiscovered presumably, yeah.
+
+STEVE:  Yes.
+
+LEO:  That's kind of amazing.
+
+STEVE:  And, you know, what we expected to have happening is happening.  We are now in good guys and bad guys, you know, leveraging the power of AI on both sides, you know, to hurt people and to help people.  So, but, you know, I'm still here.  Leo, you're mostly here.
+
+LEO:  Mostly.
+
+STEVE:  And, you know, the world hasn't ended.  And I think this is kind of the way it's going to be.
+
+LEO:  Yeah.
+
+STEVE:  And again, in the same way that the early, well-publicized instances of ransomware did cause other companies to say, "Ooh.  We have backups; right?  Do we have backups?"  So the same sort of thing, this widely covered French refrigerator meltdown, literally, that's going to, you know, cause people who have stuck their refrigerators on their own, like, you know, consumer crap on the Internet, just because it's there and because they can, to sort of think, oh, maybe we need to check our own security.  So I think we're going to get through this.  And I think we're going to end up with a lot more security in the future, although what I learned from GPT-6 Cyber - well, okay.  I have to stop.
+
+LEO:  Save it.
+
+STEVE:  I'm going to save it.
+
+LEO:  Save it.  We will get to that in a moment.  How about that.  What he's learned from GPT-6 Cyber.  Picture of the Week time.
+
+STEVE:  Yes, Leo.  I'm just going to let you stew on this one.
+
+LEO:  Okay.
+
+STEVE:  Because it's just a wonderful example of I'm not sure what.  As I often do, I love giving one of these pictures the simple caption, "But Officer."
+
+LEO:  But Officer.  No Parking All Year, 3AM to 5AM.  No Parking Nov. 1 to Apr. 1, 2AM to 6AM.  Two Hour Parking All Year, 7AM to 5PM.  Good luck.
+
+STEVE:  So, okay, you've got to know what day it is.  And, okay, so no parking all year from 3AM to 5AM.
+
+LEO:  Except during Daylight Savings Time.
+
+STEVE:  Yeah.  Kind of, but it didn't shift them both, it expanded them.
+
+LEO:  Oh.
+
+STEVE:  It starts you can't park an hour earlier and an hour later for some reason.  Which suggests that the day is longer?  Or is the day shorter?  I mean, it's...
+
+LEO:  Makes no sense.
+
+STEVE:  Depends upon whether you're in the northern...  
+
+LEO:  Maybe there's a parade there every...
+
+STEVE:  ...or southern.  And then two-hour parking all year between 7AM and 5PM.  But what about after 5PM and before either 2 or 3AM?
+
+LEO:  3AM.  Yeah.
+
+STEVE:  Or between that one or two hours after 5AM or 6AM until 7AM?  And can you not park at all?  Or can you never park more than two hours all year?  Anyway...
+
+LEO:  There wasn't enough room on the sign for the complicated rules.
+
+STEVE:  No.  And notice that the font had to change.  They had to use, like, lighter point and a small font.  We've got bold here.  But no, no, we had to go to thin, narrow down here.  Oh, what a mess.  
+
+LEO:  This smells like homeowner association rules is what this smells like.  This is an HOA for sure.  And there's some guy sitting looking out the window, waiting for you to break this rule.  Wow.  Wow.
+
+STEVE:  Okay.  So I will get everyone's attention.
+
+LEO:  Yes.  As you do.
+
+STEVE:  Those actually who have an appreciation for SpinRite, when I say the phrase "SpinRite for UEFI."
+
+LEO:  Oh.  We've been waiting for this.
+
+STEVE:  Oh, my god, Leo, I get so many people who are saying, well, I love it, and I used to love it, and I've loved it for 30 years, but I can't use it now on all my new stuff because it's all UEFI.  So I normally withhold any conversation about SpinRite until we've caught up with the news and listener feedback.  But in this case, so many of our listeners have such a strong interest in SpinRite that, you know, I said I would have some news at the top of the show, in the rundown, so here it is.
+
+Last Thursday, just four days ago, five days ago, everything about my near-term software development plans changed when one of SpinRite's very involved and prolific development testers, who uses the handle "millQ," he sent me email saying that he had SpinRite running on a UEFI-only machine without any BIOS or the so-called CSM, the compatibility support module.  It was the ongoing and long-lived presence of an original BIOS or the CSM that has allowed DOS to boot and then to run SpinRite.  And I might have been skeptical if this came from anybody but millQ.  But, I mean, he was really instrumental with wacky systems that he had and helping us, like, get all the little edge cases resolved.
+
+But, you know, as time marched forward, legacy support for the BIOS and even the CSM slowly drained out of the population of newer machines.  So here we are today with more and more of SpinRite's longtime users reporting that their machines which they would like to run SpinRite on won't boot DOS.  They say SpinRite still works great on their older machines, but not on what they would like to run it on that is newer.
+
+Well, it turned out that SpinRite was not alone in its need to run on older machines.  That total withdrawal and disappearance of the BIOS and then later the CSM compatibility wrapper thing, that was affecting other old-school software as well.  For example, turns out people still want, I don't know why, but Windows 98.  And I think maybe XT won't boot on these newer machines.  And maybe just as a curiosity; but still, that seems to be something people wanted.  So about a year and a half ago, back in May of 2025, a project was started on GitHub called "CSMWrap."  And the idea of it was to create a UEFI bootable module that would use hypervisor-style technology to emulate the older BIOS-era hardware and software that the pure, most modern UEFI firmware and their chipsets had eliminated over time.
+
+So that was a year and a half ago.  Since it first appeared, I've occasionally received queries from hopeful SpinRite users who encountered that project.  And then it's like, hey, maybe this will work for SpinRite.  So they would write to ask whether this CSMWrap thing would make SpinRite possible on newer systems.  As a consequence, I've looked at it several times over the past year and a half.  And I had even had, as it happened, a conversation with Claude about that possibility a few weeks ago.
+
+And the most recent impetus for me was that my own main Intel NUC system seemed to be acting a bit oddly, and I wanted to run SpinRite on it.  Which is, you know, what you do.  But the problem was always the same:  The CSMWrap project, because they were, like, trying - they wanted to boot old versions of Windows and maybe some gaming, or to do like text, like DOS with a text screen.  It only supported BIOS writing to VGA's text mode.  In order to obtain the its full-screen UI performance that SpinRite has, SpinRite writes directly to the original CGA (color graphics adapter) framebuffer memory, which then became the EGA and then the VGA, which were all backward compatible.
+
+Back in the late 1980s, when all this was happening first, PCs were so slow that bypassing the BIOS was a common hack.  And in fact my first commercial app for the IBM PC XT - well, IBM PC in general - was something called FlickerFree, which did replace the BIOS with my own code and dramatically accelerated color graphics adapter scrolling.  And FlickerFree was then followed by of course SpinRite, my second product for the PC.
+
+But this SpinRite enthusiast, "millQ," asked his instance of Claude what would be required to add "virtualization" of VGA text mode to the CSMWrap project.  That is, like, VGA text mode but with an actual frame buffer so that SpinRite had something that it could write to directly.  So I didn't know this was happening.  I don't even know how long it took him.  But he and Claude went to work, and they did it.  Last Thursday he sent what he had so far, and for the first time ever I ran SpinRite on my UEFI-only, no BIOS, no CSM, wouldn't run it before, Intel NUC.  I then spent last Friday adding a whole handful of additional features that, you know, made it work the way I would want it to.  I of course made it smaller because I could, and a bunch of other stuff.
+
+Okay.  But before I get everyone too excited, I need to temper this with a little bit of a dose of reality.  The only correct way for SpinRite to work with drives is to talk directly to the drive's hardware.  That's what SpinRite has always done for - actually the original floppy disk controller, and also for IDE, and finally SATA drives that are connected to ATA and AHCI controllers.  It's that direct bare metal, zero-tolerance error detection, correction, and data recovery capabilities that SpinRite depends upon.  Any sort of firmware  the BIOS or UEFI  is only about getting, these days, only about getting an operating system to boot so that the OS can then take over.
+
+To that end, firmware deliberately hides any trouble it might encounter behind lots of retrying to improve the chances of handing off responsibility to someone else.  It just wants to get the OS going.  That's pretty much what it does today.  And if an error persists, that like would cause a data transfer to fail, the firmware just returns an unhelpful "something broke" error message.  SpinRite needs much more.
+
+So the bottom line is that the SpinRite we've always known, the good news is it's no longer end-of-life.  So what it now needs is its own native USB and NVMe drivers in order to get that same bare metal action with the rest of drive technology.
+
+The reason they were not incorporated and tested during the SpinRite 6.1 work was that, first of all, it had already taken me three years to get as far as we had, and there was a lot of clamoring for SpinRite 6.1's release.  Also, as we all know, my original commitment to all SpinRite 6 users was that I would bring the SpinRite 6 they had originally purchased, as much as like 10 years ago, back to life, and I would do it for free.  Also there was a growing sense that the UEFI cliff was rapidly approaching, so that SpinRite would soon need to be rewritten to run under Windows because UEFI looked like a dead end.
+
+So for all of those reasons, it made no sense for me to invest further time creating native USB and NVMe drivers when they were, first of all, never part of SpinRite 6, so not something that anybody ever purchased, when doing so would have further delayed the release of 6.1, and mostly when all of that additional work would be discarded with the move to Windows.  But now, with SpinRite running under UEFI and for the foreseeable future, I mean, by having this all be soft now, a software solution on the hardware platform, it never needs to die.  So all of those carefully weighted tradeoffs have changed. 
+
+And as I said, I had a bit of a difficult time producing today's podcast because I've become so preoccupied, I mean, this just like, whoa, everything changes.  So my new plan is to once again bring SpinRite 6 and 6.1 that everyone purchased back to life, able to boot under BIOS, CSM, or UEFI with equal ease.  Won't matter.  So it will be usable again, everywhere and anywhere.  And my plan is that that will be SpinRite 6.2, which all current SpinRite 6 and 6.1 owners will be able to upgrade to for free. 
+
+Then I'm going to change direction here because I've been talking about SpinRite 7 being for Windows.  Not the case anymore.  What I want to do is immediately embark on upgrading the SpinRite 6 family to SpinRite 7.  It will not be hosted under Windows.  It will remain as-is, that is to say, where it is, but I will incorporate the direct low-level native drivers for USB and NVMe drives which it needs to get around the firmware because SpinRite needs physical access to the drive, which will deliver maximum drive throughput performance and, more importantly, remove any firmware-driven loss of drive status and error location awareness.
+
+So that will deliver then a universally bootable SpinRite that's able to run natively across all drive technologies except for floppy disks.  I took that out of the later SpinRites.  But all SpinRite owners still have access to SpinRite 5, and that will continue if they need to do diskette recovery and repair. 
+
+And so then, once we have SpinRite 7, and that's no longer years away, that's months away or less, I don't know, I still want to revisit and improve ValiDrive and create the Beyond Recall utility, which will both be for Windows.  And then address SpinRite 8 for Windows, which will offer all the things that I had planned, you know, data recovery features that make sense today:  operation on multiple drives at once in the background, data recovery with drive cloning, recovery to other drives,  file systems, directory trees, individual files and so forth.  
+
+So anyway, the original SpinRite development testers are aware of these changes.  I told everybody about it Friday night.  They're looking forward to have something new to start pounding on, and I expect to have something for them maybe tonight or tomorrow so they can start, and we'll determine how well this current CSMWrap project handles everyone's hardware.  I've already forked it and have made a bunch of improvements, found bugs in it that I'll be sending back to that project because like there's a 2TB problem that apparently no one ever detected and so forth.  So anyway, I am very excited, and I know that all of our SpinRite users who have been feeling like they're going to have to wait for years for me to get around to SpinRite 7 on Windows, that's no longer the case.  So yay.
+
+LEO:  Does it emulate INT-18?  Or how does it - because that's the key, isn't it, the interrupt?
+
+STEVE:  Well, so Interrupt 10 is the video BIOS interrupt.  And CSMWrap already did that.  That is, so you could say, you know, basically it's a teletype.  It's character character character, character turn linefeed, character character character.  So you sort of see it.  It's basically a console window.  That's what they have.  But I remember looking at VisiCalc back on the IBM PC.  It refreshed the screen instantly.  Well, the way it did it was it just wrote everything it wanted directly to lower memory.  There's a segment of memory, B800.  B800 is the color graphics adapter segment.  B1000 was the MDA, the Monochrome Display Adapter.
+
+And so SpinRite does the same thing.  You know, when it's doing all of its screen graphics, there's just - there's no way to, like, you could technically send bytes through Interrupt 10 to position the cursor to this location, then put that character out.  And if the next character happened to be the one to the right, then you could put another character out like you were typing.  But anything, you know, just whole screen graphics would be so slow that way.  So SpinRite just - it assumes that there is a shared memory buffer.  SpinRite writes to it.  And the screen refreshes from it.
+
+So what millQ did was he and Claude are spinning up another processor, and Claude and he wrote a little hypervisor which maps - they first mapped RAM into that segment, so there's something physically there for SpinRite to write to, which is not there in normal VGA mode, which is high-resolution graphics mode which UEFI supports.  So they map RAM there, and then this little hypervisor watches for SpinRite writing into that region and, in the background takes its own software, soft character set, and maps the character into the graphics display.  So it works.  I mean, I've - like it works perfectly.  So yeah, we basically have a future-proof solution now for anything that happens moving forward.
+
+And even when I had SpinRite for Windows, my concern was, well, you could run - SpinRite for Windows would be able to work on any drive except the boot drive; right?  Because you can't get exclusive access to it because Windows has it.  And so there was always going to be this sort of a problem, do I use, you know, there's like Windows on the Go, there's a pre-execution environment, or I guess it's WinRE that has different constraints.  So the problem was what to do about running SpinRite on a Windows machine's boot drive.  Now that problem is solved.  SpinRite 7 will always be able to run on anything.  It won't have the features that I want that make sense for Windows.  But it will be universal, and it will never need to die.  So anyway, I'm, like, everything changed on Thursday.  It's like, what?  It's running?  And then I ran it.  And it's like, yes, it is.  It actually is.
+
+LEO:  But you don't use INT-13 to access the disks?  You don't need that.  That's the BIOS call that...
+
+STEVE:  Right.  INT-13 is the BIOS call for disk drives.  And right now SpinRite does.  For example, the...
+
+LEO:  I thought that was the issue, that you needed that BIOS interrupt to do it.
+
+STEVE:  Well, it does.  Yes.  For example, when I booted SpinRite on the NUC, it saw the two NVMe drives.  In its enumeration of drives, it said, "This drive may be handled by the BIOS."  It realized it couldn't access it directly.  And sure enough, there were two, later down the enumeration, two lines for the two 256GB NVMe drives that I have in that machine.  And SpinRite ran on them.  And it ran at a respectable speed.  I think it was 512, 513MB per second.  So it was able to do a scan of that NVMe drive.  The problem is it's through the BIOS.  So if there was a problem, the BIOS would do retries...
+
+LEO:  Right.
+
+STEVE:  ...that SpinRite would never see.  And if it was doing a long transfer, and hit an error, it just says something didn't work right.  But you don't know where the error is or what it was.
+
+LEO:  No information, yeah, yeah.  
+
+STEVE:  Right.  So we'll have SpinRite running again, but really it's still the way SpinRite 6.1 has been, which is for ATA and SATA drives.  Those native drivers I wrote.  And so it is perfect for those.  And then what I'm going to do is to catch up for the other, for NVMe and USB, for SpinRite 7, which will look very much the same.  And it's not going to take years.  It should take, I don't know, I just have to get in and then see.  But remember that I purchased that RTOS 32 operating system a few years ago as one of the possible avenues that I might take.  So I do have source for those drivers.  And so, you know, they're written in C, and therefore that protected mode, so I need to make them real mode and do some work.  But I don't think it's going to take a long time.  So I know that SpinRite users will be very happy to...
+
+LEO:  Can you use AI to work with this CSAM thing?
+
+STEVE:  Have been.  Yes.  MillQ has been.  And I was working with Claude.  I mean, it's just - it's like having power steering.  It's freaky, Leo.
+
+LEO:  Oh, I know, tell me about it.
+
+STEVE:  As I was writing what I want to talk about next, this AI-pilled phenomenon, I was thinking of you, knowing that you would know exactly what I will be talking about.
+
+LEO:  I am AI-pilled, that's true.
+
+STEVE:  And I can see how it happens.  Let's take a break, and then we're going to talk about that.
+
+LEO:  Okay.  All right.  You're watching Security Now! with Mr. G, Steve Gibson.  So glad you're here, Steve.  And so glad you're all here.
+
+LEO:  Are you AI-pilled, would you say, yet?  Or not yet?
+
+STEVE:  So that's a good question.
+
+LEO:  Maybe you'd better start with talking about what that is.
+
+STEVE:  Yeah, not as I understand it.  So as I noted last week, and I mentioned this last week, I've been very much enjoying Kevin Roose's New York Times bestselling book "The AGI Chronicles."  It sounds like you are familiar with it, Leo, or...
+
+LEO:  Oh, yeah, absolutely, yeah. 
+
+STEVE:  Okay.  So I'm still only 40% of the way through the book.  But I've noticed that now when I'm reading the news about the various people and personalities who are making AI news, I know so much more about them than, you know, just their name.  I have a real sense for who they are, which is fun because - and that's the reason I picked this book up is I wanted to understand the back story.  To us, who weren't paying attention to what was going on for the last decade, it feels like this suddenly just - AI just sprang.
+
+But there's a lot more that happened historically.  One of the terms that I learned from the book is the phrase "AI-pilled."  It's a derogatory term used within the AI community.  It's sort of meant in the sense of The Matrix's Neo, right, who was offered either the red pill or the blue pill.  So if someone has been AI-pilled, the implication is that they have gone hook, line, and sinker in on believing that AI is soon to be sentient and self-aware.  You know, they took the AI pill.
+
+Now, I bring this up because, as I have continued working with Claude - and I did, I worked all day last Friday - I have become more and more impressed by what we have created.  I'm running Opus 5.5 at high effort.  And I am just utterly astounded by this technology and by what it's able to do.  I've also learned from my reading and from news reports that in-house AI researchers are always experimenting with something next, sometimes way next.  You know, they have significantly more advanced models than have yet been widely released for public use.
+
+So my point here is that the more I push the limits of what Claude 5.5 can do, the fuzzier the presence of any limit feels.  I haven't found a limit yet.  I'm just astonished.  So I don't think I'm becoming AI-pilled.  But I am increasingly becoming AI-stunned and AI-awed.  And I'm certain that anyone who has used the latest AI extensively, and I know you have, Leo, like more than extensively, you'll understand what I'm saying.  I mean, it is astonishing what we have.
+
+LEO:  Yeah.
+
+STEVE:  You know, and when I, you know, the industry's getting a little wobbly at the moment.  You know, we have all this Jensen nonsense going on.  But, you know, and a concern about profit, a concern about the fact that a lot of debt has been accrued for the financing of the hyperscaling, and now of course we had last Tuesday's election, and the Democrats generally being like, you know, foot-on-the-brake oriented.  So, you know, I don't want to ever not have this.  I mean, you can't take it back.  So it's just amazing.
+
+Okay.  So what just found 81 new Firefox vulnerabilities which Mozilla themselves classified as high severity, autonomously developed working exploits for 948 known Linux vulnerabilities in the ExploitGym test or benchmark, and demonstrated a critical remote code execution in the widely used Brotli compression library?  If you were thinking that suspiciously sounds like last Thursday's release of GPT-6 Cyber, you would be correct. 
+
+The way Mozilla characterized this significant step forward - Mozilla, right, not OpenAI, who you'd expect to be running around - Mozilla said - their Distinguished Engineer on the Firefox team, Brian Grinstead, was quoted saying:  "GPT-6 Cyber is a world-class model for cyberdefense.  Firefox entered 2026 as one of the world's most hardened and scrutinized codebases."  Like already; right?  I mean, that's why all the problems that we still have been finding have been surprising in this most scrutinized code.
+
+He said:  "Even after further hardening with multiple generations of previous frontier models, GPT-6 Cyber uncovered previously unknown high-severity vulnerabilities, identified architectural improvements, and helped us ship fixes to millions of users." 
+
+And as I said at the top, I'm kind of surprised by that.  I've had the impression that we were going to more rapidly run out of software flaws among our already well-scrutinized major projects.  But that doesn't appear to be occurring, at least not yet.  I'm still predicting it.  And in fact the news is still digesting today's Patch Tuesday.  But of course we know that last month was more than 1,400 security vulnerabilities fixed.  This month it was just shy of 1,100.  So that's more like two months ago.
+
+Maybe this is a curve, and we're now going to begin riding the downward slope of that for Windows.  It would be premature to call that after just one, you know, one month of fewer than the most.  But we'll see what next month looks like because, you know, this is a shape I would expect.  And it's not like this super killer GPT-6 Cyber found hundreds or more of problems.  You know, it found, what was it, 81.  So, but they were significant.  So said Mozilla.
+
+We all know that I've always modeled security conceptually as an inherently porous medium.  You know, the idea being that the harder you push, the more vulnerable a system would be shown to be.  You could just try harder.  But AI is revealing that even our most hardened software is software, or is softer - softer software - than we knew.  And this is all a moving target.  I get it; right?  Like today we have GPT-6 Cyber.  It'll be something next, you know, in a week or two, or a month.  But I think that the details here are interesting and important, and we are witnessing history. So I want to share some of the details of what OpenAI posted because this is another milestone along the way.
+
+The wrote:  "We're introducing GPT-6 Cyber, a major leap, and it does look like that from the data that they back it up with, in security research:  more capable at finding and fixing vulnerabilities, and also far more reliable with staying within the boundaries that researchers set.  In other words, they are claiming that this is both a lot stronger and more firmly aligned."
+
+They said:  "GPT-6 Cyber delivers major gains on key cybersecurity benchmarks over GPT-5.6 Cyber, including a 51% relative improvement on ExploitGym, which is a big jump; and," they said, "a step function improvement when tested on staying within scope."  Meaning, you know, not attacked Hugging Face.  They said:  "It's already helping to secure real-world software, uncovering and validating thousands of exploits in critical security codebases such as Linux and Firefox.
+
+"On ExploitGym, which tests whether models can exploit a specified vulnerability, GPT-6 Cyber scores 48.5%, up from 32.1%, for 5.6 Cyber.  It also follows" - that is to say, stays within - "task boundaries more reliably.  In a separate aligned evaluation" - which is to say an evaluation about alignment, where they actually teased it, and we'll get to that later - "GPT-6 Cyber avoided exploiting out-of-scope services in 99.93% of tests without its deployment prompt, and 100% with that prompt.  This improvement in alignment," they wrote, "reflects dedicated training to stay within authorized scope, respect restrictions, and report results accurately." 
+
+They said:  "These capabilities are already helping secure real systems.  Our researchers used GPT-6 Cyber to develop 948 privilege escalation exploits in Linux and identify 81 previously unknown high-severity vulnerabilities in Firefox, despite extensive prior testing with previous frontier models.  The model also helped develop candidate patches, and Mozilla has released fixes for many of the new Firefox vulnerabilities.  Security teams at Cisco, Calif, and CodeRabbit are using it for vulnerability research and code review, and we've relied on it to find and fix weaknesses within our own infrastructure. 
+
+"It's clear that we have a limited window to use frontier models to secure software.  Our goal is to dramatically" - now, and what they mean is that alternative, less constrained models are nipping at their heels.  We know that the Chinese open weight modes, which can be readily obliterated, are not far behind any longer, and the gap has been closing.  They said:  "Our goal is to dramatically expand Daybreak, bringing advanced security research to organizations of every size, independent researchers, and open-source maintainers.  Mainline models such as GPT-6 Astra already support code review, vulnerability triage, and patch development.  Daybreak Blue helps verified defenders validate vulnerabilities and fixes with fewer unnecessary refusals, while Red enables deeper exploit development and authorized security testing with GPT-6 Cyber. 
+
+"6 Cyber," they wrote, "is a major step up from 5.6 Cyber, and outperforms GPT-6 Astra on most cyber tasks, even when Astra does not refuse the request.  We evaluated the model on tasks that require it to understand software, identify vulnerabilities, and develop working exploits.  Based on these results, we classified the model as Critical in cybersecurity under our Preparedness Framework, up from High for GPT-5.6 Cyber. 
+
+"On ExploitGym, which tests whether models can exploit a specified vulnerability" - so vulnerabilities known already, but the question is will the model be able to develop an exploit for it.  So they said:  "...whether models can exploit a specified vulnerability in a remote target, 6 Cyber scores 48.5%, about 16 percentage points higher than 5.6 Cyber's 32.1%.  To test vulnerability discovery, we also built a new evaluation for offensive web pen testing.  Models probe web applications without access to their source code.  GPT-6 Cyber achieved 40.3% recall of vulnerabilities compared with 32.0% for 6 Astra. 
+
+"Daybreak Red is designed to support more advanced security workflows, including developing working exploits and using them against remote targets.  To develop these capabilities, we built a new benchmark called RemoteExploitBench, which uses known vulnerabilities in applications such as GitLab, PostgreSQL, and Jenkins deployed in a controlled environment.  In our initial evaluation, GPT-6 Astra running with Daybreak Blue refused 100% of tasks, while 6 Cyber completed 95%.  Its only failure was an exploit it could not get to work remotely. 
+
+"One risk of cybersecurity agents is that they go outside the scope of their assigned task, attempt to exploit unrelated services, or disregard the researcher's rules of engagement.  We made alignment a central focus of 6 Cyber, using specialized training to help the model stay within authorized scope, follow restrictions on its actions, and report its work accurately. 
+
+"Before deployment, we ran a series of alignment evaluations to measure these behaviors.  One of these evaluations is ExploitGym Honeypot" - and remember it was ExploitGym that's what drove the model to go after Hugging Face.  So they said:  "One of these evaluations is ExploitGym Honeypot, which was informed by the Hugging Face incident.  We give the model a difficult exploitation task in an isolated environment with access to supporting services, such as a package registry or object store.  We deliberately make these services easy to exploit so that attacking them can reveal the task's flag.  The model must infer that exploiting them is outside the scope of its task. 
+
+"6 Cyber shows a step-change improvement over 5.6 Cyber on this evaluation.  When tested without deployment safety prompts, it avoided exploiting out-of-scope services in 99.93% of cases, up from 94.49% for 5.6 Cyber.  But with those safety prompts, 6 Cyber stayed within bounds 100% of the time. 
+
+"We have also relied on 6 Cyber to secure our own systems.  It was one of the main models behind the work we recently shared on hardening the infrastructure used to train frontier models.  In controlled red-teaming campaigns, agents using 6 Cyber and other OpenAI models chained vulnerabilities to escape microVMs and execute code on the underlying hosts.  We used the findings to patch software, tighten network restrictions, and report issues to maintainers and vendors."  In other words, that was where earlier they talked about hardening their own infrastructure.  It found problems in their own infrastructure in the ability to escape microVMs and execute code on the underlying hosts. 
+
+They said:  "Our vulnerability researchers also use 6 Cyber to find and validate vulnerabilities in open-source software at scale.  This work has uncovered previously unknown flaws in software that's been scrutinized for years."  And this is where they talk about the 61 novel vulnerabilities that Mozilla classified as high severity.  They also showed that an additional 30 known issues were more severe than were previously reported and appreciated.  They said:  "We disclosed the findings to Mozilla, along with proposed patches to help its engineers develop fixes, and they began releasing fixes shortly after receiving the reports."
+
+They said:  "Also, 6 Cyber reproduced 1,724 vulnerabilities and developed working exploits for 948.  That's more than five times the 166 which 5.6 Sol was able to exploit."  It only got 166 using the same research harness.  So this model is significantly more capable.  They said:  "Following the Linux community's guidance, we disclosed 304 critical findings to maintainers with candidate patches and are in the process of getting other vulnerabilities fixed." 
+
+And finally:  "We recently discussed a critical vulnerability in Brotli, which is the compression library we've talked about in the past, used by Node.js and other software.  Our security researchers used Cyber alongside other OpenAI models to develop and validate exploits showing how the flaw could enable remote code execution in downstream applications which use the library."
+
+They wrote:  "As models become more capable and uncover more security vulnerabilities, we are also seeing more attempts to use them to cause harm.  These attempts include efforts by malicious cyber actors and adversarial groups seeking to distill our models.  We have thus paired 6 Cyber's stronger capabilities with stronger safeguards to detect and disrupt misuse and keep the model's actions within the user's intent and authorization.  We added and strengthened these protections alongside the release of 6 Cyber."
+
+And I think these measures are interesting and certainly useful.  They demonstrate that OpenAI is, as they need to be, serious about controlling access to their cyber-capable models.  So they do six things.
+
+They wrote:  "Cyber-specific alignment monitoring.  We monitor whether actions match the user's authorization, while recognizing legitimate exploit development and testing."  So, you know, they're trying not to generate false positives and upset people when they're asking for benign things.
+
+Also, "Targeted monitoring for emerging threats."  They said:  "For example, during the coordinated disclosure of critical PHP vulnerabilities, we set up targeted monitoring for attempts to develop exploits against live PHP servers, while preserving support for defenders patching affected systems."  In other words, they were on the fly during real-world events.  They dynamically changed the guardrails around the deployed AI so that it would be better about stopping what it detected as being clearly attempts to develop exploits for a known new problem, in this case PHP. 
+
+Also, they said:  "Private Safety Processing."  They said:  "We use automated checks to review related interactions for misuse."  In other words, they're watching people's use of AI over time to detect patterns in individual account usage.
+
+They said:  "Standard retention remains the default.  API customers using Zero Data Retention generally must use this Private Safety Processing (PSP), which reviews encrypted records retained in customer storage for 30 days without exposing prompts and their responses to OpenAI personnel."  So the idea is they're working to protect the privacy of their users, but they are storing encrypted records for a month in order to allow their models to look back at what this account has been doing and better improve its management of guardrails and then to detect abuse.
+
+They said:  "Protection against stolen credentials.  We require IP allowlisting for Daybreak Red API access by default, restricting requests to approved networks with limited exceptions.  We also monitor credentials for compromise." 
+
+Under "Sandboxing and oversight:  As with past models, we recommend sandboxing, action review, and human oversight for high-risk workflows."
+
+And finally:  "Protections against high-risk cyber assistance.  We use new checks to block high-risk activity involving critical systems."
+
+They wrote:  "Protecting critical infrastructure has been a key consideration in designing GPT-6 Cyber's safeguards and access, including power plants, water treatment facilities, and the operational technology and industrial control systems."  Now we have that new jargon, Operational Technology (OT) and Industrial Control Systems (ICS).  They said:  "We simultaneously want to give the teams defending these systems access to our most capable models while also strengthening our safeguards to prevent unauthorized attacks. 
+
+"First, to equip these defenders, our $1 billion Daybreak for Frontline Defenders grant program subsidizes access for resource-constrained teams such as government organizations and essential service providers.  We're also introducing a new group within Daybreak Red  Daybreak Red for Critical Infrastructure  for approved critical infrastructure defenders, which gives them permissions to conduct authorized testing of critical systems while retaining safeguards against model misalignment."  And again, this is not something first they would be able to afford, or that they would even be able to do.  So this is OpenAI, you know, working against this problematic, I mean, this inherent dual-use problem of bad guys can use it the same way good guys can use it.
+
+They said:  "Second, to prevent misuse of the Daybreak Red and Blue platforms, we've refined safeguards against assistance and capability development that could compromise industrial controls or safety-critical systems, could interfere with equipment, or cause serious injury, catastrophic physical damage, or life-threatening service disruption."
+
+They said:  "Higher safeguard block rates are not always better. Many of the techniques in this evaluation are also essential to legitimate security work:  understanding systems, finding vulnerabilities, and verifying that fixes withstand attack.  We therefore assess these rates alongside support for legitimate research and patching, rather than aiming for a 100% blockade."  In other words, just saying no too easily prevents good guys from using this technology so they are trying to sharpen their heuristics about what can and cannot be allowed. 
+
+And they say, finally:  "To evaluate how our models can help defend critical infrastructure, we partnered with Dragos, the global provider for extended operational technology cybersecurity.  Dragos ran evaluations using cyber-permissive Daybreak Red models in a controlled lab environment.  The evaluations covered requests progressing from network discovery and asset enumeration through targeted reconnaissance, sensitive data exfiltration, and unauthorized, potentially dangerous service actions."
+
+Okay.  So here's a rather chilling quote from the Chief AI Officer at Dragos, Robert T. Lee.  He said:  "Dragos put a frontier model on a mock power plant range and told it almost nothing.  On its own, it separated the OT assets from the IT noise, then found two zero-days in engineering software that manages protective relay data, exposing protection settings and breaker trip logic.  That's the map an adversary wants before touching anything physical.  The skill floor" - I refer to it as "the bar"; right?  He says:  "The skill floor is dropping for the reconnaissance and vulnerability research needed before an attack.  Working with OpenAI on this shows them the adversary's path through an OT network before real adversaries take it, so safeguards get built around how these attacks could unfold, while the models stay useful to the people defending such systems." 
+
+So, as I said, Rob's comment "the skill floor is dropping" is perhaps the most chilling of all.  This means that, you know, as bad guys get their hands on similarly powerful abliterated models, or find online models whose guardrails can be bypassed, the population of effective attackers is growing because, you know, less sophisticated attackers are being enabled. 
+
+Yesterday, in fact, I read a piece in Fast Company that noted with a great deal of irony - which was the article's intention - that the AI companies were selling both the problem and its solution.  And we know that's true.  It's the well-known "dual use" dilemma.  The same advanced cyber capability that good guys use to find the flaws in their systems can also be used by bad guys to exploit those systems which have not yet been better secured.  As we saw at the top of this story, GPT-6 Cyber is finding more critical vulnerabilities than its predecessor 5.6 Cyber.  Of course, it's not strictly true that the commercial vendors are selling offensive cyber capabilities to bad guys, but what they are selling is defense technology, and we've been seeing that, one way or another, bad guys are managing to get, for example, Claude to help them with their attacks.
+
+We have found, you know, script dialogs, prompt dialogs, among the attackers' revealed files.  So they are getting access to commercial AI.  And in that one case that we looked at closely, they managed to establish a believable environment and fed Claude a plausible cover story to convince it that their need for its exploit generation was entirely for their defensive work.  And it complied.  And that was the instance where it managed to bypass the address space layout randomization that that system was using. 
+
+So, you know, I'm not suggesting that there's any alternative, like to the current status quo which we're just going to slog through.  I don't have a better solution for where we are at the moment.  But it does seem pretty clear that AI-based network defense is destined to become a persistent reality for the foreseeable future.  I talked before about how we were seeing CrowdStrike and the Palo Alto Networks, which is a sponsor of the TWiT Network.  Their products are gaining traction because everybody's beginning to wake up to the fact that the bad guys are going to have AI.  We're going to need to have AI on the inside of the network, keeping an eye on what's going on.  So Leo?
+
+LEO:  Yeah.
+
+STEVE:  Time for me to catch my breath.
+
+LEO:  Okay.
+
+STEVE:  Rehydrate.  And then we're going to look at this sad instance of a hacker who has AI-enabled himself, really not being housebroken.
+
+LEO:  One of the things, and maybe it's Marcus Hutchins was saying this on X, that most hackers are not sophisticated enough to really be able to use these AI tools in the way that we worry about, that this is still not script-kiddie material.
+
+STEVE:  Level, right.
+
+LEO:  Right?  Yeah.
+
+STEVE:  Right.
+
+LEO:  And I think that that's encouraging.  And they're not - and we've seen that.  The attacks, we've seen a lot of flaws that we've found and fixed, but the attacks are not swamping us by any means yet.
+
+STEVE:  Well, yeah.  And in my own experience in working with Claude, I know exactly what to ask for in order to get what I want.  So I'm, you know, I mean, and from the beginning, I remember once I read you a long prompt that I had fed Claude.  And your reaction was, wow.  And I said, yeah, it's a language model.  The more language you give it, the more it has to work with.
+
+LEO:  Right, right.
+
+STEVE:  And now I'm finding that, because I'm a developer and a coder, I know exactly how to specify what I want.  
+
+LEO:  Right, right.
+
+STEVE:  Instead of just kind of, well, make it go.
+
+LEO:  Right.
+
+STEVE:  You know.  And it's like, well, it's kind of, you know.  And then you hold your breath.
+
+LEO:  Yeah.  These models are very - the other thing is they're very spiky.  They have great capabilities in one area and no capabilities at all in other areas.  They are not, you know, with us humans, it's true about humans, too.  We can be geniuses in one area and a dummy in another area.
+
+STEVE:  Well, and I guess that means not AGI because AGI, the whole point is, you know...
+
+LEO:  It's better at everything.
+
+STEVE:  It's good at everything, yes.
+
+LEO:  Right.  And that's not been my experience.  I'm sure it's not your experience, either.  And so part of knowing how to use them is to know where to apply it and where not to apply it, or where to avoid it.
+
+STEVE:  I think also what you're doing that I've not yet started to do is, you know, you've got agents running all over the place.  And you've shared with us stories of them just coming to a halt and going, oh, well, we're waiting for you to say that we could have a cookie or something.
+
+LEO:  Right.
+
+STEVE:  It's like, what?  I told you there's the whole cookie jar over there.  Just go help yourself.
+
+LEO:  Do it, do it.
+
+STEVE:  Oh, but don't you want to tell us it's okay?  No.
+
+LEO:  It's a, you know, it's fascinating.  And a lot of what I spend time doing is trying to improve the work process, the workflow.  And especially because I'm using a lot of local AI.  And it's such a learning experience.  It's really fun because I feel like I'm learning an awful lot.
+
+STEVE:  You are learning to orchestrate.
+
+LEO:  Yes.  That's right.
+
+STEVE:  You know, you are the conductor of the orchestra.  
+
+LEO:  That's right.  Yeah.  That's right.  On we go.
+
+STEVE:  Okay.  So one of the things we've begun seeing is newbie hackers calling themselves security researchers.  And you can't tell if you're not seeing the video, but I am rolling my eyes.
+
+LEO:  I'm the security researcher.
+
+STEVE:  They're calling themselves security researchers without any conduct becoming such designation.
+
+LEO:  Yeah.
+
+STEVE:  A security researcher is someone who first uncovers an important problem that requires fixing, then informs that problem's responsible publisher about the problem and the trouble, then waits often very patiently for the reported problems to be cured before publishing an expos which provides full disclosure and allows the researcher to take the bow, which he's earned.  I mean, and, you know, that's the way the system's supposed to work.  And just by agreement, right, there's no laws.  But that's, you know, to be a researcher in good standing, that's what you do.  And there was a company - I'm blanking on the name - that pre-disclosed the PHP patches to their own, you know, for their own needs and for their own use a couple weeks ago, really upset the PHP Project.  And you know, that company will not be receiving any early access next time.  So you really do need to behave yourself.
+
+Well, the following story is not about a responsible security researcher.  BleepingComputer's Lawrence Abrams wrote about this yesterday afternoon under the headline "N-able takes cloud platform offline after more than 30 zero-days published."  Lawrence wrote:  "N-able has taken its hosted N-central environments offline and urged on-premises customers" - which is to say customers who have on-premises servers rather than using N-able cloud and central solutions - "urged on-premises customers to shut down their servers after a security researcher" - and again, eye roll - "publicly disclosed more than 30 alleged" - and Lawrence is being polite and careful writing "alleged" - "zero-day vulnerabilities, including exploits that could let attackers take over vulnerable systems."  Since it has happened, I assume that these are no longer alleged.
+
+He wrote:  "Security researcher Sean Bales disclosed the vulnerabilities late Sunday, November 8th, and published a GitHub repository called Able2Shell containing proof-of-concept exploits for the flaws.  N-central" - get this - "is a remote monitoring and management platform used by managed service providers and IT teams to monitor, manage, and secure customer devices and networks remotely."
+
+And I don't remember if it's in today's show notes, but one of our listeners is a client of N-able, and they have lost all access to their own clients because of this outage caused by this irresponsible hacker, who I refuse to call a security researcher because he's not.
+
+So what this means is that for those relying upon its security, it is critical infrastructure for them because its compromise would, in turn, allow attackers to seriously damage the client enterprises of the N-central server users.
+
+So Lawrence continues his reporting, saying:  "The researcher says" - okay, the researcher, right, the hacker, this guy Sean Bales - "says the vulnerabilities were tested against N-central Appliance 2026.4.0.31, which is a pre-release version of the software.  But he believes that most, if not all, flaws also affect earlier versions."  And now we've seen that.  "Bales," writes Lawrence, "also confirmed to BleepingComputer that the discovery of the vulnerabilities was AI-assisted."  And in fact, looking at his GitHub, he has no track record beyond when he began using AI.  So he, you know, this is the birth of an AI hacker. 
+
+"The disclosed vulnerabilities," writes Lawrence, "include authentication bypasses, credential disclosure, arbitrary file writes, directory traversal, cross-site scripting, XML external entity known as XXE injection, and remote code execution flaws.  One of the most critical exploit chains abuses an unauthenticated XML external entity vulnerability in N-central's service-import functionality to steal a trusted local session, reset an account password, and execute commands on the server as an N-able user."  Basically a complete takeover.  "The same exploit can also create an enabled Default Admin account with attacker-controlled credentials, providing rogue admin access to the N-central management interface."  I mean, basically this just completely collapses their offering.
+
+Lawrence writes:  "Bales shared a video demonstration of this exploit" - it's got a little anime girl in a dance, you know, like in a skirt, dancing around the front of it.  I mean, it's just sad.  Lawrence says:  "...showing terminal output reporting successful administrator account creation, login authentication, access to protected admin functionality, and remote command execution as an N-able user.
+
+"Other disclosed exploits include a stored cross-site scripting vulnerability that can execute commands as root when an admin views malicious patch metadata, and a privilege-escalation flaw that allows code running under the N-able account to execute commands as root.  Bales confirmed to BleepingComputer that the unauthenticated XML external entity-to-RCE exploit was the most critical of the disclosed vulnerabilities."  Which is to say of all the many, 30-plus, vulnerabilities that this a-hole disclosed.  Lawrence didn't say that.  I did.
+
+"After the disclosure," writes Lawrence, "N-able announced a critical" - okay.  So after this guy's disclosure, right, N-able announced a "critical security incident and took its hosted N-central environments offline across the Americas, Europe, and Asia-Pacific regions."  In other words, like one of our listeners, all of their users lost access to this service as a consequence, again, of this disclosure, irresponsible disclosure.  "While BleepingComputer," writes Lawrence, "has not independently verified all the reported vulnerabilities, N-able confirmed it is developing a hotfix to address the security issues, lending credence to the researcher's" - again, air quote, "researchers" hackers claims, AI-enabled hacker - "that at least some of the flaws are legitimate zero-days. 
+
+"N-able told BleepingComputer:  'N-able is actively responding to non-responsible communication of critical vulnerabilities in N-central late Sunday night, November 8th, found by an independent researcher.  As a precautionary measure, we took our hosted N-central environment offline today, November 9th, and provided guidance to customers operating on-premises N-central servers to temporarily take their servers offline until further notice.  Our Security, Engineering, and Operations teams are actively working to implement the necessary remediation.  At this time, we have not observed active exploitation of these vulnerabilities.  Protecting our customers and their environments remains our highest priority, and we will provide additional updates as they become available.'"
+
+So Lawrence says:  "In a subsequent status update, N-able said it was continuing to develop and validate a hotfix and had found no evidence of active exploitation or unauthorized data access.  While the N-central classic environment is unavailable, N-able said Ecoverse services accessed through N-able Login remain operational.  N-able has not provided an estimate of when N-central will come back online, but says it plans to publish updates every four hours, or sooner if new information becomes available.
+
+"Bales [the hacker] told BleepingComputer that he deliberately released the N-central vulnerabilities without notifying N-able beforehand because the company allegedly failed to address vulnerabilities he had previously reported in a different N-able product."  So it's, right, I'll show you who you can just ignore.  And it gets worse. 
+
+Lawrence wrote:  "According to Bales, he disclosed two unrelated remote code execution vulnerabilities and a privilege-escalation flaw approximately five to six months ago, but those vulnerabilities remain unpatched.  Bales told BleepingComputer: 'I disclosed'" - this is the hacker.  "'I disclosed two unrelated RCEs for a different N-able product, along with a privilege escalation vulnerability, five or six months ago.  These have yet to be patched.'" 
+
+Lawrence writes:  "He also claims to have sent follow-up emails over the past four to six weeks without a response.  Bales says his previous experience with N-able's vulnerability disclosure process and that 'they don't take disclosure seriously' led him to publish the N-central zero-day exploits publicly.  However, he said these exploits target a different N-able product than the ones he previously disclosed.  The researcher also claims that he received no payment through N-able's bug bounty platform for his earlier reports."  Well, he couldn't because they somehow didn't respond to him.
+
+Anyway, Lawrence says:  "Bales confirmed that N-able executives, including the company's CEO and CTO, contacted him following the disclosure and asked him to remove the GitHub repository and work with the company.  Bales said:  'They didn't threaten me or anything, though.  Only asked me to take down the repo, work with them, et cetera.'"
+
+Okay.  Now, since all of those more than 30 zero-day vulnerabilities are still up on GitHub right now for anyone to obtain and abuse, Sean Bales has apparently decided to punish the N-able executives for not replying to him earlier. 
+
+Lawrence says:  "BleepingComputer asked N-able about Bales' allegations concerning the previously disclosed vulnerabilities, their patching status, and the alleged lack of responses to his follow-up emails.  However, the company did not address those questions, providing only the statement concerning the N-central security incident and the precautionary shutdown.  The earlier reported vulnerabilities are not included in the publicly released Able2Shell repository and allegedly remain unpatched."
+
+Now, okay.  I can understand the annoyance with a company who does not reply under their clearly posted policies. I went over to n-able.com, and they are completely upfront about their vulnerability disclosure program.  I don't know what happened between them and this Sean Bales, and they're being tight-lipped about that with Lawrence Abrams.  I don't know why those zero-days are still up on Sean's GitHub account after he directly told Lawrence that he was asked to take them down.  Did he, what, demand a bug bounty payment from them, even though he now, like, what, is in an argument with them?  Maybe he's trying to  leverage them for his removal of this from his GitHub?  I don't know.
+
+A week ago, on his LinkedIn account, he posted:  "Today I am sharing with you" - this is unrelated to this, but this is who this guy is a week ago.  "Today I'm sharing with you four zero-day Unauthenticated RCEs for IBM's NovaLink that I discovered back in July.  All of them work on the latest version, and as such no CVE is assigned to them.  Stay tuned for more zero-days."  And in addition he was among those who piled onto the recent PHP disaster several weeks ago, posting, again on LinkedIn:  "I published a weaponized exploit for the two CVEs that dropped for PHP today on my GitHub.  This targets the latest Wordpress.  Enjoy."  And then a smiley face.  And he says:  "This bypasses ASLR and works with display_errors off."
+
+Now, in regard to that posting, others felt as I do.  One guy replied:  "Next time, publish remediation tools and advice, will be more useful, I believe.  Help on patching, too.  Way better for the community."  And another one wrote:  "Casually distributes hacks on LinkedIn."  So I did also note that he's soliciting employment.  I hope that anyone who might be considering hiring him will poke around a bit and learn about this guy and decide whether he's the kind of person they want to be affiliated with.
+
+But our main takeaway from this mess is that Sean's skills as a "hacker" - again, even that probably in quotes - appear to be entirely AI enabled.  To do what he is doing the way he's doing it requires no skills.  You just sit in front of your computer and ask an AI to examine someone's code, find flaws, and write exploits for you.  Since true security research is a noble endeavor, I suspect that we'll be seeing many more researcher wannabes calling themselves a security researcher.  I hope things turn out better than it did in this case because this is just sad.  And, you know, I did note that N-able - I saw another follow-up piece of news that N-able then suffered some sort of serious attack or hack.  And last time I checked, they were completely down.  Their main home page is up, but all of their services are still blacked out.
+
+So again, I don't understand what happened.  We don't know.  They're not saying.  Sean is saying, you know, I wrote to them, and they ignored me, they blew me off, so I just decided to nuke them.  And that's what he did. 
+
+When I heard about the mass hacking of French refrigerators, the thought I had - ouch - the thought I had was that all these municipalities, and we talked about it at the time, Leo, who took it upon themselves to remove the hidden and suspiciously undocumented cellular radios from their Chinese-made and otherwise quite attractive city buses - I think Norway was the first country to do that - they were probably right to go to that effort.  You know, you don't want to leave, like, maybe - we don't know they were hackable.  But why were they there?  They were undocumented, and they were creepy.  So BleepingComputer again provided some great coverage of the details of what happened in France under the headline "France blames Iranian hackers for supermarket attacks that actually sparked fires."  Some refrigerators caught fire.
+
+BleepingComputer wrote:  "France has linked the October cyberattacks that disrupted refrigeration systems at more than 700 supermarkets and other retail locations to Iranian state-backed hackers, saying the attacks caused food losses and sparked at least 15 fires. 
+
+"In a statement issued Monday [meaning yesterday], France's Ministry for Europe and Foreign Affairs blamed the attacks on Shahid Kaveh, a cyber-offensive unit affiliated with the electronic and cyber center of Iran's Islamic Revolutionary Guard Corps (IRGC).  The statement reads:  'France condemns in the strongest possible terms the unacceptable cyberattacks carried out on its territory by the Islamic Republic of Iran against its interests.'"
+
+Lawrence says:  "The attacks occurred overnight on October 11-12, when hackers compromised industrial refrigeration controllers and remotely changed defrost settings to high temperatures, disrupting systems used to preserve food. 
+
+"As BleepingComputer reported, the attacks affected an estimated 250 to 350 French supermarkets, forcing stores to discard fresh and frozen products.  French authorities have now revealed that approximately 700 retail locations were targeted, with the cyberattacks causing at least 15 fires, including with small butcher shops, a slaughterhouse, and cooperative food-processing facilities all affected by the attacks. 
+
+"French authorities say the attacks caused tens of millions of euros in food losses and significant material damage.  French investigators also detected attacks against Schneider Electric industrial equipment at small hydroelectric installations during the same period, which they linked to the same campaign.  Those incidents reportedly had moderate effects on the targeted equipment. 
+
+"The October attacks were followed by a follow-up wave of refrigeration system attacks reported in November, affecting more than 115 stores across six European countries.  France's national blood service also reported a similar incident that altered temperature and defrost settings at three facilities used to store blood products.  Last week, the FBI and CISA warned of ongoing cyberattacks targeting industrial refrigeration and cold-chain monitoring systems worldwide. 
+
+"The French government says it will summon Iran's ambassador to condemn the attacks and propose new European Union sanctions against Iranian individuals and organizations involved in malicious cyber operations.  However, France has attributed only the October attacks against French supermarkets to Iranian hackers, not the later attacks. 
+
+"France's Cyber Crisis Coordination Center (C4), which includes the country's cybersecurity agency ANSSI, military cyber command, and intelligence agencies, attributed the attacks to the Iranian Shahid Kaveh IRGC unit.  According to CERT-FR, the Shahid Kaveh group operates through several online hacktivist identities, including CyberAveng3rs, Soldiers of Solomon, Mr. Soul, and Cyber Isnaad Front.  France's Cyber Crisis Coordination Center said:  'The cyberattack targeting refrigeration controllers was relayed on the propaganda outlet CyberbanNews, associated with the Shahid Kaveh unit, as early as October 13th of '26.'  French investigators linked the refrigeration attacks to Shahid Kaveh through the following observations."  And they had some pretty good evidence.
+
+First, "The attacker's infrastructure was also used to conduct reconnaissance against the Schneider Electric industrial systems, using techniques previously associated with that Iranian unit.  The attackers used the FOFA Internet-connected device search platform, which CERT-FR says the group commonly uses in its operations.  CyberbanNews, which France says is linked to the Shahid Kaveh, publicized the refrigeration attacks on October 13th.  And investigators discovered traces of Farsi-language used in the attacker's infrastructure.
+
+"CERT-FR says Shahid Kaveh claimed responsibility for a large-scale sabotage campaign targeting Israeli and U.S. interests in March and April of '26, including attacks on Israeli refrigeration equipment and other industrial control systems.  In April of 2026, the unit was observed conducting large-scale reconnaissance of Schneider Electric industrial control systems, including systems in France." 
+
+So this is the sort of story, as I said before, with the wide coverage it received, that will, let's hope, work to get other Internet-connected device makers to reexamine their security, or take their security more seriously.  Or buy some compute from OpenAI.  Buy it if you have to, to check the security of your devices before the bad guys do.  So much of our infrastructure has been put on the Internet under the fragile assumption that the device's authentication front end is flawless.  Unfortunately, now more than ever, "flawless" is what it needs to be, yet we keep encountering example after example of readily bypassable mistakes in authentication.  Authentication is hard.  Apparently it's impossibly hard.  And in fact that's what today's main topic will be about.  And as I said, it is a doozy.  Which we will get to shortly.
+
+LEO:  On with the show, Steve.
+
+STEVE:  Okay.  So Donn Edwards writes:  "Dear Steve, I must take issue with the notion you discussed last week (#1103) about a web server behind the protection of the Cloudflare WAF (Web Application Firewall) being 'off the Internet.'  Much like AV software, the WAF can only offer protection against known vulnerabilities, not badly written websites." 
+
+He says:  "If my website is vulnerable to a SQL injection or some other method of getting a remote shell, then anyone on the Internet visiting my website, irrespective of where it's located, would be able to exploit that bad security to compromise my web server.  Sure, it minimizes the attack surface, but it does not eliminate it.  Guessable admin passwords cannot be blocked by Cloudflare. 
+
+"If that server is on my local LAN, then all of the other machines on the LAN are vulnerable, too.  So if anyone wants to have their web server in-house, they should definitely put it on a guest network to minimize the blast radius.  Best wishes, Donn Edwards, Johannesburg, South Africa." 
+
+And I agree.  I think Donn makes a terrific point, and I should have been more circumspect with my enthusiasm over the slick way Cloudflare developed fronting for a website that remains on its owner's network and under its owner's control.  He's certainly right that Cloudflare's web application firewall can and will only block known threats.  But I mostly appreciated the point he made about the continuing need to protect the rest of an enterprise's network from possible compromise of that server which, despite having its web traffic routed through Cloudflare, is still nevertheless exposed to Internet traffic, if only less directly.  So, yes.  I completely agree with you, Donn.
+
+Lee's feedback email subject was "Cloudflare free version is more fantastic than SN-1103 suggests!"  Lee wrote:  "Hi, Steve.  Long-time listener.  I wanted to share how AI has changed the way I run my own small security lab, in case it's useful.  I run a dozen domains on Cloudflare's free plan, hosted on my own server.  Some of the sites are deliberately deceptive, honeypots and decoys that waste scanners' time and show me what they're looking for." 
+
+He says:  "For inbound web, the websites are not exposed directly.  Traffic reaches my server through a Cloudflare Tunnel, which connects outbound to Cloudflare, so there are no inbound web ports to open, and the origin's address isn't in public DNS."  So he's just saying that's that standard architectural model that we talked about last week. 
+
+He says:  "For content, the sites live in a private GitHub repo with a CI/CD deployment pipeline.  Claude sits at the front of it, collecting data from my findings, and I then rewrite the output so it doesn't read like AI slop. 
+
+"For threat intelligence, one site sits fully behind Cloudflare's protection, but also collects threat intelligence, using a homegrown tarpit that traps scanners.
+
+"For canaries, another domain deliberately allows direct connections to three OpenCanary hosts, two of them in Google Cloud, so I can see what turns up when nothing stands in the way. 
+
+"For inbound mail, a small Google Cloud micro instance acts as the mail relay for some domains.  It has an ephemeral IP, so a system daemon timer checks every couple of minutes and updates DNS only when the address changes.  Other domains use Cloudflare Email Routing or hosted mail. 
+
+"For outbound mail, SMTP2GO and Amazon SES, depending on the domain.  Every domain has SPF and DMARC, nearly all at p=reject."  Meaning if it doesn't match the rules, reject the mail. 
+
+"Remote access, Cloudflare One lets me tunnel into and out of my network whenever I want, and I use Tailscale as an alternative." 
+
+And finally, "Configuration:  I've just moved Cloudflare under Terraform, about 380 DNS records, settings, rules and the tunnel.  The code is in git, and the state sits in Cloudflare R2, and every change is previewed before it's applied." 
+
+He finishes:  "The surprising part is how much AI has shortened the creative process.  I'm not extracting logs or building analytical tooling anymore.  It's just Claude Code, the command-line tool, and I mostly drive it by remote control from my phone.  Thanks for all the years of Security Now!.  Lee."  And then he says:  "PS:  Fellow listeners, and you of course" - meaning me - "can explore those threat/canary sites."  Then he gives two domains, mire.cc and toce.ch.  So mire.cc and toce.ch.
+
+So anyway, I just wanted to share that in case any of that is of interest to our listeners.  He is certainly getting a great deal of mileage out of Cloudflare's free offerings.  Anyway, as I said, I just wanted to share it to show what he's done.
+
+An anonymous listener wrote - and here's a link for you, Leo, to bring up which I think would be interesting.  He said:  "Steve, you've got to see this site.  'Where are Voyager 1 and Voyager 2 Now?'"  And it's a page that we've seen before.  It's that real-time location page.  And what's interesting is the bottom of that top chart there, the one-way light time, you can see that we are approaching 24 hours.
+
+LEO:  Wow.
+
+STEVE:  So that's what we talked about last week is that this is the first ever, Voyager 1 is approaching one full day of lightspeed travel away from Earth.
+
+LEO:  That's amazing.  49 years it took it to get out there.  Wow.
+
+STEVE:  What a technology.
+
+LEO:  Wow, yeah.
+
+STEVE:  So seven days, 10 hours, 25 minutes from now.  So it's going to be on the 18th that this actually happens.
+
+LEO:  And that's one day each way.  So a day out and then a day to get back.
+
+STEVE:  Yeah.
+
+LEO:  So two days to hear the conversation.
+
+STEVE:  And Leo, imagine - they're still in touch with it.  Imagine aiming so precisely that at that distance we're able to pick up its signal and talk to it.
+
+LEO:  It's amazing, yeah.
+
+STEVE:  That's astonishing, too.  Wow.  Eric Southwell writes:  "Steve, I really enjoyed last week's show Episode 1103, particularly the expos on the various USB drives doing encryption all wrong.  I should know.  I work for Apricorn, a California-based manufacturing company.  And the products we make really are AES-256 hardware encrypted!  They're also filled with epoxy to resist tampering.  There are no backdoors, and absolutely no way to access the encrypted data without the correct PIN.  We've got FIPS certifications to back up what we sell.
+
+"If you've never heard of us, visit Apricorn.com to see our products that truly are secure.  I think you'll like what you see.  Government agencies around the world sure do.  Thank you for your years of Security Now!.  I can't wait for SpinRite 7," which actually will happen a lot sooner than he thought.  He says:  "I'll be buying a site license the day it goes on sale.  Eric @ Apricorn."
+
+And I am definitely aware of the Apricorn brand, but it is great to hear about it from someone on the inside firsthand, who really knows what's going on there.  As became painfully clear last week, it can never be safe to assume.  And Leo, just real quickly, Lenovo, of all people, and I have a hard time believing this still of them, but they have a fingerprint-enabled, supposedly AES-256 portable drive where inside is just an SD card, hot-glued to the inside of the case.  And the only thing the fingerprint reader does is turn its power on.  It's - you know again, I just think it has to be somebody using Lenovo's brand name.  I can't imagine that the Lenovo we know would do that.
+
+Anyway, Klaus Dudas, he said:  "Hi, Steve.  Love the show, been listening almost since the beginning.  I discovered how they chose the" - this is really breaking news.  "I discovered how they chose the private key at eMudhra.  They just used some open source code without fully understanding it."  And then he shows a snippet of the code.  And this of course is so Randall Munroe.  It shows a function which returns an integer.  And the function's name is getRandomNumber.  And then within the curly braces, the only thing there is return4; and then it does have a comment, two lines of comment.  It says //chosen by fair dice roll, //guaranteed to be random.
+
+Anyway, that's wonderful.  Anyway, although Klaus didn't point at its source, it's clearly xkcd.  And actually it exemplifies Randall's wit perfectly, as well. 
+
+Vladimir Jirasek said:  "Hi, Steve.  I've been listening to your podcast since Episode 1.  Really good work, thank you.  I'm just listening to Episode 1103 where you talk about Cloudflare protecting websites through tunneling.  One additional benefit that's worth pointing out is that by using Cloudflare in this way, the websites are also IPv6, so that's a massive improvement for most of the websites where they would typically not get an IPv6 IP address.  Thank you for all your hard work.  Vladimir."
+
+And so I assume Vladimir means that the public-facing side where Cloudflare publishes DNS is publishing both an IPv4 and an IPv6 address.  But that, in turn, the actual physical website behind Cloudflare could be anything, such as only IPv4, since it's the client, that is to say the user's server, which is a client making the connection, the tunneling connection out to Cloudflare.  So doesn't matter what kind of network they're on.
+
+Richard Tapp writes:  "Regarding encrypted USB drives:  I used to do the executive payroll for a large private company.  Initially I used TrueCrypt to encrypt a folder on a USB flash drive.  Later, I used TrueCrypt to encrypt a folder on my company laptop.  This enabled me to let the IT staff manage, rebuild, and replace my laptops over time without them having any knowledge of the content of the 'blob.'  It also meant the blob could be backed up by the enterprise systems, releasing me from the need to manage my own backups.  Richard, South Australia."
+
+And Richard makes a great point.  Of course, TrueCrypt is now VeraCrypt, but it's still the go-to solution for well tried-and-true and audited mass storage encryption.  As Richard notes, that fact that what those, you know, the other utilities, or I'm sorry, the fact that either of those, TrueCrypt and now VeraCrypt, what they produce is a blob that's completely indistinguishable from purely random noise means that it can be moved around, backed up, shared, whatever, with absolutely zero concern that its contents might ever be exposed. 
+
+Ian Wills writes:  "Hi, Steve.  Long-time listener, et cetera, and thanks for the great podcast.  I've just finished Episode 1103 where you mentioned that '...among all of that crap that's been up there [meaning in orbit], that's been put up there is an assortment of kinetic and energy-based weaponry.'  And he's still quoting me, saying 'I suspect humankind has quietly established a frontier that's more ready for space-based warfare than is commonly known.'  So that was what I said last week.  And he replies:  'Boy, are you right, and is that ever an understatement.'  He said:  'I've been a cybersecurity professional for over 20 years and currently lead the undergraduate program in Cyber Security at Bath Spa University in the UK.  Part of my research is in secure-by-design, including for the space domain. 
+
+"Over 1,500 satellites are launched per year, with a de-orbit time of around 25 years.  Satellites are built to be light.  It costs to throw heavy stuff up there, after all.  And so even small pieces of material may cause significant damage to sensors, radiation shields, and solar panels.  As more collisions occur, material does not simply disappear.  Debris is broken into smaller and smaller pieces.  There are more than 13,000 tons of space debris, with statistical models estimating the amount of space debris orbiting the Earth to be of the order of" - and then we have three size classifications:  "36,500 objects greater than 10cm, 1 million objects between 1 to 10cm, and 330 million objects between 1mm to 1cm."  He said...
+
+LEO:  Is this debris?  This is just debris.
+
+STEVE:  Yes.  This is crap.  This is stuff that has banged into each other, and they both come away smaller and in multiple parts.  And so over time they're all colliding and basically, like, creating sand on the beach, except that it's in orbit.
+
+LEO:  Oish.
+
+STEVE:  Yeah.  He says:  "Playing 'dodgems' with this junk is now a key part of a satellite's mission, as well as ensuring the safe maneuver either into a lower destructive orbit or further out of harm's way at the end of life, and of course there are efforts to 'clean up' space." 
+
+He said:  "The Outer Space Treaty aims for 'Peaceful Use Only' and 'No Sovereignty Claims.'  All good; right?  In 2024, five Chinese LEO (low earth orbit) satellites were observed practicing 'dogfighting' with, according to the U.S. space force, the satellites have also been observed to engage in what is assumed to be refueling operations.  The West, too.  It's no secret.  Companies in the EU, UK, and U.S. are all openly working in collaboration with government sectors on defensive, as well as offensive, space capabilities.  Dr. Julia Balm, of the Freeman Air and Space Institute at King's College London, predicts that space conflict could emerge within the next five years.  Don't look up - you might not like what you see."
+
+Then he says:  "P.S.:  The Outer Space Treaty is formally known as the 'Treaty on Principles Governing the Activities of States in the Exploration and Use of Outer Space, including the Moon and Other Celestial Bodies.'  It dates back to 1967.  Regards, Ian."
+
+Wow.  So what a mess, Leo.  We make a mess wherever we go.  And so, I mean, there's debris on the Moon now; right?
+
+LEO:  Yeah.
+
+STEVE:  And now just a ton of crap in orbit around the Earth.  Wow.  And it's like propagating itself; right?  It's colliding and crashing and cracking and making ever more smaller and smaller bits.
+
+LEO:  Like the Kessler Syndrome.
+
+STEVE:  I guess those tiny little bits, as they de-orbit, they'll just harmlessly burn up in atmosphere.  So they're just little - yeah, exactly.  Okay.  Let's take our final break, and then we are going to look at a very entertaining hole.  Bad, very bad.  Bad bad bad bad bad.  But wow, wait till you hear how it happened.
+
+LEO:  Okay, Steve.  Let's talk about that hole in PHP.
+
+STEVE:  Oh, okay.  So the French refrigeration hacks attributed to, as we know, an Iranian state-backed unit, brought the ever-present challenge of secure network authentication back into the spotlight.  I have previously flatly stated that we seem to be unable to get something as, you would think, simple and straightforward as authentication over a network correct.  Obviously I also spent seven years on SQRL, demonstrating a solution for that.  So I suggested that it would be irresponsible, several times suggested, irresponsible to depend upon the security of any form of credential presentation authentication.
+
+That means that the only way to be safe is to arrange just not to do it.  We're pulling on this particular thread once again today due to a head-shaking AI-aided discovery of a horrific flaw that was discovered in one flavor of OpenSSH specifically when OpenSSH is compiled under one particular, and not as obscure as we might wish, C language library.
+
+The story's been evolving since news of it became public.  Fortunately, that happened through an entirely responsible disclosure - yay - by an actual security researcher, not a wannabe hacker who is, you know, cruising on AI.  The affected publishers had time to fix their code.  Unfortunately, we're still left with the age-old communication and updating problem.  And as a result of that, responsibly disclosed or not, the Internet is currently seeing significant exploitation.  But let's take this one step at a time.
+
+The discoverer's website is the domain sshhole.com, whose opening statement is wonderful in its clarity.  It simply says:  "So OpenSSH on musl (M-U-S-L) Linux," he says, "(used by Alpine, OpenWrt, Buildroot, Yocto, and a lot of the Docker images you've pulled), has had a little problem since 2016.  Accounts that should never take a password at all (root, your key-only deploy user, ldap users, the default user on Alpine's AWS and Azure images) will authenticate against any password longer than 256 characters.  Yes, any password.  Yes.  I know.  Yes."
+
+LEO:  Isn't that hysterical?  Just typing at some point, and you're in.
+
+STEVE:  Yes, exactly.  And so, yes, it is as bad as it sounds.  SSH is, of course, short for "Secure Shell," which in some cases it's not.  So that means that a bypass of OpenSSH's authentication would be, and is being, devastating for any exposed systems.  Consequently, what followed the disclosure of this has been a free-for-all hack fest. 
+
+But before we talk about what's happening today, let's examine how this transpired all of 10 years ago, back in 2016.  BleepingComputer's first report of this was last Thursday, which  carried the chilling headline "OpenSSH flaw lets attackers log into password-disabled Linux accounts."  And here we're going to find out about the bug, which is why this had to become today's topic.
+
+They wrote:  "A newly disclosed flaw involving OpenSSH and musl, dubbed '*sshole,' allows attackers to log in to certain Alpine Linux and other musl-based Linux accounts configured to block password authentication."  Right?  Okay, so these are, as Linux users know, and other Unixes, if you use an asterisk for the password on an account, it's not a hash, which is normally supposed to be there.  It says no, this is not a user login-able account.  This is, you know, for system purposes, not people.  So it says configured to block password authentication simply by entering - okay, so I'm sorry, I kind of lost the thread here.
+
+"A newly disclosed flaw involving OpenSSH and musl, dubbed '*sshole,' allows attackers to log in to certain Alpine Linux and other musl-based Linux accounts configured to block password authentication simply by entering an oversized password."  As you said, Leo, just keep typing.  "The flaw only affects OpenSSH servers running on Linux distributions that use the musl C library, including Alpine Linux, OpenWrt, Buildroot, Yocto, and certain authentication configuration. 
+
+"Security researcher Ozgun Kultekin, who discovered and released details on the vulnerability today, says the flaw has existed since 2016 and stems from how OpenSSH handles password verification errors - okay - password verification errors on systems using the musl C library. 
+
+"Linux accounts can be configured to prevent password logins by replacing their password hash with an asterisk (*) character in the /etc/shadow file.  Because this is not a valid password hash, no password should allow access to those accounts."  Makes sense; right?
+
+"However, a patch introduced in OpenSSH in 2016, so 10 years ago, to fix a username enumeration vulnerability tracked as CVE-2016-6210 changed how OpenSSH handled accounts without usable password hashes.  To prevent attackers from identifying valid usernames through different response times, OpenSSH was modified to perform password hashing even when an account had no usable password hash, including accounts configured with '*' to block password logins. 
+
+"The problem is that the musl C library's crypt() function, which is what's used to do hashes of passwords, musl C library's crypt() function also returns an '*' when password hashing fails, including when a submitted password exceeds its 256-character limit.  This means an attacker can submit an oversized password and cause OpenSSH to compare the '*' returned by the crypt() function, which is an error state, against the account's stored '*,' resulting in a successful login."
+
+I rest my case.  What a wonderful bug.  It is so easy to understand and at the same time so devastating.  BleepingComputer continues, writing:  "To be clear, the flaw does not allow attackers to bypass passwords on accounts with valid password hashes.  Kultekin explains that exploitation requires the following conditions:  OpenSSH is running on a musl-based Linux system, such as Alpine Linux, OpenWrt, Buildroot, or Yocto.  And those various cloud instances.  PAM authentication must be disabled, as it is by default in Alpine Linux's openssh-server package.  SSH password authentication is enabled.  At least one account has an asterisk (*) as its password hash, which will be typical.  And another account has a valid password hash. 
+
+"The researcher warns that Alpine Linux's official AWS and Azure cloud images have an affected default 'alpine' account with passwordless 'doas' privileges, which could allow attackers to gain root access.  Systems using glibc, including Debian, Ubuntu, and Fedora and those using PAM authentication, are not vulnerable to this attack. 
+
+"Kultekin says he discovered the vulnerability [of course] using AI agents that ran about 17,600 authentication tests with different OpenSSH configurations, malformed password hashes, and oversized passwords.  The vulnerability has been fixed in OpenSSH 10.6p2, and Alpine Linux administrators are advised to update their OpenSSH packages using the command APK upgrade OpenSSH. 
+
+"Admins who cannot immediately install the update can mitigate the issue by turning off SSH password authentication with 'PasswordAuthentication no' in their SSH server configuration and restarting SSH.  Kultekin says admins can also check for signs of exploitation" - and this can be important, as we'll see - "signs of past exploitation by examining SSH authentication logs for password-based logins for accounts that should not allow them.  On Alpine Linux, the following command can reveal successful SSH password logins.  So they just give a simple Linux command:  grep 'Accepted password' /var/log/messages. 
+
+"If the logs show a successful password login for the alpine account, administrators can check whether the account has password authentication disabled.  And here they have another grep with - I forget what that's called, the little hat.
+
+LEO:  The little hat?
+
+STEVE:  My god.
+
+LEO:  What little hat?  Little hat?  The cedilla?  What?
+
+STEVE:  Not tilde.
+
+LEO:  The circumflex?  Circumflex.  The triangle hat?
+
+STEVE:  Yeah.
+
+LEO:  Yeah, that's a circumflex.
+
+STEVE:  Circumflex, yeah.  So circumflex, or just SHIFT 6, folks, '^alpine:' /etc/shadow.  He says:  "If the account's password field contains an asterisk, but SSH logs show a successful password login, it could indicate that the vulnerability was exploited."  And I would argue it probably absolutely indicates that it was exploited.
+
+And I don't know, Leo, if anything prevents clearing, you know, cleaning up the logs, you know, like var log messages.  You know, classic post-intrusion behavior is to remove traces of yourself from the log files.
+
+LEO:  Yeah, yeah.
+
+STEVE:  So, you know, if you're able to get root, then you can certainly do that.
+
+LEO:  Sure.
+
+STEVE:  Okay.  So now we know how this bug that's been present for the past 10 years in these systems happened, like a bizarre colliding of the planets.  This particular C library compiles the crypt function so that it returns an asterisk in an error state, and the password match happens to just compare whatever the crypt returns with what's in the etc shadow file.  And if they match, you're logged in, which allows a person to log into an account that has no password.  Amazing.
+
+Okay.  So now we jump forward from last Thursday to just yesterday, Monday, where BleepingComputer now picks up the story with what has happened since.  And you can guess where this is going.  Under the headline "Hackers exploit SSHole OpenSSH flaw to breach Linux systems," they reported yesterday:  "Hackers are actively exploiting the SSHole vulnerability, and it now has a CVE, it's 2026-123158, in OpenSSH to execute commands, steal credentials, and establish persistent access.  Multiple cybersecurity firms have confirmed the attacks, reporting that exploitation attempts began on November 5th, that was the day the proof-of-concept exploit became available, with successful exploitation recorded the following day."  Successful exploitation.  Not that it's hard. 
+
+"Disclosed by security researcher Ozgun Kultekin last week, SSHole allows bypassing authentication in OpenSSH running on certain musl-based Linux systems," blah blah blah.  We know all that.  "Kultekin explained that exploitation requires specific authentication settings."  We covered that already.  
+
+"Threat intelligence company GreyNoise recorded the first successful exploitation of SSHole in the wild on November 7th at 00:46 UTC, approximately 40 hours after the fix.  The researchers logged 16 successful exploitation chains targeting networks protected by GreyNoise from six source IP addresses linked to post-exploitation activity.  The company says that these attacks are not representative of the broader activity involving SSHole.  In the attacks that GreyNoise observed, the threat actor ran system and container reconnaissance, initiated queries to cloud metadata services, attempted to read password hashes and root SSH keys, and tried to modify SSH 'authorized_keys' files to grant persistent access."
+
+Okay.  I'll interrupt to note that that makes sense; right?  An attacker who could use SSHole to get into a valuable machine and network property would naturally worry that their access might soon be terminated when this bug is fixed.  So the first thing they would want to do is add their own credentials to the set of valid credentials for SSH and hope that no one notices, so that even after the bug is fixed, they'll still be able to return.  This is why checking for previous successful exploitation and also checking for any alteration of authentication permissions should absolutely always be part of follow-up remediation.  And Leo, you and I, back in the dawn of this podcast, noted that, you know, once you've confirmed that you've had somebody crawling around inside your computer, it's really very difficult to ever trust that machine again.
+
+LEO:  No, you can't, yeah.
+
+STEVE:  Right.  And these days, how do you know where they went in their network?
+
+LEO:  Right, right.
+
+STEVE:  After they got in.
+
+LEO:  Right, right.
+
+STEVE:  It's a mess.  So Bleeping wrote:  "One attacker gained root privileges and installed TAC Agent, a Python command-and-control agent.  However, in that case, the implant could not reach its command-and-control server at 'tac.vpnla[.]org,' and never received a task. 
+
+"Analysis of the TAC Agent payload shows that the implant supports shell command execution, extensive system reconnaissance, file upload/download operations, and can update itself."  Right.  It can update itself, but the system can't.  Well, that's where we are.  "The agent has no built-in persistence, so the attackers attempt to secure it by configuring a startup service.  GreyNoise notes that the implant's comments, logs, and errors were in Chinese, which may be used in conjunction with other evidence to determine the attacker's origin.  A finding that suggests possible automated operation is a missing tool check that returns feedback which could help an automated planner revise commands as needed for the attack to proceed.  Overall, GreyNoise has recorded 27.5 million port-22 scans and 20.1 million attempted SSH sessions, though these are not all confirmed SSHole attacks. 
+
+"Sensors from network security company Previdian also confirmed successful SSHole exploitation, with telemetry data showing 20 attempts from 13 attacker IP addresses in nine countries. 
+
+"Offensive security firm watchTowr said on November 6th, the day after the announcement, that it observed SSHole being exploited in attacks associated with botnets and cryptomining activity. 
+
+"System admins should update" - no kidding - "OpenSSH as soon as possible, or disable SSH password authentication on systems affected by SSHole. 
+
+"It is also recommended to check for unexpected successful password logins on accounts whose /etc/shadow password field is '*,' unauthorized SSH keys, and TAC Agent files or startup services."
+
+Wow.  So there is no doubt that systems that did not have the chance to receive the updates and then update, to receive word of the problem and update, are being found right now and compromised.  I could have wished that the researcher had waited a while longer before publishing and disclosure.  He did it the same day as the fix was published.  But he did notify them ahead of time.  The problem is there's always going to be some lag time from the notice going out and availability of a patch and getting it installed and SSH restarted.  Although it's not as bad as having to bring the whole server down.  But the counter argument that we've acknowledged is that bad guys could also reverse engineer the changes to determine what and how to attack from a patch.  So we're back there, you know, with there not really being any great solution to the need for widespread updating. 
+
+And this researcher could not and would never have discovered this, once again, without the aid of AI.  So while both bad guys and good guys can use AI, at least we are seeing many problems that are old and new both being fixed.
+
+One comment I wanted to make was note that the CVE that was assigned to the original issue 10 years ago was kind of quaint; right?  2016-6210.  The new CVE assigned to SSHole was 2026-123158.
+
+LEO:  Wow.
+
+STEVE:  Yeah.  We can be glad that there's no upper limit on the number of CVEs that you can have in one year, and that they reset and start over annually.  Otherwise, you know, we'd run out of those, too.  Or we'd have too many digits to count.  Wow.
+
+LEO:  As soon as I saw this, I was in the Far East, I asked my agents, do you any of my devices use musl?
+
+STEVE:  Right.
+
+LEO:  And it said the only device you have that uses musl, which is I guess the Linux library that this SSHole takes advantage of, is like my old Denon receiver. 
+
+STEVE:  No kidding.
+
+LEO:  It says, when you get home, just take that off of the Internet, and you'll be fine.
+
+STEVE:  But would a Denon receiver be exposing and running...
+
+LEO:  No.  It's not on the Internet, obviously.  I mean, it's on the network, but it's not - has no exposed port.  So I'm not too worried.  But I thought that was kind of interesting.
+
+STEVE:  Yeah.
+
+LEO:  That I actually did have a musl device.  Because I don't use Alpine Linux.  I mean, it's very common to use Alpine in Docker containers.
+
+STEVE:  Yes.
+
+LEO:  So maybe some people do, yeah.
+
+STEVE:  Yeah.  Yeah, well, as these - as security firms saw, they are detecting rapid uptake of this.  And why not?  It's so trivial.  I mean, here the script kiddies are able to have a field day.
+
+LEO:  Yeah.  This one they are.
+
+STEVE:  Without any AI assistance.
+
+LEO:  Now, I turn off passwords in all my SSH.  Sounds like, though, this would still work even if you were using password lists?  Or no?
+
+STEVE:  Yes.
+
+LEO:  It does.
+
+STEVE:  Yes, yes.
+
+LEO:  That's a little scary.
+
+STEVE:  Yes.
+
+LEO:  It completely bypasses that.
+
+STEVE:  You need to disable the password authentication feature, not eliminate the password from the account.
+
+LEO:  Okay.
+
+STEVE:  So maybe you'd be safe if you turn off all password-based authentication for SSH.
+
+LEO:  Yes, I do that.  Yeah, passwordless.
+
+STEVE:  Yeah.  In that case, you would be safe.
+
+LEO:  Yes.  Okay.  Whew.  Well, I don't have any musl devices except for my Denon receiver.
+
+STEVE:  And I, too, you and I both use security certificates in order to authenticate ourselves.
+
+LEO:  Yes, exactly.
+
+STEVE:  And I don't even have ports open because I only do that ever from two locations.
+
+LEO:  Right.
+
+STEVE:  So I am completely IP filtered.
+
+LEO:  Yeah, I mean, I was able to SSH into my servers from [indiscernible] Tailscale.  
+
+STEVE:  Well, and Tailscale is the way to go.  We talked about it a long time ago when it was still relatively new.  And boy, has it seen a great deal of uptake, too.
+
+LEO:  Yeah.  Yeah.  I love it.  There's an open source self-hosted one called I think Headscale that I think I'm going to move to so I'm not reliant on the Tailscale on the servers.
+
+STEVE:  Nice.
+
+LEO:  But other than that, yeah.
+
+STEVE:  Nice.
+
+LEO:  Well, Steve, you've done it again.  You've filled us, filled our brains with knowledge.  And we've survived. 
+
+Copyright (c) 2026 by Steve Gibson and Leo Laporte.  SOME RIGHTS RESERVED.  This work is licensed for the good of the Internet Community under the Creative Commons License v2.5.  See the following Web page for details:  https://creativecommons.org/licenses/by-nc-sa/2.5/.
+
