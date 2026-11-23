@@ -142,7 +142,9 @@ foreach ($staleWindow in ($sharedFolderGrowthWindows | Where-Object { ($now - $_
     Write-Host "  [WARN] stale shared-folder-growth window ignored (started $($staleWindow.CreationDate.ToString('MM-dd HH:mm')), PID $($staleWindow.ProcessId)) - close it" -ForegroundColor Yellow
 }
 
-if ($sharedFolderGrowthDoneToday) {
+if ($now.DayOfWeek -in @([DayOfWeek]::Saturday, [DayOfWeek]::Sunday)) {
+    Write-Host "  [SKIP] shared-folder-growth (Daily) — weekends excluded" -ForegroundColor DarkGray
+} elseif ($sharedFolderGrowthDoneToday) {
     Write-Host "  [SKIP] shared-folder-growth (Daily) — finished today at $(([datetime]$sharedFolderGrowthDoneToday.RunEnd).ToString('HH:mm')) (took $($sharedFolderGrowthDoneToday.Duration))" -ForegroundColor DarkGray
 } elseif ($sharedFolderGrowthRunning) {
     Write-Host "  [SKIP] shared-folder-growth (Daily) — already running since $($sharedFolderGrowthRunning.CreationDate.ToString('MM-dd HH:mm')) (PID $($sharedFolderGrowthRunning.ProcessId))" -ForegroundColor Yellow
