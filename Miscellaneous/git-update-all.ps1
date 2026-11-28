@@ -75,7 +75,7 @@ https://github.com/jasrasr/powershell/tree/main/Modules/GitUpdate
 
 .NOTES
 Filename : git-update-all.ps1
-Revision : 1.1.5
+Revision : 1.1.6
 Author   : Jason Lamb
 Created  : 2026-06-13
 Modified : 2026-10-19
@@ -94,6 +94,7 @@ Changelog:
   1.1.3 converted header and usage examples to comment-based help (Get-Help git-update-all)
   1.1.4 added a comment and .LINK pointing to the GitUpdate module (no code change)
   1.1.5 header now states the requirement on git-update.ps1 (comment and NOTES; no code change)
+  1.1.6 added jl-wp-updater to the repository allowlist
 #>
 function git-update-all {
     param(
@@ -127,6 +128,7 @@ function git-update-all {
         'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell'
         'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\powershell-private'
         'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\website'
+        'C:\Users\Jason.Lamb\OneDrive - Cooper Machinery Services\Documents\Github\jl-wp-updater'
     )
 
     $repositories = @(
