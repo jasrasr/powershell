@@ -50,7 +50,7 @@ git-update
 
 .NOTES
 Filename : Public\git-update-all.ps1 (part of the GitUpdate module)
-Revision : 1.4.2
+Revision : 1.4.3
 Author   : Jason Lamb
 Created  : 2026-06-13
 Modified : 2026-10-19
@@ -79,6 +79,7 @@ Changelog:
         ($script:GitUpdateLastAiUsage) and prints a one-line AI usage total at the end
   1.4.1 added a comment at the top linking back to the module README (no code change)
   1.4.2 help mentions the Bitwarden option for the OpenAI key (no code change)
+  1.4.3 added jl-wp-updater to the repository allowlist
 #>
 function git-update-all {
     param(
@@ -110,6 +111,7 @@ function git-update-all {
         'powershell'
         'powershell-private'
         'website'
+        'jl-wp-updater'
     )
 
     $repositories = @(
